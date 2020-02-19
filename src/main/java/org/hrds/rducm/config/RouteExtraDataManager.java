@@ -18,9 +18,9 @@ public class RouteExtraDataManager implements ExtraDataManager {
     @Override
     public ExtraData getData() {
         ChoerodonRouteData choerodonRouteData = new ChoerodonRouteData();
-        choerodonRouteData.setName(environment.getProperty("hzero.service.current.name", "rducm"));
-        choerodonRouteData.setPath(environment.getProperty("hzero.service.current.path", "/rducm/**"));
-        choerodonRouteData.setServiceId(environment.getProperty("hzero.service.current.service-name", "rducm"));
+        choerodonRouteData.setName(environment.getProperty("hzero.service.current.name", "hscm"));
+        choerodonRouteData.setPath(environment.getProperty("hzero.service.current.path", "/hscm/**"));
+        choerodonRouteData.setServiceId(environment.getProperty("hzero.service.current.service-name", "hscm"));
         extraData.put(ExtraData.ZUUL_ROUTE_DATA, choerodonRouteData);
         return extraData;
     }

@@ -12,12 +12,12 @@ import springfox.documentation.spring.web.plugins.Docket;
 @Configuration
 public class SwaggerTags {
 
-    public static final String EXAMPLE = "Example";
+    public static final String GITLAB_USER = "GitlabUser";
 
     @Autowired
     public SwaggerTags(Docket docket) {
         docket.tags(
-                new Tag(EXAMPLE, "EXAMPLE 案例")
+                new Tag(GITLAB_USER, "GitlabUser 案例")
         );
     }
 }
