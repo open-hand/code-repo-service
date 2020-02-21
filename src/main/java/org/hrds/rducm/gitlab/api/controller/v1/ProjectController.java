@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.app.service.GitlabMemberService;
 import org.hrds.rducm.gitlab.domain.entity.GitlabMember;
+import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Api(tags = SwaggerTags.GITLAB_MEMBER)
-@RestController("gitlabPermissionController.v1")
+@RestController("projectController.v1")
 @RequestMapping("rducm/v1/gitlab/projects/{projectId}")
-public class ProjectController {
+public class ProjectController extends BaseController {
     private final GitlabMemberService gitlabMemberService;
 
     public ProjectController(GitlabMemberService gitlabMemberService) {
@@ -32,7 +33,8 @@ public class ProjectController {
             @ApiImplicitParam(name = "id", value = "ID", paramType = "path")
     })
     @PostMapping("/members")
-    public ResponseEntity<List<GitlabMember>> pageByOptions(@PathVariable Long projectId) {
+    public ResponseEntity<List<GitlabMember>> pageByOptions(@PathVariable Long projectId,
+                                                            @RequestBody GitlabMember query) {
         return Results.success(gitlabMemberService.list(projectId));
     }
 

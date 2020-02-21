@@ -3,31 +3,26 @@ package org.hrds.rducm.gitlab.domain.entity;
 import io.choerodon.mybatis.domain.AuditDomain;
 
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Date;
 
 /**
  * @author xy
  */
 @Table(name = "rducm_gitlab_user")
 public class GitlabUser extends AuditDomain {
-
     @Id
     @GeneratedValue
     private Long id;
-    private Long iamUserId;
     private Long userId;
-    private String userName;
-    private Boolean isAdmin;
-    private String impersonationToken;
     private String initPassword;
-    private String state;
-
-    enum State {
-        INIT,
-        SUCCESS
-    }
+    private Integer glUserId;
+    private String glUserName;
+    private Boolean glIsAdmin;
+    private String glImpersonationToken;
+    private Boolean isSyncGitlab;
+    private Date syncDateGitlab;
 
     public Long getId() {
         return id;
@@ -35,15 +30,6 @@ public class GitlabUser extends AuditDomain {
 
     public GitlabUser setId(Long id) {
         this.id = id;
-        return this;
-    }
-
-    public Long getIamUserId() {
-        return iamUserId;
-    }
-
-    public GitlabUser setIamUserId(Long iamUserId) {
-        this.iamUserId = iamUserId;
         return this;
     }
 
@@ -56,33 +42,6 @@ public class GitlabUser extends AuditDomain {
         return this;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public GitlabUser setUserName(String userName) {
-        this.userName = userName;
-        return this;
-    }
-
-    public Boolean getAdmin() {
-        return isAdmin;
-    }
-
-    public GitlabUser setAdmin(Boolean admin) {
-        isAdmin = admin;
-        return this;
-    }
-
-    public String getImpersonationToken() {
-        return impersonationToken;
-    }
-
-    public GitlabUser setImpersonationToken(String impersonationToken) {
-        this.impersonationToken = impersonationToken;
-        return this;
-    }
-
     public String getInitPassword() {
         return initPassword;
     }
@@ -92,12 +51,57 @@ public class GitlabUser extends AuditDomain {
         return this;
     }
 
-    public String getState() {
-        return state;
+    public Integer getGlUserId() {
+        return glUserId;
     }
 
-    public GitlabUser setState(String state) {
-        this.state = state;
+    public GitlabUser setGlUserId(Integer glUserId) {
+        this.glUserId = glUserId;
+        return this;
+    }
+
+    public String getGlUserName() {
+        return glUserName;
+    }
+
+    public GitlabUser setGlUserName(String glUserName) {
+        this.glUserName = glUserName;
+        return this;
+    }
+
+    public Boolean getGlIsAdmin() {
+        return glIsAdmin;
+    }
+
+    public GitlabUser setGlIsAdmin(Boolean glIsAdmin) {
+        this.glIsAdmin = glIsAdmin;
+        return this;
+    }
+
+    public String getGlImpersonationToken() {
+        return glImpersonationToken;
+    }
+
+    public GitlabUser setGlImpersonationToken(String glImpersonationToken) {
+        this.glImpersonationToken = glImpersonationToken;
+        return this;
+    }
+
+    public Boolean getSyncGitlab() {
+        return isSyncGitlab;
+    }
+
+    public GitlabUser setSyncGitlab(Boolean syncGitlab) {
+        isSyncGitlab = syncGitlab;
+        return this;
+    }
+
+    public Date getSyncDateGitlab() {
+        return syncDateGitlab;
+    }
+
+    public GitlabUser setSyncDateGitlab(Date syncDateGitlab) {
+        this.syncDateGitlab = syncDateGitlab;
         return this;
     }
 }

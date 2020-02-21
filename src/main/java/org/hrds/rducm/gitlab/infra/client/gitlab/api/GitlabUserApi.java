@@ -14,6 +14,16 @@ public class GitlabUserApi {
         this.gitlab4jClient = gitlab4jClient;
     }
 
+    public User getUser(Integer userId) {
+        try {
+            return gitlab4jClient.getGitLabApi()
+                    .getUserApi()
+                    .getUser(userId);
+        } catch (GitLabApiException e) {
+            throw new CommonException(e.getMessage());
+        }
+    }
+
     public User createUser(User user, String password, Integer projectsLimit) {
         try {
             return gitlab4jClient.getGitLabApi()

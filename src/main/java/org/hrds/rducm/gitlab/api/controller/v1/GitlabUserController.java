@@ -26,14 +26,14 @@ public class GitlabUserController extends BaseController {
     @Autowired
     private GitlabUserService gitlabUserService;
 
-    @ApiOperation(value = "查询用户")
-    @Permission(level = ResourceLevel.SITE, permissionPublic = true)
+    @ApiOperation(value = "查询个人信息")
+    @Permission(level = ResourceLevel.USER, permissionPublic = true)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "ID", paramType = "path")
     })
-    @GetMapping("/{userId}")
-    public ResponseEntity<GitlabUserVO> queryUser(@PathVariable Long userId) {
-        return Results.success(gitlabUserService.queryUser(userId));
+    @GetMapping("/self")
+    public ResponseEntity<GitlabUserVO> queryUser() {
+        return Results.success(gitlabUserService.queryUserSelf());
     }
 
     @ApiOperation(value = "新建用户")
@@ -41,23 +41,24 @@ public class GitlabUserController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "ID", paramType = "path")
     })
-    @PostMapping
-    public ResponseEntity<Object> createUser(@RequestParam String email,
-                                             @RequestParam String username,
-                                             @RequestParam String name) {
-        gitlabUserService.createUserWithRandomPassword(email, username, name);
+    @PostMapping("/{userId}")
+    public ResponseEntity<Object> createUser(@PathVariable Long userId,
+                                             @RequestParam String glEmail,
+                                             @RequestParam String glUsername,
+                                             @RequestParam String glName) {
+        gitlabUserService.createUserWithRandomPassword(userId, glEmail, glUsername, glName);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @ApiOperation(value = "修改个人密码")
-    @Permission(level = ResourceLevel.SITE, permissionLogin = true)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "ID", paramType = "path")
-    })
-    @PutMapping("/personal/password")
-    public ResponseEntity<Object> updateUserPassword(@RequestParam String password,
-                                                     @RequestParam String confirmPassword) {
-        gitlabUserService.updatePasswordForUser(password, confirmPassword);
-        return Results.created(null);
-    }
+//    @ApiOperation(value = "修改个人密码")
+//    @Permission(level = ResourceLevel.SITE, permissionLogin = true)
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "id", value = "ID", paramType = "path")
+//    })
+//    @PutMapping("/personal/password")
+//    public ResponseEntity<Object> updateUserPassword(@RequestParam String password,
+//                                                     @RequestParam String confirmPassword) {
+//        gitlabUserService.updatePasswordForUser(password, confirmPassword);
+//        return Results.created(null);
+//    }
 }

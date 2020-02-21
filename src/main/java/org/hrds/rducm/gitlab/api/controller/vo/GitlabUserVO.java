@@ -1,12 +1,19 @@
 package org.hrds.rducm.gitlab.api.controller.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.gitlab4j.api.models.User;
+
+import java.util.Date;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GitlabUserVO {
     private Long id;
     private Long userId;
-    private String userName;
-    private Boolean isAdmin;
-    private String impersonationToken;
     private String initPassword;
+    private Integer glUserId;
+    private Boolean isSyncGitlab;
+    private Date syncDateGitlab;
+    private User glUser;
 
     public Long getId() {
         return id;
@@ -26,33 +33,6 @@ public class GitlabUserVO {
         return this;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
-    public GitlabUserVO setUserName(String userName) {
-        this.userName = userName;
-        return this;
-    }
-
-    public Boolean getAdmin() {
-        return isAdmin;
-    }
-
-    public GitlabUserVO setAdmin(Boolean admin) {
-        isAdmin = admin;
-        return this;
-    }
-
-    public String getImpersonationToken() {
-        return impersonationToken;
-    }
-
-    public GitlabUserVO setImpersonationToken(String impersonationToken) {
-        this.impersonationToken = impersonationToken;
-        return this;
-    }
-
     public String getInitPassword() {
         return initPassword;
     }
@@ -62,15 +42,39 @@ public class GitlabUserVO {
         return this;
     }
 
-    @Override
-    public String toString() {
-        return "GitlabUserVO{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", isAdmin=" + isAdmin +
-                ", impersonationToken='" + impersonationToken + '\'' +
-                ", initPassword='" + initPassword + '\'' +
-                '}';
+    public Integer getGlUserId() {
+        return glUserId;
+    }
+
+    public GitlabUserVO setGlUserId(Integer glUserId) {
+        this.glUserId = glUserId;
+        return this;
+    }
+
+    public Boolean getSyncGitlab() {
+        return isSyncGitlab;
+    }
+
+    public GitlabUserVO setSyncGitlab(Boolean syncGitlab) {
+        isSyncGitlab = syncGitlab;
+        return this;
+    }
+
+    public Date getSyncDateGitlab() {
+        return syncDateGitlab;
+    }
+
+    public GitlabUserVO setSyncDateGitlab(Date syncDateGitlab) {
+        this.syncDateGitlab = syncDateGitlab;
+        return this;
+    }
+
+    public User getGlUser() {
+        return glUser;
+    }
+
+    public GitlabUserVO setGlUser(User glUser) {
+        this.glUser = glUser;
+        return this;
     }
 }

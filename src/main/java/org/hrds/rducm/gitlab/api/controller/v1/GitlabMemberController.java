@@ -18,7 +18,7 @@ import java.util.List;
 
 @Api(tags = SwaggerTags.GITLAB_MEMBER)
 @RestController("gitlabMemberController.v1")
-@RequestMapping("rducm/v1/gitlab/projects/{projectId}/repositories/{repositoryId}/members")
+@RequestMapping("rducm/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/members")
 public class GitlabMemberController extends BaseController {
     private final GitlabMemberService gitlabMemberService;
 

@@ -19,6 +19,11 @@ public class GitlabUserApiApiRepositoryImpl implements GitlabUserApiRepository {
     }
 
     @Override
+    public User getUser(Integer userId) {
+        return gitlabUserApi.getUser(userId);
+    }
+
+    @Override
     public User createUser(String email, String username, String name, String password) {
         User user = new User();
         user.setEmail(email);

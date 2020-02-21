@@ -21,11 +21,21 @@ public class GitlabMember extends AuditDomain {
     private Long projectId;
     private Long repositoryId;
     private Long userId;
+    private String state;
     private Integer glMemberId;
     private Integer glProjectId;
     private Integer glUserId;
     private Integer glAccessLevel;
     private Date glExpiresAt;
+
+    public String getState() {
+        return state;
+    }
+
+    public GitlabMember setState(String state) {
+        this.state = state;
+        return this;
+    }
 
     public Long getId() {
         return id;
