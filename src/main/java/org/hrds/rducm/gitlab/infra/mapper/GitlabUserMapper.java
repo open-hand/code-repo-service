@@ -6,6 +6,6 @@ import org.hrds.rducm.gitlab.domain.entity.GitlabUser;
 /**
  * Mapper
  */
-public interface ExampleMapper extends BaseMapper<GitlabUser> {
+public interface GitlabUserMapper extends BaseMapper<GitlabUser> {
 
 }

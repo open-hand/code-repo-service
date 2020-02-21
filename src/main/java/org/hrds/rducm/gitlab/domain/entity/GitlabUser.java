@@ -10,11 +10,11 @@ import javax.persistence.Table;
 /**
  * @author xy
  */
-@Table(name = "gitlab_user")
+@Table(name = "rducm_gitlab_user")
 public class GitlabUser extends AuditDomain {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
     private Long iamUserId;
     private Long userId;

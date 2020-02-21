@@ -3,14 +3,14 @@ package org.hrds.rducm.gitlab.infra.client.gitlab.api;
 import io.choerodon.core.exception.CommonException;
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.models.User;
-import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClient;
+import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class GitlabUserApi {
-    private final Gitlab4jClient gitlab4jClient;
+    private final Gitlab4jClientWrapper gitlab4jClient;
 
-    public GitlabUserApi(Gitlab4jClient gitlab4jClient) {
+    public GitlabUserApi(Gitlab4jClientWrapper gitlab4jClient) {
         this.gitlab4jClient = gitlab4jClient;
     }
 

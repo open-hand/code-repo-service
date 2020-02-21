@@ -13,11 +13,14 @@ import springfox.documentation.spring.web.plugins.Docket;
 public class SwaggerTags {
 
     public static final String GITLAB_USER = "GitlabUser";
+    public static final String GITLAB_MEMBER = "GitlabMember";
+
 
     @Autowired
     public SwaggerTags(Docket docket) {
         docket.tags(
-                new Tag(GITLAB_USER, "GitlabUser 案例")
+                new Tag(GITLAB_USER, "GitlabUser 案例"),
+                new Tag(GITLAB_MEMBER, "GitlabMember 案例")
         );
     }
 }

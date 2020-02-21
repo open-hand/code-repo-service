@@ -27,7 +27,7 @@ public class GitlabUserController extends BaseController {
     private GitlabUserService gitlabUserService;
 
     @ApiOperation(value = "查询用户")
-    @Permission(level = ResourceLevel.SITE, permissionLogin = true)
+    @Permission(level = ResourceLevel.SITE, permissionPublic = true)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "ID", paramType = "path")
     })
