@@ -13,6 +13,10 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>rducm</name>
 
+    <properties>
+        <choerodon.starters.version>0.14.0.RELEASE</choerodon.starters.version>
+    </properties>
+
     <dependencies>
         <!-- add by ying.xie -->
         <!-- gitlab-api客户端 -->
@@ -119,14 +123,59 @@
         </dependency>
 
         <!-- add by ying.xie -->
-        <dependency>
-            <groupId>io.choerodon</groupId>
-            <artifactId>choerodon-starter-asgard</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.choerodon</groupId>-->
+<!--            <artifactId>choerodon-starter-asgard</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.hzero.boot</groupId>
             <artifactId>hzero-boot-scheduler</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.choerodon</groupId>
+            <artifactId>choerodon-starter-asgard</artifactId>
+            <version>${choerodon.starters.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.choerodon</groupId>
+            <artifactId>choerodon-starter-actuator</artifactId>
+            <version>${choerodon.starters.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.choerodon</groupId>
+            <artifactId>choerodon-starter-core</artifactId>
+            <version>${choerodon.starters.version}</version>
+        </dependency>
+        <!-- hzero boot -->
+        <dependency>
+            <groupId>io.github.openfeign.form</groupId>
+            <artifactId>feign-form</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfeign.form</groupId>
+            <artifactId>feign-form-spring</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.choerodon</groupId>
+            <artifactId>choerodon-starter-swagger</artifactId>
+            <version>${choerodon.starters.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.choerodon</groupId>
+            <artifactId>choerodon-starter-feign-replay</artifactId>
+            <version>${choerodon.starters.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
         <!-- end -->
     </dependencies>
