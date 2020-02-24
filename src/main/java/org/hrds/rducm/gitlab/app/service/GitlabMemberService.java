@@ -1,8 +1,9 @@
 package org.hrds.rducm.gitlab.app.service;
 
-import org.hrds.rducm.gitlab.api.controller.vo.GitlabUserVO;
-import org.hrds.rducm.gitlab.domain.entity.GitlabMember;
-import org.hzero.core.base.AopProxy;
+import io.choerodon.core.domain.Page;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberUpdateDTO;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -12,14 +13,13 @@ import java.util.List;
  */
 public interface GitlabMemberService {
 
-    List<GitlabMember> list(Long projectId);
+    Page<GitlabMemberDTO> list(Long projectId, PageRequest pageRequest);
 
-    void batchAddMembers(List<GitlabMember> gitlabMembers);
+    void batchAddMembers(Long projectId, List<GitlabMemberDTO> gitlabMembersDTO);
 
-    void updateMember(GitlabMember gitlabMember);
+    void updateMember(Long projectId, Long repositoryId, Long memberId, GitlabMemberUpdateDTO gitlabMemberUpdateDTO);
 
     void removeMember(Long id, Integer glProjectId, Integer glUserId);
 
-    @Transactional(rollbackFor = Exception.class)
     void handleExpiredMembers();
 }

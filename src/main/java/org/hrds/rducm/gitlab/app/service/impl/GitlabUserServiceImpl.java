@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
-import io.choerodon.core.convertor.ConvertHelper;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.oauth.DetailsHelper;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -8,7 +7,6 @@ import org.gitlab4j.api.models.User;
 import org.hrds.rducm.gitlab.api.controller.vo.GitlabUserVO;
 import org.hrds.rducm.gitlab.app.service.GitlabUserService;
 import org.hrds.rducm.gitlab.domain.entity.GitlabUser;
-import org.hrds.rducm.gitlab.domain.repository.GitlabUserApiRepository;
 import org.hrds.rducm.gitlab.domain.repository.GitlabUserRepository;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class GitlabUserServiceImpl implements GitlabUserService {
     @Autowired
-    private GitlabUserApiRepository gitlabUserApiRepository;
-
-    @Autowired
     private GitlabUserRepository gitlabUserRepository;
 
     @Override
     public GitlabUserVO queryUserSelf() {
         Long userId = DetailsHelper.getUserDetails().getUserId();
         GitlabUserVO gitlabUser = this.queryUser(userId);
-        User glUser = gitlabUserApiRepository.getUser(gitlabUser.getGlUserId());
+        User glUser = gitlabUserRepository.getUserFromGitlab(gitlabUser.getGlUserId());
         gitlabUser.setGlUser(glUser);
         return gitlabUser;
     }
@@ -63,7 +58,7 @@ public class GitlabUserServiceImpl implements GitlabUserService {
         gitlabUserRepository.insertSelective(gitlabUser);
 
         // <2> 调用gitlab api创建用户
-        User user = gitlabUserApiRepository.createUser(glEmail, glUsername, glName, randomPassword);
+        User user = gitlabUserRepository.createUserToGitlab(glEmail, glUsername, glName, randomPassword);
 
         // <3> gitlab调用成功, 数据库修改用户数据
         gitlabUser.setGlUserId(user.getId())

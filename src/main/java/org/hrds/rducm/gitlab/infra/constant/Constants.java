@@ -8,7 +8,6 @@ public class Constants {
     private Constants() {}
 
     public interface MemberState {
-        String ACTIVE = "active";
         String EXPIRED = "expired";
     }
 }

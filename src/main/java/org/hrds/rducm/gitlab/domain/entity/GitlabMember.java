@@ -27,6 +27,8 @@ public class GitlabMember extends AuditDomain {
     private Integer glUserId;
     private Integer glAccessLevel;
     private Date glExpiresAt;
+    private Boolean isSyncGitlab;
+    private Date syncDateGitlab;
 
     public String getState() {
         return state;
@@ -118,4 +120,21 @@ public class GitlabMember extends AuditDomain {
         return this;
     }
 
+    public Boolean getSyncGitlab() {
+        return isSyncGitlab;
+    }
+
+    public GitlabMember setSyncGitlab(Boolean syncGitlab) {
+        isSyncGitlab = syncGitlab;
+        return this;
+    }
+
+    public Date getSyncDateGitlab() {
+        return syncDateGitlab;
+    }
+
+    public GitlabMember setSyncDateGitlab(Date syncDateGitlab) {
+        this.syncDateGitlab = syncDateGitlab;
+        return this;
+    }
 }

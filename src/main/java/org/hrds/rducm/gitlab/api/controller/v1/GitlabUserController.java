@@ -48,7 +48,7 @@ public class GitlabUserController extends BaseController {
                                              @RequestParam String glName) {
         gitlabUserService.createUserWithRandomPassword(userId, glEmail, glUsername, glName);
         return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
+}
 
 //    @ApiOperation(value = "修改个人密码")
 //    @Permission(level = ResourceLevel.SITE, permissionLogin = true)

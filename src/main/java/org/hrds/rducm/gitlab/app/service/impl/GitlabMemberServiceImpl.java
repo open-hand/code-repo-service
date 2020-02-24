@@ -4,17 +4,18 @@ import io.choerodon.asgard.saga.annotation.Saga;
 import io.choerodon.asgard.saga.annotation.SagaTask;
 import io.choerodon.asgard.saga.producer.StartSagaBuilder;
 import io.choerodon.asgard.saga.producer.TransactionalProducer;
+import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
-import org.gitlab4j.api.models.Member;
-import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
+import io.choerodon.mybatis.pagehelper.PageHelper;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberUpdateDTO;
 import org.hrds.rducm.gitlab.app.service.GitlabMemberService;
 import org.hrds.rducm.gitlab.domain.entity.GitlabMember;
 import org.hrds.rducm.gitlab.domain.repository.GitlabMemberRepository;
-import org.hrds.rducm.gitlab.domain.repository.GitlabProjectApiRepository;
 import org.hrds.rducm.gitlab.infra.constant.Constants;
+import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.core.base.AopProxy;
-import org.hzero.mybatis.common.Criteria;
-import org.hzero.mybatis.common.query.WhereField;
 import org.hzero.mybatis.domian.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,62 +28,53 @@ import static org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeCons
 
 @Service
 public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<GitlabMemberServiceImpl> {
-    private final GitlabProjectApiRepository gitlabProjectApiRepository;
-
     private final GitlabMemberRepository gitlabMemberRepository;
 
     @Autowired
     private TransactionalProducer producer;
 
-    public GitlabMemberServiceImpl(GitlabProjectApiRepository gitlabProjectApiRepository, GitlabMemberRepository gitlabMemberRepository) {
-        this.gitlabProjectApiRepository = gitlabProjectApiRepository;
+    public GitlabMemberServiceImpl(GitlabMemberRepository gitlabMemberRepository) {
         this.gitlabMemberRepository = gitlabMemberRepository;
     }
 
     @Override
-    public List<GitlabMember> list(Long projectId) {
+    public Page<GitlabMemberDTO> list(Long projectId, PageRequest pageRequest) {
         GitlabMember query = new GitlabMember();
         query.setProjectId(projectId);
-        return gitlabMemberRepository.select(query);
+        return PageHelper.doPage(pageRequest, () -> ConvertUtils.convertList(gitlabMemberRepository.select(query), GitlabMemberDTO.class));
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void batchAddMembers(List<GitlabMember> gitlabMembers) {
-        // <0> 校验入参
-
+    public void batchAddMembers(Long projectId, List<GitlabMemberDTO> gitlabMembersDTO) {
+        // <0> 校验入参 + 转换
+        List<GitlabMember> gitlabMembers = ConvertUtils.convertList(gitlabMembersDTO, GitlabMember.class);
+        gitlabMembers.forEach(m -> m.setProjectId(projectId));
         // <1> 数据库添加成员
         gitlabMemberRepository.batchInsertSelective(gitlabMembers);
 
         // <2> 调用gitlab api添加成员 todo 事务一致性问题
-        batchAddMemberToGitlab(gitlabMembers);
-    }
-
-    private void batchAddMemberToGitlab(List<GitlabMember> gitlabMembers) {
-        gitlabMembers.forEach((m) -> {
-            // <1> 调用gitlab api添加成员
-            Member glMember = gitlabProjectApiRepository.addMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
-            // <2> 回写数据库
-            m = gitlabMemberRepository.selectByPrimaryKey(m.getId());
-
-            m.setGlMemberId(glMember.getId());
-            m.setGlProjectId(m.getGlProjectId());
-            m.setGlUserId(m.getGlUserId());
-            m.setGlAccessLevel(glMember.getAccessLevel().toValue());
-            m.setGlExpiresAt(glMember.getExpiresAt());
-            gitlabMemberRepository.batchUpdateByPrimaryKeySelective(gitlabMembers);
-        });
+        gitlabMemberRepository.batchAddMembersToGitlab(gitlabMembers);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateMember(GitlabMember gitlabMember) {
+    public void updateMember(Long projectId,
+                             Long repositoryId,
+                             Long memberId,
+                             GitlabMemberUpdateDTO gitlabMemberUpdateDTO) {
+        // <0> 校验入参 todo + 转换
+        GitlabMember gitlabMember = ConvertUtils.convertObject(gitlabMemberUpdateDTO, GitlabMember.class);
+        gitlabMember.setId(memberId);
+        gitlabMember.setProjectId(projectId);
+        gitlabMember.setRepositoryId(repositoryId);
+
         // <1> 数据库更新成员
+        gitlabMember.setSyncGitlab(false);
         gitlabMemberRepository.updateByPrimaryKeySelective(gitlabMember);
 
         // <2> 调用gitlab api更新成员 todo 事务一致性问题
-        Member glMember = gitlabProjectApiRepository.updateMember(gitlabMember.getGlProjectId(), gitlabMember.getGlUserId(), gitlabMember.getGlAccessLevel(), gitlabMember.getGlExpiresAt());
-
+        gitlabMemberRepository.updateMemberToGitlab(memberId, gitlabMember.getGlProjectId(), gitlabMember.getGlUserId(), gitlabMember.getGlAccessLevel(), gitlabMember.getGlExpiresAt());
     }
 
     @Override
@@ -92,7 +84,7 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
         gitlabMemberRepository.deleteByPrimaryKey(id);
 
         // <2> 调用gitlab api删除成员 todo 事务一致性问题
-        gitlabProjectApiRepository.removeMember(glProjectId, glUserId);
+        gitlabMemberRepository.removeMemberToGitlab(glProjectId, glUserId);
     }
 
     /**
@@ -141,6 +133,6 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
     @SagaTask(code = "", sagaCode = RDUCM_ADD_MEMBERS, description = "调用gitlab api添加成员并回写", seq = 1)
     public void batchAddMemberToGitlabSagaDemo(List<GitlabMember> gitlabMembers) {
         // <2> 调用gitlab api添加成员
-        batchAddMemberToGitlab(gitlabMembers);
+        gitlabMemberRepository.batchAddMembersToGitlab(gitlabMembers);
     }
 }
