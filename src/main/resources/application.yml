@@ -97,3 +97,35 @@ logging:
     io.choerodon: debug
     org.hzero: debug
 
+choerodon:
+  category:
+    enabled: true # 是否开启项目/组织类型控制
+  devops:
+    message: true
+  eureka:
+    event:
+      max-cache-size: 300
+      retry-time: 5
+      retry-interval: 3
+      skip-services: config**, **register-server, **gateway**, zipkin**, hystrix**, oauth**
+  saga:
+    consumer:
+      enabled: true # 启动消费端
+      thread-num: 2 # saga消息消费线程池大小
+      max-poll-size: 200 # 每次拉取消息最大数量
+      poll-interval-ms: 1000 # 拉取间隔，默认1000毫秒
+  schedule:
+    consumer:
+      enabled: true # 启用任务调度消费端
+      thread-num: 1 # 任务调度消费线程数
+      poll-interval-ms: 1000 # 拉取间隔，默认1000毫秒
+  cleanPermission: false
+
+
+gitlab:
+  url: "http://git.staging.saas.hand-china.com/"
+  privateToken: "tZ2yQsKUcCAbxKHfYHhS" # 个人测试环境token
+#   privateToken: "TyAwRwqY2QfPKdq81CSs" # 管理员token
+
+
+
