@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -41,7 +42,8 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
     public Page<GitlabMemberDTO> list(Long projectId, PageRequest pageRequest) {
         GitlabMember query = new GitlabMember();
         query.setProjectId(projectId);
-        return PageHelper.doPage(pageRequest, () -> ConvertUtils.convertList(gitlabMemberRepository.select(query), GitlabMemberDTO.class));
+        Page<GitlabMember> page = PageHelper.doPage(pageRequest, () -> gitlabMemberRepository.select(query));
+        return ConvertUtils.convertPage(page, GitlabMemberDTO.class);
     }
 
     @Override
@@ -131,7 +133,8 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
     }
 
     @SagaTask(code = "", sagaCode = RDUCM_ADD_MEMBERS, description = "调用gitlab api添加成员并回写", seq = 1)
-    public void batchAddMemberToGitlabSagaDemo(List<GitlabMember> gitlabMembers) {
+    public void batchAddMemberToGitlabSagaDemo(String payload) {
+        List<GitlabMember> gitlabMembers = new ArrayList<>();
         // <2> 调用gitlab api添加成员
         gitlabMemberRepository.batchAddMembersToGitlab(gitlabMembers);
     }

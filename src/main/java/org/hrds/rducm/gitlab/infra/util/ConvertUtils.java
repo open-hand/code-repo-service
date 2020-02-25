@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.infra.util;
 
 
+import io.choerodon.core.domain.Page;
 import io.choerodon.core.domain.PageInfo;
 import io.choerodon.core.exception.CommonException;
 import org.springframework.beans.BeanUtils;
@@ -85,6 +86,26 @@ public class ConvertUtils {
 //        }
 //        return destination;
 //    }
+
+    /**
+     * convert page with default beanUtils
+     *
+     * @param source source page
+     * @param <S>    the source content type
+     * @param <D>    the destination content type
+     * @return destination page
+     */
+    public static <S, D> Page<D> convertPage(Page<S> source, Class<D> destinationClass) {
+        if (source == null) {
+            return null;
+        }
+        Page<D> destination = new Page<>();
+        BeanUtils.copyProperties(source, destination, "list");
+        if (source.getContent() != null) {
+            destination.setContent(source.getContent().stream().map(s -> convertObject(s, destinationClass)).collect(Collectors.toList()));
+        }
+        return destination;
+    }
 
     /**
      * convert List with default beanUtils

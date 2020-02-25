@@ -33,7 +33,7 @@ public class ProjectController extends BaseController {
     @GetMapping("/members")
     public ResponseEntity<Page<GitlabMemberDTO>> pageByOptions(@PathVariable Long projectId,
                                                                PageRequest pageRequest,
-                                                               @RequestBody GitlabMember query) {
+                                                               GitlabMemberDTO query) {
         return Results.success(gitlabMemberService.list(projectId, pageRequest));
     }
 
