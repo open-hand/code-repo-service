@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.swagger.annotation.Permission;
+import io.choerodon.core.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.gitlab4j.api.models.ProtectedTag;
 import org.hrds.rducm.gitlab.app.service.GitlabTagService;
@@ -21,7 +21,7 @@ public class GitlabTagController extends BaseController {
     private GitlabTagService gitlabTagService;
 
     @ApiOperation(value = "查询保护标签")
-    @Permission(level = ResourceLevel.PROJECT, permissionPublic = true)
+    @Permission(permissionPublic = true)
     @GetMapping("/protected-tags")
     public ResponseEntity<List<ProtectedTag>> getProtectedTags(@PathVariable Long projectId,
                                                                @PathVariable Long repositoryId,
@@ -30,7 +30,7 @@ public class GitlabTagController extends BaseController {
     }
 
     @ApiOperation(value = "创建保护标签")
-    @Permission(level = ResourceLevel.PROJECT, permissionPublic = true)
+    @Permission(permissionPublic = true)
     @PostMapping("/protected-tags")
     public ResponseEntity<ProtectedTag> createProtectedTag(@PathVariable Long projectId,
                                                            @PathVariable Long repositoryId,
@@ -41,7 +41,7 @@ public class GitlabTagController extends BaseController {
     }
 
     @ApiOperation(value = "修改保护标签")
-    @Permission(level = ResourceLevel.PROJECT, permissionPublic = true)
+    @Permission(permissionPublic = true)
     @PutMapping("/protected-tags")
     public ResponseEntity<ProtectedTag> updateProtectedTag(@PathVariable Long projectId,
                                                            @PathVariable Long repositoryId,
@@ -52,7 +52,7 @@ public class GitlabTagController extends BaseController {
     }
 
     @ApiOperation(value = "删除保护标签")
-    @Permission(level = ResourceLevel.PROJECT, permissionPublic = true)
+    @Permission(permissionPublic = true)
     @DeleteMapping("/protected-tags")
     public ResponseEntity<ProtectedTag> deleteProtectedTag(@PathVariable Long projectId,
                                                      @PathVariable Long repositoryId,

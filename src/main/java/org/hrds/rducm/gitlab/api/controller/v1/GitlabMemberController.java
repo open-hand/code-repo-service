@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.swagger.annotation.Permission;
+import io.choerodon.core.annotation.Permission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.config.SwaggerTags;
@@ -29,7 +29,7 @@ public class GitlabMemberController extends BaseController {
     }
 
     @ApiOperation(value = "修改仓库成员")
-    @Permission(level = ResourceLevel.PROJECT, permissionPublic = true)
+    @Permission(permissionPublic = true)
     @PutMapping("/{memberId}")
     public ResponseEntity<Object> updateMember(@PathVariable Long projectId,
                                                @PathVariable Long repositoryId,
@@ -40,7 +40,7 @@ public class GitlabMemberController extends BaseController {
     }
 
     @ApiOperation(value = "移除仓库成员")
-    @Permission(level = ResourceLevel.PROJECT, permissionPublic = true)
+    @Permission(permissionPublic = true)
     @DeleteMapping("/{memberId}")
     public ResponseEntity<Object> removeMember(@PathVariable Long repositoryId,
                                                @PathVariable Long memberId,

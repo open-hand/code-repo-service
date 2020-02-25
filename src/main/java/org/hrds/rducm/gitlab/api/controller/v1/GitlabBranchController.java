@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.swagger.annotation.Permission;
+import io.choerodon.core.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.gitlab4j.api.models.ProtectedBranch;
 import org.hrds.rducm.gitlab.app.service.GitlabBranchService;
@@ -21,7 +21,7 @@ public class GitlabBranchController extends BaseController {
     private GitlabBranchService gitlabBranchService;
 
     @ApiOperation(value = "查询保护分支")
-    @Permission(level = ResourceLevel.PROJECT, permissionPublic = true)
+    @Permission(permissionPublic = true)
     @GetMapping("/protected-branches")
     public ResponseEntity<List<ProtectedBranch>> getProtectedBranches(@PathVariable Long projectId,
                                                                       @PathVariable Long repositoryId,
@@ -30,7 +30,7 @@ public class GitlabBranchController extends BaseController {
     }
 
     @ApiOperation(value = "添加保护分支")
-    @Permission(level = ResourceLevel.PROJECT, permissionPublic = true)
+    @Permission(permissionPublic = true)
     @PostMapping("/protected-branches")
     public ResponseEntity<ProtectedBranch> createProtectedBranch(@PathVariable Long projectId,
                                                                  @PathVariable Long repositoryId,
@@ -42,7 +42,7 @@ public class GitlabBranchController extends BaseController {
     }
 
     @ApiOperation(value = "修改保护分支")
-    @Permission(level = ResourceLevel.PROJECT, permissionPublic = true)
+    @Permission(permissionPublic = true)
     @PutMapping("/protected-branches")
     public ResponseEntity<ProtectedBranch> updateProtectedBranch(@PathVariable Long projectId,
                                                                  @PathVariable Long repositoryId,
@@ -54,7 +54,7 @@ public class GitlabBranchController extends BaseController {
     }
 
     @ApiOperation(value = "删除保护分支")
-    @Permission(level = ResourceLevel.PROJECT, permissionPublic = true)
+    @Permission(permissionPublic = true)
     @DeleteMapping("/protected-branches")
     public ResponseEntity<ProtectedBranch> updateProtectedBranch(@PathVariable Long projectId,
                                                                  @PathVariable Long repositoryId,
