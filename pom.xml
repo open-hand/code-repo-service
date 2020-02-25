@@ -128,10 +128,10 @@
 <!--            <artifactId>choerodon-starter-asgard</artifactId>-->
 <!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.hzero.boot</groupId>
-            <artifactId>hzero-boot-scheduler</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.hzero.boot</groupId>-->
+<!--            <artifactId>hzero-boot-scheduler</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>io.choerodon</groupId>
