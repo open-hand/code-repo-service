@@ -49,7 +49,7 @@ env:
     # Ribbon 连接超时时间
     RIBBON_CONNECT_TIMEOUT: 3000
     # 日志级别
-    LOGGING_LEVEL: info
+#    LOGGING_LEVEL: info
 
     JAVA_OPTS: >
       -Xms1024m
