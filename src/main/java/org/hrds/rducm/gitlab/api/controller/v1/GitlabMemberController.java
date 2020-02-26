@@ -3,11 +3,14 @@ package org.hrds.rducm.gitlab.api.controller.v1;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.core.annotation.Permission;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberUpdateDTO;
 import org.hrds.rducm.gitlab.app.service.GitlabMemberService;
 import org.hrds.rducm.gitlab.domain.entity.GitlabMember;
+import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.http.ResponseEntity;
@@ -28,24 +31,39 @@ public class GitlabMemberController extends BaseController {
         this.gitlabMemberService = gitlabMemberService;
     }
 
-    @ApiOperation(value = "修改仓库成员")
+    @ApiOperation(value = "修改代码库成员")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, required = true),
+            @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, required = true),
+            @ApiImplicitParam(name = "memberId", value = "成员id", required = true),
+            @ApiImplicitParam(name = "gitlabMemberUpdateDTO", value = "修改成员信息")
+    })
     @Permission(permissionPublic = true)
     @PutMapping("/{memberId}")
     public ResponseEntity<Object> updateMember(@PathVariable Long projectId,
                                                @PathVariable Long repositoryId,
                                                @PathVariable Long memberId,
-                                               @RequestBody GitlabMemberUpdateDTO gitlabMemberUpdateDTO) {
+                                               @RequestBody @Valid GitlabMemberUpdateDTO gitlabMemberUpdateDTO) {
         gitlabMemberService.updateMember(projectId, repositoryId, memberId, gitlabMemberUpdateDTO);
         return Results.created(null);
     }
 
     @ApiOperation(value = "移除仓库成员")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, required = true),
+            @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, required = true),
+            @ApiImplicitParam(name = "memberId", value = "成员id", required = true),
+            @ApiImplicitParam(name = "glProjectId", value = ApiInfoConstants.GL_PROJECT_ID, required = true),
+            @ApiImplicitParam(name = "glUserId", value = ApiInfoConstants.GL_USER_ID, required = true)
+    })
     @Permission(permissionPublic = true)
     @DeleteMapping("/{memberId}")
-    public ResponseEntity<Object> removeMember(@PathVariable Long repositoryId,
+    public ResponseEntity<Object> removeMember(@PathVariable Long projectId,
+                                               @PathVariable Long repositoryId,
                                                @PathVariable Long memberId,
-                                               @RequestBody @Valid GitlabMember gitlabMember) {
-        gitlabMemberService.removeMember(memberId, gitlabMember.getGlProjectId(), gitlabMember.getGlUserId());
+                                               @RequestParam Integer glProjectId,
+                                               @RequestParam Integer glUserId) {
+        gitlabMemberService.removeMember(memberId, glProjectId, glUserId);
         return Results.created(null);
     }
 }

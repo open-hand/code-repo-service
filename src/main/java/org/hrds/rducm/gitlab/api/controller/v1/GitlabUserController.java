@@ -1,13 +1,8 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import io.choerodon.core.enums.ResourceType;
-import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.core.annotation.Permission;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
+import io.choerodon.core.enums.ResourceType;
 import io.swagger.annotations.ApiOperation;
-import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.vo.GitlabUserVO;
 import org.hrds.rducm.gitlab.app.service.GitlabUserService;
 import org.hzero.core.base.BaseController;
@@ -36,9 +31,6 @@ public class GitlabUserController extends BaseController {
 
     @ApiOperation(value = "新建用户")
     @Permission(type = ResourceType.SITE, permissionLogin = true)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "ID", paramType = "path")
-    })
     @PostMapping("/{userId}")
     public ResponseEntity<Object> createUser(@PathVariable Long userId,
                                              @RequestParam String glEmail,
@@ -46,7 +38,7 @@ public class GitlabUserController extends BaseController {
                                              @RequestParam String glName) {
         gitlabUserService.createUserWithRandomPassword(userId, glEmail, glUsername, glName);
         return ResponseEntity.status(HttpStatus.CREATED).build();
-}
+    }
 
 //    @ApiOperation(value = "修改个人密码")
 //    @Permission(level = ResourceLevel.SITE, permissionLogin = true)

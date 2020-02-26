@@ -8,7 +8,7 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberCreateDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberUpdateDTO;
 import org.hrds.rducm.gitlab.app.service.GitlabMemberService;
 import org.hrds.rducm.gitlab.domain.entity.GitlabMember;
@@ -39,16 +39,16 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
     }
 
     @Override
-    public Page<GitlabMemberDTO> list(Long projectId, PageRequest pageRequest) {
+    public Page<GitlabMemberCreateDTO> list(Long projectId, PageRequest pageRequest) {
         GitlabMember query = new GitlabMember();
         query.setProjectId(projectId);
         Page<GitlabMember> page = PageHelper.doPage(pageRequest, () -> gitlabMemberRepository.select(query));
-        return ConvertUtils.convertPage(page, GitlabMemberDTO.class);
+        return ConvertUtils.convertPage(page, GitlabMemberCreateDTO.class);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void batchAddMembers(Long projectId, List<GitlabMemberDTO> gitlabMembersDTO) {
+    public void batchAddMembers(Long projectId, List<GitlabMemberCreateDTO> gitlabMembersDTO) {
         // <0> 校验入参 + 转换
         List<GitlabMember> gitlabMembers = ConvertUtils.convertList(gitlabMembersDTO, GitlabMember.class);
         gitlabMembers.forEach(m -> m.setProjectId(projectId));
