@@ -1,7 +1,8 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
+import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.swagger.annotation.Permission;
+import io.choerodon.core.annotation.Permission;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -19,25 +20,22 @@ import org.springframework.web.bind.annotation.*;
 /**
  * API接口
  */
-@Api(tags = SwaggerTags.GITLAB_USER)
+//@Api(tags = SwaggerTags.GITLAB_USER)
 @RestController("gitlabUserController.v1")
-@RequestMapping("rducm/v1/gitlab/users")
+@RequestMapping("/v1/gitlab/users")
 public class GitlabUserController extends BaseController {
     @Autowired
     private GitlabUserService gitlabUserService;
 
     @ApiOperation(value = "查询个人信息")
-    @Permission(level = ResourceLevel.USER, permissionPublic = true)
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "ID", paramType = "path")
-    })
+    @Permission(type = ResourceType.SITE, permissionPublic = true)
     @GetMapping("/self")
     public ResponseEntity<GitlabUserVO> queryUser() {
         return Results.success(gitlabUserService.queryUserSelf());
     }
 
     @ApiOperation(value = "新建用户")
-    @Permission(level = ResourceLevel.SITE, permissionLogin = true)
+    @Permission(type = ResourceType.SITE, permissionLogin = true)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "ID", paramType = "path")
     })

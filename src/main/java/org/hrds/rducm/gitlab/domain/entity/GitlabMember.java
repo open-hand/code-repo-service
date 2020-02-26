@@ -22,7 +22,7 @@ public class GitlabMember extends AuditDomain {
     private Long repositoryId;
     private Long userId;
     private String state;
-    private Integer glMemberId;
+//    private Integer glMemberId;
     private Integer glProjectId;
     private Integer glUserId;
     private Integer glAccessLevel;
@@ -72,15 +72,6 @@ public class GitlabMember extends AuditDomain {
 
     public GitlabMember setUserId(Long userId) {
         this.userId = userId;
-        return this;
-    }
-
-    public Integer getGlMemberId() {
-        return glMemberId;
-    }
-
-    public GitlabMember setGlMemberId(Integer glMemberId) {
-        this.glMemberId = glMemberId;
         return this;
     }
 

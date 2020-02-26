@@ -18,9 +18,9 @@ import javax.validation.Valid;
 /**
  * @author ying.xie@hand-china.com
  */
-@Api(tags = SwaggerTags.GITLAB_MEMBER)
+//@Api(tags = SwaggerTags.GITLAB_MEMBER)
 @RestController("gitlabMemberController.v1")
-@RequestMapping("rducm/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/members")
+@RequestMapping("/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/members")
 public class GitlabMemberController extends BaseController {
     private final GitlabMemberService gitlabMemberService;
 

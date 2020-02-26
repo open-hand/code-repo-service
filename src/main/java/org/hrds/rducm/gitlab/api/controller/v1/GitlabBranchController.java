@@ -15,7 +15,7 @@ import java.util.List;
 
 //@Api(tags = SwaggerTags.GITLAB_MEMBER)
 @RestController("gitlabBranchController.v1")
-@RequestMapping("rducm/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/branches")
+@RequestMapping("/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/branches")
 public class GitlabBranchController extends BaseController {
     @Autowired
     private GitlabBranchService gitlabBranchService;

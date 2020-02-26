@@ -7,7 +7,7 @@ import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
-import java.util.Map;
+import java.util.List;
 
 @Repository
 public class GitlabPorjectApi {
@@ -15,6 +15,16 @@ public class GitlabPorjectApi {
 
     public GitlabPorjectApi(Gitlab4jClientWrapper gitlab4jClient) {
         this.gitlab4jClient = gitlab4jClient;
+    }
+
+    public List<Member> getMembers(Integer projectId) {
+        try {
+            return gitlab4jClient.getGitLabApi()
+                    .getProjectApi()
+                    .getMembers(projectId);
+        } catch (GitLabApiException e) {
+            throw new CommonException(e.getMessage());
+        }
     }
 
     public Member addMember(Object projectIdOrPath, Integer userId, Integer accessLevel, Date expiresAt) {
@@ -47,23 +57,4 @@ public class GitlabPorjectApi {
         }
     }
 
-//    public Map<String, Object> protectedBranches(Integer projectId, String name, String mergeAccessLevel, String pushAccessLevel) {
-//        try {
-//            return gitlab4jClient.getGitLabApi()
-//                    .getProjectApi()
-//                    .protectedBranches(projectId, name, mergeAccessLevel, pushAccessLevel);
-//        } catch (GitLabApiException e) {
-//            throw new CommonException(e.getMessage());
-//        }
-//    }
-//
-//    public Map<String, Object> protectedBranches(Integer projectId, String name, String mergeAccessLevel, String pushAccessLevel) {
-//        try {
-//            return gitlab4jClient.getGitLabApi()
-//                    .getOauthApi().oauthLogin().protectBranch()
-//                    .deleteBranch(projectId, name, mergeAccessLevel, pushAccessLevel);
-//        } catch (GitLabApiException e) {
-//            throw new CommonException(e.getMessage());
-//        }
-//    }
 }
