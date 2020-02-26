@@ -18,7 +18,7 @@ public interface GitlabMemberService {
 
     void updateMember(Long projectId, Long repositoryId, Long memberId, GitlabMemberUpdateDTO gitlabMemberUpdateDTO);
 
-    void removeMember(Long id, Integer glProjectId, Integer glUserId);
+    void removeMember(Long projectId, Long repositoryId, Long memberId);
 
     void handleExpiredMembers();
 }

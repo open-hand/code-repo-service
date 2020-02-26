@@ -18,12 +18,12 @@ public class GitlabMemberCreateDTO {
     @NotNull
     @ApiModelProperty(ApiInfoConstants.USER_ID)
     private Long userId;
-    @NotNull
-    @ApiModelProperty(ApiInfoConstants.GL_PROJECT_ID)
-    private Integer glProjectId;
-    @NotNull
-    @ApiModelProperty(ApiInfoConstants.GL_USER_ID)
-    private Integer glUserId;
+//    @NotNull
+//    @ApiModelProperty(ApiInfoConstants.GL_PROJECT_ID)
+//    private Integer glProjectId;
+//    @NotNull
+//    @ApiModelProperty(ApiInfoConstants.GL_USER_ID)
+//    private Integer glUserId;
     @NotNull
     @ApiModelProperty(ApiInfoConstants.GL_ACCESS_LEVEL)
     private Integer glAccessLevel;
@@ -58,23 +58,23 @@ public class GitlabMemberCreateDTO {
         return this;
     }
 
-    public Integer getGlProjectId() {
-        return glProjectId;
-    }
-
-    public GitlabMemberCreateDTO setGlProjectId(Integer glProjectId) {
-        this.glProjectId = glProjectId;
-        return this;
-    }
-
-    public Integer getGlUserId() {
-        return glUserId;
-    }
-
-    public GitlabMemberCreateDTO setGlUserId(Integer glUserId) {
-        this.glUserId = glUserId;
-        return this;
-    }
+//    public Integer getGlProjectId() {
+//        return glProjectId;
+//    }
+//
+//    public GitlabMemberCreateDTO setGlProjectId(Integer glProjectId) {
+//        this.glProjectId = glProjectId;
+//        return this;
+//    }
+//
+//    public Integer getGlUserId() {
+//        return glUserId;
+//    }
+//
+//    public GitlabMemberCreateDTO setGlUserId(Integer glUserId) {
+//        this.glUserId = glUserId;
+//        return this;
+//    }
 
     public Integer getGlAccessLevel() {
         return glAccessLevel;

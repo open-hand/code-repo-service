@@ -36,7 +36,7 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
             m.setGlUserId(m.getGlUserId());
             m.setGlAccessLevel(glMember.getAccessLevel().toValue());
             m.setGlExpiresAt(glMember.getExpiresAt());
-            m.setSyncGitlab(true);
+            m.setIsSyncGitlab(true);
             m.setSyncDateGitlab(new Date());
             this.updateByPrimaryKeySelective(m);
         });
@@ -48,7 +48,7 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
 
         // <2> 回写数据库
         GitlabMember m = this.selectByPrimaryKey(id);
-        m.setSyncGitlab(true);
+        m.setIsSyncGitlab(true);
         m.setSyncDateGitlab(new Date());
         m.setGlAccessLevel(glMember.getAccessLevel().toValue());
         m.setGlExpiresAt(glMember.getExpiresAt());

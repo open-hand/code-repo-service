@@ -12,6 +12,7 @@ import org.hrds.rducm.gitlab.app.service.GitlabMemberService;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -44,7 +45,8 @@ public class ProjectController extends BaseController {
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping("/members/batch-add")
     public ResponseEntity<Object> batchAddMembers(@PathVariable Long projectId,
-                                                  @RequestBody @Valid List<GitlabMemberCreateDTO> gitlabMembers) {
+                                                  @RequestBody List<GitlabMemberCreateDTO> gitlabMembers) {
+        validList(gitlabMembers);
         gitlabMemberService.batchAddMembers(projectId, gitlabMembers);
         return Results.created(null);
     }

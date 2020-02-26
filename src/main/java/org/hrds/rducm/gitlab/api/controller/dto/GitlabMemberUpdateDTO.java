@@ -8,12 +8,12 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 public class GitlabMemberUpdateDTO {
-    @NotNull
-    @ApiModelProperty(ApiInfoConstants.GL_PROJECT_ID)
-    private Integer glProjectId;
-    @NotNull
-    @ApiModelProperty(ApiInfoConstants.GL_USER_ID)
-    private Integer glUserId;
+//    @NotNull
+//    @ApiModelProperty(ApiInfoConstants.GL_PROJECT_ID)
+//    private Integer glProjectId;
+//    @NotNull
+//    @ApiModelProperty(ApiInfoConstants.GL_USER_ID)
+//    private Integer glUserId;
     @NotNull
     @ApiModelProperty(ApiInfoConstants.GL_ACCESS_LEVEL)
     private Integer glAccessLevel;
@@ -24,23 +24,23 @@ public class GitlabMemberUpdateDTO {
     @ApiModelProperty(ApiInfoConstants.OBJECT_VERSION_NUMBER)
     private Long objectVersionNumber;
 
-    public Integer getGlProjectId() {
-        return glProjectId;
-    }
-
-    public GitlabMemberUpdateDTO setGlProjectId(Integer glProjectId) {
-        this.glProjectId = glProjectId;
-        return this;
-    }
-
-    public Integer getGlUserId() {
-        return glUserId;
-    }
-
-    public GitlabMemberUpdateDTO setGlUserId(Integer glUserId) {
-        this.glUserId = glUserId;
-        return this;
-    }
+//    public Integer getGlProjectId() {
+//        return glProjectId;
+//    }
+//
+//    public GitlabMemberUpdateDTO setGlProjectId(Integer glProjectId) {
+//        this.glProjectId = glProjectId;
+//        return this;
+//    }
+//
+//    public Integer getGlUserId() {
+//        return glUserId;
+//    }
+//
+//    public GitlabMemberUpdateDTO setGlUserId(Integer glUserId) {
+//        this.glUserId = glUserId;
+//        return this;
+//    }
 
     public Integer getGlAccessLevel() {
         return glAccessLevel;
