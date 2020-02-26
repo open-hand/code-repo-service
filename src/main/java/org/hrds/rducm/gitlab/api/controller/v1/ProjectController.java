@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
+import io.choerodon.asgard.schedule.ParamType;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
@@ -38,8 +39,8 @@ public class ProjectController extends BaseController {
 
     @ApiOperation(value = "批量新增代码库成员(项目层)")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectId", value = "项目id", required = true),
-            @ApiImplicitParam(name = "gitlabMembers", value = "新增成员信息"),
+            @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
+            @ApiImplicitParam(name = "gitlabMembers", value = "新增成员信息", paramType = "GitlabMemberCreateDTO"),
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping("/members/batch-add")
