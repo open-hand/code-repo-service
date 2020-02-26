@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.core.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.gitlab4j.api.models.ProtectedBranch;

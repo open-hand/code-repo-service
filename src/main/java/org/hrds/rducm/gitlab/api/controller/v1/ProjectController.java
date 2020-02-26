@@ -1,10 +1,9 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import io.choerodon.asgard.schedule.ParamType;
+import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import io.choerodon.core.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;

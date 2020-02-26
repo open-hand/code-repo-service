@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.core.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.gitlab4j.api.models.ProtectedTag;
@@ -55,9 +54,9 @@ public class GitlabTagController extends BaseController {
     @Permission(permissionPublic = true)
     @DeleteMapping("/protected-tags")
     public ResponseEntity<ProtectedTag> deleteProtectedTag(@PathVariable Long projectId,
-                                                     @PathVariable Long repositoryId,
-                                                     @RequestParam Integer glProjectId,
-                                                     @RequestParam String glTagName) {
+                                                           @PathVariable Long repositoryId,
+                                                           @RequestParam Integer glProjectId,
+                                                           @RequestParam String glTagName) {
         gitlabTagService.unprotectTag(glProjectId, glTagName);
         return Results.success();
     }
