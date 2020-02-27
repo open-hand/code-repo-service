@@ -7,16 +7,13 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberCreateDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberBatchDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberViewDTO;
 import org.hrds.rducm.gitlab.app.service.GitlabMemberService;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.List;
 
 //@Api(tags = SwaggerTags.GITLAB_MEMBER)
 @RestController("projectController.v1")
@@ -31,9 +28,9 @@ public class ProjectController extends BaseController {
     @ApiOperation(value = "查询代码库成员(项目层)")
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping("/members")
-    public ResponseEntity<Page<GitlabMemberCreateDTO>> pageByOptions(@PathVariable Long projectId,
-                                                                     PageRequest pageRequest,
-                                                                     GitlabMemberCreateDTO query) {
+    public ResponseEntity<Page<GitlabMemberViewDTO>> pageByOptions(@PathVariable Long projectId,
+                                                                   PageRequest pageRequest,
+                                                                   GitlabMemberViewDTO query) {
         return Results.success(gitlabMemberService.list(projectId, pageRequest));
     }
 
@@ -45,9 +42,9 @@ public class ProjectController extends BaseController {
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping("/members/batch-add")
     public ResponseEntity<Object> batchAddMembers(@PathVariable Long projectId,
-                                                  @RequestBody List<GitlabMemberCreateDTO> gitlabMembers) {
-        validList(gitlabMembers);
-        gitlabMemberService.batchAddMembers(projectId, gitlabMembers);
+                                                  @RequestBody GitlabMemberBatchDTO gitlabMemberBatchDTO) {
+        validObject(gitlabMemberBatchDTO);
+        gitlabMemberService.batchAddOrUpdateMembers(projectId, gitlabMemberBatchDTO);
         return Results.created(null);
     }
 }

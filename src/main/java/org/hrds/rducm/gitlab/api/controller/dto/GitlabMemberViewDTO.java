@@ -8,15 +8,13 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 
-public class GitlabMemberCreateDTO {
+public class GitlabMemberViewDTO {
 //    @NotNull
 //    @ApiModelProperty(ApiInfoConstants.PROJECT_ID)
 //    private Long projectId;
-    @NotNull
-    @ApiModelProperty(ApiInfoConstants.REPOSITORY_ID)
+
     private Long repositoryId;
-    @NotNull
-    @ApiModelProperty(ApiInfoConstants.USER_ID)
+
     private Long userId;
 //    @NotNull
 //    @ApiModelProperty(ApiInfoConstants.GL_PROJECT_ID)
@@ -24,11 +22,9 @@ public class GitlabMemberCreateDTO {
 //    @NotNull
 //    @ApiModelProperty(ApiInfoConstants.GL_USER_ID)
 //    private Integer glUserId;
-    @NotNull
-    @ApiModelProperty(ApiInfoConstants.GL_ACCESS_LEVEL)
+
     private Integer glAccessLevel;
-    @Future
-    @ApiModelProperty(ApiInfoConstants.GL_EXPIRES_AT)
+
     private Date glExpiresAt;
 
 //    public Long getProjectId() {
@@ -44,7 +40,7 @@ public class GitlabMemberCreateDTO {
         return repositoryId;
     }
 
-    public GitlabMemberCreateDTO setRepositoryId(Long repositoryId) {
+    public GitlabMemberViewDTO setRepositoryId(Long repositoryId) {
         this.repositoryId = repositoryId;
         return this;
     }
@@ -53,7 +49,7 @@ public class GitlabMemberCreateDTO {
         return userId;
     }
 
-    public GitlabMemberCreateDTO setUserId(Long userId) {
+    public GitlabMemberViewDTO setUserId(Long userId) {
         this.userId = userId;
         return this;
     }
@@ -80,7 +76,7 @@ public class GitlabMemberCreateDTO {
         return glAccessLevel;
     }
 
-    public GitlabMemberCreateDTO setGlAccessLevel(Integer glAccessLevel) {
+    public GitlabMemberViewDTO setGlAccessLevel(Integer glAccessLevel) {
         this.glAccessLevel = glAccessLevel;
         return this;
     }
@@ -89,7 +85,7 @@ public class GitlabMemberCreateDTO {
         return glExpiresAt;
     }
 
-    public GitlabMemberCreateDTO setGlExpiresAt(Date glExpiresAt) {
+    public GitlabMemberViewDTO setGlExpiresAt(Date glExpiresAt) {
         this.glExpiresAt = glExpiresAt;
         return this;
     }

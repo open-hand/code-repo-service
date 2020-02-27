@@ -39,9 +39,16 @@ public class GitlabPorjectApi {
 
     public Member updateMember(Object projectIdOrPath, Integer userId, Integer accessLevel, Date expiresAt) {
         try {
-            return gitlab4jClient.getGitLabApi()
-                    .getProjectApi()
-                    .updateMember(projectIdOrPath, userId, accessLevel, expiresAt);
+            if (expiresAt == null) {
+                return gitlab4jClient.getGitLabApi()
+                        .getProjectApi()
+                        .updateMember((Integer) projectIdOrPath, userId, accessLevel);
+            } else {
+                return gitlab4jClient.getGitLabApi()
+                        .getProjectApi()
+                        .updateMember(projectIdOrPath, userId, accessLevel, expiresAt);
+            }
+
         } catch (GitLabApiException e) {
             throw new CommonException(e.getMessage());
         }

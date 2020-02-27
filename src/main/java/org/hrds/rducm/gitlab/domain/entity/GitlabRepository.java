@@ -57,35 +57,31 @@ public class GitlabRepository extends AuditDomain {
     // getter/setter
     // ------------------------------------------------------------------------------
 
-    /**
-     * @return 
-     */
+
 	public Long getId() {
 		return id;
 	}
 
-	public void setId(Long id) {
+	public GitlabRepository setId(Long id) {
 		this.id = id;
+		return this;
 	}
-    /**
-     * @return 代码库id
-     */
+
 	public Long getRepositoryId() {
 		return repositoryId;
 	}
 
-	public void setRepositoryId(Long repositoryId) {
+	public GitlabRepository setRepositoryId(Long repositoryId) {
 		this.repositoryId = repositoryId;
+		return this;
 	}
-    /**
-     * @return Gitlab项目id（代码库）
-     */
+
 	public Integer getGlProjectId() {
 		return glProjectId;
 	}
 
-	public void setGlProjectId(Integer glProjectId) {
+	public GitlabRepository setGlProjectId(Integer glProjectId) {
 		this.glProjectId = glProjectId;
+		return this;
 	}
-
 }
