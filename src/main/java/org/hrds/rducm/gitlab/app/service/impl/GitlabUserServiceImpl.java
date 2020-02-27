@@ -4,7 +4,7 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.oauth.DetailsHelper;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.gitlab4j.api.models.User;
-import org.hrds.rducm.gitlab.api.controller.vo.GitlabUserVO;
+import org.hrds.rducm.gitlab.api.controller.dto.GitlabUserViewDTO;
 import org.hrds.rducm.gitlab.app.service.GitlabUserService;
 import org.hrds.rducm.gitlab.domain.entity.GitlabUser;
 import org.hrds.rducm.gitlab.domain.repository.GitlabUserRepository;
@@ -22,24 +22,33 @@ public class GitlabUserServiceImpl implements GitlabUserService {
     private GitlabUserRepository gitlabUserRepository;
 
     @Override
-    public GitlabUserVO queryUserSelf() {
+    public GitlabUserViewDTO queryUserSelf() {
         Long userId = DetailsHelper.getUserDetails().getUserId();
-        GitlabUserVO gitlabUser = this.queryUser(userId);
+        GitlabUser gitlabUser = gitlabUserRepository.queryUser(userId);
         User glUser = gitlabUserRepository.getUserFromGitlab(gitlabUser.getGlUserId());
-        gitlabUser.setGlUser(glUser);
-        return gitlabUser;
+
+        GitlabUserViewDTO gitlabUserViewDTO = ConvertUtils.convertObject(gitlabUser, GitlabUserViewDTO.class);
+        gitlabUserViewDTO.setGlState(glUser.getState());
+        gitlabUserViewDTO.setGlAvatarUrl(glUser.getAvatarUrl());
+        gitlabUserViewDTO.setGlBio(glUser.getBio());
+        gitlabUserViewDTO.setGlCreatedAt(glUser.getCreatedAt());
+        gitlabUserViewDTO.setGlName(glUser.getName());
+        gitlabUserViewDTO.setGlUsername(glUser.getUsername());
+        gitlabUserViewDTO.setGlWebsiteUrl(glUser.getWebsiteUrl());
+        gitlabUserViewDTO.setGlWebUrl(glUser.getWebUrl());
+
+        return gitlabUserViewDTO;
     }
 
     @Override
-    public GitlabUserVO queryUser(Long userId) {
-        GitlabUser gitlabUser = new GitlabUser();
-        gitlabUser.setUserId(userId);
-        gitlabUser = gitlabUserRepository.selectOne(gitlabUser);
-        return ConvertUtils.convertObject(gitlabUser, GitlabUserVO.class);
+    public GitlabUserViewDTO queryUser(Long userId) {
+        GitlabUser gitlabUser = gitlabUserRepository.queryUser(userId);
+        return ConvertUtils.convertObject(gitlabUser, GitlabUserViewDTO.class);
     }
 
     /**
      * todo 需要分布式事务
+     *
      * @param userId
      * @param glEmail
      * @param glUsername

@@ -3,7 +3,7 @@ package org.hrds.rducm.gitlab.api.controller.v1;
 import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
 import io.swagger.annotations.ApiOperation;
-import org.hrds.rducm.gitlab.api.controller.vo.GitlabUserVO;
+import org.hrds.rducm.gitlab.api.controller.dto.GitlabUserViewDTO;
 import org.hrds.rducm.gitlab.app.service.GitlabUserService;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
@@ -25,7 +25,7 @@ public class GitlabUserController extends BaseController {
     @ApiOperation(value = "查询个人信息")
     @Permission(type = ResourceType.SITE, permissionPublic = true)
     @GetMapping("/self")
-    public ResponseEntity<GitlabUserVO> queryUser() {
+    public ResponseEntity<GitlabUserViewDTO> queryUser() {
         return Results.success(gitlabUserService.queryUserSelf());
     }
 

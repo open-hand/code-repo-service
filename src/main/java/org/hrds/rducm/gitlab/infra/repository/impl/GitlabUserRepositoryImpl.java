@@ -16,6 +16,14 @@ public class GitlabUserRepositoryImpl extends BaseRepositoryImpl<GitlabUser> imp
     private GitlabUserApi gitlabUserApi;
 
     @Override
+    public GitlabUser queryUser(Long userId) {
+        GitlabUser gitlabUser = new GitlabUser();
+        gitlabUser.setUserId(userId);
+        gitlabUser = this.selectOne(gitlabUser);
+        return gitlabUser;
+    }
+
+    @Override
     public User getUserFromGitlab(Integer userId) {
         return gitlabUserApi.getUser(userId);
     }

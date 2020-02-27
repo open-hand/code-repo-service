@@ -27,6 +27,10 @@ public class ProjectController extends BaseController {
     }
 
     @ApiOperation(value = "查询代码库成员(项目层)")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
+            @ApiImplicitParam(name = "query", value = "body参数", dataType = "GitlabMemberQueryDTO"),
+    })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping("/members")
     public ResponseEntity<Page<GitlabMemberViewDTO>> pageByOptions(@PathVariable Long projectId,
@@ -38,6 +42,7 @@ public class ProjectController extends BaseController {
     @ApiOperation(value = "批量新增代码库成员(项目层)")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
+            @ApiImplicitParam(name = "gitlabMemberBatchDTO", value = "body参数", dataType = "GitlabMemberBatchDTO", required = true),
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping("/members/batch-add")

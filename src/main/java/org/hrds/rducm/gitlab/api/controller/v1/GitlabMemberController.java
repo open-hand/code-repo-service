@@ -33,8 +33,8 @@ public class GitlabMemberController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "memberId", value = "成员id", paramType = "path", required = true),
+            @ApiImplicitParam(name = "gitlabMemberUpdateDTO", value = "参数", dataType = "GitlabMemberUpdateDTO", required = true),
     })
-    @ApiParam(name = "gitlabMemberUpdateDTO", value = "参数")
     @Permission(permissionPublic = true)
     @PutMapping("/{memberId}")
     public ResponseEntity<Object> updateMember(@PathVariable Long projectId,
