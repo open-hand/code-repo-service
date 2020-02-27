@@ -15,11 +15,12 @@ databaseChangeLog(logicalFilePath: 'script/db/example.groovy') {
             column(name: "id", type: "bigint(20)", autoIncrement: true, remarks: "") { constraints(primaryKey: true) }
             column(name: "code", type: "varchar(" + 64 * weight + ")", remarks: "编码") { constraints(nullable: "false") }
             column(name: "name", type: "varchar(" + 64 * weight + ")", remarks: "名称") { constraints(nullable: "false") }
-            column(name: "object_version_number", type: "bigint(20)", defaultValue: "1", remarks: "")
-            column(name: "created_by", type: "bigint(20)", defaultValue: "0", remarks: "")
-            column(name: "creation_date", type: "datetime", defaultValueComputed: "CURRENT_TIMESTAMP", remarks: "")
-            column(name: "last_updated_by", type: "bigint(20)", defaultValue: "0", remarks: "")
-            column(name: "last_update_date", type: "datetime", defaultValueComputed: "CURRENT_TIMESTAMP", remarks: "")
+
+            column(name: "object_version_number", type: "bigint(20)", defaultValue: "1", remarks: "行版本号，用来处理锁") { constraints(nullable: "false") }
+            column(name: "created_by", type: "bigint(20)", defaultValue: "-1", remarks: "") { constraints(nullable: "false") }
+            column(name: "creation_date", type: "datetime", defaultValueComputed: "CURRENT_TIMESTAMP", remarks: "") { constraints(nullable: "false") }
+            column(name: "last_updated_by", type: "bigint(20)", defaultValue: "-1", remarks: "") { constraints(nullable: "false") }
+            column(name: "last_update_date", type: "datetime", defaultValueComputed: "CURRENT_TIMESTAMP", remarks: "") { constraints(nullable: "false") }
 
         }
 
