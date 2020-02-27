@@ -4,10 +4,13 @@ import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberBatchDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberViewDTO;
 import org.hrds.rducm.gitlab.app.service.GitlabMemberService;
 import org.hzero.core.base.BaseController;
@@ -30,18 +33,19 @@ public class ProjectController extends BaseController {
     @GetMapping("/members")
     public ResponseEntity<Page<GitlabMemberViewDTO>> pageByOptions(@PathVariable Long projectId,
                                                                    PageRequest pageRequest,
-                                                                   GitlabMemberViewDTO query) {
-        return Results.success(gitlabMemberService.list(projectId, pageRequest));
+                                                                   GitlabMemberQueryDTO query) {
+        return Results.success(gitlabMemberService.list(projectId, pageRequest, query));
     }
 
     @ApiOperation(value = "批量新增代码库成员(项目层)")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
-            @ApiImplicitParam(name = "gitlabMembers", value = "新增成员信息", paramType = "GitlabMemberCreateDTO"),
+//            @ApiImplicitParam(name = "gitlabMembers", value = "新增成员信息", paramType = "body"),
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping("/members/batch-add")
     public ResponseEntity<Object> batchAddMembers(@PathVariable Long projectId,
+                                                  @ApiParam("新增成员信息")
                                                   @RequestBody GitlabMemberBatchDTO gitlabMemberBatchDTO) {
         validObject(gitlabMemberBatchDTO);
         gitlabMemberService.batchAddOrUpdateMembers(projectId, gitlabMemberBatchDTO);

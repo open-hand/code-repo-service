@@ -9,32 +9,110 @@ import java.util.Date;
 
 
 public class GitlabMemberViewDTO {
-//    @NotNull
-//    @ApiModelProperty(ApiInfoConstants.PROJECT_ID)
-//    private Long projectId;
+    private String realName;
 
-    private Long repositoryId;
+    private String loginName;
 
-    private Long userId;
-//    @NotNull
-//    @ApiModelProperty(ApiInfoConstants.GL_PROJECT_ID)
-//    private Integer glProjectId;
-//    @NotNull
-//    @ApiModelProperty(ApiInfoConstants.GL_USER_ID)
-//    private Integer glUserId;
+    private String appServiceName;
+
+    private String projectRoleName;
 
     private Integer glAccessLevel;
 
     private Date glExpiresAt;
 
-//    public Long getProjectId() {
-//        return projectId;
-//    }
-//
-//    public GitlabMemberCreateDTO setProjectId(Long projectId) {
-//        this.projectId = projectId;
-//        return this;
-//    }
+    private Long createdBy;
+
+    private String createdByName;
+
+    private Date creationDate;
+
+    private Long projectId;
+
+    private Long repositoryId;
+
+    private Long userId;
+
+    public String getRealName() {
+        return realName;
+    }
+
+    public GitlabMemberViewDTO setRealName(String realName) {
+        this.realName = realName;
+        return this;
+    }
+
+    public String getLoginName() {
+        return loginName;
+    }
+
+    public GitlabMemberViewDTO setLoginName(String loginName) {
+        this.loginName = loginName;
+        return this;
+    }
+
+    public String getAppServiceName() {
+        return appServiceName;
+    }
+
+    public GitlabMemberViewDTO setAppServiceName(String appServiceName) {
+        this.appServiceName = appServiceName;
+        return this;
+    }
+
+    public String getProjectRoleName() {
+        return projectRoleName;
+    }
+
+    public GitlabMemberViewDTO setProjectRoleName(String projectRoleName) {
+        this.projectRoleName = projectRoleName;
+        return this;
+    }
+
+    public Integer getGlAccessLevel() {
+        return glAccessLevel;
+    }
+
+    public GitlabMemberViewDTO setGlAccessLevel(Integer glAccessLevel) {
+        this.glAccessLevel = glAccessLevel;
+        return this;
+    }
+
+    public Date getGlExpiresAt() {
+        return glExpiresAt;
+    }
+
+    public GitlabMemberViewDTO setGlExpiresAt(Date glExpiresAt) {
+        this.glExpiresAt = glExpiresAt;
+        return this;
+    }
+
+    public Long getCreatedBy() {
+        return createdBy;
+    }
+
+    public GitlabMemberViewDTO setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
+        return this;
+    }
+
+    public String getCreatedByName() {
+        return createdByName;
+    }
+
+    public GitlabMemberViewDTO setCreatedByName(String createdByName) {
+        this.createdByName = createdByName;
+        return this;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public GitlabMemberViewDTO setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+        return this;
+    }
 
     public Long getRepositoryId() {
         return repositoryId;
@@ -54,39 +132,13 @@ public class GitlabMemberViewDTO {
         return this;
     }
 
-//    public Integer getGlProjectId() {
-//        return glProjectId;
-//    }
-//
-//    public GitlabMemberCreateDTO setGlProjectId(Integer glProjectId) {
-//        this.glProjectId = glProjectId;
-//        return this;
-//    }
-//
-//    public Integer getGlUserId() {
-//        return glUserId;
-//    }
-//
-//    public GitlabMemberCreateDTO setGlUserId(Integer glUserId) {
-//        this.glUserId = glUserId;
-//        return this;
-//    }
-
-    public Integer getGlAccessLevel() {
-        return glAccessLevel;
+    public Long getProjectId() {
+        return projectId;
     }
 
-    public GitlabMemberViewDTO setGlAccessLevel(Integer glAccessLevel) {
-        this.glAccessLevel = glAccessLevel;
-        return this;
-    }
-
-    public Date getGlExpiresAt() {
-        return glExpiresAt;
-    }
-
-    public GitlabMemberViewDTO setGlExpiresAt(Date glExpiresAt) {
-        this.glExpiresAt = glExpiresAt;
+    public GitlabMemberViewDTO setProjectId(Long projectId) {
+        this.projectId = projectId;
         return this;
     }
 }
+

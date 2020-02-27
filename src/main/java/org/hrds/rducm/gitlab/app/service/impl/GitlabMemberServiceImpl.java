@@ -10,7 +10,9 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.domain.AuditDomain;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.mybatis.pagehelper.domain.Sort;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberBatchDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberUpdateDTO;
 import org.hrds.rducm.gitlab.app.service.GitlabMemberService;
@@ -24,6 +26,7 @@ import org.hrds.rducm.gitlab.infra.constant.Constants;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.core.base.AopProxy;
 import org.hzero.mybatis.domian.Condition;
+import org.hzero.mybatis.util.Sqls;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,10 +53,26 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
     }
 
     @Override
-    public Page<GitlabMemberViewDTO> list(Long projectId, PageRequest pageRequest) {
-        GitlabMember query = new GitlabMember();
-        query.setProjectId(projectId);
-        Page<GitlabMember> page = PageHelper.doPage(pageRequest, () -> gitlabMemberRepository.select(query));
+    public Page<GitlabMemberViewDTO> list(Long projectId, PageRequest pageRequest, GitlabMemberQueryDTO query) {
+        // <1> 封装查询条件
+
+        // 获取用户名对应的userId数组
+        // 调用外部接口模糊查询的到userId todo
+        List<Long> userIds = new ArrayList<>();
+        // 获取应用服务对应的repositoryId数组
+        // 调用外部接口模糊查询的到userId todo
+        List<Long> repositoryIds = new ArrayList<>();
+
+        Condition condition = Condition.builder(GitlabMember.class)
+                .where(Sqls.custom()
+                        .andEqualTo(GitlabMember.FIELD_PROJECT_ID, projectId)
+                        .andIn(GitlabMember.FIELD_USER_ID, userIds, true)
+                        .andIn(GitlabMember.FIELD_REPOSITORY_ID, repositoryIds, true))
+                .build();
+
+        Page<GitlabMember> page = PageHelper.doPageAndSort(pageRequest, () -> gitlabMemberRepository.selectByCondition(condition));
+
+//        Page<GitlabMember> page = PageHelper.doPage(pageRequest, () -> gitlabMemberRepository.select(query));
         return ConvertUtils.convertPage(page, GitlabMemberViewDTO.class);
     }
 
