@@ -13,7 +13,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 /**
- * @author ying.xie@hand-china.com 2020-02-27 16:13:38
+ * @author ying.xie@hand-china.com 2020-02-27 19:19:50
  */
 @ApiModel("")
 @VersionAudit
@@ -23,7 +23,9 @@ import javax.validation.constraints.NotNull;
 public class GitlabRepository extends AuditDomain {
 
     public static final String FIELD_ID = "id";
+    public static final String FIELD_PROJECT_ID = "projectId";
     public static final String FIELD_REPOSITORY_ID = "repositoryId";
+    public static final String FIELD_REPOSITORY_NAME = "repositoryName";
     public static final String FIELD_GL_PROJECT_ID = "glProjectId";
 
     //
@@ -39,9 +41,13 @@ public class GitlabRepository extends AuditDomain {
     @Id
     @GeneratedValue
     private Long id;
+    @ApiModelProperty(value = "项目id")
+    private Long projectId;
     @ApiModelProperty(value = "代码库id", required = true)
     @NotNull
     private Long repositoryId;
+    @ApiModelProperty(value = "代码库名称（即应用服务名称）")
+    private String repositoryName;
     @ApiModelProperty(value = "Gitlab项目id（代码库）", required = true)
     @NotNull
     private Integer glProjectId;
@@ -55,30 +61,48 @@ public class GitlabRepository extends AuditDomain {
     // ------------------------------------------------------------------------------
 
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public GitlabRepository setId(Long id) {
-		this.id = id;
-		return this;
-	}
+    public GitlabRepository setId(Long id) {
+        this.id = id;
+        return this;
+    }
 
-	public Long getRepositoryId() {
-		return repositoryId;
-	}
+    public Long getProjectId() {
+        return projectId;
+    }
 
-	public GitlabRepository setRepositoryId(Long repositoryId) {
-		this.repositoryId = repositoryId;
-		return this;
-	}
+    public GitlabRepository setProjectId(Long projectId) {
+        this.projectId = projectId;
+        return this;
+    }
 
-	public Integer getGlProjectId() {
-		return glProjectId;
-	}
+    public Long getRepositoryId() {
+        return repositoryId;
+    }
 
-	public GitlabRepository setGlProjectId(Integer glProjectId) {
-		this.glProjectId = glProjectId;
-		return this;
-	}
+    public GitlabRepository setRepositoryId(Long repositoryId) {
+        this.repositoryId = repositoryId;
+        return this;
+    }
+
+    public String getRepositoryName() {
+        return repositoryName;
+    }
+
+    public GitlabRepository setRepositoryName(String repositoryName) {
+        this.repositoryName = repositoryName;
+        return this;
+    }
+
+    public Integer getGlProjectId() {
+        return glProjectId;
+    }
+
+    public GitlabRepository setGlProjectId(Integer glProjectId) {
+        this.glProjectId = glProjectId;
+        return this;
+    }
 }

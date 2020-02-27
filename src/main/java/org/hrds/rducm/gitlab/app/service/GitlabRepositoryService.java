@@ -1,5 +1,9 @@
 package org.hrds.rducm.gitlab.app.service;
 
+import org.hrds.rducm.gitlab.domain.entity.GitlabRepository;
+
+import java.util.List;
+
 /**
  * 应用服务
  *
@@ -7,4 +11,5 @@ package org.hrds.rducm.gitlab.app.service;
  */
 public interface GitlabRepositoryService {
 
+    List<GitlabRepository> listByActive(Long projectId);
 }
