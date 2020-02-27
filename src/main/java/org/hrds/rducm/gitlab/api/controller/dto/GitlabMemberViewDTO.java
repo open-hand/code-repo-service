@@ -38,6 +38,8 @@ public class GitlabMemberViewDTO {
 
     private Date creationDate;
 
+    private Long objectVersionNumber;
+
     public Long getId() {
         return id;
     }
@@ -152,6 +154,15 @@ public class GitlabMemberViewDTO {
 
     public GitlabMemberViewDTO setProjectId(Long projectId) {
         this.projectId = projectId;
+        return this;
+    }
+
+    public Long getObjectVersionNumber() {
+        return objectVersionNumber;
+    }
+
+    public GitlabMemberViewDTO setObjectVersionNumber(Long objectVersionNumber) {
+        this.objectVersionNumber = objectVersionNumber;
         return this;
     }
 }
