@@ -1,8 +1,13 @@
 package org.hrds.rducm.gitlab.api.controller.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
 public class GitlabMemberQueryDTO {
+    @ApiModelProperty(value = "应用服务名称")
     private String appServiceName;
+    @ApiModelProperty(value = "用户名")
     private String username;
+    @ApiModelProperty(value = "通用参数")
     private String params;
 
     public String getAppServiceName() {

@@ -5,14 +5,12 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberViewDTO;
 import org.hrds.rducm.gitlab.app.service.GitlabMemberService;
+import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.http.ResponseEntity;
@@ -40,12 +38,10 @@ public class ProjectController extends BaseController {
     @ApiOperation(value = "批量新增代码库成员(项目层)")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
-//            @ApiImplicitParam(name = "gitlabMembers", value = "新增成员信息", paramType = "body"),
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping("/members/batch-add")
     public ResponseEntity<Object> batchAddMembers(@PathVariable Long projectId,
-                                                  @ApiParam("新增成员信息")
                                                   @RequestBody GitlabMemberBatchDTO gitlabMemberBatchDTO) {
         validObject(gitlabMemberBatchDTO);
         gitlabMemberService.batchAddOrUpdateMembers(projectId, gitlabMemberBatchDTO);

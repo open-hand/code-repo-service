@@ -12,12 +12,12 @@ import java.util.List;
 
 
 public class GitlabMemberBatchDTO {
-    @NotNull
-    @ApiModelProperty(ApiInfoConstants.REPOSITORY_ID)
+    @NotEmpty
+    @ApiModelProperty(value = ApiInfoConstants.REPOSITORY_ID, dataType = "Long", required = true)
     private List<Long> repositoryIds;
 
     @NotNull
-    @ApiModelProperty("是否项目下所有成员")
+    @ApiModelProperty(value = "是否项目下所有成员", dataType = "Boolean", required = true)
     private Boolean isAllMember;
 
     @NotEmpty
@@ -27,10 +27,10 @@ public class GitlabMemberBatchDTO {
 
     public static class GitlabMemberCreateDTO {
         @NotNull
-        @ApiModelProperty(ApiInfoConstants.USER_ID)
+        @ApiModelProperty(value = ApiInfoConstants.USER_ID, required = true)
         private Long userId;
         @NotNull
-        @ApiModelProperty(ApiInfoConstants.GL_ACCESS_LEVEL)
+        @ApiModelProperty(value = ApiInfoConstants.GL_ACCESS_LEVEL, required = true)
         private Integer glAccessLevel;
         @Future
         @ApiModelProperty(ApiInfoConstants.GL_EXPIRES_AT)

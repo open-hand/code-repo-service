@@ -17,21 +17,35 @@ public class GitlabMemberViewDTO {
 
     private String projectRoleName;
 
-    private Integer glAccessLevel;
-
-    private Date glExpiresAt;
-
-    private Long createdBy;
-
     private String createdByName;
 
-    private Date creationDate;
+    /**
+     * 成员id, 主键
+     */
+    private Long id;
 
     private Long projectId;
 
     private Long repositoryId;
 
     private Long userId;
+
+    private Integer glAccessLevel;
+
+    private Date glExpiresAt;
+
+    private Long createdBy;
+
+    private Date creationDate;
+
+    public Long getId() {
+        return id;
+    }
+
+    public GitlabMemberViewDTO setId(Long id) {
+        this.id = id;
+        return this;
+    }
 
     public String getRealName() {
         return realName;
