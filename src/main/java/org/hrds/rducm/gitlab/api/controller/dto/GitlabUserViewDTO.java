@@ -6,7 +6,7 @@ public class GitlabUserViewDTO {
     private Long id;
     private Long userId;
     private String initPassword;
-    private Boolean isSyncGitlab;
+    private Boolean syncGitlabFlag;
     private Date syncDateGitlab;
 //    private User glUser;
 
@@ -50,11 +50,11 @@ public class GitlabUserViewDTO {
     }
 
     public Boolean getSyncGitlab() {
-        return isSyncGitlab;
+        return syncGitlabFlag;
     }
 
     public GitlabUserViewDTO setSyncGitlab(Boolean syncGitlab) {
-        isSyncGitlab = syncGitlab;
+        syncGitlabFlag = syncGitlab;
         return this;
     }
 

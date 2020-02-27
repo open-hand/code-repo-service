@@ -87,7 +87,7 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
     @Override
     public void insertMemberBefore(GitlabMember param) {
         GitlabMember m = ConvertUtils.convertObject(param, GitlabMember.class);
-        m.setIsSyncGitlab(false);
+        m.setSyncGitlabFlag(false);
         m.setGlAccessLevel(null);
         m.setGlExpiresAt(null);
         this.insertSelective(m);
@@ -99,10 +99,10 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
     @Override
     public void updateMemberBefore(GitlabMember param) {
         GitlabMember m = ConvertUtils.convertObject(param, GitlabMember.class);
-        m.setIsSyncGitlab(false);
+        m.setSyncGitlabFlag(false);
         m.setGlAccessLevel(null);
         m.setGlExpiresAt(null);
-        this.updateOptional(m, GitlabMember.FIELD_IS_SYNC_GITLAB, GitlabMember.FIELD_GL_ACCESS_LEVEL, GitlabMember.FIELD_GL_EXPIRES_AT);
+        this.updateOptional(m, GitlabMember.FIELD_SYNC_GITLAB_FLAG, GitlabMember.FIELD_GL_ACCESS_LEVEL, GitlabMember.FIELD_GL_EXPIRES_AT);
 
         param.setId(m.getId());
         param.setObjectVersionNumber(m.getObjectVersionNumber());
@@ -115,12 +115,12 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
                 GitlabMember.FIELD_GL_USER_ID,
                 GitlabMember.FIELD_GL_ACCESS_LEVEL,
                 GitlabMember.FIELD_GL_EXPIRES_AT,
-                GitlabMember.FIELD_IS_SYNC_GITLAB,
+                GitlabMember.FIELD_SYNC_GITLAB_FLAG,
                 GitlabMember.FIELD_SYNC_DATE_GITLAB
         };
         m.setGlAccessLevel(member.getAccessLevel().toValue());
         m.setGlExpiresAt(member.getExpiresAt());
-        m.setIsSyncGitlab(true);
+        m.setSyncGitlabFlag(true);
         m.setSyncDateGitlab(new Date());
         this.updateOptional(m, fields);
     }
@@ -144,7 +144,7 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
      */
     @Override
     public void checkIsSyncGitlab(GitlabMember m) {
-        if (!m.getIsSyncGitlab()) {
+        if (!m.getSyncGitlabFlag()) {
             // 当同步标记为false时, 表示上个事务还未结束
             throw new CommonException("error.sync.flag.false");
         }

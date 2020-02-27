@@ -1,22 +1,19 @@
 package org.hrds.rducm.gitlab.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.choerodon.mybatis.annotation.ModifyAudit;
+import io.choerodon.mybatis.annotation.VersionAudit;
+import io.choerodon.mybatis.domain.AuditDomain;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-import io.choerodon.mybatis.domain.AuditDomain;
-import io.choerodon.mybatis.annotation.ModifyAudit;
-import io.choerodon.mybatis.annotation.VersionAudit;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
 /**
- * 
- *
- * @author ying.xie@hand-china.com 2020-02-26 14:03:22
+ * @author ying.xie@hand-china.com 2020-02-27 16:13:38
  */
 @ApiModel("")
 @VersionAudit
@@ -42,14 +39,14 @@ public class GitlabRepository extends AuditDomain {
     @Id
     @GeneratedValue
     private Long id;
-    @ApiModelProperty(value = "代码库id",required = true)
+    @ApiModelProperty(value = "代码库id", required = true)
     @NotNull
     private Long repositoryId;
-    @ApiModelProperty(value = "Gitlab项目id（代码库）",required = true)
-	@NotNull
-	private Integer glProjectId;
+    @ApiModelProperty(value = "Gitlab项目id（代码库）", required = true)
+    @NotNull
+    private Integer glProjectId;
 
-	//
+    //
     // 非数据库字段
     // ------------------------------------------------------------------------------
 

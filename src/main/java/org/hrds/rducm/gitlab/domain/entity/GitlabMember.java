@@ -1,25 +1,22 @@
 package org.hrds.rducm.gitlab.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.choerodon.mybatis.annotation.ModifyAudit;
+import io.choerodon.mybatis.annotation.VersionAudit;
+import io.choerodon.mybatis.domain.AuditDomain;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-import javax.validation.constraints.NotBlank;
-import io.choerodon.mybatis.domain.AuditDomain;
-import io.choerodon.mybatis.annotation.ModifyAudit;
-import io.choerodon.mybatis.annotation.VersionAudit;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
 import java.util.Date;
 
 /**
  * Gitlab成员表
  *
- * @author ying.xie@hand-china.com 2020-02-26 14:52:07
+ * @author ying.xie@hand-china.com 2020-02-27 16:13:38
  */
 @ApiModel("Gitlab成员表")
 @VersionAudit
@@ -37,7 +34,7 @@ public class GitlabMember extends AuditDomain {
     public static final String FIELD_GL_USER_ID = "glUserId";
     public static final String FIELD_GL_ACCESS_LEVEL = "glAccessLevel";
     public static final String FIELD_GL_EXPIRES_AT = "glExpiresAt";
-    public static final String FIELD_IS_SYNC_GITLAB = "isSyncGitlab";
+    public static final String FIELD_SYNC_GITLAB_FLAG = "syncGitlabFlag";
     public static final String FIELD_SYNC_DATE_GITLAB = "syncDateGitlab";
 
     //
@@ -53,32 +50,32 @@ public class GitlabMember extends AuditDomain {
     @Id
     @GeneratedValue
     private Long id;
-    @ApiModelProperty(value = "项目层，项目id",required = true)
+    @ApiModelProperty(value = "项目层，项目id", required = true)
     @NotNull
     private Long projectId;
-    @ApiModelProperty(value = "代码仓库id",required = true)
+    @ApiModelProperty(value = "代码仓库id", required = true)
     @NotNull
     private Long repositoryId;
-    @ApiModelProperty(value = "用户id",required = true)
+    @ApiModelProperty(value = "用户id", required = true)
     @NotNull
     private Long userId;
-   @ApiModelProperty(value = "成员状态")    
+    @ApiModelProperty(value = "成员状态")
     private String state;
-   @ApiModelProperty(value = "gitlab项目id")    
+    @ApiModelProperty(value = "gitlab项目id")
     private Integer glProjectId;
-   @ApiModelProperty(value = "gitlab用户id")    
+    @ApiModelProperty(value = "gitlab用户id")
     private Integer glUserId;
-   @ApiModelProperty(value = "gitlab成员权限级别")    
+    @ApiModelProperty(value = "gitlab成员权限级别")
     private Integer glAccessLevel;
-   @ApiModelProperty(value = "gitlab成员过期时间")    
+    @ApiModelProperty(value = "gitlab成员过期时间")
     private Date glExpiresAt;
-    @ApiModelProperty(value = "gitlab同步标识",required = true)
+    @ApiModelProperty(value = "gitlab同步标识", required = true)
     @NotNull
-    private Boolean isSyncGitlab;
-   @ApiModelProperty(value = "gitlab同步时间")    
+    private Boolean syncGitlabFlag;
+    @ApiModelProperty(value = "gitlab同步时间")
     private Date syncDateGitlab;
 
-	//
+    //
     // 非数据库字段
     // ------------------------------------------------------------------------------
 
@@ -168,12 +165,12 @@ public class GitlabMember extends AuditDomain {
 		return this;
 	}
 
-	public Boolean getIsSyncGitlab() {
-		return isSyncGitlab;
+	public Boolean getSyncGitlabFlag() {
+		return syncGitlabFlag;
 	}
 
-	public GitlabMember setIsSyncGitlab(Boolean syncGitlab) {
-		isSyncGitlab = syncGitlab;
+	public GitlabMember setSyncGitlabFlag(Boolean syncGitlabFlag) {
+		this.syncGitlabFlag = syncGitlabFlag;
 		return this;
 	}
 

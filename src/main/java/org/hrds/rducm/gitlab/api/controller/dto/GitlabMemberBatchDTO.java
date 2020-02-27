@@ -18,7 +18,7 @@ public class GitlabMemberBatchDTO {
 
     @NotNull
     @ApiModelProperty(value = "是否项目下所有成员", dataType = "Boolean", required = true)
-    private Boolean isAllMember;
+    private Boolean allMemberFlag;
 
     @NotEmpty
     @Valid
@@ -74,12 +74,12 @@ public class GitlabMemberBatchDTO {
         return this;
     }
 
-    public Boolean getIsAllMember() {
-        return isAllMember;
+    public Boolean getAllMemberFlag() {
+        return allMemberFlag;
     }
 
-    public GitlabMemberBatchDTO setIsAllMember(Boolean allMember) {
-        isAllMember = allMember;
+    public GitlabMemberBatchDTO setAllMemberFlag(Boolean allMember) {
+        allMemberFlag = allMember;
         return this;
     }
 
