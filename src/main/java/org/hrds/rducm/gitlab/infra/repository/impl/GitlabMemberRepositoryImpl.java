@@ -6,6 +6,8 @@ import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.domain.entity.GitlabMember;
 import org.hrds.rducm.gitlab.domain.entity.GitlabMemberAudit;
 import org.hrds.rducm.gitlab.domain.repository.GitlabMemberRepository;
+import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
+import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabPorjectApi;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.mybatis.base.impl.BaseRepositoryImpl;
@@ -23,8 +25,9 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
     private GitlabPorjectApi gitlabPorjectApi;
 
     @Override
-    public GitlabMember selectOneByUk(Long repositoryId, Long userId) {
+    public GitlabMember selectOneByUk(Long projectId, Long repositoryId, Long userId) {
         GitlabMember gitlabMember = new GitlabMember();
+        gitlabMember.setProjectId(projectId);
         gitlabMember.setRepositoryId(repositoryId);
         gitlabMember.setUserId(userId);
         return this.selectOne(gitlabMember);
@@ -52,13 +55,22 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
             if (isExists) {
                 // 调用gitlab api更新成员
                 glMember = gitlabPorjectApi.updateMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
-            } else  {
+            } else {
                 // 调用gitlab api添加成员
                 glMember = gitlabPorjectApi.addMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
             }
 
             // <2> 回写数据库
             this.updateMemberAfter(m, glMember);
+
+            // <3> 发送事件
+            MemberEvent.EventParam eventParam = buildEventParam(m.getProjectId(), m.getRepositoryId(), m.getUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
+            if (isExists) {
+                OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.UPDATE_MEMBER, eventParam));
+            } else {
+                OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.ADD_MEMBER, eventParam));
+            }
+
         });
     }
 
@@ -67,7 +79,7 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
     public void batchAddOrUpdateMembersBefore(List<GitlabMember> gitlabMembers) {
         gitlabMembers.forEach(m -> {
             // 判断新增或修改
-            GitlabMember dbMember = this.selectOneByUk(m.getRepositoryId(), m.getUserId());
+            GitlabMember dbMember = this.selectOneByUk(m.getProjectId(), m.getRepositoryId(), m.getUserId());
             boolean isExists = dbMember != null;
 
             // 设置状态供后续判断
@@ -110,7 +122,7 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
 
     public void updateMemberAfter(GitlabMember m, Member member) {
         // <2> 回写数据库
-        String[] fields = new String[] {
+        String[] fields = new String[]{
                 GitlabMember.FIELD_GL_PROJECT_ID,
                 GitlabMember.FIELD_GL_USER_ID,
                 GitlabMember.FIELD_GL_ACCESS_LEVEL,
@@ -123,6 +135,7 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
         m.setSyncGitlabFlag(true);
         m.setSyncDateGitlab(new Date());
         this.updateOptional(m, fields);
+
     }
 
     @Override
@@ -131,15 +144,27 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
 
         // <2> 回写数据库
         updateMemberAfter(param, glMember);
+
+        // <3> 发送事件
+        MemberEvent.EventParam eventParam = buildEventParam(param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+        OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.UPDATE_MEMBER, eventParam));
     }
 
     @Override
-    public void removeMemberToGitlab(Integer glProjectId, Integer glUserId) {
-        gitlabPorjectApi.removeMember(glProjectId, glUserId);
+    public void removeMemberToGitlab(GitlabMember param) {
+        gitlabPorjectApi.removeMember(param.getGlProjectId(), param.getGlUserId());
+
+        // <1> 数据库删除成员
+        this.deleteByPrimaryKey(param.getId());
+
+        // <3> 发送事件
+        MemberEvent.EventParam eventParam = buildEventParam(param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+        OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.REMOVE_MEMBER, eventParam));
     }
 
     /**
      * 检查当前记录是否处于"预更新"状态
+     *
      * @param m
      */
     @Override
@@ -153,6 +178,7 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
     /**
      * todo
      * 成员权限审计
+     *
      * @param
      */
     private void compareMembersWithGitlab(Long glProjectId, List<GitlabMember> dbMembers, List<Member> glMembers) {
@@ -172,7 +198,17 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
             String key = glProjectId + "-" + glMember.getId();
 
 
-
         }
+    }
+
+    /**
+     * 构造审计所需报文参数
+     *
+     * @param targetUserId 目标用户id
+     * @param accessLevel  访问权限等级
+     * @param expiresAt    过期时间
+     */
+    private MemberEvent.EventParam buildEventParam(Long projectId, Long repositoryId, Long targetUserId, Integer accessLevel, Date expiresAt) {
+        return new MemberEvent.EventParam(projectId, repositoryId, targetUserId, accessLevel, expiresAt);
     }
 }

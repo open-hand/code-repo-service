@@ -5,12 +5,9 @@ import io.choerodon.asgard.saga.annotation.SagaTask;
 import io.choerodon.asgard.saga.producer.StartSagaBuilder;
 import io.choerodon.asgard.saga.producer.TransactionalProducer;
 import io.choerodon.core.domain.Page;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.mybatis.domain.AuditDomain;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import io.choerodon.mybatis.pagehelper.domain.Sort;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberViewDTO;
@@ -79,7 +76,7 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
     /**
      * 批量新增或修改成员
      * @param projectId
-     * @param gitlabMembersDTO
+     * @param
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -96,18 +93,20 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateMember(Long projectId, Long repositoryId, Long memberId, GitlabMemberUpdateDTO gitlabMemberUpdateDTO) {
+    public void updateMember(Long memberId, GitlabMemberUpdateDTO gitlabMemberUpdateDTO) {
         // <0> 校验入参 todo + 转换
         final GitlabMember gitlabMember = ConvertUtils.convertObject(gitlabMemberUpdateDTO, GitlabMember.class);
         gitlabMember.setId(memberId);
-        gitlabMember.setProjectId(projectId);
-        gitlabMember.setRepositoryId(repositoryId);
 
         // 获取gitlab项目id和用户id todo 应从外部接口获取, 暂时从数据库获取
         GitlabMember dbMember = gitlabMemberRepository.selectByPrimaryKey(memberId);
         gitlabMemberRepository.checkIsSyncGitlab(dbMember);
         gitlabMember.setGlProjectId(dbMember.getGlProjectId());
         gitlabMember.setGlUserId(dbMember.getGlUserId());
+        gitlabMember.setUserId(dbMember.getUserId());
+
+        gitlabMember.setProjectId(dbMember.getProjectId());
+        gitlabMember.setRepositoryId(dbMember.getRepositoryId());
 
         // <1> 数据库更新成员
         gitlabMemberRepository.updateMemberBefore(gitlabMember);
@@ -118,13 +117,14 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void removeMember(Long projectId, Long repositoryId, Long memberId) {
-        // <1> 数据库删除成员
-        GitlabMember gitlabMember = gitlabMemberRepository.selectByPrimaryKey(memberId);
-        gitlabMemberRepository.deleteByPrimaryKey(memberId);
+    public void removeMember(Long memberId) {
+        // <1> 数据库更新成员, 预删除
+        GitlabMember dbMember = gitlabMemberRepository.selectByPrimaryKey(memberId);
+        gitlabMemberRepository.checkIsSyncGitlab(dbMember);
+        gitlabMemberRepository.updateMemberBefore(dbMember);
 
         // <2> 调用gitlab api删除成员 todo 事务一致性问题
-        gitlabMemberRepository.removeMemberToGitlab(gitlabMember.getGlProjectId(), gitlabMember.getGlUserId());
+        gitlabMemberRepository.removeMemberToGitlab(dbMember);
     }
 
     /**

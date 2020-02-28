@@ -4,17 +4,18 @@ import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.domain.entity.GitlabMember;
 import org.hzero.mybatis.base.BaseRepository;
 
-import java.util.Date;
 import java.util.List;
 
 public interface GitlabMemberRepository extends BaseRepository<GitlabMember> {
     /**
      * 根据唯一索引查询成员
+     *
+     * @param projectId
      * @param repositoryId
      * @param userId
      * @return
      */
-    GitlabMember selectOneByUk(Long repositoryId, Long userId);
+    GitlabMember selectOneByUk(Long projectId, Long repositoryId, Long userId);
 
     List<Member> queryMembersFromGitlab(Integer glProjectId);
 
@@ -40,7 +41,7 @@ public interface GitlabMemberRepository extends BaseRepository<GitlabMember> {
 
     void updateMemberToGitlab(GitlabMember param);
 
-    void removeMemberToGitlab(Integer glProjectId, Integer glUserId);
+    void removeMemberToGitlab(GitlabMember param);
 
     void checkIsSyncGitlab(GitlabMember m);
 }
