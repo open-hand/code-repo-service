@@ -23,7 +23,9 @@ public class GitlabUserServiceImpl implements GitlabUserService {
 
     @Override
     public GitlabUserViewDTO queryUserSelf() {
-        Long userId = DetailsHelper.getUserDetails().getUserId();
+        // todo fixme 暂时写死
+//        Long userId = DetailsHelper.getUserDetails().getUserId();
+        Long userId = 10003L;
         GitlabUser gitlabUser = gitlabUserRepository.queryUser(userId);
         User glUser = gitlabUserRepository.getUserFromGitlab(gitlabUser.getGlUserId());
 
