@@ -44,7 +44,10 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
 
     private void createOperationLog(MemberEvent event) {
         // 获取
-        Long userId = DetailsHelper.getUserDetails().getUserId();
+        // 暂时写死 todo fixme
+//        Long userId = DetailsHelper.getUserDetails().getUserId();
+        Long userId = 10002L;
+
         Long projectId = event.getEventParam().getProjectId();
         Long repositoryId = event.getEventParam().getRepositoryId();
         Long targetUserId = event.getEventParam().getTargetUserId();
