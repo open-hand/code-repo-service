@@ -1,7 +1,6 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.oauth.DetailsHelper;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.gitlab4j.api.models.User;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabUserViewDTO;
@@ -26,7 +25,7 @@ public class GitlabUserServiceImpl implements GitlabUserService {
         // todo fixme 暂时写死
 //        Long userId = DetailsHelper.getUserDetails().getUserId();
         Long userId = 10003L;
-        GitlabUser gitlabUser = gitlabUserRepository.queryUser(userId);
+        GitlabUser gitlabUser = gitlabUserRepository.selectByUk(userId);
         User glUser = gitlabUserRepository.getUserFromGitlab(gitlabUser.getGlUserId());
 
         GitlabUserViewDTO gitlabUserViewDTO = ConvertUtils.convertObject(gitlabUser, GitlabUserViewDTO.class);
@@ -44,7 +43,7 @@ public class GitlabUserServiceImpl implements GitlabUserService {
 
     @Override
     public GitlabUserViewDTO queryUser(Long userId) {
-        GitlabUser gitlabUser = gitlabUserRepository.queryUser(userId);
+        GitlabUser gitlabUser = gitlabUserRepository.selectByUk(userId);
         return ConvertUtils.convertObject(gitlabUser, GitlabUserViewDTO.class);
     }
 

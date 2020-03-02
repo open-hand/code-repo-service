@@ -5,7 +5,7 @@ import org.hrds.rducm.gitlab.domain.entity.GitlabUser;
 import org.hzero.mybatis.base.BaseRepository;
 
 public interface GitlabUserRepository extends BaseRepository<GitlabUser> {
-    GitlabUser queryUser(Long userId);
+    GitlabUser selectByUk(Long userId);
 
     User getUserFromGitlab(Integer userId);
 

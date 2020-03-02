@@ -13,5 +13,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class GitlabRepositoryRepositoryImpl extends BaseRepositoryImpl<GitlabRepository> implements GitlabRepositoryRepository {
 
+    @Override
+    public GitlabRepository selectByUk(Long repositoryId) {
+        GitlabRepository repository = new GitlabRepository();
+        repository.setRepositoryId(repositoryId);
+        return this.selectOne(repository);
+    }
   
 }
