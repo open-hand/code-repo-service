@@ -1,10 +1,10 @@
 package org.hrds.rducm.gitlab.infra.client.gitlab.api;
 
-import io.choerodon.core.exception.CommonException;
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.models.AccessLevel;
 import org.gitlab4j.api.models.ProtectedBranch;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
+import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class GitlabProtectedBranchesApi {
                     .getProtectedBranchesApi()
                     .getProtectedBranches(projectIdOrPath);
         } catch (GitLabApiException e) {
-            throw new CommonException(e.getMessage());
+            throw new GitlabClientException(e, e.getMessage());
         }
     }
 
@@ -33,7 +33,7 @@ public class GitlabProtectedBranchesApi {
                     .getProtectedBranchesApi()
                     .protectBranch(projectIdOrPath, branchName, pushAccessLevel, mergeAccessLevel);
         } catch (GitLabApiException e) {
-            throw new CommonException(e.getMessage());
+            throw new GitlabClientException(e, e.getMessage());
         }
     }
 
@@ -43,7 +43,7 @@ public class GitlabProtectedBranchesApi {
                     .getProtectedBranchesApi()
                     .unprotectBranch(projectIdOrPath, branchName);
         } catch (GitLabApiException e) {
-            throw new CommonException(e.getMessage());
+            throw new GitlabClientException(e, e.getMessage());
         }
     }
 }

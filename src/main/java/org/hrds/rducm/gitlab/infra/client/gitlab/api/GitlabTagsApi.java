@@ -5,6 +5,7 @@ import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.models.AccessLevel;
 import org.gitlab4j.api.models.ProtectedTag;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
+import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,7 +24,7 @@ public class GitlabTagsApi {
                     .getTagsApi()
                     .getProtectedTags(projectIdOrPath);
         } catch (GitLabApiException e) {
-            throw new CommonException(e.getMessage());
+            throw new GitlabClientException(e, e.getMessage());
         }
     }
 
@@ -33,7 +34,7 @@ public class GitlabTagsApi {
                     .getTagsApi()
                     .protectTag(projectIdOrPath, name, createAccessLevel);
         } catch (GitLabApiException e) {
-            throw new CommonException(e.getMessage());
+            throw new GitlabClientException(e, e.getMessage());
         }
     }
 
@@ -43,7 +44,7 @@ public class GitlabTagsApi {
                     .getTagsApi()
                     .unprotectTag(projectIdOrPath, name);
         } catch (GitLabApiException e) {
-            throw new CommonException(e.getMessage());
+            throw new GitlabClientException(e, e.getMessage());
         }
     }
 }

@@ -1,9 +1,9 @@
 package org.hrds.rducm.gitlab.infra.client.gitlab.api;
 
-import io.choerodon.core.exception.CommonException;
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
+import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -23,7 +23,7 @@ public class GitlabPorjectApi {
                     .getProjectApi()
                     .getMembers(projectId);
         } catch (GitLabApiException e) {
-            throw new CommonException(e.getMessage());
+            throw new GitlabClientException(e, e.getMessage());
         }
     }
 
@@ -33,7 +33,7 @@ public class GitlabPorjectApi {
                     .getProjectApi()
                     .addMember(projectIdOrPath, userId, accessLevel, expiresAt);
         } catch (GitLabApiException e) {
-            throw new CommonException(e.getMessage());
+            throw new GitlabClientException(e, e.getMessage());
         }
     }
 
@@ -50,7 +50,7 @@ public class GitlabPorjectApi {
             }
 
         } catch (GitLabApiException e) {
-            throw new CommonException(e.getMessage());
+            throw new GitlabClientException(e, e.getMessage());
         }
     }
 
@@ -60,7 +60,7 @@ public class GitlabPorjectApi {
                     .getProjectApi()
                     .removeMember(projectId, userId);
         } catch (GitLabApiException e) {
-            throw new CommonException(e.getMessage());
+            throw new GitlabClientException(e, e.getMessage());
         }
     }
 

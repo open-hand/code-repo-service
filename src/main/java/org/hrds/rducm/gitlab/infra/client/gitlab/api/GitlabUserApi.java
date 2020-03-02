@@ -4,6 +4,7 @@ import io.choerodon.core.exception.CommonException;
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.models.User;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
+import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -20,7 +21,7 @@ public class GitlabUserApi {
                     .getUserApi()
                     .getUser(userId);
         } catch (GitLabApiException e) {
-            throw new CommonException(e.getMessage());
+            throw new GitlabClientException(e, e.getMessage());
         }
     }
 
@@ -30,7 +31,7 @@ public class GitlabUserApi {
                     .getUserApi()
                     .getUser(username);
         } catch (GitLabApiException e) {
-            throw new CommonException(e.getMessage());
+            throw new GitlabClientException(e, e.getMessage());
         }
     }
 
@@ -40,7 +41,7 @@ public class GitlabUserApi {
                     .getUserApi()
                     .createUser(user, password, projectsLimit);
         } catch (GitLabApiException e) {
-            throw new CommonException(e.getMessage());
+            throw new GitlabClientException(e, e.getMessage());
         }
     }
 
@@ -50,7 +51,7 @@ public class GitlabUserApi {
                     .getUserApi()
                     .modifyUser(user, password, projectsLimit);
         } catch (GitLabApiException e) {
-            throw new CommonException(e.getMessage());
+            throw new GitlabClientException(e, e.getMessage());
         }
     }
 }
