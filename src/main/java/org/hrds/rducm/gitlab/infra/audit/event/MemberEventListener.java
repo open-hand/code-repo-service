@@ -3,7 +3,6 @@ package org.hrds.rducm.gitlab.infra.audit.event;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.core.oauth.DetailsHelper;
 import org.gitlab4j.api.models.AccessLevel;
 import org.hrds.rducm.gitlab.domain.entity.GitlabOperationLog;
 import org.hrds.rducm.gitlab.domain.entity.GitlabUser;
@@ -91,11 +90,10 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
                 .setProjectId(projectId)
                 .setRepositoryId(repositoryId)
                 .setOpType(event.getOpType().getCode())
-                .setOpAction(event.getEventType().getCode())
                 .setOpTarget(String.valueOf(event.getEventParam().getTargetUserId()))
                 .setOpDate(new Date(event.getTimestamp()))
                 .setOpContent(opContent)
-                .setEventType(event.getEventType().getCode())
+                .setOpEventType(event.getEventType().getCode())
                 .setExtraParam(extraParam);
 
         operationLogRepository.insertSelective(operationLog);

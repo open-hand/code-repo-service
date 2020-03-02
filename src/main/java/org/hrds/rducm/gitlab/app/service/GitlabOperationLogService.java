@@ -1,6 +1,9 @@
 package org.hrds.rducm.gitlab.app.service;
 
-import java.util.Date;
+import io.choerodon.core.domain.Page;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import org.hrds.rducm.gitlab.api.controller.dto.OperationLogQueryDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
 
 /**
  * 操作日志表应用服务
@@ -9,4 +12,5 @@ import java.util.Date;
  */
 public interface GitlabOperationLogService {
 
+    Page<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId, Long repositoryId, PageRequest pageRequest, OperationLogQueryDTO queryDTO);
 }

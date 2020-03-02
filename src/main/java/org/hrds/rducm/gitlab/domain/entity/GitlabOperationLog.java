@@ -27,6 +27,8 @@ import java.util.Date;
 public class GitlabOperationLog extends AuditDomain {
 
     public static final String FIELD_ID = "id";
+    public static final String FIELD_PROJECT_ID = "projectId";
+    public static final String FIELD_REPOSITORY_ID = "repositoryId";
     public static final String FIELD_OP_USER_ID = "opUserId";
     public static final String FIELD_OP_TYPE = "opType";
     public static final String FIELD_OP_CONTENT = "opContent";
@@ -64,20 +66,18 @@ public class GitlabOperationLog extends AuditDomain {
     @NotBlank
     private String opType;
 
+    @ApiModelProperty(value = "操作事件类型", required = true)
+    @NotBlank
+    private String opEventType;
+
     @ApiModelProperty(value = "操作内容")
     private String opContent;
 
-    @ApiModelProperty(value = "操作行为", required = true)
-    @NotBlank
-    private String opAction;
-
     private String opTarget;
+
     @ApiModelProperty(value = "操作日期", required = true)
     @NotNull
     private Date opDate;
-    @ApiModelProperty(value = "事件类型", required = true)
-    @NotBlank
-    private String eventType;
 
     private String extraParam;
     //
@@ -143,15 +143,6 @@ public class GitlabOperationLog extends AuditDomain {
         return this;
     }
 
-    public String getOpAction() {
-        return opAction;
-    }
-
-    public GitlabOperationLog setOpAction(String opAction) {
-        this.opAction = opAction;
-        return this;
-    }
-
     public Date getOpDate() {
         return opDate;
     }
@@ -161,12 +152,12 @@ public class GitlabOperationLog extends AuditDomain {
         return this;
     }
 
-    public String getEventType() {
-        return eventType;
+    public String getOpEventType() {
+        return opEventType;
     }
 
-    public GitlabOperationLog setEventType(String eventType) {
-        this.eventType = eventType;
+    public GitlabOperationLog setOpEventType(String opEventType) {
+        this.opEventType = opEventType;
         return this;
     }
 
