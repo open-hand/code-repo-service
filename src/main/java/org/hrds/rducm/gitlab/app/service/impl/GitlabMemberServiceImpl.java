@@ -70,7 +70,23 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
         Page<GitlabMember> page = PageHelper.doPageAndSort(pageRequest, () -> gitlabMemberRepository.selectByCondition(condition));
 
 //        Page<GitlabMember> page = PageHelper.doPage(pageRequest, () -> gitlabMemberRepository.select(query));
-        return ConvertUtils.convertPage(page, GitlabMemberViewDTO.class);
+        Page<GitlabMemberViewDTO> gitlabMemberViewDTOS = ConvertUtils.convertPage(page, GitlabMemberViewDTO.class);
+
+        // todo 关联查询, 需从接口获取数据, 暂时造数据
+        for (GitlabMemberViewDTO viewDTO : gitlabMemberViewDTOS.getContent()) {
+
+            GitlabUser dbUser = gitlabUserRepository.selectByUk(viewDTO.getUserId());
+            viewDTO.setRealName(dbUser.getGlUserName());
+            viewDTO.setLoginName(dbUser.getGlUserName());
+
+            GitlabRepository dbRepository = gitlabRepositoryRepository.selectByUk(viewDTO.getRepositoryId());
+            viewDTO.setAppServiceName(dbRepository.getRepositoryName());
+
+            viewDTO.setCreatedByName("张三");
+            viewDTO.setProjectRoleName("项目成员");
+        }
+
+        return gitlabMemberViewDTOS;
     }
 
     /**
