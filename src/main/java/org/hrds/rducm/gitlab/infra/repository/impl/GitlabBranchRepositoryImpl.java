@@ -1,9 +1,12 @@
 package org.hrds.rducm.gitlab.infra.repository.impl;
 
 import org.gitlab4j.api.models.AccessLevel;
+import org.gitlab4j.api.models.Branch;
 import org.gitlab4j.api.models.ProtectedBranch;
+import org.hrds.rducm.gitlab.domain.entity.GitlabRepository;
 import org.hrds.rducm.gitlab.domain.repository.GitlabBranchRepository;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProtectedBranchesApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabRepositoryApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +16,13 @@ import java.util.List;
 public class GitlabBranchRepositoryImpl implements GitlabBranchRepository {
     @Autowired
     private GitlabProtectedBranchesApi gitlabProtectedBranchesApi;
+    @Autowired
+    private GitlabRepositoryApi gitlabRepositoryApi;
+
+    @Override
+    public List<Branch> getBranchesFromGitlab(Integer projectId) {
+        return gitlabRepositoryApi.getBranches(projectId);
+    }
 
     @Override
     public List<ProtectedBranch> getProtectedBranchesFromGitlab(Object projectIdOrPath) {

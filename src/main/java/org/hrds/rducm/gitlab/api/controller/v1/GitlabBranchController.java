@@ -2,8 +2,10 @@ package org.hrds.rducm.gitlab.api.controller.v1;
 
 import io.choerodon.core.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
+import org.gitlab4j.api.models.Branch;
 import org.gitlab4j.api.models.ProtectedBranch;
 import org.hrds.rducm.gitlab.app.service.GitlabBranchService;
+import org.hrds.rducm.gitlab.domain.repository.GitlabBranchRepository;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,14 @@ import java.util.List;
 public class GitlabBranchController extends BaseController {
     @Autowired
     private GitlabBranchService gitlabBranchService;
+
+    @ApiOperation(value = "查询分支")
+    @Permission(permissionPublic = true)
+    @GetMapping
+    public ResponseEntity<List<Branch>> getBranches(@PathVariable Long projectId,
+                                                    @PathVariable Long repositoryId) {
+        return Results.success(gitlabBranchService.getBranches(repositoryId));
+    }
 
     @ApiOperation(value = "查询保护分支")
     @Permission(permissionPublic = true)

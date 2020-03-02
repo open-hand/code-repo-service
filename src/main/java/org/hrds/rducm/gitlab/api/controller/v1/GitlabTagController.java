@@ -3,6 +3,7 @@ package org.hrds.rducm.gitlab.api.controller.v1;
 import io.choerodon.core.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.gitlab4j.api.models.ProtectedTag;
+import org.gitlab4j.api.models.Tag;
 import org.hrds.rducm.gitlab.app.service.GitlabTagService;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
@@ -18,6 +19,14 @@ import java.util.List;
 public class GitlabTagController extends BaseController {
     @Autowired
     private GitlabTagService gitlabTagService;
+
+    @ApiOperation(value = "查询标签")
+    @Permission(permissionPublic = true)
+    @GetMapping
+    public ResponseEntity<List<Tag>> getTags(@PathVariable Long projectId,
+                                             @PathVariable Long repositoryId) {
+        return Results.success(gitlabTagService.getTags(repositoryId));
+    }
 
     @ApiOperation(value = "查询保护标签")
     @Permission(permissionPublic = true)

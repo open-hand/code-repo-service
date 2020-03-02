@@ -1,9 +1,12 @@
 package org.hrds.rducm.gitlab.infra.repository.impl;
 
+import io.choerodon.core.exception.CommonException;
 import org.hzero.mybatis.base.impl.BaseRepositoryImpl;
 import org.hrds.rducm.gitlab.domain.entity.GitlabRepository;
 import org.hrds.rducm.gitlab.domain.repository.GitlabRepositoryRepository;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 /**
  *  资源库实现
@@ -17,7 +20,8 @@ public class GitlabRepositoryRepositoryImpl extends BaseRepositoryImpl<GitlabRep
     public GitlabRepository selectByUk(Long repositoryId) {
         GitlabRepository repository = new GitlabRepository();
         repository.setRepositoryId(repositoryId);
-        return this.selectOne(repository);
+        return Optional.ofNullable(this.selectOne(repository))
+                .orElseThrow(() -> new CommonException("数据库不存在该数据, 请检查参数repositoryId " + repositoryId));
     }
   
 }
