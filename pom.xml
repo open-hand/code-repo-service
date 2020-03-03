@@ -122,7 +122,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- add by ying.xie -->
+        <!-- 添加猪齿鱼相关依赖 add by ying.xie -->
 <!--        <dependency>-->
 <!--            <groupId>io.choerodon</groupId>-->
 <!--            <artifactId>choerodon-starter-asgard</artifactId>-->
@@ -208,6 +208,22 @@
         </repository> -->
     </repositories>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.choerodon</groupId>
+                <artifactId>choerodon-maven-plugin</artifactId>
+                <version>${choerodon.starters.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>convert</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
 
 
