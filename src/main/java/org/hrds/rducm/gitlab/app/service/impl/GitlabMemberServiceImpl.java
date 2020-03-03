@@ -124,6 +124,9 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
         gitlabMember.setProjectId(dbMember.getProjectId());
         gitlabMember.setRepositoryId(dbMember.getRepositoryId());
 
+        // 设置过期标识
+        gitlabMember.setExpiredFlag(dbMember.checkExpiredFlag());
+
         // <1> 数据库更新成员
         gitlabMemberRepository.updateMemberBefore(gitlabMember);
 

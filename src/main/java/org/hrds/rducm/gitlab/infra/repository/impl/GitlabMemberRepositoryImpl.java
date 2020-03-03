@@ -53,8 +53,14 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
 
             Member glMember;
             if (isExists) {
-                // 调用gitlab api更新成员
-                glMember = gitlabPorjectApi.updateMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
+                // 如果过期, Gitlab会直接移除成员, 所以需改成添加成员
+                if (m.getExpiredFlag()) {
+                    // 调用gitlab api添加成员
+                    glMember = gitlabPorjectApi.addMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
+                } else {
+                    // 调用gitlab api更新成员
+                    glMember = gitlabPorjectApi.updateMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
+                }
             } else {
                 // 调用gitlab api添加成员
                 glMember = gitlabPorjectApi.addMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
@@ -87,6 +93,10 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
 
             if (isExists) {
                 this.checkIsSyncGitlab(dbMember);
+
+                // 设置过期标识
+                m.setExpiredFlag(dbMember.checkExpiredFlag());
+
                 m.setId(dbMember.getId());
                 m.setObjectVersionNumber(dbMember.getObjectVersionNumber());
                 this.updateMemberBefore(m);
@@ -140,7 +150,13 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
 
     @Override
     public void updateMemberToGitlab(GitlabMember param) {
-        Member glMember = gitlabPorjectApi.updateMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+        Member glMember;
+        // 如果过期, Gitlab会直接移除成员, 所以需改成添加成员
+        if (param.getExpiredFlag()) {
+            glMember = gitlabPorjectApi.addMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+        } else {
+            glMember = gitlabPorjectApi.updateMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+        }
 
         // <2> 回写数据库
         updateMemberAfter(param, glMember);

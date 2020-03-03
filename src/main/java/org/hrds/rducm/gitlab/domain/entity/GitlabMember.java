@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.annotation.ModifyAudit;
 import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
@@ -10,6 +11,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -40,6 +42,18 @@ public class GitlabMember extends AuditDomain {
     //
     // 业务方法(按public protected private顺序排列)
     // ------------------------------------------------------------------------------
+
+    /**
+     * 设置是否过期标识
+     */
+    public boolean checkExpiredFlag() {
+        // 当前时间 >= 过期时间
+        if (this.getGlExpiresAt() != null && !new Date().before(this.getGlExpiresAt())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     //
     // 数据库字段
@@ -78,108 +92,122 @@ public class GitlabMember extends AuditDomain {
     //
     // 非数据库字段
     // ------------------------------------------------------------------------------
+    /**
+     * 是否到期
+     */
+    @Transient
+    private Boolean expiredFlag;
 
     //
     // getter/setter
     // ------------------------------------------------------------------------------
 
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public GitlabMember setId(Long id) {
-		this.id = id;
-		return this;
-	}
+    public GitlabMember setId(Long id) {
+        this.id = id;
+        return this;
+    }
 
-	public Long getProjectId() {
-		return projectId;
-	}
+    public Long getProjectId() {
+        return projectId;
+    }
 
-	public GitlabMember setProjectId(Long projectId) {
-		this.projectId = projectId;
-		return this;
-	}
+    public GitlabMember setProjectId(Long projectId) {
+        this.projectId = projectId;
+        return this;
+    }
 
-	public Long getRepositoryId() {
-		return repositoryId;
-	}
+    public Long getRepositoryId() {
+        return repositoryId;
+    }
 
-	public GitlabMember setRepositoryId(Long repositoryId) {
-		this.repositoryId = repositoryId;
-		return this;
-	}
+    public GitlabMember setRepositoryId(Long repositoryId) {
+        this.repositoryId = repositoryId;
+        return this;
+    }
 
-	public Long getUserId() {
-		return userId;
-	}
+    public Long getUserId() {
+        return userId;
+    }
 
-	public GitlabMember setUserId(Long userId) {
-		this.userId = userId;
-		return this;
-	}
+    public GitlabMember setUserId(Long userId) {
+        this.userId = userId;
+        return this;
+    }
 
-	public String getState() {
-		return state;
-	}
+    public String getState() {
+        return state;
+    }
 
-	public GitlabMember setState(String state) {
-		this.state = state;
-		return this;
-	}
+    public GitlabMember setState(String state) {
+        this.state = state;
+        return this;
+    }
 
-	public Integer getGlProjectId() {
-		return glProjectId;
-	}
+    public Integer getGlProjectId() {
+        return glProjectId;
+    }
 
-	public GitlabMember setGlProjectId(Integer glProjectId) {
-		this.glProjectId = glProjectId;
-		return this;
-	}
+    public GitlabMember setGlProjectId(Integer glProjectId) {
+        this.glProjectId = glProjectId;
+        return this;
+    }
 
-	public Integer getGlUserId() {
-		return glUserId;
-	}
+    public Integer getGlUserId() {
+        return glUserId;
+    }
 
-	public GitlabMember setGlUserId(Integer glUserId) {
-		this.glUserId = glUserId;
-		return this;
-	}
+    public GitlabMember setGlUserId(Integer glUserId) {
+        this.glUserId = glUserId;
+        return this;
+    }
 
-	public Integer getGlAccessLevel() {
-		return glAccessLevel;
-	}
+    public Integer getGlAccessLevel() {
+        return glAccessLevel;
+    }
 
-	public GitlabMember setGlAccessLevel(Integer glAccessLevel) {
-		this.glAccessLevel = glAccessLevel;
-		return this;
-	}
+    public GitlabMember setGlAccessLevel(Integer glAccessLevel) {
+        this.glAccessLevel = glAccessLevel;
+        return this;
+    }
 
-	public Date getGlExpiresAt() {
-		return glExpiresAt;
-	}
+    public Date getGlExpiresAt() {
+        return glExpiresAt;
+    }
 
-	public GitlabMember setGlExpiresAt(Date glExpiresAt) {
-		this.glExpiresAt = glExpiresAt;
-		return this;
-	}
+    public GitlabMember setGlExpiresAt(Date glExpiresAt) {
+        this.glExpiresAt = glExpiresAt;
+        return this;
+    }
 
-	public Boolean getSyncGitlabFlag() {
-		return syncGitlabFlag;
-	}
+    public Boolean getSyncGitlabFlag() {
+        return syncGitlabFlag;
+    }
 
-	public GitlabMember setSyncGitlabFlag(Boolean syncGitlabFlag) {
-		this.syncGitlabFlag = syncGitlabFlag;
-		return this;
-	}
+    public GitlabMember setSyncGitlabFlag(Boolean syncGitlabFlag) {
+        this.syncGitlabFlag = syncGitlabFlag;
+        return this;
+    }
 
-	public Date getSyncDateGitlab() {
-		return syncDateGitlab;
-	}
+    public Date getSyncDateGitlab() {
+        return syncDateGitlab;
+    }
 
-	public GitlabMember setSyncDateGitlab(Date syncDateGitlab) {
-		this.syncDateGitlab = syncDateGitlab;
-		return this;
-	}
+    public GitlabMember setSyncDateGitlab(Date syncDateGitlab) {
+        this.syncDateGitlab = syncDateGitlab;
+        return this;
+    }
+
+    public Boolean getExpiredFlag() {
+        return expiredFlag;
+    }
+
+    public GitlabMember setExpiredFlag(Boolean expiredFlag) {
+        this.expiredFlag = expiredFlag;
+        return this;
+    }
 }
