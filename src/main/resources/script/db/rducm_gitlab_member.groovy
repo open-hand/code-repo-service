@@ -1,7 +1,7 @@
 package script.db
 
 databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member.groovy') {
-    changeSet(author: "ying.xie@hand-china.com", id: "2020-02-27-rducm_gitlab_member") {
+    changeSet(author: "ying.xie@hand-china.com", id: "2020-03-03-rducm_gitlab_member") {
         def weight = 1
         if (helper.isSqlServer()) {
             weight = 2
@@ -11,7 +11,7 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member.groovy') {
         if (helper.dbType().isSupportSequence()) {
             createSequence(sequenceName: 'rducm_gitlab_member_s', startValue: "1")
         }
-        createTable(tableName: "rducm_gitlab_member", remarks: "Gitlab成员表") {
+        createTable(tableName: "rducm_gitlab_member", remarks: "成员表") {
             column(name: "id", type: "bigint(20)", autoIncrement: true, remarks: "主键") { constraints(primaryKey: true) }
             column(name: "project_id", type: "bigint(20)", remarks: "项目层，项目id") { constraints(nullable: "false") }
             column(name: "repository_id", type: "bigint(20)", remarks: "代码仓库id") { constraints(nullable: "false") }
@@ -32,6 +32,7 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member.groovy') {
         }
 
         addUniqueConstraint(columnNames: "gl_project_id,gl_user_id", tableName: "rducm_gitlab_member", constraintName: "uk_gl_project_id_gl_user_id")
+        addUniqueConstraint(columnNames: "project_id,repository_id,user_id", tableName: "rducm_gitlab_member", constraintName: "uk_project_id_repository_id_user_id")
         addUniqueConstraint(columnNames: "repository_id,user_id", tableName: "rducm_gitlab_member", constraintName: "uk_repository_id_user_id")
     }
 }
