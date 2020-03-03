@@ -32,9 +32,8 @@ public class GitlabTagController extends BaseController {
     @Permission(permissionPublic = true)
     @GetMapping("/protected-tags")
     public ResponseEntity<List<ProtectedTag>> getProtectedTags(@PathVariable Long projectId,
-                                                               @PathVariable Long repositoryId,
-                                                               @RequestParam Integer glProjectId) {
-        return Results.success(gitlabTagService.getProtectedTags(glProjectId));
+                                                               @PathVariable Long repositoryId) {
+        return Results.success(gitlabTagService.getProtectedTags(repositoryId));
     }
 
     @ApiOperation(value = "创建保护标签")
@@ -42,10 +41,9 @@ public class GitlabTagController extends BaseController {
     @PostMapping("/protected-tags")
     public ResponseEntity<ProtectedTag> createProtectedTag(@PathVariable Long projectId,
                                                            @PathVariable Long repositoryId,
-                                                           @RequestParam Integer glProjectId,
                                                            @RequestParam String glTagName,
                                                            @RequestParam Integer glCreateAccessLevel) {
-        return Results.success(gitlabTagService.protectTag(glProjectId, glTagName, glCreateAccessLevel));
+        return Results.success(gitlabTagService.protectTag(repositoryId, glTagName, glCreateAccessLevel));
     }
 
     @ApiOperation(value = "修改保护标签")
@@ -53,10 +51,9 @@ public class GitlabTagController extends BaseController {
     @PutMapping("/protected-tags")
     public ResponseEntity<ProtectedTag> updateProtectedTag(@PathVariable Long projectId,
                                                            @PathVariable Long repositoryId,
-                                                           @RequestParam Integer glProjectId,
                                                            @RequestParam String glTagName,
                                                            @RequestParam Integer glCreateAccessLevel) {
-        return Results.success(gitlabTagService.protectTag(glProjectId, glTagName, glCreateAccessLevel));
+        return Results.success(gitlabTagService.protectTag(repositoryId, glTagName, glCreateAccessLevel));
     }
 
     @ApiOperation(value = "删除保护标签")
@@ -64,9 +61,8 @@ public class GitlabTagController extends BaseController {
     @DeleteMapping("/protected-tags")
     public ResponseEntity<ProtectedTag> deleteProtectedTag(@PathVariable Long projectId,
                                                            @PathVariable Long repositoryId,
-                                                           @RequestParam Integer glProjectId,
                                                            @RequestParam String glTagName) {
-        gitlabTagService.unprotectTag(glProjectId, glTagName);
+        gitlabTagService.unprotectTag(repositoryId, glTagName);
         return Results.success();
     }
 }

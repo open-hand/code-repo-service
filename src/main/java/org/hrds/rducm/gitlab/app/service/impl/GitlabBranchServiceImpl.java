@@ -27,20 +27,26 @@ public class GitlabBranchServiceImpl implements GitlabBranchService {
     }
 
     @Override
-    public List<ProtectedBranch> getProtectedBranches(Integer glProjectId) {
-        return gitlabBranchRepository.getProtectedBranchesFromGitlab(glProjectId);
+    public List<ProtectedBranch> getProtectedBranches(Long repositoryId) {
+        // 获取对应Gitlab项目id todo 临时
+        GitlabRepository gitlabRepository = repositoryRepository.selectByUk(repositoryId);
+        return gitlabBranchRepository.getProtectedBranchesFromGitlab(gitlabRepository.getGlProjectId());
     }
 
     @Override
-    public ProtectedBranch protectBranch(Integer glProjectId,
+    public ProtectedBranch protectBranch(Long repositoryId,
                                          String branchName,
                                          Integer pushAccessLevel,
                                          Integer mergeAccessLevel) {
-        return gitlabBranchRepository.protectBranchToGitlab(glProjectId, branchName, pushAccessLevel, mergeAccessLevel);
+        // 获取对应Gitlab项目id todo 临时
+        GitlabRepository gitlabRepository = repositoryRepository.selectByUk(repositoryId);
+        return gitlabBranchRepository.protectBranchToGitlab(gitlabRepository.getGlProjectId(), branchName, pushAccessLevel, mergeAccessLevel);
     }
 
     @Override
-    public void unprotectBranch(Integer glProjectId, String branchName) {
-        gitlabBranchRepository.unprotectBranchToGitlab(glProjectId, branchName);
+    public void unprotectBranch(Long repositoryId, String branchName) {
+        // 获取对应Gitlab项目id todo 临时
+        GitlabRepository gitlabRepository = repositoryRepository.selectByUk(repositoryId);
+        gitlabBranchRepository.unprotectBranchToGitlab(gitlabRepository.getGlProjectId(), branchName);
     }
 }

@@ -33,9 +33,8 @@ public class GitlabBranchController extends BaseController {
     @Permission(permissionPublic = true)
     @GetMapping("/protected-branches")
     public ResponseEntity<List<ProtectedBranch>> getProtectedBranches(@PathVariable Long projectId,
-                                                                      @PathVariable Long repositoryId,
-                                                                      @RequestParam Integer glProjectId) {
-        return Results.success(gitlabBranchService.getProtectedBranches(glProjectId));
+                                                                      @PathVariable Long repositoryId) {
+        return Results.success(gitlabBranchService.getProtectedBranches(repositoryId));
     }
 
     @ApiOperation(value = "添加保护分支")
@@ -43,11 +42,10 @@ public class GitlabBranchController extends BaseController {
     @PostMapping("/protected-branches")
     public ResponseEntity<ProtectedBranch> createProtectedBranch(@PathVariable Long projectId,
                                                                  @PathVariable Long repositoryId,
-                                                                 @RequestParam Integer glProjectId,
                                                                  @RequestParam String branchName,
                                                                  @RequestParam Integer pushAccessLevel,
                                                                  @RequestParam Integer mergeAccessLevel) {
-        return Results.success(gitlabBranchService.protectBranch(glProjectId, branchName, pushAccessLevel, mergeAccessLevel));
+        return Results.success(gitlabBranchService.protectBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
     }
 
     @ApiOperation(value = "修改保护分支")
@@ -55,11 +53,10 @@ public class GitlabBranchController extends BaseController {
     @PutMapping("/protected-branches")
     public ResponseEntity<ProtectedBranch> updateProtectedBranch(@PathVariable Long projectId,
                                                                  @PathVariable Long repositoryId,
-                                                                 @RequestParam Integer glProjectId,
                                                                  @RequestParam String branchName,
                                                                  @RequestParam Integer pushAccessLevel,
                                                                  @RequestParam Integer mergeAccessLevel) {
-        return Results.success(gitlabBranchService.protectBranch(glProjectId, branchName, pushAccessLevel, mergeAccessLevel));
+        return Results.success(gitlabBranchService.protectBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
     }
 
     @ApiOperation(value = "删除保护分支")
@@ -67,9 +64,8 @@ public class GitlabBranchController extends BaseController {
     @DeleteMapping("/protected-branches")
     public ResponseEntity<ProtectedBranch> updateProtectedBranch(@PathVariable Long projectId,
                                                                  @PathVariable Long repositoryId,
-                                                                 @RequestParam Integer glProjectId,
                                                                  @RequestParam String branchName) {
-        gitlabBranchService.unprotectBranch(glProjectId, branchName);
+        gitlabBranchService.unprotectBranch(repositoryId, branchName);
         return Results.created(null);
     }
 }

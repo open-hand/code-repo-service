@@ -8,12 +8,12 @@ import java.util.List;
 public interface GitlabBranchService {
     List<Branch> getBranches(Long repositoryId);
 
-    List<ProtectedBranch> getProtectedBranches(Integer glProjectId);
+    List<ProtectedBranch> getProtectedBranches(Long repositoryId);
 
-    ProtectedBranch protectBranch(Integer glProjectId,
+    ProtectedBranch protectBranch(Long repositoryId,
                                   String branchName,
                                   Integer pushAccessLevel,
                                   Integer mergeAccessLevel);
 
-    void unprotectBranch(Integer glProjectId, String branchName);
+    void unprotectBranch(Long repositoryId, String branchName);
 }
