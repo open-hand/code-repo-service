@@ -124,7 +124,7 @@ choerodon:
 
 gitlab:
   url: "http://git.staging.saas.hand-china.com/"
-  privateToken: "w9LyyuJAQD9KyTEHDey_" # 个人测试环境token
+  privateToken: "Z_zzd7udbFpF3oykXued" # 个人测试环境token
 #  privateToken: "TyAwRwqY2QfPKdq81CSs" # 管理员token
 
 

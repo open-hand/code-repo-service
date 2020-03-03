@@ -17,6 +17,7 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member.groovy') {
             column(name: "repository_id", type: "bigint(20)", remarks: "代码仓库id") { constraints(nullable: "false") }
             column(name: "user_id", type: "bigint(20)", remarks: "用户id") { constraints(nullable: "false") }
             column(name: "state", type: "varchar(" + 40 * weight + ")", remarks: "成员状态")
+            column(name: "expired_flag", type: "tinyint(1)", defaultValue: "0", remarks: "是否过期") { constraints(nullable: "false") }
             column(name: "gl_project_id", type: "int(11)", remarks: "gitlab项目id")
             column(name: "gl_user_id", type: "int(11)", remarks: "gitlab用户id")
             column(name: "gl_access_level", type: "int(11)", remarks: "gitlab成员权限级别")
