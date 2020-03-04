@@ -13,8 +13,8 @@ public interface GitlabTagService {
     List<ProtectedTag> getProtectedTags(Long repositoryId);
 
     ProtectedTag protectTag(Long repositoryId,
-                            String glTagName,
-                            Integer glCreateAccessLevel);
+                            String tagName,
+                            Integer createAccessLevel);
 
-    void unprotectTag(Long repositoryId, String glTagName);
+    void unprotectTag(Long repositoryId, String tagName);
 }

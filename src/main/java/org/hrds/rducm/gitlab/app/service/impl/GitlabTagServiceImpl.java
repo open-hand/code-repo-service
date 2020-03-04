@@ -34,17 +34,17 @@ public class GitlabTagServiceImpl implements GitlabTagService {
 
     @Override
     public ProtectedTag protectTag(Long repositoryId,
-                                   String glTagName,
-                                   Integer glCreateAccessLevel) {
+                                   String tagName,
+                                   Integer createAccessLevel) {
         // 获取对应Gitlab项目id todo 临时
         GitlabRepository gitlabRepository = repositoryRepository.selectByUk(repositoryId);
-        return gitlabTagRepository.protectTag(gitlabRepository.getGlProjectId(), glTagName, glCreateAccessLevel);
+        return gitlabTagRepository.protectTag(gitlabRepository.getGlProjectId(), tagName, createAccessLevel);
     }
 
     @Override
-    public void unprotectTag(Long repositoryId, String glTagName) {
+    public void unprotectTag(Long repositoryId, String tagName) {
         // 获取对应Gitlab项目id todo 临时
         GitlabRepository gitlabRepository = repositoryRepository.selectByUk(repositoryId);
-        gitlabTagRepository.unprotectTag(gitlabRepository.getGlProjectId(), glTagName);
+        gitlabTagRepository.unprotectTag(gitlabRepository.getGlProjectId(), tagName);
     }
 }
