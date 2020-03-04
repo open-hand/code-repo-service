@@ -4,15 +4,13 @@ import io.choerodon.core.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import org.gitlab4j.api.models.Branch;
 import org.gitlab4j.api.models.ProtectedBranch;
+import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.branch.ProtectedBranchDTO;
 import org.hrds.rducm.gitlab.app.service.GitlabBranchService;
-import org.hrds.rducm.gitlab.domain.repository.GitlabBranchRepository;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
-import org.springframework.beans.Mergeable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,8 +35,8 @@ public class GitlabBranchController extends BaseController {
     })
     @Permission(permissionPublic = true)
     @GetMapping
-    public ResponseEntity<List<Branch>> getBranches(@PathVariable Long projectId,
-                                                    @PathVariable Long repositoryId) {
+    public ResponseEntity<List<BranchDTO>> getBranches(@PathVariable Long projectId,
+                                                       @PathVariable Long repositoryId) {
         return Results.success(gitlabBranchService.getBranches(repositoryId));
     }
 
@@ -49,8 +47,8 @@ public class GitlabBranchController extends BaseController {
     })
     @Permission(permissionPublic = true)
     @GetMapping("/protected-branches")
-    public ResponseEntity<List<ProtectedBranch>> getProtectedBranches(@PathVariable Long projectId,
-                                                                      @PathVariable Long repositoryId) {
+    public ResponseEntity<List<ProtectedBranchDTO>> getProtectedBranches(@PathVariable Long projectId,
+                                                                         @PathVariable Long repositoryId) {
         return Results.success(gitlabBranchService.getProtectedBranches(repositoryId));
     }
 
@@ -64,11 +62,11 @@ public class GitlabBranchController extends BaseController {
     })
     @Permission(permissionPublic = true)
     @PostMapping("/protected-branches")
-    public ResponseEntity<ProtectedBranch> createProtectedBranch(@PathVariable Long projectId,
-                                                                 @PathVariable Long repositoryId,
-                                                                 @RequestParam String branchName,
-                                                                 @RequestParam Integer pushAccessLevel,
-                                                                 @RequestParam Integer mergeAccessLevel) {
+    public ResponseEntity<ProtectedBranchDTO> createProtectedBranch(@PathVariable Long projectId,
+                                                                    @PathVariable Long repositoryId,
+                                                                    @RequestParam String branchName,
+                                                                    @RequestParam Integer pushAccessLevel,
+                                                                    @RequestParam Integer mergeAccessLevel) {
         return Results.success(gitlabBranchService.protectBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
     }
 
@@ -82,11 +80,11 @@ public class GitlabBranchController extends BaseController {
     })
     @Permission(permissionPublic = true)
     @PutMapping("/protected-branches")
-    public ResponseEntity<ProtectedBranch> updateProtectedBranch(@PathVariable Long projectId,
-                                                                 @PathVariable Long repositoryId,
-                                                                 @RequestParam String branchName,
-                                                                 @RequestParam Integer pushAccessLevel,
-                                                                 @RequestParam Integer mergeAccessLevel) {
+    public ResponseEntity<ProtectedBranchDTO> updateProtectedBranch(@PathVariable Long projectId,
+                                                                    @PathVariable Long repositoryId,
+                                                                    @RequestParam String branchName,
+                                                                    @RequestParam Integer pushAccessLevel,
+                                                                    @RequestParam Integer mergeAccessLevel) {
         return Results.success(gitlabBranchService.protectBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
     }
 

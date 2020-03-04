@@ -1,12 +1,13 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
-import org.gitlab4j.api.models.Branch;
 import org.gitlab4j.api.models.ProtectedBranch;
+import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.branch.ProtectedBranchDTO;
 import org.hrds.rducm.gitlab.app.service.GitlabBranchService;
 import org.hrds.rducm.gitlab.domain.entity.GitlabRepository;
 import org.hrds.rducm.gitlab.domain.repository.GitlabBranchRepository;
 import org.hrds.rducm.gitlab.domain.repository.GitlabRepositoryRepository;
-import org.hrds.rducm.gitlab.infra.enums.GitlabAccessLevel;
+import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,27 +21,28 @@ public class GitlabBranchServiceImpl implements GitlabBranchService {
     private GitlabRepositoryRepository repositoryRepository;
 
     @Override
-    public List<Branch> getBranches(Long repositoryId) {
+    public List<BranchDTO> getBranches(Long repositoryId) {
         // 获取对应Gitlab项目id todo 临时
         GitlabRepository gitlabRepository = repositoryRepository.selectByUk(repositoryId);
-        return gitlabBranchRepository.getBranchesFromGitlab(gitlabRepository.getGlProjectId());
+        return ConvertUtils.convertList(gitlabBranchRepository.getBranchesFromGitlab(gitlabRepository.getGlProjectId()), BranchDTO.class);
     }
 
     @Override
-    public List<ProtectedBranch> getProtectedBranches(Long repositoryId) {
+    public List<ProtectedBranchDTO> getProtectedBranches(Long repositoryId) {
         // 获取对应Gitlab项目id todo 临时
         GitlabRepository gitlabRepository = repositoryRepository.selectByUk(repositoryId);
-        return gitlabBranchRepository.getProtectedBranchesFromGitlab(gitlabRepository.getGlProjectId());
+        return ConvertUtils.convertList(gitlabBranchRepository.getProtectedBranchesFromGitlab(gitlabRepository.getGlProjectId()), ProtectedBranchDTO.class);
     }
 
     @Override
-    public ProtectedBranch protectBranch(Long repositoryId,
-                                         String branchName,
-                                         Integer pushAccessLevel,
-                                         Integer mergeAccessLevel) {
+    public ProtectedBranchDTO protectBranch(Long repositoryId,
+                                            String branchName,
+                                            Integer pushAccessLevel,
+                                            Integer mergeAccessLevel) {
         // 获取对应Gitlab项目id todo 临时
         GitlabRepository gitlabRepository = repositoryRepository.selectByUk(repositoryId);
-        return gitlabBranchRepository.protectBranchToGitlab(gitlabRepository.getGlProjectId(), branchName, pushAccessLevel, mergeAccessLevel);
+        ProtectedBranch protectedBranch = gitlabBranchRepository.protectBranchToGitlab(gitlabRepository.getGlProjectId(), branchName, pushAccessLevel, mergeAccessLevel);
+        return ConvertUtils.convertObject(protectedBranch, ProtectedBranchDTO.class);
     }
 
     @Override
