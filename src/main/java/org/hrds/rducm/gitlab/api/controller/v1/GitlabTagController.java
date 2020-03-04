@@ -64,7 +64,7 @@ public class GitlabTagController extends BaseController {
                                                               @PathVariable Long repositoryId,
                                                               @RequestParam String tagName,
                                                               @RequestParam Integer createAccessLevel) {
-        return Results.success(gitlabTagService.protectTag(repositoryId, tagName, createAccessLevel));
+        return Results.created(gitlabTagService.protectTag(repositoryId, tagName, createAccessLevel));
     }
 
     @ApiOperation(value = "修改保护标签")
@@ -80,7 +80,7 @@ public class GitlabTagController extends BaseController {
                                                               @PathVariable Long repositoryId,
                                                               @RequestParam String tagName,
                                                               @RequestParam Integer createAccessLevel) {
-        return Results.success(gitlabTagService.protectTag(repositoryId, tagName, createAccessLevel));
+        return Results.created(gitlabTagService.protectTag(repositoryId, tagName, createAccessLevel));
     }
 
     @ApiOperation(value = "删除保护标签")
