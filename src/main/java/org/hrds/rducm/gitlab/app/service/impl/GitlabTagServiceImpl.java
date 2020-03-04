@@ -49,6 +49,19 @@ public class GitlabTagServiceImpl implements GitlabTagService {
     }
 
     @Override
+    public ProtectedTagDTO updateProtectedTag(Long repositoryId,
+                                              String tagName,
+                                              Integer createAccessLevel) {
+        // 获取对应Gitlab项目id todo 临时
+        GitlabRepository gitlabRepository = repositoryRepository.selectByUk(repositoryId);
+
+        // 由于Gitlab不提供修改保护标签的api, 故只能先删除, 再新增
+        gitlabTagRepository.unprotectTag(gitlabRepository.getGlProjectId(), tagName);
+        ProtectedTag protectedTag = gitlabTagRepository.protectTag(gitlabRepository.getGlProjectId(), tagName, createAccessLevel);
+        return ConvertUtils.convertObject(protectedTag, ProtectedTagDTO.class);
+    }
+
+    @Override
     public void unprotectTag(Long repositoryId, String tagName) {
         // 获取对应Gitlab项目id todo 临时
         GitlabRepository gitlabRepository = repositoryRepository.selectByUk(repositoryId);

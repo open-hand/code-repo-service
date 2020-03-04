@@ -15,5 +15,9 @@ public interface GitlabTagService {
                                String tagName,
                                Integer createAccessLevel);
 
+    ProtectedTagDTO updateProtectedTag(Long repositoryId,
+                                       String tagName,
+                                       Integer createAccessLevel);
+
     void unprotectTag(Long repositoryId, String tagName);
 }

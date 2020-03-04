@@ -15,5 +15,10 @@ public interface GitlabBranchService {
                                      Integer pushAccessLevel,
                                      Integer mergeAccessLevel);
 
+    ProtectedBranchDTO updateProtectedBranch(Long repositoryId,
+                                             String branchName,
+                                             Integer pushAccessLevel,
+                                             Integer mergeAccessLevel);
+
     void unprotectBranch(Long repositoryId, String branchName);
 }

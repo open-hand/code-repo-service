@@ -46,6 +46,20 @@ public class GitlabBranchServiceImpl implements GitlabBranchService {
     }
 
     @Override
+    public ProtectedBranchDTO updateProtectedBranch(Long repositoryId,
+                                                    String branchName,
+                                                    Integer pushAccessLevel,
+                                                    Integer mergeAccessLevel) {
+        // 获取对应Gitlab项目id todo 临时
+        GitlabRepository gitlabRepository = repositoryRepository.selectByUk(repositoryId);
+
+        // 由于Gitlab不提供修改保护分支的api, 故只能先删除, 再新增
+        gitlabBranchRepository.unprotectBranchToGitlab(gitlabRepository.getGlProjectId(), branchName);
+        ProtectedBranch protectedBranch = gitlabBranchRepository.protectBranchToGitlab(gitlabRepository.getGlProjectId(), branchName, pushAccessLevel, mergeAccessLevel);
+        return ConvertUtils.convertObject(protectedBranch, ProtectedBranchDTO.class);
+    }
+
+    @Override
     public void unprotectBranch(Long repositoryId, String branchName) {
         // 获取对应Gitlab项目id todo 临时
         GitlabRepository gitlabRepository = repositoryRepository.selectByUk(repositoryId);
