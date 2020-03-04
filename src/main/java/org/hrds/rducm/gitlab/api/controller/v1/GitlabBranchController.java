@@ -56,16 +56,16 @@ public class GitlabBranchController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "branchName", value = "分支名(可使用通配符)", paramType = "query", required = true),
-            @ApiImplicitParam(name = "pushAccessLevel", value = API_INFO_PUSH_ACCESS_LEVEL, paramType = "query", required = false),
-            @ApiImplicitParam(name = "mergeAccessLevel", value = API_INFO_MERGE_ACCESS_LEVEL, paramType = "query", required = false),
+            @ApiImplicitParam(name = "pushAccessLevel", value = API_INFO_PUSH_ACCESS_LEVEL, paramType = "query", required = true),
+            @ApiImplicitParam(name = "mergeAccessLevel", value = API_INFO_MERGE_ACCESS_LEVEL, paramType = "query", required = true),
     })
     @Permission(permissionPublic = true)
     @PostMapping("/protected-branches")
     public ResponseEntity<ProtectedBranchDTO> createProtectedBranch(@PathVariable Long projectId,
                                                                     @PathVariable Long repositoryId,
                                                                     @RequestParam String branchName,
-                                                                    @RequestParam(required = false) Integer pushAccessLevel,
-                                                                    @RequestParam(required = false) Integer mergeAccessLevel) {
+                                                                    @RequestParam Integer pushAccessLevel,
+                                                                    @RequestParam Integer mergeAccessLevel) {
         return Results.created(gitlabBranchService.protectBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
     }
 
@@ -74,16 +74,16 @@ public class GitlabBranchController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "branchName", value = "分支名", paramType = "query", required = true),
-            @ApiImplicitParam(name = "pushAccessLevel", value = API_INFO_PUSH_ACCESS_LEVEL, paramType = "query", required = false),
-            @ApiImplicitParam(name = "mergeAccessLevel", value = API_INFO_MERGE_ACCESS_LEVEL, paramType = "query", required = false),
+            @ApiImplicitParam(name = "pushAccessLevel", value = API_INFO_PUSH_ACCESS_LEVEL, paramType = "query", required = true),
+            @ApiImplicitParam(name = "mergeAccessLevel", value = API_INFO_MERGE_ACCESS_LEVEL, paramType = "query", required = true),
     })
     @Permission(permissionPublic = true)
     @PutMapping("/protected-branches")
     public ResponseEntity<ProtectedBranchDTO> updateProtectedBranch(@PathVariable Long projectId,
                                                                     @PathVariable Long repositoryId,
                                                                     @RequestParam String branchName,
-                                                                    @RequestParam(required = false) Integer pushAccessLevel,
-                                                                    @RequestParam(required = false) Integer mergeAccessLevel) {
+                                                                    @RequestParam Integer pushAccessLevel,
+                                                                    @RequestParam Integer mergeAccessLevel) {
         return Results.created(gitlabBranchService.updateProtectedBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
     }
 

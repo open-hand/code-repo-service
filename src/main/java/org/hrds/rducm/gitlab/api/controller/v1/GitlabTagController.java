@@ -56,14 +56,14 @@ public class GitlabTagController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "tagName", value = API_INFO_TAG_NAME, paramType = "query", required = true),
-            @ApiImplicitParam(name = "createAccessLevel", value = API_INFO_CREATE_ACCESS_LEVEL, paramType = "query", required = false),
+            @ApiImplicitParam(name = "createAccessLevel", value = API_INFO_CREATE_ACCESS_LEVEL, paramType = "query", required = true),
     })
     @Permission(permissionPublic = true)
     @PostMapping("/protected-tags")
     public ResponseEntity<ProtectedTagDTO> createProtectedTag(@PathVariable Long projectId,
                                                               @PathVariable Long repositoryId,
                                                               @RequestParam String tagName,
-                                                              @RequestParam(required = false) Integer createAccessLevel) {
+                                                              @RequestParam Integer createAccessLevel) {
         return Results.created(gitlabTagService.protectTag(repositoryId, tagName, createAccessLevel));
     }
 
@@ -72,14 +72,14 @@ public class GitlabTagController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "tagName", value = "标签名", paramType = "query", required = true),
-            @ApiImplicitParam(name = "createAccessLevel", value = API_INFO_CREATE_ACCESS_LEVEL, paramType = "query", required = false),
+            @ApiImplicitParam(name = "createAccessLevel", value = API_INFO_CREATE_ACCESS_LEVEL, paramType = "query", required = true),
     })
     @Permission(permissionPublic = true)
     @PutMapping("/protected-tags")
     public ResponseEntity<ProtectedTagDTO> updateProtectedTag(@PathVariable Long projectId,
                                                               @PathVariable Long repositoryId,
                                                               @RequestParam String tagName,
-                                                              @RequestParam(required = false) Integer createAccessLevel) {
+                                                              @RequestParam Integer createAccessLevel) {
         return Results.created(gitlabTagService.updateProtectedTag(repositoryId, tagName, createAccessLevel));
     }
 
