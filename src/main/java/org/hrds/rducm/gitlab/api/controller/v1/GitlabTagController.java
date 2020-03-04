@@ -5,7 +5,8 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.gitlab4j.api.models.ProtectedTag;
-import org.gitlab4j.api.models.Tag;
+import org.hrds.rducm.gitlab.api.controller.dto.tag.ProtectedTagDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.tag.TagDTO;
 import org.hrds.rducm.gitlab.app.service.GitlabTagService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
@@ -33,8 +34,8 @@ public class GitlabTagController extends BaseController {
     })
     @Permission(permissionPublic = true)
     @GetMapping
-    public ResponseEntity<List<Tag>> getTags(@PathVariable Long projectId,
-                                             @PathVariable Long repositoryId) {
+    public ResponseEntity<List<TagDTO>> getTags(@PathVariable Long projectId,
+                                                @PathVariable Long repositoryId) {
         return Results.success(gitlabTagService.getTags(repositoryId));
     }
 
@@ -45,8 +46,8 @@ public class GitlabTagController extends BaseController {
     })
     @Permission(permissionPublic = true)
     @GetMapping("/protected-tags")
-    public ResponseEntity<List<ProtectedTag>> getProtectedTags(@PathVariable Long projectId,
-                                                               @PathVariable Long repositoryId) {
+    public ResponseEntity<List<ProtectedTagDTO>> getProtectedTags(@PathVariable Long projectId,
+                                                                  @PathVariable Long repositoryId) {
         return Results.success(gitlabTagService.getProtectedTags(repositoryId));
     }
 
@@ -59,10 +60,10 @@ public class GitlabTagController extends BaseController {
     })
     @Permission(permissionPublic = true)
     @PostMapping("/protected-tags")
-    public ResponseEntity<ProtectedTag> createProtectedTag(@PathVariable Long projectId,
-                                                           @PathVariable Long repositoryId,
-                                                           @RequestParam String tagName,
-                                                           @RequestParam Integer createAccessLevel) {
+    public ResponseEntity<ProtectedTagDTO> createProtectedTag(@PathVariable Long projectId,
+                                                              @PathVariable Long repositoryId,
+                                                              @RequestParam String tagName,
+                                                              @RequestParam Integer createAccessLevel) {
         return Results.success(gitlabTagService.protectTag(repositoryId, tagName, createAccessLevel));
     }
 
@@ -75,10 +76,10 @@ public class GitlabTagController extends BaseController {
     })
     @Permission(permissionPublic = true)
     @PutMapping("/protected-tags")
-    public ResponseEntity<ProtectedTag> updateProtectedTag(@PathVariable Long projectId,
-                                                           @PathVariable Long repositoryId,
-                                                           @RequestParam String tagName,
-                                                           @RequestParam Integer createAccessLevel) {
+    public ResponseEntity<ProtectedTagDTO> updateProtectedTag(@PathVariable Long projectId,
+                                                              @PathVariable Long repositoryId,
+                                                              @RequestParam String tagName,
+                                                              @RequestParam Integer createAccessLevel) {
         return Results.success(gitlabTagService.protectTag(repositoryId, tagName, createAccessLevel));
     }
 

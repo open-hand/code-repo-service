@@ -67,7 +67,7 @@ public class GitlabBranchController extends BaseController {
                                                                     @RequestParam String branchName,
                                                                     @RequestParam Integer pushAccessLevel,
                                                                     @RequestParam Integer mergeAccessLevel) {
-        return Results.success(gitlabBranchService.protectBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
+        return Results.created(gitlabBranchService.protectBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
     }
 
     @ApiOperation(value = "修改保护分支")
@@ -85,7 +85,7 @@ public class GitlabBranchController extends BaseController {
                                                                     @RequestParam String branchName,
                                                                     @RequestParam Integer pushAccessLevel,
                                                                     @RequestParam Integer mergeAccessLevel) {
-        return Results.success(gitlabBranchService.protectBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
+        return Results.created(gitlabBranchService.protectBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
     }
 
     @ApiOperation(value = "删除保护分支")
@@ -96,10 +96,10 @@ public class GitlabBranchController extends BaseController {
     })
     @Permission(permissionPublic = true)
     @DeleteMapping("/protected-branches")
-    public ResponseEntity<ProtectedBranch> updateProtectedBranch(@PathVariable Long projectId,
+    public ResponseEntity<?> updateProtectedBranch(@PathVariable Long projectId,
                                                                  @PathVariable Long repositoryId,
                                                                  @RequestParam String branchName) {
         gitlabBranchService.unprotectBranch(repositoryId, branchName);
-        return Results.created(null);
+        return Results.success();
     }
 }

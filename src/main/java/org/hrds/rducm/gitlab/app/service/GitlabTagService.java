@@ -1,20 +1,19 @@
 package org.hrds.rducm.gitlab.app.service;
 
-import org.gitlab4j.api.models.ProtectedBranch;
-import org.gitlab4j.api.models.ProtectedTag;
-import org.gitlab4j.api.models.Tag;
+import org.hrds.rducm.gitlab.api.controller.dto.tag.ProtectedTagDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.tag.TagDTO;
 
 import java.util.List;
 
 public interface GitlabTagService {
 
-    List<Tag> getTags(Long repositoryId);
+    List<TagDTO> getTags(Long repositoryId);
 
-    List<ProtectedTag> getProtectedTags(Long repositoryId);
+    List<ProtectedTagDTO> getProtectedTags(Long repositoryId);
 
-    ProtectedTag protectTag(Long repositoryId,
-                            String tagName,
-                            Integer createAccessLevel);
+    ProtectedTagDTO protectTag(Long repositoryId,
+                               String tagName,
+                               Integer createAccessLevel);
 
     void unprotectTag(Long repositoryId, String tagName);
 }
