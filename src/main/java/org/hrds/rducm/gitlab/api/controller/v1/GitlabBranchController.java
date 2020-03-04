@@ -95,7 +95,7 @@ public class GitlabBranchController extends BaseController {
     })
     @Permission(permissionPublic = true)
     @DeleteMapping("/protected-branches")
-    public ResponseEntity<?> updateProtectedBranch(@PathVariable Long projectId,
+    public ResponseEntity<?> removeProtectedBranch(@PathVariable Long projectId,
                                                    @PathVariable Long repositoryId,
                                                    @RequestParam String branchName) {
         gitlabBranchService.unprotectBranch(repositoryId, branchName);
