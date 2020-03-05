@@ -13,8 +13,8 @@ import java.util.Date;
 @ModifyAudit
 @VersionAudit
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Table(name = "rducm_gitlab_member_audit")
-public class GitlabMemberAudit extends AuditDomain {
+@Table(name = "rducm_gitlab_member_sync_audit_log")
+public class MemberSyncAuditLog extends AuditDomain {
     @Id
     @GeneratedValue
     private Long id;
@@ -35,7 +35,7 @@ public class GitlabMemberAudit extends AuditDomain {
         return id;
     }
 
-    public GitlabMemberAudit setId(Long id) {
+    public MemberSyncAuditLog setId(Long id) {
         this.id = id;
         return this;
     }
@@ -44,7 +44,7 @@ public class GitlabMemberAudit extends AuditDomain {
         return repositoryId;
     }
 
-    public GitlabMemberAudit setRepositoryId(Long repositoryId) {
+    public MemberSyncAuditLog setRepositoryId(Long repositoryId) {
         this.repositoryId = repositoryId;
         return this;
     }
@@ -53,7 +53,7 @@ public class GitlabMemberAudit extends AuditDomain {
         return userId;
     }
 
-    public GitlabMemberAudit setUserId(Long userId) {
+    public MemberSyncAuditLog setUserId(Long userId) {
         this.userId = userId;
         return this;
     }
@@ -62,7 +62,7 @@ public class GitlabMemberAudit extends AuditDomain {
         return state;
     }
 
-    public GitlabMemberAudit setState(String state) {
+    public MemberSyncAuditLog setState(String state) {
         this.state = state;
         return this;
     }
@@ -71,7 +71,7 @@ public class GitlabMemberAudit extends AuditDomain {
         return accessLevel;
     }
 
-    public GitlabMemberAudit setAccessLevel(Integer accessLevel) {
+    public MemberSyncAuditLog setAccessLevel(Integer accessLevel) {
         this.accessLevel = accessLevel;
         return this;
     }
@@ -80,7 +80,7 @@ public class GitlabMemberAudit extends AuditDomain {
         return expiresAt;
     }
 
-    public GitlabMemberAudit setExpiresAt(Date expiresAt) {
+    public MemberSyncAuditLog setExpiresAt(Date expiresAt) {
         this.expiresAt = expiresAt;
         return this;
     }
@@ -89,7 +89,7 @@ public class GitlabMemberAudit extends AuditDomain {
         return glProjectId;
     }
 
-    public GitlabMemberAudit setGlProjectId(Integer glProjectId) {
+    public MemberSyncAuditLog setGlProjectId(Integer glProjectId) {
         this.glProjectId = glProjectId;
         return this;
     }
@@ -98,7 +98,7 @@ public class GitlabMemberAudit extends AuditDomain {
         return glUserId;
     }
 
-    public GitlabMemberAudit setGlUserId(Integer glUserId) {
+    public MemberSyncAuditLog setGlUserId(Integer glUserId) {
         this.glUserId = glUserId;
         return this;
     }
@@ -107,7 +107,7 @@ public class GitlabMemberAudit extends AuditDomain {
         return glState;
     }
 
-    public GitlabMemberAudit setGlState(String glState) {
+    public MemberSyncAuditLog setGlState(String glState) {
         this.glState = glState;
         return this;
     }
@@ -116,7 +116,7 @@ public class GitlabMemberAudit extends AuditDomain {
         return glAccessLevel;
     }
 
-    public GitlabMemberAudit setGlAccessLevel(Integer glAccessLevel) {
+    public MemberSyncAuditLog setGlAccessLevel(Integer glAccessLevel) {
         this.glAccessLevel = glAccessLevel;
         return this;
     }
@@ -125,7 +125,7 @@ public class GitlabMemberAudit extends AuditDomain {
         return glExpiresAt;
     }
 
-    public GitlabMemberAudit setGlExpiresAt(Date glExpiresAt) {
+    public MemberSyncAuditLog setGlExpiresAt(Date glExpiresAt) {
         this.glExpiresAt = glExpiresAt;
         return this;
     }
