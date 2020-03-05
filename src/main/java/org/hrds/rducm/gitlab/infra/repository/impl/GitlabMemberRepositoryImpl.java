@@ -4,22 +4,17 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.domain.AuditDomain;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.domain.entity.GitlabMember;
-import org.hrds.rducm.gitlab.domain.entity.GitlabMemberAudit;
 import org.hrds.rducm.gitlab.domain.repository.GitlabMemberRepository;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabPorjectApi;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.mybatis.base.impl.BaseRepositoryImpl;
-import org.hzero.mybatis.domian.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember> implements GitlabMemberRepository {

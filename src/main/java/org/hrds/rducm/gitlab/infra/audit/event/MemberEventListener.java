@@ -57,7 +57,6 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
         // 封装模板参数, 用于替换"操作内容"模板
         Map<String, Object> templateMap = buildTemplateMap(event);
         String opContent = event.getEventType().getContent();
-//        opContent = MessageFormat.format(opContent, sourceUserIdStr, targetUserIdStr, accessLevelStr, expiresAtStr);
         opContent = PlaceholderUtils.format(opContent, templateMap);
 
         // 插入数据库
