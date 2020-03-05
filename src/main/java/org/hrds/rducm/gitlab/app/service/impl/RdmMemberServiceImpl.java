@@ -8,10 +8,10 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberBatchDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberQueryDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberViewDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberUpdateDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
@@ -51,7 +51,7 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
     }
 
     @Override
-    public Page<GitlabMemberViewDTO> list(Long projectId, PageRequest pageRequest, GitlabMemberQueryDTO query) {
+    public Page<RdmMemberViewDTO> list(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query) {
         // <1> 封装查询条件
 
         // 获取用户名对应的userId数组
@@ -71,10 +71,10 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectByCondition(condition));
 
 //        Page<RdmMember> page = PageHelper.doPage(pageRequest, () -> rdmMemberRepository.select(query));
-        Page<GitlabMemberViewDTO> gitlabMemberViewDTOS = ConvertUtils.convertPage(page, GitlabMemberViewDTO.class);
+        Page<RdmMemberViewDTO> rdmMemberViewDTOS = ConvertUtils.convertPage(page, RdmMemberViewDTO.class);
 
         // todo 关联查询, 需从接口获取数据, 暂时造数据
-        for (GitlabMemberViewDTO viewDTO : gitlabMemberViewDTOS.getContent()) {
+        for (RdmMemberViewDTO viewDTO : rdmMemberViewDTOS.getContent()) {
 
             RdmUser dbUser = rdmUserRepository.selectByUk(viewDTO.getUserId());
             viewDTO.setRealName(dbUser.getGlUserName());
@@ -87,7 +87,7 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
             viewDTO.setProjectRoleName("项目成员");
         }
 
-        return gitlabMemberViewDTOS;
+        return rdmMemberViewDTOS;
     }
 
     /**
@@ -97,9 +97,9 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void batchAddOrUpdateMembers(Long projectId, GitlabMemberBatchDTO gitlabMemberBatchDTO) {
+    public void batchAddOrUpdateMembers(Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
         // <0> 校验入参 + 转换
-        List<RdmMember> rdmMembers = convertGitlabMemberBatchDTO(projectId, gitlabMemberBatchDTO);
+        List<RdmMember> rdmMembers = convertGitlabMemberBatchDTO(projectId, rdmMemberBatchDTO);
 
         // <1> 数据库添加成员, 已存在需要更新
         rdmMemberRepository.batchAddOrUpdateMembersBefore(rdmMembers);
@@ -110,9 +110,9 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateMember(Long memberId, GitlabMemberUpdateDTO gitlabMemberUpdateDTO) {
+    public void updateMember(Long memberId, RdmMemberUpdateDTO rdmMemberUpdateDTO) {
         // <0> 校验入参 todo + 转换
-        final RdmMember rdmMember = ConvertUtils.convertObject(gitlabMemberUpdateDTO, RdmMember.class);
+        final RdmMember rdmMember = ConvertUtils.convertObject(rdmMemberUpdateDTO, RdmMember.class);
         rdmMember.setId(memberId);
 
         // 获取gitlab项目id和用户id todo 应从外部接口获取, 暂时从数据库获取
@@ -202,13 +202,13 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
 
     /**
      * 将GitlabMemberBatchDTO转换为List<RdmMember>
-     * @param gitlabMemberBatchDTO
+     * @param rdmMemberBatchDTO
      * @return
      */
-    private List<RdmMember> convertGitlabMemberBatchDTO(Long projectId, GitlabMemberBatchDTO gitlabMemberBatchDTO) {
+    private List<RdmMember> convertGitlabMemberBatchDTO(Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
         // 查询gitlab项目id和用户id todo 应从外部接口获取, 暂时从数据库获取
         Map<Long, Integer> repositoryIdToGlProjectIdMap = new HashMap<>();
-        gitlabMemberBatchDTO.getRepositoryIds().forEach(repositoryId -> {
+        rdmMemberBatchDTO.getRepositoryIds().forEach(repositoryId -> {
             // 获取gitlab项目id
             RdmRepository rdmRepository = rdmRepositoryRepository.selectOne(new RdmRepository().setRepositoryId(repositoryId));
             repositoryIdToGlProjectIdMap.put(repositoryId, rdmRepository.getGlProjectId());
@@ -216,15 +216,15 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
 
         // 查询gitlab用户id todo 应从外部接口获取, 暂时从数据库获取
         Map<Long, Integer> userIdToGlUserIdMap = new HashMap<>();
-        gitlabMemberBatchDTO.getMembers().forEach(m -> {
+        rdmMemberBatchDTO.getMembers().forEach(m -> {
             RdmUser rdmUser = rdmUserRepository.selectOne(new RdmUser().setUserId(m.getUserId()));
             userIdToGlUserIdMap.put(m.getUserId(), rdmUser.getGlUserId());
         });
 
         // 转换为List<RdmMember>格式
         List<RdmMember> rdmMembers = new ArrayList<>();
-        for (Long repositoryId : gitlabMemberBatchDTO.getRepositoryIds()) {
-            for (GitlabMemberBatchDTO.GitlabMemberCreateDTO member : gitlabMemberBatchDTO.getMembers()) {
+        for (Long repositoryId : rdmMemberBatchDTO.getRepositoryIds()) {
+            for (RdmMemberBatchDTO.GitlabMemberCreateDTO member : rdmMemberBatchDTO.getMembers()) {
                 RdmMember rdmMember = ConvertUtils.convertObject(member, RdmMember.class);
                 rdmMember.setProjectId(projectId);
                 rdmMember.setRepositoryId(repositoryId);

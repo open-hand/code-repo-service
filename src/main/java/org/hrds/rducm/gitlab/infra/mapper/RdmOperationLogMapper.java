@@ -8,6 +8,6 @@ import io.choerodon.mybatis.common.BaseMapper;
  *
  * @author ying.xie@hand-china.com 2020-02-28 10:33:02
  */
-public interface GitlabOperationLogMapper extends BaseMapper<RdmOperationLog> {
+public interface RdmOperationLogMapper extends BaseMapper<RdmOperationLog> {
 
 }

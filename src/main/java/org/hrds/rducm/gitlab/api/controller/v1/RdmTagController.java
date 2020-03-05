@@ -20,7 +20,7 @@ import java.util.List;
 //@Api(tags = SwaggerTags.GITLAB_MEMBER)
 @RestController("gitlabTagController.v1")
 @RequestMapping("/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/tags")
-public class GitlabTagController extends BaseController {
+public class RdmTagController extends BaseController {
     public static final String API_INFO_TAG_NAME = "标签名(可使用通配符)";
     public static final String API_INFO_CREATE_ACCESS_LEVEL = "是否允许创建-权限级别(0|30|40)";
 

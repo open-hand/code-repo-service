@@ -19,7 +19,7 @@ import java.util.List;
 //@Api(tags = SwaggerTags.GITLAB_MEMBER)
 @RestController("gitlabBranchController.v1")
 @RequestMapping("/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/branches")
-public class GitlabBranchController extends BaseController {
+public class RdmBranchController extends BaseController {
     public static final String API_INFO_PUSH_ACCESS_LEVEL = "是否允许推送-权限级别(0|30|40)";
     public static final String API_INFO_MERGE_ACCESS_LEVEL = "是否允许合并-权限级别(0|30|40)";
 

@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController("gitlabOperationLogController.v1")
 @RequestMapping("/v1/{organizationId}/projects/{projectId}/gitlab/operation-logs")
-public class GitlabOperationLogController extends BaseController {
+public class RdmOperationLogController extends BaseController {
 
     @Autowired
     private RdmOperationLogService operationLogService;

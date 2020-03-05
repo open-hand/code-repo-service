@@ -8,6 +8,6 @@ import io.choerodon.mybatis.common.BaseMapper;
  *
  * @author ying.xie@hand-china.com 2020-02-26 14:03:22
  */
-public interface GitlabRepositoryMapper extends BaseMapper<RdmRepository> {
+public interface RdmRepositoryMapper extends BaseMapper<RdmRepository> {
 
 }

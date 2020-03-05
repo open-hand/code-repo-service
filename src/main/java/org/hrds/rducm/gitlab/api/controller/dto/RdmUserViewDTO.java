@@ -2,7 +2,7 @@ package org.hrds.rducm.gitlab.api.controller.dto;
 
 import java.util.Date;
 
-public class GitlabUserViewDTO {
+public class RdmUserViewDTO {
     private Long id;
     private Long userId;
     private String initPassword;
@@ -26,7 +26,7 @@ public class GitlabUserViewDTO {
         return id;
     }
 
-    public GitlabUserViewDTO setId(Long id) {
+    public RdmUserViewDTO setId(Long id) {
         this.id = id;
         return this;
     }
@@ -35,7 +35,7 @@ public class GitlabUserViewDTO {
         return userId;
     }
 
-    public GitlabUserViewDTO setUserId(Long userId) {
+    public RdmUserViewDTO setUserId(Long userId) {
         this.userId = userId;
         return this;
     }
@@ -44,7 +44,7 @@ public class GitlabUserViewDTO {
         return initPassword;
     }
 
-    public GitlabUserViewDTO setInitPassword(String initPassword) {
+    public RdmUserViewDTO setInitPassword(String initPassword) {
         this.initPassword = initPassword;
         return this;
     }
@@ -53,7 +53,7 @@ public class GitlabUserViewDTO {
         return syncGitlabFlag;
     }
 
-    public GitlabUserViewDTO setSyncGitlab(Boolean syncGitlab) {
+    public RdmUserViewDTO setSyncGitlab(Boolean syncGitlab) {
         syncGitlabFlag = syncGitlab;
         return this;
     }
@@ -62,7 +62,7 @@ public class GitlabUserViewDTO {
         return syncDateGitlab;
     }
 
-    public GitlabUserViewDTO setSyncDateGitlab(Date syncDateGitlab) {
+    public RdmUserViewDTO setSyncDateGitlab(Date syncDateGitlab) {
         this.syncDateGitlab = syncDateGitlab;
         return this;
     }
@@ -71,7 +71,7 @@ public class GitlabUserViewDTO {
         return glUserId;
     }
 
-    public GitlabUserViewDTO setGlUserId(Integer glUserId) {
+    public RdmUserViewDTO setGlUserId(Integer glUserId) {
         this.glUserId = glUserId;
         return this;
     }
@@ -80,7 +80,7 @@ public class GitlabUserViewDTO {
         return glAvatarUrl;
     }
 
-    public GitlabUserViewDTO setGlAvatarUrl(String glAvatarUrl) {
+    public RdmUserViewDTO setGlAvatarUrl(String glAvatarUrl) {
         this.glAvatarUrl = glAvatarUrl;
         return this;
     }
@@ -89,7 +89,7 @@ public class GitlabUserViewDTO {
         return glBio;
     }
 
-    public GitlabUserViewDTO setGlBio(String glBio) {
+    public RdmUserViewDTO setGlBio(String glBio) {
         this.glBio = glBio;
         return this;
     }
@@ -98,7 +98,7 @@ public class GitlabUserViewDTO {
         return glCreatedAt;
     }
 
-    public GitlabUserViewDTO setGlCreatedAt(Date glCreatedAt) {
+    public RdmUserViewDTO setGlCreatedAt(Date glCreatedAt) {
         this.glCreatedAt = glCreatedAt;
         return this;
     }
@@ -107,7 +107,7 @@ public class GitlabUserViewDTO {
         return glName;
     }
 
-    public GitlabUserViewDTO setGlName(String glName) {
+    public RdmUserViewDTO setGlName(String glName) {
         this.glName = glName;
         return this;
     }
@@ -116,7 +116,7 @@ public class GitlabUserViewDTO {
         return glState;
     }
 
-    public GitlabUserViewDTO setGlState(String glState) {
+    public RdmUserViewDTO setGlState(String glState) {
         this.glState = glState;
         return this;
     }
@@ -125,7 +125,7 @@ public class GitlabUserViewDTO {
         return glUsername;
     }
 
-    public GitlabUserViewDTO setGlUsername(String glUsername) {
+    public RdmUserViewDTO setGlUsername(String glUsername) {
         this.glUsername = glUsername;
         return this;
     }
@@ -134,7 +134,7 @@ public class GitlabUserViewDTO {
         return glWebsiteUrl;
     }
 
-    public GitlabUserViewDTO setGlWebsiteUrl(String glWebsiteUrl) {
+    public RdmUserViewDTO setGlWebsiteUrl(String glWebsiteUrl) {
         this.glWebsiteUrl = glWebsiteUrl;
         return this;
     }
@@ -143,7 +143,7 @@ public class GitlabUserViewDTO {
         return glWebUrl;
     }
 
-    public GitlabUserViewDTO setGlWebUrl(String glWebUrl) {
+    public RdmUserViewDTO setGlWebUrl(String glWebUrl) {
         this.glWebUrl = glWebUrl;
         return this;
     }

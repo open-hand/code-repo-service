@@ -4,7 +4,7 @@ import io.choerodon.core.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberUpdateDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.*;
 //@Api(tags = SwaggerTags.GITLAB_MEMBER)
 @RestController("gitlabMemberController.v1")
 @RequestMapping("/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/members")
-public class GitlabMemberController extends BaseController {
+public class RdmMemberController extends BaseController {
     private final RdmMemberService rdmMemberService;
 
-    public GitlabMemberController(RdmMemberService rdmMemberService) {
+    public RdmMemberController(RdmMemberService rdmMemberService) {
         this.rdmMemberService = rdmMemberService;
     }
 
@@ -30,16 +30,16 @@ public class GitlabMemberController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "memberId", value = "成员id", paramType = "path", required = true),
-            @ApiImplicitParam(name = "gitlabMemberUpdateDTO", value = "参数", dataType = "GitlabMemberUpdateDTO", required = true),
+            @ApiImplicitParam(name = "rdmMemberUpdateDTO", value = "参数", dataType = "RdmMemberUpdateDTO", required = true),
     })
     @Permission(permissionPublic = true)
     @PutMapping("/{memberId}")
     public ResponseEntity<Object> updateMember(@PathVariable Long projectId,
                                                @PathVariable Long repositoryId,
                                                @PathVariable Long memberId,
-                                               @RequestBody GitlabMemberUpdateDTO gitlabMemberUpdateDTO) {
-        validObject(gitlabMemberUpdateDTO);
-        rdmMemberService.updateMember(memberId, gitlabMemberUpdateDTO);
+                                               @RequestBody RdmMemberUpdateDTO rdmMemberUpdateDTO) {
+        validObject(rdmMemberUpdateDTO);
+        rdmMemberService.updateMember(memberId, rdmMemberUpdateDTO);
         return Results.created(null);
     }
 

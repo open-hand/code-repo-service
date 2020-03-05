@@ -1,14 +1,9 @@
 package org.hrds.rducm.gitlab.api.controller.dto;
 
-import io.swagger.annotations.ApiModelProperty;
-import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
-
-import javax.validation.constraints.Future;
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 
-public class GitlabMemberViewDTO {
+public class RdmMemberViewDTO {
     private String realName;
 
     private String loginName;
@@ -44,7 +39,7 @@ public class GitlabMemberViewDTO {
         return id;
     }
 
-    public GitlabMemberViewDTO setId(Long id) {
+    public RdmMemberViewDTO setId(Long id) {
         this.id = id;
         return this;
     }
@@ -53,7 +48,7 @@ public class GitlabMemberViewDTO {
         return realName;
     }
 
-    public GitlabMemberViewDTO setRealName(String realName) {
+    public RdmMemberViewDTO setRealName(String realName) {
         this.realName = realName;
         return this;
     }
@@ -62,7 +57,7 @@ public class GitlabMemberViewDTO {
         return loginName;
     }
 
-    public GitlabMemberViewDTO setLoginName(String loginName) {
+    public RdmMemberViewDTO setLoginName(String loginName) {
         this.loginName = loginName;
         return this;
     }
@@ -71,7 +66,7 @@ public class GitlabMemberViewDTO {
         return appServiceName;
     }
 
-    public GitlabMemberViewDTO setAppServiceName(String appServiceName) {
+    public RdmMemberViewDTO setAppServiceName(String appServiceName) {
         this.appServiceName = appServiceName;
         return this;
     }
@@ -80,7 +75,7 @@ public class GitlabMemberViewDTO {
         return projectRoleName;
     }
 
-    public GitlabMemberViewDTO setProjectRoleName(String projectRoleName) {
+    public RdmMemberViewDTO setProjectRoleName(String projectRoleName) {
         this.projectRoleName = projectRoleName;
         return this;
     }
@@ -89,7 +84,7 @@ public class GitlabMemberViewDTO {
         return glAccessLevel;
     }
 
-    public GitlabMemberViewDTO setGlAccessLevel(Integer glAccessLevel) {
+    public RdmMemberViewDTO setGlAccessLevel(Integer glAccessLevel) {
         this.glAccessLevel = glAccessLevel;
         return this;
     }
@@ -98,7 +93,7 @@ public class GitlabMemberViewDTO {
         return glExpiresAt;
     }
 
-    public GitlabMemberViewDTO setGlExpiresAt(Date glExpiresAt) {
+    public RdmMemberViewDTO setGlExpiresAt(Date glExpiresAt) {
         this.glExpiresAt = glExpiresAt;
         return this;
     }
@@ -107,7 +102,7 @@ public class GitlabMemberViewDTO {
         return createdBy;
     }
 
-    public GitlabMemberViewDTO setCreatedBy(Long createdBy) {
+    public RdmMemberViewDTO setCreatedBy(Long createdBy) {
         this.createdBy = createdBy;
         return this;
     }
@@ -116,7 +111,7 @@ public class GitlabMemberViewDTO {
         return createdByName;
     }
 
-    public GitlabMemberViewDTO setCreatedByName(String createdByName) {
+    public RdmMemberViewDTO setCreatedByName(String createdByName) {
         this.createdByName = createdByName;
         return this;
     }
@@ -125,7 +120,7 @@ public class GitlabMemberViewDTO {
         return creationDate;
     }
 
-    public GitlabMemberViewDTO setCreationDate(Date creationDate) {
+    public RdmMemberViewDTO setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
         return this;
     }
@@ -134,7 +129,7 @@ public class GitlabMemberViewDTO {
         return repositoryId;
     }
 
-    public GitlabMemberViewDTO setRepositoryId(Long repositoryId) {
+    public RdmMemberViewDTO setRepositoryId(Long repositoryId) {
         this.repositoryId = repositoryId;
         return this;
     }
@@ -143,7 +138,7 @@ public class GitlabMemberViewDTO {
         return userId;
     }
 
-    public GitlabMemberViewDTO setUserId(Long userId) {
+    public RdmMemberViewDTO setUserId(Long userId) {
         this.userId = userId;
         return this;
     }
@@ -152,7 +147,7 @@ public class GitlabMemberViewDTO {
         return projectId;
     }
 
-    public GitlabMemberViewDTO setProjectId(Long projectId) {
+    public RdmMemberViewDTO setProjectId(Long projectId) {
         this.projectId = projectId;
         return this;
     }
@@ -161,7 +156,7 @@ public class GitlabMemberViewDTO {
         return objectVersionNumber;
     }
 
-    public GitlabMemberViewDTO setObjectVersionNumber(Long objectVersionNumber) {
+    public RdmMemberViewDTO setObjectVersionNumber(Long objectVersionNumber) {
         this.objectVersionNumber = objectVersionNumber;
         return this;
     }

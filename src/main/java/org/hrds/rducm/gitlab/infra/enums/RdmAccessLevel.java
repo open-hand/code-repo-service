@@ -3,7 +3,7 @@ package org.hrds.rducm.gitlab.infra.enums;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum GitlabAccessLevel {
+public enum RdmAccessLevel {
     /**
      * Gitlab成员的权限等级
      */
@@ -19,24 +19,24 @@ public enum GitlabAccessLevel {
 
     public final Integer value;
 
-    GitlabAccessLevel(int value) {
+    RdmAccessLevel(int value) {
         this.value = value;
     }
 
-    private static Map<Integer, GitlabAccessLevel> valuesMap = new HashMap<Integer, GitlabAccessLevel>(9);
+    private static Map<Integer, RdmAccessLevel> valuesMap = new HashMap<Integer, RdmAccessLevel>(9);
 
     static {
-        for (GitlabAccessLevel gitlabAccessLevel : GitlabAccessLevel.values()) {
-            valuesMap.put(gitlabAccessLevel.value, gitlabAccessLevel);
+        for (RdmAccessLevel rdmAccessLevel : RdmAccessLevel.values()) {
+            valuesMap.put(rdmAccessLevel.value, rdmAccessLevel);
         }
 
         // Make sure MAINTAINER is mapped to 40 and not MASTER (MASTER is deprecated)
         valuesMap.put(MAINTAINER.value, MAINTAINER);
     }
 
-    public static GitlabAccessLevel forValue(Integer value) {
+    public static RdmAccessLevel forValue(Integer value) {
 
-        GitlabAccessLevel level = valuesMap.get(value);
+        RdmAccessLevel level = valuesMap.get(value);
         if (level != null) {
             return (level);
         }

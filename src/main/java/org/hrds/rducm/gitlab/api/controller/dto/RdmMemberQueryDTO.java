@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
 
 @ApiModel
-public class GitlabMemberQueryDTO {
+public class RdmMemberQueryDTO {
     @ApiModelProperty(value = "应用服务id")
     private List<Long> repositoryIds;
     @ApiModelProperty(value = "应用服务名称")
@@ -20,7 +20,7 @@ public class GitlabMemberQueryDTO {
         return repositoryIds;
     }
 
-    public GitlabMemberQueryDTO setRepositoryIds(List<Long> repositoryIds) {
+    public RdmMemberQueryDTO setRepositoryIds(List<Long> repositoryIds) {
         this.repositoryIds = repositoryIds;
         return this;
     }
@@ -29,7 +29,7 @@ public class GitlabMemberQueryDTO {
         return appServiceName;
     }
 
-    public GitlabMemberQueryDTO setAppServiceName(String appServiceName) {
+    public RdmMemberQueryDTO setAppServiceName(String appServiceName) {
         this.appServiceName = appServiceName;
         return this;
     }
@@ -38,7 +38,7 @@ public class GitlabMemberQueryDTO {
         return username;
     }
 
-    public GitlabMemberQueryDTO setUsername(String username) {
+    public RdmMemberQueryDTO setUsername(String username) {
         this.username = username;
         return this;
     }
@@ -47,7 +47,7 @@ public class GitlabMemberQueryDTO {
         return params;
     }
 
-    public GitlabMemberQueryDTO setParams(String params) {
+    public RdmMemberQueryDTO setParams(String params) {
         this.params = params;
         return this;
     }

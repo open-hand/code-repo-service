@@ -3,7 +3,7 @@ package org.hrds.rducm.gitlab.app.service.impl;
 import io.choerodon.core.exception.CommonException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.gitlab4j.api.models.User;
-import org.hrds.rducm.gitlab.api.controller.dto.GitlabUserViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmUserViewDTO;
 import org.hrds.rducm.gitlab.app.service.RdmUserService;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
@@ -21,30 +21,30 @@ public class RdmUserServiceImpl implements RdmUserService {
     private RdmUserRepository rdmUserRepository;
 
     @Override
-    public GitlabUserViewDTO queryUserSelf() {
+    public RdmUserViewDTO queryUserSelf() {
         // todo fixme 暂时写死
 //        Long userId = DetailsHelper.getUserDetails().getUserId();
         Long userId = 10003L;
         RdmUser rdmUser = rdmUserRepository.selectByUk(userId);
         User glUser = rdmUserRepository.getUserFromGitlab(rdmUser.getGlUserId());
 
-        GitlabUserViewDTO gitlabUserViewDTO = ConvertUtils.convertObject(rdmUser, GitlabUserViewDTO.class);
-        gitlabUserViewDTO.setGlState(glUser.getState());
-        gitlabUserViewDTO.setGlAvatarUrl(glUser.getAvatarUrl());
-        gitlabUserViewDTO.setGlBio(glUser.getBio());
-        gitlabUserViewDTO.setGlCreatedAt(glUser.getCreatedAt());
-        gitlabUserViewDTO.setGlName(glUser.getName());
-        gitlabUserViewDTO.setGlUsername(glUser.getUsername());
-        gitlabUserViewDTO.setGlWebsiteUrl(glUser.getWebsiteUrl());
-        gitlabUserViewDTO.setGlWebUrl(glUser.getWebUrl());
+        RdmUserViewDTO rdmUserViewDTO = ConvertUtils.convertObject(rdmUser, RdmUserViewDTO.class);
+        rdmUserViewDTO.setGlState(glUser.getState());
+        rdmUserViewDTO.setGlAvatarUrl(glUser.getAvatarUrl());
+        rdmUserViewDTO.setGlBio(glUser.getBio());
+        rdmUserViewDTO.setGlCreatedAt(glUser.getCreatedAt());
+        rdmUserViewDTO.setGlName(glUser.getName());
+        rdmUserViewDTO.setGlUsername(glUser.getUsername());
+        rdmUserViewDTO.setGlWebsiteUrl(glUser.getWebsiteUrl());
+        rdmUserViewDTO.setGlWebUrl(glUser.getWebUrl());
 
-        return gitlabUserViewDTO;
+        return rdmUserViewDTO;
     }
 
     @Override
-    public GitlabUserViewDTO queryUser(Long userId) {
+    public RdmUserViewDTO queryUser(Long userId) {
         RdmUser rdmUser = rdmUserRepository.selectByUk(userId);
-        return ConvertUtils.convertObject(rdmUser, GitlabUserViewDTO.class);
+        return ConvertUtils.convertObject(rdmUser, RdmUserViewDTO.class);
     }
 
     /**

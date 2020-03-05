@@ -7,7 +7,7 @@ import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-public class GitlabMemberUpdateDTO {
+public class RdmMemberUpdateDTO {
 //    @NotNull
 //    @ApiModelProperty(ApiInfoConstants.GL_PROJECT_ID)
 //    private Integer glProjectId;
@@ -28,7 +28,7 @@ public class GitlabMemberUpdateDTO {
 //        return glProjectId;
 //    }
 //
-//    public GitlabMemberUpdateDTO setGlProjectId(Integer glProjectId) {
+//    public RdmMemberUpdateDTO setGlProjectId(Integer glProjectId) {
 //        this.glProjectId = glProjectId;
 //        return this;
 //    }
@@ -37,7 +37,7 @@ public class GitlabMemberUpdateDTO {
 //        return glUserId;
 //    }
 //
-//    public GitlabMemberUpdateDTO setGlUserId(Integer glUserId) {
+//    public RdmMemberUpdateDTO setGlUserId(Integer glUserId) {
 //        this.glUserId = glUserId;
 //        return this;
 //    }
@@ -46,7 +46,7 @@ public class GitlabMemberUpdateDTO {
         return glAccessLevel;
     }
 
-    public GitlabMemberUpdateDTO setGlAccessLevel(Integer glAccessLevel) {
+    public RdmMemberUpdateDTO setGlAccessLevel(Integer glAccessLevel) {
         this.glAccessLevel = glAccessLevel;
         return this;
     }
@@ -55,7 +55,7 @@ public class GitlabMemberUpdateDTO {
         return glExpiresAt;
     }
 
-    public GitlabMemberUpdateDTO setGlExpiresAt(Date glExpiresAt) {
+    public RdmMemberUpdateDTO setGlExpiresAt(Date glExpiresAt) {
         this.glExpiresAt = glExpiresAt;
         return this;
     }
@@ -64,7 +64,7 @@ public class GitlabMemberUpdateDTO {
         return objectVersionNumber;
     }
 
-    public GitlabMemberUpdateDTO setObjectVersionNumber(Long objectVersionNumber) {
+    public RdmMemberUpdateDTO setObjectVersionNumber(Long objectVersionNumber) {
         this.objectVersionNumber = objectVersionNumber;
         return this;
     }

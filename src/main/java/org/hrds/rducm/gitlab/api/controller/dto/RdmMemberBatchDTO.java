@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 
-public class GitlabMemberBatchDTO {
+public class RdmMemberBatchDTO {
     @NotEmpty
     @ApiModelProperty(value = ApiInfoConstants.REPOSITORY_ID, dataType = "Long", required = true)
     private List<Long> repositoryIds;
@@ -69,7 +69,7 @@ public class GitlabMemberBatchDTO {
         return repositoryIds;
     }
 
-    public GitlabMemberBatchDTO setRepositoryIds(List<Long> repositoryIds) {
+    public RdmMemberBatchDTO setRepositoryIds(List<Long> repositoryIds) {
         this.repositoryIds = repositoryIds;
         return this;
     }
@@ -78,7 +78,7 @@ public class GitlabMemberBatchDTO {
         return allMemberFlag;
     }
 
-    public GitlabMemberBatchDTO setAllMemberFlag(Boolean allMember) {
+    public RdmMemberBatchDTO setAllMemberFlag(Boolean allMember) {
         allMemberFlag = allMember;
         return this;
     }
@@ -87,7 +87,7 @@ public class GitlabMemberBatchDTO {
         return members;
     }
 
-    public GitlabMemberBatchDTO setMembers(List<GitlabMemberCreateDTO> members) {
+    public RdmMemberBatchDTO setMembers(List<GitlabMemberCreateDTO> members) {
         this.members = members;
         return this;
     }

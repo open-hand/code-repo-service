@@ -1,14 +1,14 @@
 package org.hrds.rducm.gitlab.app.service;
 
-import org.hrds.rducm.gitlab.api.controller.dto.GitlabUserViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmUserViewDTO;
 
 /**
  * @author xy
  */
 public interface RdmUserService {
-    GitlabUserViewDTO queryUserSelf();
+    RdmUserViewDTO queryUserSelf();
 
-    GitlabUserViewDTO queryUser(Long userId);
+    RdmUserViewDTO queryUser(Long userId);
 
     void createUserWithRandomPassword(Long userId, String glEmail, String glUsername, String glName);
 
