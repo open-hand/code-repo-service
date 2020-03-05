@@ -69,7 +69,7 @@ public class ProjectController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
-    @PostMapping("/c7n/members")
+    @GetMapping("/c7n/members")
     public ResponseEntity<List<Map<String, Object>>> listProjectMembers(@PathVariable Long projectId) {
         // todo 临时使用, 后续需替换为 外部接口
         List<GitlabUser> gitlabUsers = gitlabUserRepository.selectAll();

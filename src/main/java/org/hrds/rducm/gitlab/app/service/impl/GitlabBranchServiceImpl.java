@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
+import org.apache.commons.compress.utils.Lists;
 import org.gitlab4j.api.models.ProtectedBranch;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.ProtectedBranchDTO;
@@ -8,7 +9,9 @@ import org.hrds.rducm.gitlab.domain.entity.GitlabRepository;
 import org.hrds.rducm.gitlab.domain.repository.GitlabBranchRepository;
 import org.hrds.rducm.gitlab.domain.repository.GitlabRepositoryRepository;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,7 +34,9 @@ public class GitlabBranchServiceImpl implements GitlabBranchService {
     public List<ProtectedBranchDTO> getProtectedBranches(Long repositoryId) {
         // 获取对应Gitlab项目id todo 临时
         GitlabRepository gitlabRepository = repositoryRepository.selectByUk(repositoryId);
-        return ConvertUtils.convertList(gitlabBranchRepository.getProtectedBranchesFromGitlab(gitlabRepository.getGlProjectId()), ProtectedBranchDTO.class);
+
+        List<ProtectedBranch> protectedBranches = gitlabBranchRepository.getProtectedBranchesFromGitlab(gitlabRepository.getGlProjectId());
+        return ConvertUtils.convertList(protectedBranches, ProtectedBranchDTO.class);
     }
 
     @Override

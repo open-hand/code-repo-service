@@ -19,6 +19,8 @@ import org.hrds.rducm.gitlab.domain.entity.GitlabUser;
 import org.hrds.rducm.gitlab.domain.repository.GitlabMemberRepository;
 import org.hrds.rducm.gitlab.domain.repository.GitlabRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.repository.GitlabUserRepository;
+import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
+import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
 import org.hrds.rducm.gitlab.infra.constant.Constants;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.core.base.AopProxy;
@@ -147,16 +149,19 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
     }
 
     /**
-     * 将成员设为过期
+     * 成员过期处理
+     *
+     * @param expiredGitlabMembers 过期成员数据
      */
     private void batchExpireMembers(List<GitlabMember> expiredGitlabMembers) {
-        // <2> 设置过期成员的状态
         expiredGitlabMembers.forEach(m -> {
-            m.setState(Constants.MemberState.EXPIRED);
-        });
+            // <1> 删除
+            gitlabMemberRepository.deleteByPrimaryKey(m);
 
-        // <3> 批量更新
-        gitlabMemberRepository.batchUpdateByPrimaryKeySelective(expiredGitlabMembers);
+            // <2> 发送事件
+            MemberEvent.EventParam eventParam = buildEventParam(m.getProjectId(), m.getRepositoryId(), m.getUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
+            OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.REMOVE_EXPIRED_MEMBER, eventParam));
+        });
     }
 
     @Override
@@ -164,10 +169,10 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
     public void handleExpiredMembers() {
         // <1> 查询已过期的成员
         Condition condition = new Condition(GitlabMember.class);
-        condition.createCriteria().andLessThanOrEqualTo("glExpiresAt", new Date());
+        condition.createCriteria().andLessThanOrEqualTo(GitlabMember.FIELD_GL_EXPIRES_AT, new Date());
         List<GitlabMember> expiredGitlabMembers = gitlabMemberRepository.selectByCondition(condition);
 
-        // <2> 设置过期成员的状态
+        // <2> 处理过期成员
         batchExpireMembers(expiredGitlabMembers);
     }
 
@@ -234,5 +239,16 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
         }
 
         return gitlabMembers;
+    }
+
+    /**
+     * 构造审计所需报文参数
+     *
+     * @param targetUserId 目标用户id
+     * @param accessLevel  访问权限等级
+     * @param expiresAt    过期时间
+     */
+    private MemberEvent.EventParam buildEventParam(Long projectId, Long repositoryId, Long targetUserId, Integer accessLevel, Date expiresAt) {
+        return new MemberEvent.EventParam(projectId, repositoryId, targetUserId, accessLevel, expiresAt);
     }
 }

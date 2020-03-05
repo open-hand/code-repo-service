@@ -11,8 +11,10 @@ import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabPorjectApi;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.mybatis.base.impl.BaseRepositoryImpl;
+import org.hzero.mybatis.domian.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -191,31 +193,31 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
         }
     }
 
-    /**
-     * todo
-     * 成员权限审计
-     *
-     * @param
-     */
-    private void compareMembersWithGitlab(Long glProjectId, List<GitlabMember> dbMembers, List<Member> glMembers) {
-        Map<String, GitlabMemberAudit> gitlabMemberAuditMap = new HashMap<>();
-
-        for (GitlabMember dbMember : dbMembers) {
-            GitlabMemberAudit gitlabMemberAudit = new GitlabMemberAudit();
-            gitlabMemberAudit.setRepositoryId(dbMember.getRepositoryId())
-                    .setUserId(dbMember.getUserId())
-                    .setAccessLevel(dbMember.getGlAccessLevel())
-                    .setExpiresAt(dbMember.getGlExpiresAt());
-
-            gitlabMemberAuditMap.put(dbMember.getGlProjectId() + "-" + dbMember.getGlUserId(), gitlabMemberAudit);
-        }
-
-        for (Member glMember : glMembers) {
-            String key = glProjectId + "-" + glMember.getId();
-
-
-        }
-    }
+//    /**
+//     * todo
+//     * 成员权限审计
+//     *
+//     * @param
+//     */
+//    private void compareMembersWithGitlab(Long glProjectId, List<GitlabMember> dbMembers, List<Member> glMembers) {
+//        Map<String, GitlabMemberAudit> gitlabMemberAuditMap = new HashMap<>();
+//
+//        for (GitlabMember dbMember : dbMembers) {
+//            GitlabMemberAudit gitlabMemberAudit = new GitlabMemberAudit();
+//            gitlabMemberAudit.setRepositoryId(dbMember.getRepositoryId())
+//                    .setUserId(dbMember.getUserId())
+//                    .setAccessLevel(dbMember.getGlAccessLevel())
+//                    .setExpiresAt(dbMember.getGlExpiresAt());
+//
+//            gitlabMemberAuditMap.put(dbMember.getGlProjectId() + "-" + dbMember.getGlUserId(), gitlabMemberAudit);
+//        }
+//
+//        for (Member glMember : glMembers) {
+//            String key = glProjectId + "-" + glMember.getId();
+//
+//
+//        }
+//    }
 
     /**
      * 构造审计所需报文参数
