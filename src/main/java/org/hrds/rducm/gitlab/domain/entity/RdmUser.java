@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
- * Gitlab用户表
+ * 用户表
  *
  * @author ying.xie@hand-china.com 2020-02-27 16:13:38
  */

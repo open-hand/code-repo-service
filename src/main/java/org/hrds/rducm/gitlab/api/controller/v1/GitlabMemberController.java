@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberUpdateDTO;
-import org.hrds.rducm.gitlab.app.service.GitlabMemberService;
+import org.hrds.rducm.gitlab.app.service.RdmMemberService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController("gitlabMemberController.v1")
 @RequestMapping("/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/members")
 public class GitlabMemberController extends BaseController {
-    private final GitlabMemberService gitlabMemberService;
+    private final RdmMemberService rdmMemberService;
 
-    public GitlabMemberController(GitlabMemberService gitlabMemberService) {
-        this.gitlabMemberService = gitlabMemberService;
+    public GitlabMemberController(RdmMemberService rdmMemberService) {
+        this.rdmMemberService = rdmMemberService;
     }
 
     @ApiOperation(value = "修改代码库成员")
@@ -39,7 +39,7 @@ public class GitlabMemberController extends BaseController {
                                                @PathVariable Long memberId,
                                                @RequestBody GitlabMemberUpdateDTO gitlabMemberUpdateDTO) {
         validObject(gitlabMemberUpdateDTO);
-        gitlabMemberService.updateMember(memberId, gitlabMemberUpdateDTO);
+        rdmMemberService.updateMember(memberId, gitlabMemberUpdateDTO);
         return Results.created(null);
     }
 
@@ -54,7 +54,7 @@ public class GitlabMemberController extends BaseController {
     public ResponseEntity<Object> removeMember(@PathVariable Long projectId,
                                                @PathVariable Long repositoryId,
                                                @PathVariable Long memberId) {
-        gitlabMemberService.removeMember(memberId);
+        rdmMemberService.removeMember(memberId);
         return Results.created(null);
     }
 }

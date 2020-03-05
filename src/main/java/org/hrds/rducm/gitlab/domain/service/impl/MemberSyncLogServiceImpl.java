@@ -1,11 +1,11 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
 import org.gitlab4j.api.models.Member;
-import org.hrds.rducm.gitlab.domain.entity.GitlabMember;
+import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.MemberSyncAuditLog;
-import org.hrds.rducm.gitlab.domain.entity.GitlabRepository;
-import org.hrds.rducm.gitlab.domain.repository.GitlabMemberRepository;
-import org.hrds.rducm.gitlab.domain.repository.GitlabRepositoryRepository;
+import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
+import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.service.IMemberSyncLogService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabPorjectApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +27,12 @@ import java.util.stream.Collectors;
 @Service
 public class MemberSyncLogServiceImpl implements IMemberSyncLogService {
     @Autowired
-    private GitlabMemberRepository memberRepository;
+    private RdmMemberRepository memberRepository;
 
     @Autowired
     private GitlabPorjectApi gitlabPorjectApi;
     @Autowired
-    private GitlabRepositoryRepository repositoryRepository;
+    private RdmRepositoryRepository repositoryRepository;
 
     /**
      * 定时审计gitlab权限和数据库权限
@@ -49,15 +49,15 @@ public class MemberSyncLogServiceImpl implements IMemberSyncLogService {
 
     public List<MemberSyncAuditLog> compareMemberPermissionByRepositoryId(Long repositoryId) {
         // 查询仓库id
-        GitlabRepository repository = repositoryRepository.selectByUk(repositoryId);
+        RdmRepository repository = repositoryRepository.selectByUk(repositoryId);
         Integer glProjectId = repository.getGlProjectId();
 
         // 查询gitlab所有成员
         List<Member> members = gitlabPorjectApi.getMembers(glProjectId);
 
         // 查询数据库所有成员
-        List<GitlabMember> dbMembers = memberRepository.select(new GitlabMember().setGlProjectId(glProjectId));
-        Map<Integer, GitlabMember> dbMemberMap = dbMembers.stream().collect(Collectors.toMap(m -> m.getGlUserId(), m -> m));
+        List<RdmMember> dbMembers = memberRepository.select(new RdmMember().setGlProjectId(glProjectId));
+        Map<Integer, RdmMember> dbMemberMap = dbMembers.stream().collect(Collectors.toMap(m -> m.getGlUserId(), m -> m));
 
         // 比较是否有差异
         List<MemberSyncAuditLog> memberAudits = new ArrayList<>();
@@ -65,7 +65,7 @@ public class MemberSyncLogServiceImpl implements IMemberSyncLogService {
             boolean isDifferent = false;
 
             // 查找数据库是否有此成员
-            GitlabMember dbMember = dbMemberMap.get(member.getId());
+            RdmMember dbMember = dbMemberMap.get(member.getId());
 
             // 移除
             dbMemberMap.remove(member.getId());
@@ -105,7 +105,7 @@ public class MemberSyncLogServiceImpl implements IMemberSyncLogService {
                                                Long repositoryId,
                                                Integer glProjectId,
                                                Member glMember,
-                                               GitlabMember dbMember) {
+                                               RdmMember dbMember) {
         MemberSyncAuditLog memberAudit = new MemberSyncAuditLog();
 
         if (glMember != null) {

@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.core.exception.CommonException;
 import org.gitlab4j.api.models.AccessLevel;
-import org.hrds.rducm.gitlab.domain.entity.GitlabOperationLog;
+import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
-import org.hrds.rducm.gitlab.domain.repository.GitlabOperationLogRepository;
-import org.hrds.rducm.gitlab.domain.repository.GitlabUserRepository;
+import org.hrds.rducm.gitlab.domain.repository.RdmOperationLogRepository;
+import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
 import org.hrds.rducm.gitlab.infra.util.PlaceholderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +25,12 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
     private static final Logger LOGGER = LoggerFactory.getLogger(MemberEventListener.class);
 
     @Autowired
-    private GitlabOperationLogRepository operationLogRepository;
+    private RdmOperationLogRepository operationLogRepository;
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
-    private GitlabUserRepository userRepository;
+    private RdmUserRepository userRepository;
 
     @Override
     public void onApplicationEvent(MemberEvent event) {
@@ -59,7 +59,7 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
         opContent = PlaceholderUtils.format(opContent, templateMap);
 
         // 插入数据库
-        GitlabOperationLog operationLog = new GitlabOperationLog();
+        RdmOperationLog operationLog = new RdmOperationLog();
         operationLog.setOpUserId(userId)
                 .setProjectId(projectId)
                 .setRepositoryId(repositoryId)

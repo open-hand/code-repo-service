@@ -1,12 +1,12 @@
 package org.hrds.rducm.gitlab.domain.repository;
 
 import org.gitlab4j.api.models.Member;
-import org.hrds.rducm.gitlab.domain.entity.GitlabMember;
+import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hzero.mybatis.base.BaseRepository;
 
 import java.util.List;
 
-public interface GitlabMemberRepository extends BaseRepository<GitlabMember> {
+public interface RdmMemberRepository extends BaseRepository<RdmMember> {
     /**
      * 根据唯一索引查询成员
      *
@@ -15,33 +15,33 @@ public interface GitlabMemberRepository extends BaseRepository<GitlabMember> {
      * @param userId
      * @return
      */
-    GitlabMember selectOneByUk(Long projectId, Long repositoryId, Long userId);
+    RdmMember selectOneByUk(Long projectId, Long repositoryId, Long userId);
 
     List<Member> queryMembersFromGitlab(Integer glProjectId);
 
-    void batchAddOrUpdateMembersToGitlab(List<GitlabMember> gitlabMembers);
+    void batchAddOrUpdateMembersToGitlab(List<RdmMember> rdmMembers);
 
-    void insertMemberBefore(GitlabMember param);
+    void insertMemberBefore(RdmMember param);
 
     /**
      * 更新成员, 预更新(同步标识设为false, gitlab字段置空)
      * 执行成功会设置主键和版本号
      *
-     * @param gitlabMember
+     * @param rdmMember
      */
-    void updateMemberBefore(GitlabMember gitlabMember);
+    void updateMemberBefore(RdmMember rdmMember);
 
     /**
      * 批量新增或更新成员, 预更新(同步标识设为false, gitlab字段置空)
      * 执行成功后会设置主键和版本号
      *
-     * @param gitlabMembers
+     * @param rdmMembers
      */
-    void batchAddOrUpdateMembersBefore(List<GitlabMember> gitlabMembers);
+    void batchAddOrUpdateMembersBefore(List<RdmMember> rdmMembers);
 
-    void updateMemberToGitlab(GitlabMember param);
+    void updateMemberToGitlab(RdmMember param);
 
-    void removeMemberToGitlab(GitlabMember param);
+    void removeMemberToGitlab(RdmMember param);
 
-    void checkIsSyncGitlab(GitlabMember m);
+    void checkIsSyncGitlab(RdmMember m);
 }

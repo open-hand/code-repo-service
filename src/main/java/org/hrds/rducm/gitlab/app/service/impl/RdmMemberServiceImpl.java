@@ -12,13 +12,13 @@ import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberUpdateDTO;
-import org.hrds.rducm.gitlab.app.service.GitlabMemberService;
-import org.hrds.rducm.gitlab.domain.entity.GitlabMember;
-import org.hrds.rducm.gitlab.domain.entity.GitlabRepository;
+import org.hrds.rducm.gitlab.app.service.RdmMemberService;
+import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
-import org.hrds.rducm.gitlab.domain.repository.GitlabMemberRepository;
-import org.hrds.rducm.gitlab.domain.repository.GitlabRepositoryRepository;
-import org.hrds.rducm.gitlab.domain.repository.GitlabUserRepository;
+import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
+import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
@@ -34,20 +34,20 @@ import java.util.*;
 import static org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants.RDUCM_ADD_MEMBERS;
 
 @Service
-public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<GitlabMemberServiceImpl> {
-    private final GitlabMemberRepository gitlabMemberRepository;
+public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMemberServiceImpl> {
+    private final RdmMemberRepository rdmMemberRepository;
 
     @Autowired
-    private GitlabRepositoryRepository gitlabRepositoryRepository;
+    private RdmRepositoryRepository rdmRepositoryRepository;
 
     @Autowired
-    private GitlabUserRepository gitlabUserRepository;
+    private RdmUserRepository rdmUserRepository;
 
     @Autowired
     private TransactionalProducer producer;
 
-    public GitlabMemberServiceImpl(GitlabMemberRepository gitlabMemberRepository) {
-        this.gitlabMemberRepository = gitlabMemberRepository;
+    public RdmMemberServiceImpl(RdmMemberRepository rdmMemberRepository) {
+        this.rdmMemberRepository = rdmMemberRepository;
     }
 
     @Override
@@ -61,26 +61,26 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
         // 调用外部接口模糊查询的到userId todo
         List<Long> repositoryIds = query.getRepositoryIds();
 
-        Condition condition = Condition.builder(GitlabMember.class)
+        Condition condition = Condition.builder(RdmMember.class)
                 .where(Sqls.custom()
-                        .andEqualTo(GitlabMember.FIELD_PROJECT_ID, projectId)
-                        .andIn(GitlabMember.FIELD_USER_ID, userIds, true)
-                        .andIn(GitlabMember.FIELD_REPOSITORY_ID, repositoryIds, true))
+                        .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
+                        .andIn(RdmMember.FIELD_USER_ID, userIds, true)
+                        .andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIds, true))
                 .build();
 
-        Page<GitlabMember> page = PageHelper.doPageAndSort(pageRequest, () -> gitlabMemberRepository.selectByCondition(condition));
+        Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectByCondition(condition));
 
-//        Page<GitlabMember> page = PageHelper.doPage(pageRequest, () -> gitlabMemberRepository.select(query));
+//        Page<RdmMember> page = PageHelper.doPage(pageRequest, () -> rdmMemberRepository.select(query));
         Page<GitlabMemberViewDTO> gitlabMemberViewDTOS = ConvertUtils.convertPage(page, GitlabMemberViewDTO.class);
 
         // todo 关联查询, 需从接口获取数据, 暂时造数据
         for (GitlabMemberViewDTO viewDTO : gitlabMemberViewDTOS.getContent()) {
 
-            RdmUser dbUser = gitlabUserRepository.selectByUk(viewDTO.getUserId());
+            RdmUser dbUser = rdmUserRepository.selectByUk(viewDTO.getUserId());
             viewDTO.setRealName(dbUser.getGlUserName());
             viewDTO.setLoginName(dbUser.getGlUserName());
 
-            GitlabRepository dbRepository = gitlabRepositoryRepository.selectByUk(viewDTO.getRepositoryId());
+            RdmRepository dbRepository = rdmRepositoryRepository.selectByUk(viewDTO.getRepositoryId());
             viewDTO.setAppServiceName(dbRepository.getRepositoryName());
 
             viewDTO.setCreatedByName("张三");
@@ -99,63 +99,63 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
     @Transactional(rollbackFor = Exception.class)
     public void batchAddOrUpdateMembers(Long projectId, GitlabMemberBatchDTO gitlabMemberBatchDTO) {
         // <0> 校验入参 + 转换
-        List<GitlabMember> gitlabMembers = convertGitlabMemberBatchDTO(projectId, gitlabMemberBatchDTO);
+        List<RdmMember> rdmMembers = convertGitlabMemberBatchDTO(projectId, gitlabMemberBatchDTO);
 
         // <1> 数据库添加成员, 已存在需要更新
-        gitlabMemberRepository.batchAddOrUpdateMembersBefore(gitlabMembers);
+        rdmMemberRepository.batchAddOrUpdateMembersBefore(rdmMembers);
 
         // <2> 调用gitlab api添加成员 todo 事务一致性问题
-        gitlabMemberRepository.batchAddOrUpdateMembersToGitlab(gitlabMembers);
+        rdmMemberRepository.batchAddOrUpdateMembersToGitlab(rdmMembers);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateMember(Long memberId, GitlabMemberUpdateDTO gitlabMemberUpdateDTO) {
         // <0> 校验入参 todo + 转换
-        final GitlabMember gitlabMember = ConvertUtils.convertObject(gitlabMemberUpdateDTO, GitlabMember.class);
-        gitlabMember.setId(memberId);
+        final RdmMember rdmMember = ConvertUtils.convertObject(gitlabMemberUpdateDTO, RdmMember.class);
+        rdmMember.setId(memberId);
 
         // 获取gitlab项目id和用户id todo 应从外部接口获取, 暂时从数据库获取
-        GitlabMember dbMember = gitlabMemberRepository.selectByPrimaryKey(memberId);
-        gitlabMemberRepository.checkIsSyncGitlab(dbMember);
-        gitlabMember.setGlProjectId(dbMember.getGlProjectId());
-        gitlabMember.setGlUserId(dbMember.getGlUserId());
-        gitlabMember.setUserId(dbMember.getUserId());
+        RdmMember dbMember = rdmMemberRepository.selectByPrimaryKey(memberId);
+        rdmMemberRepository.checkIsSyncGitlab(dbMember);
+        rdmMember.setGlProjectId(dbMember.getGlProjectId());
+        rdmMember.setGlUserId(dbMember.getGlUserId());
+        rdmMember.setUserId(dbMember.getUserId());
 
-        gitlabMember.setProjectId(dbMember.getProjectId());
-        gitlabMember.setRepositoryId(dbMember.getRepositoryId());
+        rdmMember.setProjectId(dbMember.getProjectId());
+        rdmMember.setRepositoryId(dbMember.getRepositoryId());
 
         // 设置过期标识
-        gitlabMember.setExpiredFlag(dbMember.checkExpiredFlag());
+        rdmMember.setExpiredFlag(dbMember.checkExpiredFlag());
 
         // <1> 数据库更新成员
-        gitlabMemberRepository.updateMemberBefore(gitlabMember);
+        rdmMemberRepository.updateMemberBefore(rdmMember);
 
         // <2> 调用gitlab api更新成员 todo 事务一致性问题
-        gitlabMemberRepository.updateMemberToGitlab(gitlabMember);
+        rdmMemberRepository.updateMemberToGitlab(rdmMember);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void removeMember(Long memberId) {
         // <1> 数据库更新成员, 预删除
-        GitlabMember dbMember = gitlabMemberRepository.selectByPrimaryKey(memberId);
-        gitlabMemberRepository.checkIsSyncGitlab(dbMember);
-        gitlabMemberRepository.updateMemberBefore(dbMember);
+        RdmMember dbMember = rdmMemberRepository.selectByPrimaryKey(memberId);
+        rdmMemberRepository.checkIsSyncGitlab(dbMember);
+        rdmMemberRepository.updateMemberBefore(dbMember);
 
         // <2> 调用gitlab api删除成员 todo 事务一致性问题
-        gitlabMemberRepository.removeMemberToGitlab(dbMember);
+        rdmMemberRepository.removeMemberToGitlab(dbMember);
     }
 
     /**
      * 成员过期处理
      *
-     * @param expiredGitlabMembers 过期成员数据
+     * @param expiredRdmMembers 过期成员数据
      */
-    private void batchExpireMembers(List<GitlabMember> expiredGitlabMembers) {
-        expiredGitlabMembers.forEach(m -> {
+    private void batchExpireMembers(List<RdmMember> expiredRdmMembers) {
+        expiredRdmMembers.forEach(m -> {
             // <1> 删除
-            gitlabMemberRepository.deleteByPrimaryKey(m);
+            rdmMemberRepository.deleteByPrimaryKey(m);
 
             // <2> 发送事件
             MemberEvent.EventParam eventParam = buildEventParam(m.getProjectId(), m.getRepositoryId(), m.getUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
@@ -167,19 +167,19 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
     @Transactional(rollbackFor = Exception.class)
     public void handleExpiredMembers() {
         // <1> 查询已过期的成员
-        Condition condition = new Condition(GitlabMember.class);
-        condition.createCriteria().andLessThanOrEqualTo(GitlabMember.FIELD_GL_EXPIRES_AT, new Date());
-        List<GitlabMember> expiredGitlabMembers = gitlabMemberRepository.selectByCondition(condition);
+        Condition condition = new Condition(RdmMember.class);
+        condition.createCriteria().andLessThanOrEqualTo(RdmMember.FIELD_GL_EXPIRES_AT, new Date());
+        List<RdmMember> expiredRdmMembers = rdmMemberRepository.selectByCondition(condition);
 
         // <2> 处理过期成员
-        batchExpireMembers(expiredGitlabMembers);
+        batchExpireMembers(expiredRdmMembers);
     }
 
     @Saga(code = RDUCM_ADD_MEMBERS, description = "批量添加代码库成员")
     @Transactional(rollbackFor = Exception.class)
-    public void batchAddMemberSagaDemo(List<GitlabMember> gitlabMembers) {
+    public void batchAddMemberSagaDemo(List<RdmMember> rdmMembers) {
         // <1> 数据库添加成员
-        gitlabMemberRepository.batchInsertSelective(gitlabMembers);
+        rdmMemberRepository.batchInsertSelective(rdmMembers);
 
         // 创建saga
         producer.apply(
@@ -195,49 +195,49 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
 
     @SagaTask(code = "", sagaCode = RDUCM_ADD_MEMBERS, description = "调用gitlab api添加成员并回写", seq = 1)
     public void batchAddMemberToGitlabSagaDemo(String payload) {
-        List<GitlabMember> gitlabMembers = new ArrayList<>();
+        List<RdmMember> rdmMembers = new ArrayList<>();
         // <2> 调用gitlab api添加成员
-        gitlabMemberRepository.batchAddOrUpdateMembersToGitlab(gitlabMembers);
+        rdmMemberRepository.batchAddOrUpdateMembersToGitlab(rdmMembers);
     }
 
     /**
-     * 将GitlabMemberBatchDTO转换为List<GitlabMember>
+     * 将GitlabMemberBatchDTO转换为List<RdmMember>
      * @param gitlabMemberBatchDTO
      * @return
      */
-    private List<GitlabMember> convertGitlabMemberBatchDTO(Long projectId, GitlabMemberBatchDTO gitlabMemberBatchDTO) {
+    private List<RdmMember> convertGitlabMemberBatchDTO(Long projectId, GitlabMemberBatchDTO gitlabMemberBatchDTO) {
         // 查询gitlab项目id和用户id todo 应从外部接口获取, 暂时从数据库获取
         Map<Long, Integer> repositoryIdToGlProjectIdMap = new HashMap<>();
         gitlabMemberBatchDTO.getRepositoryIds().forEach(repositoryId -> {
             // 获取gitlab项目id
-            GitlabRepository gitlabRepository = gitlabRepositoryRepository.selectOne(new GitlabRepository().setRepositoryId(repositoryId));
-            repositoryIdToGlProjectIdMap.put(repositoryId, gitlabRepository.getGlProjectId());
+            RdmRepository rdmRepository = rdmRepositoryRepository.selectOne(new RdmRepository().setRepositoryId(repositoryId));
+            repositoryIdToGlProjectIdMap.put(repositoryId, rdmRepository.getGlProjectId());
         });
 
         // 查询gitlab用户id todo 应从外部接口获取, 暂时从数据库获取
         Map<Long, Integer> userIdToGlUserIdMap = new HashMap<>();
         gitlabMemberBatchDTO.getMembers().forEach(m -> {
-            RdmUser rdmUser = gitlabUserRepository.selectOne(new RdmUser().setUserId(m.getUserId()));
+            RdmUser rdmUser = rdmUserRepository.selectOne(new RdmUser().setUserId(m.getUserId()));
             userIdToGlUserIdMap.put(m.getUserId(), rdmUser.getGlUserId());
         });
 
-        // 转换为List<GitlabMember>格式
-        List<GitlabMember> gitlabMembers = new ArrayList<>();
+        // 转换为List<RdmMember>格式
+        List<RdmMember> rdmMembers = new ArrayList<>();
         for (Long repositoryId : gitlabMemberBatchDTO.getRepositoryIds()) {
             for (GitlabMemberBatchDTO.GitlabMemberCreateDTO member : gitlabMemberBatchDTO.getMembers()) {
-                GitlabMember gitlabMember = ConvertUtils.convertObject(member, GitlabMember.class);
-                gitlabMember.setProjectId(projectId);
-                gitlabMember.setRepositoryId(repositoryId);
+                RdmMember rdmMember = ConvertUtils.convertObject(member, RdmMember.class);
+                rdmMember.setProjectId(projectId);
+                rdmMember.setRepositoryId(repositoryId);
 
                 // 设置gitlab项目id和用户id
-                gitlabMember.setGlProjectId(repositoryIdToGlProjectIdMap.get(repositoryId));
-                gitlabMember.setGlUserId(userIdToGlUserIdMap.get(member.getUserId()));
+                rdmMember.setGlProjectId(repositoryIdToGlProjectIdMap.get(repositoryId));
+                rdmMember.setGlUserId(userIdToGlUserIdMap.get(member.getUserId()));
 
-                gitlabMembers.add(gitlabMember);
+                rdmMembers.add(rdmMember);
             }
         }
 
-        return gitlabMembers;
+        return rdmMembers;
     }
 
     /**

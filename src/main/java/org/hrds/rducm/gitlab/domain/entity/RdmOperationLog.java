@@ -24,7 +24,7 @@ import java.util.Date;
 @ModifyAudit
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @Table(name = "rducm_gitlab_operation_log")
-public class GitlabOperationLog extends AuditDomain {
+public class RdmOperationLog extends AuditDomain {
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_PROJECT_ID = "projectId";
@@ -93,7 +93,7 @@ public class GitlabOperationLog extends AuditDomain {
         return id;
     }
 
-    public GitlabOperationLog setId(Long id) {
+    public RdmOperationLog setId(Long id) {
         this.id = id;
         return this;
     }
@@ -102,7 +102,7 @@ public class GitlabOperationLog extends AuditDomain {
         return projectId;
     }
 
-    public GitlabOperationLog setProjectId(Long projectId) {
+    public RdmOperationLog setProjectId(Long projectId) {
         this.projectId = projectId;
         return this;
     }
@@ -111,7 +111,7 @@ public class GitlabOperationLog extends AuditDomain {
         return repositoryId;
     }
 
-    public GitlabOperationLog setRepositoryId(Long repositoryId) {
+    public RdmOperationLog setRepositoryId(Long repositoryId) {
         this.repositoryId = repositoryId;
         return this;
     }
@@ -120,7 +120,7 @@ public class GitlabOperationLog extends AuditDomain {
         return opUserId;
     }
 
-    public GitlabOperationLog setOpUserId(Long opUserId) {
+    public RdmOperationLog setOpUserId(Long opUserId) {
         this.opUserId = opUserId;
         return this;
     }
@@ -129,7 +129,7 @@ public class GitlabOperationLog extends AuditDomain {
         return opType;
     }
 
-    public GitlabOperationLog setOpType(String opType) {
+    public RdmOperationLog setOpType(String opType) {
         this.opType = opType;
         return this;
     }
@@ -138,7 +138,7 @@ public class GitlabOperationLog extends AuditDomain {
         return opContent;
     }
 
-    public GitlabOperationLog setOpContent(String opContent) {
+    public RdmOperationLog setOpContent(String opContent) {
         this.opContent = opContent;
         return this;
     }
@@ -147,7 +147,7 @@ public class GitlabOperationLog extends AuditDomain {
         return opDate;
     }
 
-    public GitlabOperationLog setOpDate(Date opDate) {
+    public RdmOperationLog setOpDate(Date opDate) {
         this.opDate = opDate;
         return this;
     }
@@ -156,7 +156,7 @@ public class GitlabOperationLog extends AuditDomain {
         return opEventType;
     }
 
-    public GitlabOperationLog setOpEventType(String opEventType) {
+    public RdmOperationLog setOpEventType(String opEventType) {
         this.opEventType = opEventType;
         return this;
     }
@@ -165,7 +165,7 @@ public class GitlabOperationLog extends AuditDomain {
         return opTarget;
     }
 
-    public GitlabOperationLog setOpTarget(String opTarget) {
+    public RdmOperationLog setOpTarget(String opTarget) {
         this.opTarget = opTarget;
         return this;
     }
@@ -174,7 +174,7 @@ public class GitlabOperationLog extends AuditDomain {
         return extraParam;
     }
 
-    public GitlabOperationLog setExtraParam(String extraParam) {
+    public RdmOperationLog setExtraParam(String extraParam) {
         this.extraParam = extraParam;
         return this;
     }

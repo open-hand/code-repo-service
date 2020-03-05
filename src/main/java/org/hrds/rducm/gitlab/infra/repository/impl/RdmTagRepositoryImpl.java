@@ -3,7 +3,7 @@ package org.hrds.rducm.gitlab.infra.repository.impl;
 import org.gitlab4j.api.models.AccessLevel;
 import org.gitlab4j.api.models.ProtectedTag;
 import org.gitlab4j.api.models.Tag;
-import org.hrds.rducm.gitlab.domain.repository.GitlabTagRepository;
+import org.hrds.rducm.gitlab.domain.repository.RdmTagRepository;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabRepositoryApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabTagsApi;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class GitlabTagRepositoryImpl implements GitlabTagRepository {
+public class RdmTagRepositoryImpl implements RdmTagRepository {
     @Autowired
     private GitlabTagsApi gitlabTagsApi;
     @Autowired

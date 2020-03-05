@@ -1,6 +1,6 @@
 //package org.hrds.rducm.gitlab.app.job;
 //
-//import org.hrds.rducm.gitlab.app.service.GitlabMemberService;
+//import org.hrds.rducm.gitlab.app.service.RdmMemberService;
 //import org.hzero.boot.scheduler.infra.annotation.JobHandler;
 //import org.hzero.boot.scheduler.infra.enums.ReturnT;
 //import org.hzero.boot.scheduler.infra.handler.IJobHandler;
@@ -12,7 +12,7 @@
 //@JobHandler("handleExpiredMembers")
 //public class handleExpiredMembersJob implements IJobHandler {
 //    @Autowired
-//    private GitlabMemberService gitlabMemberService;
+//    private RdmMemberService gitlabMemberService;
 //
 //    @Override
 //    public ReturnT execute(Map<String, String> map, SchedulerTool tool) {

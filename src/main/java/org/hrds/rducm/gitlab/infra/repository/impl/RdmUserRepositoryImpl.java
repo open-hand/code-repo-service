@@ -2,7 +2,7 @@ package org.hrds.rducm.gitlab.infra.repository.impl;
 
 import org.gitlab4j.api.models.User;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
-import org.hrds.rducm.gitlab.domain.repository.GitlabUserRepository;
+import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabUserApi;
 import org.hzero.mybatis.base.impl.BaseRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Objects;
 
 @Repository
-public class GitlabUserRepositoryImpl extends BaseRepositoryImpl<RdmUser> implements GitlabUserRepository {
+public class RdmUserRepositoryImpl extends BaseRepositoryImpl<RdmUser> implements RdmUserRepository {
     @Autowired
     private GitlabUserApi gitlabUserApi;
 

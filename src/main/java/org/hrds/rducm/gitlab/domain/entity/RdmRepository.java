@@ -20,7 +20,7 @@ import javax.validation.constraints.NotNull;
 @ModifyAudit
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @Table(name = "rducm_gitlab_repository")
-public class GitlabRepository extends AuditDomain {
+public class RdmRepository extends AuditDomain {
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_PROJECT_ID = "projectId";
@@ -65,7 +65,7 @@ public class GitlabRepository extends AuditDomain {
         return id;
     }
 
-    public GitlabRepository setId(Long id) {
+    public RdmRepository setId(Long id) {
         this.id = id;
         return this;
     }
@@ -74,7 +74,7 @@ public class GitlabRepository extends AuditDomain {
         return projectId;
     }
 
-    public GitlabRepository setProjectId(Long projectId) {
+    public RdmRepository setProjectId(Long projectId) {
         this.projectId = projectId;
         return this;
     }
@@ -83,7 +83,7 @@ public class GitlabRepository extends AuditDomain {
         return repositoryId;
     }
 
-    public GitlabRepository setRepositoryId(Long repositoryId) {
+    public RdmRepository setRepositoryId(Long repositoryId) {
         this.repositoryId = repositoryId;
         return this;
     }
@@ -92,7 +92,7 @@ public class GitlabRepository extends AuditDomain {
         return repositoryName;
     }
 
-    public GitlabRepository setRepositoryName(String repositoryName) {
+    public RdmRepository setRepositoryName(String repositoryName) {
         this.repositoryName = repositoryName;
         return this;
     }
@@ -101,7 +101,7 @@ public class GitlabRepository extends AuditDomain {
         return glProjectId;
     }
 
-    public GitlabRepository setGlProjectId(Integer glProjectId) {
+    public RdmRepository setGlProjectId(Integer glProjectId) {
         this.glProjectId = glProjectId;
         return this;
     }

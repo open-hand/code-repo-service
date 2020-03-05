@@ -2,13 +2,10 @@ package org.hrds.rducm.gitlab.domain.repository;
 
 import org.gitlab4j.api.models.ProtectedTag;
 import org.gitlab4j.api.models.Tag;
-import org.hrds.rducm.gitlab.domain.entity.GitlabMember;
-import org.hzero.mybatis.base.BaseRepository;
 
-import java.util.Date;
 import java.util.List;
 
-public interface GitlabTagRepository {
+public interface RdmTagRepository {
 
     List<Tag> getTagsFromGitlab(Integer projectId);
 

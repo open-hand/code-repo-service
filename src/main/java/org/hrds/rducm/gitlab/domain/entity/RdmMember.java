@@ -1,7 +1,6 @@
 package org.hrds.rducm.gitlab.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.annotation.ModifyAudit;
 import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
@@ -25,7 +24,7 @@ import java.util.Date;
 @ModifyAudit
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @Table(name = "rducm_gitlab_member")
-public class GitlabMember extends AuditDomain {
+public class RdmMember extends AuditDomain {
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_PROJECT_ID = "projectId";
@@ -107,7 +106,7 @@ public class GitlabMember extends AuditDomain {
         return id;
     }
 
-    public GitlabMember setId(Long id) {
+    public RdmMember setId(Long id) {
         this.id = id;
         return this;
     }
@@ -116,7 +115,7 @@ public class GitlabMember extends AuditDomain {
         return projectId;
     }
 
-    public GitlabMember setProjectId(Long projectId) {
+    public RdmMember setProjectId(Long projectId) {
         this.projectId = projectId;
         return this;
     }
@@ -125,7 +124,7 @@ public class GitlabMember extends AuditDomain {
         return repositoryId;
     }
 
-    public GitlabMember setRepositoryId(Long repositoryId) {
+    public RdmMember setRepositoryId(Long repositoryId) {
         this.repositoryId = repositoryId;
         return this;
     }
@@ -134,7 +133,7 @@ public class GitlabMember extends AuditDomain {
         return userId;
     }
 
-    public GitlabMember setUserId(Long userId) {
+    public RdmMember setUserId(Long userId) {
         this.userId = userId;
         return this;
     }
@@ -143,7 +142,7 @@ public class GitlabMember extends AuditDomain {
         return state;
     }
 
-    public GitlabMember setState(String state) {
+    public RdmMember setState(String state) {
         this.state = state;
         return this;
     }
@@ -152,7 +151,7 @@ public class GitlabMember extends AuditDomain {
         return glProjectId;
     }
 
-    public GitlabMember setGlProjectId(Integer glProjectId) {
+    public RdmMember setGlProjectId(Integer glProjectId) {
         this.glProjectId = glProjectId;
         return this;
     }
@@ -161,7 +160,7 @@ public class GitlabMember extends AuditDomain {
         return glUserId;
     }
 
-    public GitlabMember setGlUserId(Integer glUserId) {
+    public RdmMember setGlUserId(Integer glUserId) {
         this.glUserId = glUserId;
         return this;
     }
@@ -170,7 +169,7 @@ public class GitlabMember extends AuditDomain {
         return glAccessLevel;
     }
 
-    public GitlabMember setGlAccessLevel(Integer glAccessLevel) {
+    public RdmMember setGlAccessLevel(Integer glAccessLevel) {
         this.glAccessLevel = glAccessLevel;
         return this;
     }
@@ -179,7 +178,7 @@ public class GitlabMember extends AuditDomain {
         return glExpiresAt;
     }
 
-    public GitlabMember setGlExpiresAt(Date glExpiresAt) {
+    public RdmMember setGlExpiresAt(Date glExpiresAt) {
         this.glExpiresAt = glExpiresAt;
         return this;
     }
@@ -188,7 +187,7 @@ public class GitlabMember extends AuditDomain {
         return syncGitlabFlag;
     }
 
-    public GitlabMember setSyncGitlabFlag(Boolean syncGitlabFlag) {
+    public RdmMember setSyncGitlabFlag(Boolean syncGitlabFlag) {
         this.syncGitlabFlag = syncGitlabFlag;
         return this;
     }
@@ -197,7 +196,7 @@ public class GitlabMember extends AuditDomain {
         return syncDateGitlab;
     }
 
-    public GitlabMember setSyncDateGitlab(Date syncDateGitlab) {
+    public RdmMember setSyncDateGitlab(Date syncDateGitlab) {
         this.syncDateGitlab = syncDateGitlab;
         return this;
     }
@@ -206,7 +205,7 @@ public class GitlabMember extends AuditDomain {
         return expiredFlag;
     }
 
-    public GitlabMember setExpiredFlag(Boolean expiredFlag) {
+    public RdmMember setExpiredFlag(Boolean expiredFlag) {
         this.expiredFlag = expiredFlag;
         return this;
     }

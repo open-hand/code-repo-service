@@ -4,7 +4,7 @@ import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabUserViewDTO;
-import org.hrds.rducm.gitlab.app.service.GitlabUserService;
+import org.hrds.rducm.gitlab.app.service.RdmUserService;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +20,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1/gitlab/users")
 public class GitlabUserController extends BaseController {
     @Autowired
-    private GitlabUserService gitlabUserService;
+    private RdmUserService rdmUserService;
 
     @ApiOperation(value = "查询个人信息")
     @Permission(type = ResourceType.SITE, permissionPublic = true)
     @GetMapping("/self")
     public ResponseEntity<GitlabUserViewDTO> queryUser() {
-        return Results.success(gitlabUserService.queryUserSelf());
+        return Results.success(rdmUserService.queryUserSelf());
     }
 
     @ApiOperation(value = "新建用户")
@@ -36,7 +36,7 @@ public class GitlabUserController extends BaseController {
                                              @RequestParam String glEmail,
                                              @RequestParam String glUsername,
                                              @RequestParam String glName) {
-        gitlabUserService.createUserWithRandomPassword(userId, glEmail, glUsername, glName);
+        rdmUserService.createUserWithRandomPassword(userId, glEmail, glUsername, glName);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -48,7 +48,7 @@ public class GitlabUserController extends BaseController {
 //    @PutMapping("/personal/password")
 //    public ResponseEntity<Object> updateUserPassword(@RequestParam String password,
 //                                                     @RequestParam String confirmPassword) {
-//        gitlabUserService.updatePasswordForUser(password, confirmPassword);
+//        rdmUserService.updatePasswordForUser(password, confirmPassword);
 //        return Results.created(null);
 //    }
 }

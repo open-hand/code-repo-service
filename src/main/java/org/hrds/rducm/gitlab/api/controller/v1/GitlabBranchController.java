@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.ProtectedBranchDTO;
-import org.hrds.rducm.gitlab.app.service.GitlabBranchService;
+import org.hrds.rducm.gitlab.app.service.RdmBranchService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
@@ -25,7 +25,7 @@ public class GitlabBranchController extends BaseController {
 
 
     @Autowired
-    private GitlabBranchService gitlabBranchService;
+    private RdmBranchService rdmBranchService;
 
     @ApiOperation(value = "查询分支")
     @ApiImplicitParams({
@@ -36,7 +36,7 @@ public class GitlabBranchController extends BaseController {
     @GetMapping
     public ResponseEntity<List<BranchDTO>> getBranches(@PathVariable Long projectId,
                                                        @PathVariable Long repositoryId) {
-        return Results.success(gitlabBranchService.getBranches(repositoryId));
+        return Results.success(rdmBranchService.getBranches(repositoryId));
     }
 
     @ApiOperation(value = "查询保护分支")
@@ -48,7 +48,7 @@ public class GitlabBranchController extends BaseController {
     @GetMapping("/protected-branches")
     public ResponseEntity<List<ProtectedBranchDTO>> getProtectedBranches(@PathVariable Long projectId,
                                                                          @PathVariable Long repositoryId) {
-        return Results.success(gitlabBranchService.getProtectedBranches(repositoryId));
+        return Results.success(rdmBranchService.getProtectedBranches(repositoryId));
     }
 
     @ApiOperation(value = "添加保护分支")
@@ -66,7 +66,7 @@ public class GitlabBranchController extends BaseController {
                                                                     @RequestParam String branchName,
                                                                     @RequestParam Integer pushAccessLevel,
                                                                     @RequestParam Integer mergeAccessLevel) {
-        return Results.created(gitlabBranchService.protectBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
+        return Results.created(rdmBranchService.protectBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
     }
 
     @ApiOperation(value = "修改保护分支")
@@ -84,7 +84,7 @@ public class GitlabBranchController extends BaseController {
                                                                     @RequestParam String branchName,
                                                                     @RequestParam Integer pushAccessLevel,
                                                                     @RequestParam Integer mergeAccessLevel) {
-        return Results.created(gitlabBranchService.updateProtectedBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
+        return Results.created(rdmBranchService.updateProtectedBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
     }
 
     @ApiOperation(value = "删除保护分支")
@@ -98,7 +98,7 @@ public class GitlabBranchController extends BaseController {
     public ResponseEntity<?> removeProtectedBranch(@PathVariable Long projectId,
                                                    @PathVariable Long repositoryId,
                                                    @RequestParam String branchName) {
-        gitlabBranchService.unprotectBranch(repositoryId, branchName);
+        rdmBranchService.unprotectBranch(repositoryId, branchName);
         return Results.success();
     }
 }

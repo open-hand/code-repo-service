@@ -3,8 +3,8 @@ package org.hrds.rducm.gitlab.infra.repository.impl;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.domain.AuditDomain;
 import org.gitlab4j.api.models.Member;
-import org.hrds.rducm.gitlab.domain.entity.GitlabMember;
-import org.hrds.rducm.gitlab.domain.repository.GitlabMemberRepository;
+import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabPorjectApi;
@@ -17,17 +17,17 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember> implements GitlabMemberRepository {
+public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> implements RdmMemberRepository {
     @Autowired
     private GitlabPorjectApi gitlabPorjectApi;
 
     @Override
-    public GitlabMember selectOneByUk(Long projectId, Long repositoryId, Long userId) {
-        GitlabMember gitlabMember = new GitlabMember();
-        gitlabMember.setProjectId(projectId);
-        gitlabMember.setRepositoryId(repositoryId);
-        gitlabMember.setUserId(userId);
-        return this.selectOne(gitlabMember);
+    public RdmMember selectOneByUk(Long projectId, Long repositoryId, Long userId) {
+        RdmMember rdmMember = new RdmMember();
+        rdmMember.setProjectId(projectId);
+        rdmMember.setRepositoryId(repositoryId);
+        rdmMember.setUserId(userId);
+        return this.selectOne(rdmMember);
     }
 
     @Override
@@ -36,8 +36,8 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
     }
 
     @Override
-    public void batchAddOrUpdateMembersToGitlab(List<GitlabMember> gitlabMembers) {
-        gitlabMembers.forEach((m) -> {
+    public void batchAddOrUpdateMembersToGitlab(List<RdmMember> rdmMembers) {
+        rdmMembers.forEach((m) -> {
             // <1> 判断新增或更新
             boolean isExists;
             if (m.get_status().equals(AuditDomain.RecordStatus.create)) {
@@ -79,10 +79,10 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
 
 
     @Override
-    public void batchAddOrUpdateMembersBefore(List<GitlabMember> gitlabMembers) {
-        gitlabMembers.forEach(m -> {
+    public void batchAddOrUpdateMembersBefore(List<RdmMember> rdmMembers) {
+        rdmMembers.forEach(m -> {
             // 判断新增或修改
-            GitlabMember dbMember = this.selectOneByUk(m.getProjectId(), m.getRepositoryId(), m.getUserId());
+            RdmMember dbMember = this.selectOneByUk(m.getProjectId(), m.getRepositoryId(), m.getUserId());
             boolean isExists = dbMember != null;
 
             // 设置状态供后续判断
@@ -104,8 +104,8 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
     }
 
     @Override
-    public void insertMemberBefore(GitlabMember param) {
-        GitlabMember m = ConvertUtils.convertObject(param, GitlabMember.class);
+    public void insertMemberBefore(RdmMember param) {
+        RdmMember m = ConvertUtils.convertObject(param, RdmMember.class);
         m.setSyncGitlabFlag(false);
         m.setGlAccessLevel(null);
         m.setGlExpiresAt(null);
@@ -116,26 +116,26 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
     }
 
     @Override
-    public void updateMemberBefore(GitlabMember param) {
-        GitlabMember m = ConvertUtils.convertObject(param, GitlabMember.class);
+    public void updateMemberBefore(RdmMember param) {
+        RdmMember m = ConvertUtils.convertObject(param, RdmMember.class);
         m.setSyncGitlabFlag(false);
         m.setGlAccessLevel(null);
         m.setGlExpiresAt(null);
-        this.updateOptional(m, GitlabMember.FIELD_SYNC_GITLAB_FLAG, GitlabMember.FIELD_GL_ACCESS_LEVEL, GitlabMember.FIELD_GL_EXPIRES_AT);
+        this.updateOptional(m, RdmMember.FIELD_SYNC_GITLAB_FLAG, RdmMember.FIELD_GL_ACCESS_LEVEL, RdmMember.FIELD_GL_EXPIRES_AT);
 
         param.setId(m.getId());
         param.setObjectVersionNumber(m.getObjectVersionNumber());
     }
 
-    public void updateMemberAfter(GitlabMember m, Member member) {
+    public void updateMemberAfter(RdmMember m, Member member) {
         // <2> 回写数据库
         String[] fields = new String[]{
-                GitlabMember.FIELD_GL_PROJECT_ID,
-                GitlabMember.FIELD_GL_USER_ID,
-                GitlabMember.FIELD_GL_ACCESS_LEVEL,
-                GitlabMember.FIELD_GL_EXPIRES_AT,
-                GitlabMember.FIELD_SYNC_GITLAB_FLAG,
-                GitlabMember.FIELD_SYNC_DATE_GITLAB
+                RdmMember.FIELD_GL_PROJECT_ID,
+                RdmMember.FIELD_GL_USER_ID,
+                RdmMember.FIELD_GL_ACCESS_LEVEL,
+                RdmMember.FIELD_GL_EXPIRES_AT,
+                RdmMember.FIELD_SYNC_GITLAB_FLAG,
+                RdmMember.FIELD_SYNC_DATE_GITLAB
         };
         m.setGlAccessLevel(member.getAccessLevel().toValue());
         m.setGlExpiresAt(member.getExpiresAt());
@@ -146,7 +146,7 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
     }
 
     @Override
-    public void updateMemberToGitlab(GitlabMember param) {
+    public void updateMemberToGitlab(RdmMember param) {
         Member glMember;
         // 如果过期, Gitlab会直接移除成员, 所以需改成添加成员
         if (param.getExpiredFlag()) {
@@ -164,7 +164,7 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
     }
 
     @Override
-    public void removeMemberToGitlab(GitlabMember param) {
+    public void removeMemberToGitlab(RdmMember param) {
         gitlabPorjectApi.removeMember(param.getGlProjectId(), param.getGlUserId());
 
         // <1> 数据库删除成员
@@ -181,7 +181,7 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
      * @param m
      */
     @Override
-    public void checkIsSyncGitlab(GitlabMember m) {
+    public void checkIsSyncGitlab(RdmMember m) {
         if (!m.getSyncGitlabFlag()) {
             // 当同步标记为false时, 表示上个事务还未结束
             throw new CommonException("error.sync.flag.false");
@@ -194,10 +194,10 @@ public class GitlabMemberRepositoryImpl extends BaseRepositoryImpl<GitlabMember>
 //     *
 //     * @param
 //     */
-//    private void compareMembersWithGitlab(Long glProjectId, List<GitlabMember> dbMembers, List<Member> glMembers) {
+//    private void compareMembersWithGitlab(Long glProjectId, List<RdmMember> dbMembers, List<Member> glMembers) {
 //        Map<String, GitlabMemberAudit> gitlabMemberAuditMap = new HashMap<>();
 //
-//        for (GitlabMember dbMember : dbMembers) {
+//        for (RdmMember dbMember : dbMembers) {
 //            GitlabMemberAudit gitlabMemberAudit = new GitlabMemberAudit();
 //            gitlabMemberAudit.setRepositoryId(dbMember.getRepositoryId())
 //                    .setUserId(dbMember.getUserId())

@@ -1,6 +1,6 @@
 package org.hrds.rducm.gitlab.infra.mapper;
 
-import org.hrds.rducm.gitlab.domain.entity.GitlabOperationLog;
+import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import io.choerodon.mybatis.common.BaseMapper;
 
 /**
@@ -8,6 +8,6 @@ import io.choerodon.mybatis.common.BaseMapper;
  *
  * @author ying.xie@hand-china.com 2020-02-28 10:33:02
  */
-public interface GitlabOperationLogMapper extends BaseMapper<GitlabOperationLog> {
+public interface GitlabOperationLogMapper extends BaseMapper<RdmOperationLog> {
 
 }

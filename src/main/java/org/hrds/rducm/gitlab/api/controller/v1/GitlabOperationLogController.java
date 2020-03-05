@@ -2,7 +2,6 @@ package org.hrds.rducm.gitlab.api.controller.v1;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
-import io.choerodon.mybatis.pagehelper.annotation.PageableDefault;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
@@ -10,8 +9,8 @@ import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
-import org.hrds.rducm.gitlab.app.service.GitlabOperationLogService;
-import org.hrds.rducm.gitlab.domain.entity.GitlabOperationLog;
+import org.hrds.rducm.gitlab.app.service.RdmOperationLogService;
+import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +30,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class GitlabOperationLogController extends BaseController {
 
     @Autowired
-    private GitlabOperationLogService operationLogService;
+    private RdmOperationLogService operationLogService;
 
     @ApiOperation(value = "查询成员管理操作日志列表")
     @Permission(level = ResourceLevel.PROJECT, permissionPublic = true)
     @GetMapping
     public ResponseEntity<Page<OperationLogViewDTO>> pageByOptionsMemberLog(@PathVariable Long organizationId,
                                                                             @PathVariable Long projectId,
-                                                                            @SortDefault(value = GitlabOperationLog.FIELD_CREATION_DATE,
+                                                                            @SortDefault(value = RdmOperationLog.FIELD_CREATION_DATE,
                                                                                     direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                                             OperationLogQueryDTO queryDTO) {
 

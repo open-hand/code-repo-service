@@ -10,7 +10,7 @@ import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberUpdateDTO;
 /**
  * @author xy
  */
-public interface GitlabMemberService {
+public interface RdmMemberService {
 
     Page<GitlabMemberViewDTO> list(Long projectId, PageRequest pageRequest, GitlabMemberQueryDTO query);
 

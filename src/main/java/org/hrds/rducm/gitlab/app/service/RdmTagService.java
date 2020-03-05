@@ -5,7 +5,7 @@ import org.hrds.rducm.gitlab.api.controller.dto.tag.TagDTO;
 
 import java.util.List;
 
-public interface GitlabTagService {
+public interface RdmTagService {
 
     List<TagDTO> getTags(Long repositoryId);
 

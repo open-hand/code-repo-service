@@ -11,9 +11,9 @@ import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberViewDTO;
-import org.hrds.rducm.gitlab.app.service.GitlabMemberService;
+import org.hrds.rducm.gitlab.app.service.RdmMemberService;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
-import org.hrds.rducm.gitlab.domain.repository.GitlabUserRepository;
+import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +28,13 @@ import java.util.stream.Collectors;
 @RestController("projectController.v1")
 @RequestMapping("/v1/projects/{projectId}")
 public class ProjectController extends BaseController {
-    private final GitlabMemberService gitlabMemberService;
+    private final RdmMemberService rdmMemberService;
 
     @Autowired
-    private GitlabUserRepository gitlabUserRepository;
+    private RdmUserRepository rdmUserRepository;
 
-    public ProjectController(GitlabMemberService gitlabMemberService) {
-        this.gitlabMemberService = gitlabMemberService;
+    public ProjectController(RdmMemberService rdmMemberService) {
+        this.rdmMemberService = rdmMemberService;
     }
 
     @ApiOperation(value = "查询代码库成员(项目层)")
@@ -48,7 +48,7 @@ public class ProjectController extends BaseController {
     public ResponseEntity<Page<GitlabMemberViewDTO>> pageByOptions(@PathVariable Long projectId,
                                                                    PageRequest pageRequest,
                                                                    GitlabMemberQueryDTO query) {
-        return Results.success(gitlabMemberService.list(projectId, pageRequest, query));
+        return Results.success(rdmMemberService.list(projectId, pageRequest, query));
     }
 
     @ApiOperation(value = "批量新增代码库成员(项目层)")
@@ -61,7 +61,7 @@ public class ProjectController extends BaseController {
     public ResponseEntity<Object> batchAddMembers(@PathVariable Long projectId,
                                                   @RequestBody GitlabMemberBatchDTO gitlabMemberBatchDTO) {
         validObject(gitlabMemberBatchDTO);
-        gitlabMemberService.batchAddOrUpdateMembers(projectId, gitlabMemberBatchDTO);
+        rdmMemberService.batchAddOrUpdateMembers(projectId, gitlabMemberBatchDTO);
         return Results.created(null);
     }
 
@@ -73,7 +73,7 @@ public class ProjectController extends BaseController {
     @GetMapping("/c7n/members")
     public ResponseEntity<List<Map<String, Object>>> listProjectMembers(@PathVariable Long projectId) {
         // todo 临时使用, 后续需替换为 外部接口
-        List<RdmUser> rdmUsers = gitlabUserRepository.selectAll();
+        List<RdmUser> rdmUsers = rdmUserRepository.selectAll();
         List<Map<String, Object>> collect = rdmUsers.stream().map(u -> {
             Map<String, Object> m = Maps.newHashMap();
             m.put("userId", u.getUserId());
