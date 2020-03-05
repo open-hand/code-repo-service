@@ -15,13 +15,12 @@ import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberUpdateDTO;
 import org.hrds.rducm.gitlab.app.service.GitlabMemberService;
 import org.hrds.rducm.gitlab.domain.entity.GitlabMember;
 import org.hrds.rducm.gitlab.domain.entity.GitlabRepository;
-import org.hrds.rducm.gitlab.domain.entity.GitlabUser;
+import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.GitlabMemberRepository;
 import org.hrds.rducm.gitlab.domain.repository.GitlabRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.repository.GitlabUserRepository;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
-import org.hrds.rducm.gitlab.infra.constant.Constants;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.core.base.AopProxy;
 import org.hzero.mybatis.domian.Condition;
@@ -77,7 +76,7 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
         // todo 关联查询, 需从接口获取数据, 暂时造数据
         for (GitlabMemberViewDTO viewDTO : gitlabMemberViewDTOS.getContent()) {
 
-            GitlabUser dbUser = gitlabUserRepository.selectByUk(viewDTO.getUserId());
+            RdmUser dbUser = gitlabUserRepository.selectByUk(viewDTO.getUserId());
             viewDTO.setRealName(dbUser.getGlUserName());
             viewDTO.setLoginName(dbUser.getGlUserName());
 
@@ -218,8 +217,8 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
         // 查询gitlab用户id todo 应从外部接口获取, 暂时从数据库获取
         Map<Long, Integer> userIdToGlUserIdMap = new HashMap<>();
         gitlabMemberBatchDTO.getMembers().forEach(m -> {
-            GitlabUser gitlabUser = gitlabUserRepository.selectOne(new GitlabUser().setUserId(m.getUserId()));
-            userIdToGlUserIdMap.put(m.getUserId(), gitlabUser.getGlUserId());
+            RdmUser rdmUser = gitlabUserRepository.selectOne(new RdmUser().setUserId(m.getUserId()));
+            userIdToGlUserIdMap.put(m.getUserId(), rdmUser.getGlUserId());
         });
 
         // 转换为List<GitlabMember>格式

@@ -8,12 +8,11 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberViewDTO;
 import org.hrds.rducm.gitlab.app.service.GitlabMemberService;
-import org.hrds.rducm.gitlab.domain.entity.GitlabUser;
+import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.GitlabUserRepository;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
@@ -74,8 +73,8 @@ public class ProjectController extends BaseController {
     @GetMapping("/c7n/members")
     public ResponseEntity<List<Map<String, Object>>> listProjectMembers(@PathVariable Long projectId) {
         // todo 临时使用, 后续需替换为 外部接口
-        List<GitlabUser> gitlabUsers = gitlabUserRepository.selectAll();
-        List<Map<String, Object>> collect = gitlabUsers.stream().map(u -> {
+        List<RdmUser> rdmUsers = gitlabUserRepository.selectAll();
+        List<Map<String, Object>> collect = rdmUsers.stream().map(u -> {
             Map<String, Object> m = Maps.newHashMap();
             m.put("userId", u.getUserId());
             m.put("realName", u.getGlUserName());

@@ -18,12 +18,12 @@ import java.util.Date;
  *
  * @author ying.xie@hand-china.com 2020-02-27 16:13:38
  */
-@ApiModel("Gitlab用户表")
+@ApiModel("用户表")
 @VersionAudit
 @ModifyAudit
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @Table(name = "rducm_gitlab_user")
-public class GitlabUser extends AuditDomain {
+public class RdmUser extends AuditDomain {
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_USER_ID = "userId";
@@ -80,93 +80,93 @@ public class GitlabUser extends AuditDomain {
     // ------------------------------------------------------------------------------
 
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public GitlabUser setId(Long id) {
-		this.id = id;
-		return this;
-	}
+    public RdmUser setId(Long id) {
+        this.id = id;
+        return this;
+    }
 
-	public Long getUserId() {
-		return userId;
-	}
+    public Long getUserId() {
+        return userId;
+    }
 
-	public GitlabUser setUserId(Long userId) {
-		this.userId = userId;
-		return this;
-	}
+    public RdmUser setUserId(Long userId) {
+        this.userId = userId;
+        return this;
+    }
 
-	public String getInitPassword() {
-		return initPassword;
-	}
+    public String getInitPassword() {
+        return initPassword;
+    }
 
-	public GitlabUser setInitPassword(String initPassword) {
-		this.initPassword = initPassword;
-		return this;
-	}
+    public RdmUser setInitPassword(String initPassword) {
+        this.initPassword = initPassword;
+        return this;
+    }
 
-	public Boolean getResetPasswordFlag() {
-		return resetPasswordFlag;
-	}
+    public Boolean getResetPasswordFlag() {
+        return resetPasswordFlag;
+    }
 
-	public GitlabUser setResetPasswordFlag(Boolean resetPasswordFlag) {
-		this.resetPasswordFlag = resetPasswordFlag;
-		return this;
-	}
+    public RdmUser setResetPasswordFlag(Boolean resetPasswordFlag) {
+        this.resetPasswordFlag = resetPasswordFlag;
+        return this;
+    }
 
-	public Integer getGlUserId() {
-		return glUserId;
-	}
+    public Integer getGlUserId() {
+        return glUserId;
+    }
 
-	public GitlabUser setGlUserId(Integer glUserId) {
-		this.glUserId = glUserId;
-		return this;
-	}
+    public RdmUser setGlUserId(Integer glUserId) {
+        this.glUserId = glUserId;
+        return this;
+    }
 
-	public String getGlUserName() {
-		return glUserName;
-	}
+    public String getGlUserName() {
+        return glUserName;
+    }
 
-	public GitlabUser setGlUserName(String glUserName) {
-		this.glUserName = glUserName;
-		return this;
-	}
+    public RdmUser setGlUserName(String glUserName) {
+        this.glUserName = glUserName;
+        return this;
+    }
 
-	public Boolean getGlIsAdmin() {
-		return glIsAdmin;
-	}
+    public Boolean getGlIsAdmin() {
+        return glIsAdmin;
+    }
 
-	public GitlabUser setGlIsAdmin(Boolean glIsAdmin) {
-		this.glIsAdmin = glIsAdmin;
-		return this;
-	}
+    public RdmUser setGlIsAdmin(Boolean glIsAdmin) {
+        this.glIsAdmin = glIsAdmin;
+        return this;
+    }
 
-	public String getGlImpersonationToken() {
-		return glImpersonationToken;
-	}
+    public String getGlImpersonationToken() {
+        return glImpersonationToken;
+    }
 
-	public GitlabUser setGlImpersonationToken(String glImpersonationToken) {
-		this.glImpersonationToken = glImpersonationToken;
-		return this;
-	}
+    public RdmUser setGlImpersonationToken(String glImpersonationToken) {
+        this.glImpersonationToken = glImpersonationToken;
+        return this;
+    }
 
-	public Boolean getSyncGitlabFlag() {
-		return syncGitlabFlag;
-	}
+    public Boolean getSyncGitlabFlag() {
+        return syncGitlabFlag;
+    }
 
-	public GitlabUser setSyncGitlabFlag(Boolean syncGitlabFlag) {
-		this.syncGitlabFlag = syncGitlabFlag;
-		return this;
-	}
+    public RdmUser setSyncGitlabFlag(Boolean syncGitlabFlag) {
+        this.syncGitlabFlag = syncGitlabFlag;
+        return this;
+    }
 
-	public Date getSyncDateGitlab() {
-		return syncDateGitlab;
-	}
+    public Date getSyncDateGitlab() {
+        return syncDateGitlab;
+    }
 
-	public GitlabUser setSyncDateGitlab(Date syncDateGitlab) {
-		this.syncDateGitlab = syncDateGitlab;
-		return this;
-	}
+    public RdmUser setSyncDateGitlab(Date syncDateGitlab) {
+        this.syncDateGitlab = syncDateGitlab;
+        return this;
+    }
 }

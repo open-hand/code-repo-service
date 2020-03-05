@@ -1,11 +1,11 @@
 package org.hrds.rducm.gitlab.domain.repository;
 
 import org.gitlab4j.api.models.User;
-import org.hrds.rducm.gitlab.domain.entity.GitlabUser;
+import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hzero.mybatis.base.BaseRepository;
 
-public interface GitlabUserRepository extends BaseRepository<GitlabUser> {
-    GitlabUser selectByUk(Long userId);
+public interface GitlabUserRepository extends BaseRepository<RdmUser> {
+    RdmUser selectByUk(Long userId);
 
     User getUserFromGitlab(Integer userId);
 

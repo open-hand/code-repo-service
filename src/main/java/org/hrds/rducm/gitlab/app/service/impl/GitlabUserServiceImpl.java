@@ -5,7 +5,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.gitlab4j.api.models.User;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabUserViewDTO;
 import org.hrds.rducm.gitlab.app.service.GitlabUserService;
-import org.hrds.rducm.gitlab.domain.entity.GitlabUser;
+import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.GitlabUserRepository;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +25,10 @@ public class GitlabUserServiceImpl implements GitlabUserService {
         // todo fixme 暂时写死
 //        Long userId = DetailsHelper.getUserDetails().getUserId();
         Long userId = 10003L;
-        GitlabUser gitlabUser = gitlabUserRepository.selectByUk(userId);
-        User glUser = gitlabUserRepository.getUserFromGitlab(gitlabUser.getGlUserId());
+        RdmUser rdmUser = gitlabUserRepository.selectByUk(userId);
+        User glUser = gitlabUserRepository.getUserFromGitlab(rdmUser.getGlUserId());
 
-        GitlabUserViewDTO gitlabUserViewDTO = ConvertUtils.convertObject(gitlabUser, GitlabUserViewDTO.class);
+        GitlabUserViewDTO gitlabUserViewDTO = ConvertUtils.convertObject(rdmUser, GitlabUserViewDTO.class);
         gitlabUserViewDTO.setGlState(glUser.getState());
         gitlabUserViewDTO.setGlAvatarUrl(glUser.getAvatarUrl());
         gitlabUserViewDTO.setGlBio(glUser.getBio());
@@ -43,8 +43,8 @@ public class GitlabUserServiceImpl implements GitlabUserService {
 
     @Override
     public GitlabUserViewDTO queryUser(Long userId) {
-        GitlabUser gitlabUser = gitlabUserRepository.selectByUk(userId);
-        return ConvertUtils.convertObject(gitlabUser, GitlabUserViewDTO.class);
+        RdmUser rdmUser = gitlabUserRepository.selectByUk(userId);
+        return ConvertUtils.convertObject(rdmUser, GitlabUserViewDTO.class);
     }
 
     /**
@@ -62,19 +62,19 @@ public class GitlabUserServiceImpl implements GitlabUserService {
         String randomPassword = RandomStringUtils.randomAlphanumeric(10);
 
         // <1> 往数据库添加用户
-        GitlabUser gitlabUser = new GitlabUser();
-        gitlabUser.setUserId(userId)
+        RdmUser rdmUser = new RdmUser();
+        rdmUser.setUserId(userId)
                 .setInitPassword(randomPassword);
-        gitlabUserRepository.insertSelective(gitlabUser);
+        gitlabUserRepository.insertSelective(rdmUser);
 
         // <2> 调用gitlab api创建用户
         User user = gitlabUserRepository.createUserToGitlab(glEmail, glUsername, glName, randomPassword);
 
         // <3> gitlab调用成功, 数据库修改用户数据
-        gitlabUser.setGlUserId(user.getId())
+        rdmUser.setGlUserId(user.getId())
                 .setGlUserName(user.getUsername())
                 .setGlIsAdmin(user.getIsAdmin());
-        gitlabUserRepository.updateByPrimaryKey(gitlabUser);
+        gitlabUserRepository.updateByPrimaryKey(rdmUser);
     }
 
 
@@ -91,7 +91,7 @@ public class GitlabUserServiceImpl implements GitlabUserService {
 //        // 校验用户是否同步
 //        CustomUserDetails userDetails = DetailsHelper.getUserDetails();
 //        AssertUtils.notNull(userDetails.getUserId(), "error.");
-//        GitlabUser gitlabUser = new GitlabUser();
+//        RdmUser gitlabUser = new RdmUser();
 //        gitlabUser.setIamUserId(userDetails.getUserId());
 //        gitlabUser = gitlabUserRepository.selectOne(gitlabUser);
 //        this.checkUserSync(gitlabUser, userDetails.getUserId());
@@ -100,8 +100,8 @@ public class GitlabUserServiceImpl implements GitlabUserService {
 //        gitlabUserApiRepository.updateUserPassword(gitlabUser.getUserId(), password);
 //    }
 
-    private void checkUserSync(GitlabUser gitlabUser, Long iamUserId) {
-        if (gitlabUser == null || gitlabUser.getUserId() == null) {
+    private void checkUserSync(RdmUser rdmUser, Long iamUserId) {
+        if (rdmUser == null || rdmUser.getUserId() == null) {
             throw new CommonException("error.iam.user.sync.to.gitlab", iamUserId);
         }
     }

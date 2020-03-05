@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.infra.repository.impl;
 
 import org.gitlab4j.api.models.User;
-import org.hrds.rducm.gitlab.domain.entity.GitlabUser;
+import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.GitlabUserRepository;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabUserApi;
 import org.hzero.mybatis.base.impl.BaseRepositoryImpl;
@@ -11,16 +11,16 @@ import org.springframework.stereotype.Repository;
 import java.util.Objects;
 
 @Repository
-public class GitlabUserRepositoryImpl extends BaseRepositoryImpl<GitlabUser> implements GitlabUserRepository {
+public class GitlabUserRepositoryImpl extends BaseRepositoryImpl<RdmUser> implements GitlabUserRepository {
     @Autowired
     private GitlabUserApi gitlabUserApi;
 
     @Override
-    public GitlabUser selectByUk(Long userId) {
-        GitlabUser gitlabUser = new GitlabUser();
-        gitlabUser.setUserId(userId);
-        gitlabUser = this.selectOne(gitlabUser);
-        return gitlabUser;
+    public RdmUser selectByUk(Long userId) {
+        RdmUser rdmUser = new RdmUser();
+        rdmUser.setUserId(userId);
+        rdmUser = this.selectOne(rdmUser);
+        return rdmUser;
     }
 
     @Override

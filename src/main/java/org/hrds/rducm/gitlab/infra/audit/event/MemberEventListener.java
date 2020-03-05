@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.core.exception.CommonException;
 import org.gitlab4j.api.models.AccessLevel;
 import org.hrds.rducm.gitlab.domain.entity.GitlabOperationLog;
-import org.hrds.rducm.gitlab.domain.entity.GitlabUser;
+import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.GitlabOperationLogRepository;
 import org.hrds.rducm.gitlab.domain.repository.GitlabUserRepository;
 import org.hrds.rducm.gitlab.infra.util.PlaceholderUtils;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-import java.text.MessageFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -104,8 +103,8 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
         String expiresAtStr;
         String opDateStr;
 
-        GitlabUser dbUserS = userRepository.selectOne(new GitlabUser().setUserId(userId));
-        GitlabUser dbUserT = userRepository.selectOne(new GitlabUser().setUserId(targetUserId));
+        RdmUser dbUserS = userRepository.selectOne(new RdmUser().setUserId(userId));
+        RdmUser dbUserT = userRepository.selectOne(new RdmUser().setUserId(targetUserId));
 
         sourceUserIdStr = dbUserS.getGlUserName();
         targetUserIdStr = dbUserT.getGlUserName();
