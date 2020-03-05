@@ -60,7 +60,7 @@ public class GitlabMemberServiceImpl implements GitlabMemberService, AopProxy<Gi
         List<Long> userIds = new ArrayList<>();
         // 获取应用服务对应的repositoryId数组
         // 调用外部接口模糊查询的到userId todo
-        List<Long> repositoryIds = new ArrayList<>();
+        List<Long> repositoryIds = query.getRepositoryIds();
 
         Condition condition = Condition.builder(GitlabMember.class)
                 .where(Sqls.custom()

@@ -11,7 +11,9 @@ import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class GitlabBranchServiceImpl implements GitlabBranchService {
@@ -33,7 +35,9 @@ public class GitlabBranchServiceImpl implements GitlabBranchService {
         GitlabRepository gitlabRepository = repositoryRepository.selectByUk(repositoryId);
 
         List<ProtectedBranch> protectedBranches = gitlabBranchRepository.getProtectedBranchesFromGitlab(gitlabRepository.getGlProjectId());
-        return ConvertUtils.convertList(protectedBranches, ProtectedBranchDTO.class);
+        List<ProtectedBranchDTO> protectedBranchDTOS = ConvertUtils.convertList(protectedBranches, ProtectedBranchDTO.class);
+        // 排序
+        return protectedBranchDTOS.stream().sorted(Comparator.comparing(ProtectedBranchDTO::getName)).collect(Collectors.toList());
     }
 
     @Override

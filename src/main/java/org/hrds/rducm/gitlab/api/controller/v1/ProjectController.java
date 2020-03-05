@@ -8,6 +8,7 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.GitlabMemberViewDTO;
@@ -39,8 +40,9 @@ public class ProjectController extends BaseController {
 
     @ApiOperation(value = "查询代码库成员(项目层)")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
-            @ApiImplicitParam(name = "query", value = "body参数", dataType = "GitlabMemberQueryDTO"),
+            @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", dataType = "Long", required = true),
+//            @ApiImplicitParam(name = "query", value = "查询参数", paramType = "query", dataType = "GitlabMemberQueryDTO"),
+            @ApiImplicitParam(name = "repositoryIds", value = "应用服务id", paramType = "query", dataType = "Long", allowMultiple = true),
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping("/gitlab/members")

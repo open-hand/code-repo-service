@@ -12,7 +12,9 @@ import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class GitlabTagServiceImpl implements GitlabTagService {
@@ -35,7 +37,10 @@ public class GitlabTagServiceImpl implements GitlabTagService {
         GitlabRepository gitlabRepository = repositoryRepository.selectByUk(repositoryId);
         List<ProtectedTag> protectedTags = gitlabTagRepository.getProtectedTagsFromGitlab(gitlabRepository.getGlProjectId());
 
-        return ConvertUtils.convertList(protectedTags, ProtectedTagDTO.class);
+        return ConvertUtils.convertList(protectedTags, ProtectedTagDTO.class)
+                .stream()
+                .sorted(Comparator.comparing(ProtectedTagDTO::getName))
+                .collect(Collectors.toList());
     }
 
     @Override
