@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 public class RdmMemberUpdateDTO {
-//    @NotNull
+    //    @NotNull
 //    @ApiModelProperty(ApiInfoConstants.GL_PROJECT_ID)
 //    private Integer glProjectId;
 //    @NotNull

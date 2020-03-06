@@ -51,9 +51,9 @@ public class RdmMemberController extends BaseController {
     })
     @Permission(permissionPublic = true)
     @DeleteMapping("/{memberId}")
-    public ResponseEntity<Object> removeMember(@PathVariable Long projectId,
-                                               @PathVariable Long repositoryId,
-                                               @PathVariable Long memberId) {
+    public ResponseEntity<?> removeMember(@PathVariable Long projectId,
+                                          @PathVariable Long repositoryId,
+                                          @PathVariable Long memberId) {
         rdmMemberService.removeMember(memberId);
         return Results.created(null);
     }

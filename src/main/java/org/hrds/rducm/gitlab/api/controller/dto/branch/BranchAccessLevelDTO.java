@@ -1,7 +1,6 @@
 package org.hrds.rducm.gitlab.api.controller.dto.branch;
 
 import io.swagger.annotations.ApiModelProperty;
-import org.gitlab4j.api.models.AccessLevel;
 import org.gitlab4j.api.utils.JacksonJson;
 
 public class BranchAccessLevelDTO {

@@ -38,11 +38,11 @@ public enum AccessLevelDTO {
      *
      */
     INVALID(-1),
-//    NONE(0),
+    //    NONE(0),
     GUEST(10),
     REPORTER(20),
     DEVELOPER(30),
-//    @Deprecated MASTER(40),
+    //    @Deprecated MASTER(40),
     MAINTAINER(40),
     OWNER(50);
 //    ADMIN(60);

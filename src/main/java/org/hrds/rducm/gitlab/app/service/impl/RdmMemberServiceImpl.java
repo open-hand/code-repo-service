@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-import static org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants.RDUCM_ADD_MEMBERS;
+import static org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants.RDUCM_BATCH_ADD_MEMBERS;
 
 @Service
 public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMemberServiceImpl> {
@@ -175,25 +175,29 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
         batchExpireMembers(expiredRdmMembers);
     }
 
-    @Saga(code = RDUCM_ADD_MEMBERS, description = "批量添加代码库成员")
+    @Override
+    @Saga(code = RDUCM_BATCH_ADD_MEMBERS, description = "批量添加代码库成员")
     @Transactional(rollbackFor = Exception.class)
-    public void batchAddMemberSagaDemo(List<RdmMember> rdmMembers) {
-        // <1> 数据库添加成员
-        rdmMemberRepository.batchInsertSelective(rdmMembers);
+    public void batchAddMemberSagaDemo(Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
+        // <0> 校验入参 + 转换
+        List<RdmMember> rdmMembers = convertGitlabMemberBatchDTO(projectId, rdmMemberBatchDTO);
+
+        // <1> 预更新, 数据库添加成员, 已存在需要更新
+        rdmMemberRepository.batchAddOrUpdateMembersBefore(rdmMembers);
 
         // 创建saga
         producer.apply(
                 StartSagaBuilder.newBuilder()
                         .withLevel(ResourceLevel.PROJECT)
-                        .withRefType("app-service")
-                        .withSagaCode(RDUCM_ADD_MEMBERS)
-                        .withPayloadAndSerialize(null)
-                        .withRefId(null)
-                        .withSourceId(null),
+                        .withRefType("hrds-code-repo")
+                        .withSagaCode(RDUCM_BATCH_ADD_MEMBERS)
+                        .withPayloadAndSerialize(rdmMembers)
+//                        .withRefId(null)
+                        .withSourceId(projectId),
                 builder -> {});
     }
 
-    @SagaTask(code = "", sagaCode = RDUCM_ADD_MEMBERS, description = "调用gitlab api添加成员并回写", seq = 1)
+    @SagaTask(code = "", sagaCode = RDUCM_BATCH_ADD_MEMBERS, description = "调用gitlab api添加成员并回写", seq = 1)
     public void batchAddMemberToGitlabSagaDemo(String payload) {
         List<RdmMember> rdmMembers = new ArrayList<>();
         // <2> 调用gitlab api添加成员

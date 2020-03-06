@@ -1,12 +1,11 @@
-
 package org.hrds.rducm.gitlab.api.controller.dto.branch;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.gitlab4j.api.models.BranchAccessLevel;
 import org.gitlab4j.api.utils.JacksonJson;
 
 import java.util.List;
+
 @ApiModel("保护分支")
 public class ProtectedBranchDTO {
     @ApiModelProperty("名称")
@@ -48,7 +47,6 @@ public class ProtectedBranchDTO {
     public static final boolean isValid(ProtectedBranchDTO branch) {
         return (branch != null && branch.getName() != null);
     }
-
 
 
     @Override

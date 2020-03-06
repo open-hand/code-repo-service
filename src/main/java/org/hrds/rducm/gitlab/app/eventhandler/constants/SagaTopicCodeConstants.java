@@ -8,7 +8,7 @@ public class SagaTopicCodeConstants {
     /**
      * 代码仓库添加成员
      */
-    public static final String RDUCM_ADD_MEMBERS = "rducm-add-members";
+    public static final String RDUCM_BATCH_ADD_MEMBERS = "rducm-batch-add-members";
 
     private SagaTopicCodeConstants() {
     }
