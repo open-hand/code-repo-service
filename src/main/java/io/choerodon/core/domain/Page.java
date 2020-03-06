@@ -19,6 +19,7 @@ public class Page<E> extends AbstractList<E> {
 	private int number;
 	private List<E> content;
 	private List<E> list;
+	private long total;
 
 	public Page() {
 		content = new ArrayList<>();
@@ -41,7 +42,16 @@ public class Page<E> extends AbstractList<E> {
 		this.numberOfElements = content.size();
 
 		this.list = content;
+		this.total = total;
 
+	}
+
+	public long getTotal() {
+		return total;
+	}
+
+	public void setTotal(long total) {
+		this.total = total;
 	}
 
 	public int getTotalPages() {
