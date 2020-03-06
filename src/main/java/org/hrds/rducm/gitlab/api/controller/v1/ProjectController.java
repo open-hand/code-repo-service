@@ -11,9 +11,11 @@ import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.repository.RepositoryOverViewDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberService;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
+import org.hrds.rducm.gitlab.domain.service.IRdmRepositoryService;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,9 @@ public class ProjectController extends BaseController {
 
     @Autowired
     private RdmUserRepository rdmUserRepository;
+
+    @Autowired
+    private IRdmRepositoryService rdmRepositoryService;
 
     public ProjectController(RdmMemberService rdmMemberService) {
         this.rdmMemberService = rdmMemberService;
@@ -81,5 +86,16 @@ public class ProjectController extends BaseController {
             return m;
         }).collect(Collectors.toList());
         return Results.success(collect);
+    }
+
+    @ApiOperation(value = "查询项目总览(项目层)")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
+    })
+    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @GetMapping("/gitlab/repositories/overview")
+    public ResponseEntity<List<RepositoryOverViewDTO>> pageOverviewByOptions(@PathVariable Long projectId) {
+        List<RepositoryOverViewDTO> repositoryOverViewDTOS = rdmRepositoryService.pageByOptions(projectId);
+        return Results.success(repositoryOverViewDTOS);
     }
 }

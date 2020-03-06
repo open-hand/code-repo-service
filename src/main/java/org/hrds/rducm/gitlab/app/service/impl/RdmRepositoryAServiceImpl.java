@@ -14,7 +14,7 @@ import java.util.List;
  * @author ying.xie@hand-china.com 2020-02-26 14:03:22
  */
 @Service
-public class RdmRepositoryServiceImpl implements RdmRepositoryService {
+public class RdmRepositoryAServiceImpl implements RdmRepositoryService {
     @Autowired
     private RdmRepositoryRepository rdmRepositoryRepository;
 

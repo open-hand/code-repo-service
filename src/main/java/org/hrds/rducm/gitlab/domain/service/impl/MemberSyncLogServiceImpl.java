@@ -7,7 +7,7 @@ import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.service.IMemberSyncLogService;
-import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabPorjectApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +30,7 @@ public class MemberSyncLogServiceImpl implements IMemberSyncLogService {
     private RdmMemberRepository memberRepository;
 
     @Autowired
-    private GitlabPorjectApi gitlabPorjectApi;
+    private GitlabProjectApi gitlabProjectApi;
     @Autowired
     private RdmRepositoryRepository repositoryRepository;
 
@@ -53,7 +53,7 @@ public class MemberSyncLogServiceImpl implements IMemberSyncLogService {
         Integer glProjectId = repository.getGlProjectId();
 
         // 查询gitlab所有成员
-        List<Member> members = gitlabPorjectApi.getMembers(glProjectId);
+        List<Member> members = gitlabProjectApi.getMembers(glProjectId);
 
         // 查询数据库所有成员
         List<RdmMember> dbMembers = memberRepository.select(new RdmMember().setGlProjectId(glProjectId));

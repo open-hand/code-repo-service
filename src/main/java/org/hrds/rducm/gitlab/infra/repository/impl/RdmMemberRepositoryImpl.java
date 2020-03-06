@@ -7,7 +7,7 @@ import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
-import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabPorjectApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.mybatis.base.impl.BaseRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import java.util.List;
 @Repository
 public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> implements RdmMemberRepository {
     @Autowired
-    private GitlabPorjectApi gitlabPorjectApi;
+    private GitlabProjectApi gitlabProjectApi;
 
     @Override
     public RdmMember selectOneByUk(Long projectId, Long repositoryId, Long userId) {
@@ -32,7 +32,7 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
 
     @Override
     public List<Member> queryMembersFromGitlab(Integer glProjectId) {
-        return gitlabPorjectApi.getMembers(glProjectId);
+        return gitlabProjectApi.getMembers(glProjectId);
     }
 
     @Override
@@ -53,14 +53,14 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
                 // 如果过期, Gitlab会直接移除成员, 所以需改成添加成员
                 if (m.getExpiredFlag()) {
                     // 调用gitlab api添加成员
-                    glMember = gitlabPorjectApi.addMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
+                    glMember = gitlabProjectApi.addMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
                 } else {
                     // 调用gitlab api更新成员
-                    glMember = gitlabPorjectApi.updateMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
+                    glMember = gitlabProjectApi.updateMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
                 }
             } else {
                 // 调用gitlab api添加成员
-                glMember = gitlabPorjectApi.addMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
+                glMember = gitlabProjectApi.addMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
             }
 
             // <2> 回写数据库
@@ -150,9 +150,9 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
         Member glMember;
         // 如果过期, Gitlab会直接移除成员, 所以需改成添加成员
         if (param.getExpiredFlag()) {
-            glMember = gitlabPorjectApi.addMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+            glMember = gitlabProjectApi.addMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
         } else {
-            glMember = gitlabPorjectApi.updateMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+            glMember = gitlabProjectApi.updateMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
         }
 
         // <2> 回写数据库
@@ -165,7 +165,7 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
 
     @Override
     public void removeMemberToGitlab(RdmMember param) {
-        gitlabPorjectApi.removeMember(param.getGlProjectId(), param.getGlUserId());
+        gitlabProjectApi.removeMember(param.getGlProjectId(), param.getGlUserId());
 
         // <1> 数据库删除成员
         this.deleteByPrimaryKey(param.getId());

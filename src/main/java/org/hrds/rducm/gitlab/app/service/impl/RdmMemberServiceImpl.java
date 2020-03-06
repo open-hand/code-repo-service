@@ -189,7 +189,7 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
         producer.apply(
                 StartSagaBuilder.newBuilder()
                         .withLevel(ResourceLevel.PROJECT)
-                        .withRefType("hrds-code-repo")
+//                        .withRefType("hrds-code-repo")
                         .withSagaCode(RDUCM_BATCH_ADD_MEMBERS)
                         .withPayloadAndSerialize(rdmMembers)
 //                        .withRefId(null)

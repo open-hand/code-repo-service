@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.infra.client.gitlab.api;
 
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.models.Member;
+import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
 import org.springframework.stereotype.Repository;
@@ -10,10 +11,10 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public class GitlabPorjectApi {
+public class GitlabProjectApi {
     private final Gitlab4jClientWrapper gitlab4jClient;
 
-    public GitlabPorjectApi(Gitlab4jClientWrapper gitlab4jClient) {
+    public GitlabProjectApi(Gitlab4jClientWrapper gitlab4jClient) {
         this.gitlab4jClient = gitlab4jClient;
     }
 
@@ -59,6 +60,23 @@ public class GitlabPorjectApi {
             gitlab4jClient.getGitLabApi()
                     .getProjectApi()
                     .removeMember(projectId, userId);
+        } catch (GitLabApiException e) {
+            throw new GitlabClientException(e, e.getMessage());
+        }
+    }
+
+    /**
+     * 获取项目详情
+     * GET /projects/:id
+     *
+     * @param projectId 项目id
+     * @return Project
+     */
+    public Project getProject(Integer projectId) {
+        try {
+            return gitlab4jClient.getGitLabApi()
+                    .getProjectApi()
+                    .getProject(projectId);
         } catch (GitLabApiException e) {
             throw new GitlabClientException(e, e.getMessage());
         }
