@@ -27,7 +27,7 @@ public class RdmSagaHandler {
     /**
      * 调用gitlab添加/修改成员
      */
-    @SagaTask(code = SagaTopicCodeConstants.RDUCM_BATCH_ADD_MEMBERS,
+    @SagaTask(code = SagaTaskCodeConstants.RDUCM_BATCH_ADD_MEMBERS_TO_GITLAB,
             description = "Gitlab添加/修改成员",
             sagaCode = SagaTopicCodeConstants.RDUCM_BATCH_ADD_MEMBERS,
             maxRetryCount = 3,

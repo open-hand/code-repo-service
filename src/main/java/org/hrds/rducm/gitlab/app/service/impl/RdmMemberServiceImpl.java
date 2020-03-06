@@ -197,13 +197,6 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
                 builder -> {});
     }
 
-    @SagaTask(code = "", sagaCode = RDUCM_BATCH_ADD_MEMBERS, description = "调用gitlab api添加成员并回写", seq = 1)
-    public void batchAddMemberToGitlabSagaDemo(String payload) {
-        List<RdmMember> rdmMembers = new ArrayList<>();
-        // <2> 调用gitlab api添加成员
-        rdmMemberRepository.batchAddOrUpdateMembersToGitlab(rdmMembers);
-    }
-
     /**
      * 将GitlabMemberBatchDTO转换为List<RdmMember>
      * @param rdmMemberBatchDTO

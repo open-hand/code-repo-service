@@ -5,6 +5,7 @@ package org.hrds.rducm.gitlab.app.eventhandler.constants;
  *
  */
 public class SagaTaskCodeConstants {
+    public static final String RDUCM_BATCH_ADD_MEMBERS_TO_GITLAB = "rducmBatchAddMembersToGitlab";
 
     private SagaTaskCodeConstants() {
     }
