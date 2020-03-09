@@ -1,12 +1,11 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
 import com.github.pagehelper.PageInfo;
-import io.choerodon.core.domain.Page;
-import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.core.annotation.Permission;
+import io.choerodon.core.enums.ResourceType;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
-import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
@@ -34,13 +33,13 @@ public class RdmOperationLogController extends BaseController {
     private RdmOperationLogService operationLogService;
 
     @ApiOperation(value = "查询成员管理操作日志列表")
-    @Permission(level = ResourceLevel.PROJECT, permissionPublic = true)
+    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping
     public ResponseEntity<PageInfo<OperationLogViewDTO>> pageByOptionsMemberLog(@PathVariable Long organizationId,
-                                                                            @PathVariable Long projectId,
-                                                                            @SortDefault(value = RdmOperationLog.FIELD_CREATION_DATE,
-                                                                                    direction = Sort.Direction.DESC) PageRequest pageRequest,
-                                                                            OperationLogQueryDTO queryDTO) {
+                                                                                @PathVariable Long projectId,
+                                                                                @SortDefault(value = RdmOperationLog.FIELD_CREATION_DATE,
+                                                                                        direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                                                OperationLogQueryDTO queryDTO) {
 
         PageInfo<OperationLogViewDTO> list = operationLogService.pageByOptionsMemberLog(projectId, null, pageRequest, queryDTO);
         return Results.success(list);
