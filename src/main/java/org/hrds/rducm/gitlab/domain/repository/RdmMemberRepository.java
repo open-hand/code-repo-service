@@ -17,6 +17,14 @@ public interface RdmMemberRepository extends BaseRepository<RdmMember> {
      */
     RdmMember selectOneByUk(Long projectId, Long repositoryId, Long userId);
 
+    /**
+     * 查询某个代码库成员总数
+     *
+     * @param repositoryId 代码库id
+     * @return 成员数量
+     */
+    int selectCountByRepositoryId(Long repositoryId);
+
     List<Member> queryMembersFromGitlab(Integer glProjectId);
 
     void batchAddOrUpdateMembersToGitlab(List<RdmMember> rdmMembers);

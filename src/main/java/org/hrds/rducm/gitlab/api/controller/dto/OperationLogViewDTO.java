@@ -21,6 +21,9 @@ public class OperationLogViewDTO {
     @ApiModelProperty(value = "操作人，用户id", required = true)
     private Long opUserId;
 
+    @ApiModelProperty(value = "操作人，用户名", required = true)
+    private Long opUserName;
+
     @ApiModelProperty(value = "操作类型(成员管理|分支管理)", required = true)
     private String opType;
 
@@ -35,7 +38,7 @@ public class OperationLogViewDTO {
     @ApiModelProperty(value = "操作日期", required = true)
     private Date opDate;
 
-    private String extraParam;
+//    private String extraParam;
 
     public Long getId() {
         return id;
@@ -70,6 +73,15 @@ public class OperationLogViewDTO {
 
     public OperationLogViewDTO setOpUserId(Long opUserId) {
         this.opUserId = opUserId;
+        return this;
+    }
+
+    public Long getOpUserName() {
+        return opUserName;
+    }
+
+    public OperationLogViewDTO setOpUserName(Long opUserName) {
+        this.opUserName = opUserName;
         return this;
     }
 
@@ -115,15 +127,6 @@ public class OperationLogViewDTO {
 
     public OperationLogViewDTO setOpDate(Date opDate) {
         this.opDate = opDate;
-        return this;
-    }
-
-    public String getExtraParam() {
-        return extraParam;
-    }
-
-    public OperationLogViewDTO setExtraParam(String extraParam) {
-        this.extraParam = extraParam;
         return this;
     }
 }

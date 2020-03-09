@@ -6,6 +6,8 @@ import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.hzero.mybatis.common.query.JoinOn;
+import org.hzero.mybatis.common.query.JoinTable;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;

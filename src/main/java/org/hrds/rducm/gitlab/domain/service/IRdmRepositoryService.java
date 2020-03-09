@@ -13,7 +13,8 @@ public interface IRdmRepositoryService {
      * 查询代码库总览信息
      *
      * @param projectId 项目id
+     * @param repositoryIds
      * @return
      */
-    List<RepositoryOverViewDTO> pageByOptions(Long projectId);
+    List<RepositoryOverViewDTO> pageByOptions(Long projectId, List<Long> repositoryIds);
 }

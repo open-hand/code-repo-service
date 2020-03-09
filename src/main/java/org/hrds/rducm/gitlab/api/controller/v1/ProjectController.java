@@ -91,11 +91,13 @@ public class ProjectController extends BaseController {
     @ApiOperation(value = "查询项目总览(项目层)")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
+            @ApiImplicitParam(name = "repositoryIds", value = "应用服务id", paramType = "query", dataType = "Long", allowMultiple = true),
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping("/gitlab/repositories/overview")
-    public ResponseEntity<List<RepositoryOverViewDTO>> pageOverviewByOptions(@PathVariable Long projectId) {
-        List<RepositoryOverViewDTO> repositoryOverViewDTOS = rdmRepositoryService.pageByOptions(projectId);
+    public ResponseEntity<List<RepositoryOverViewDTO>> pageOverviewByOptions(@PathVariable Long projectId,
+                                                                             @RequestParam(required = false) List<Long> repositoryIds) {
+        List<RepositoryOverViewDTO> repositoryOverViewDTOS = rdmRepositoryService.pageByOptions(projectId, repositoryIds);
         return Results.success(repositoryOverViewDTOS);
     }
 }

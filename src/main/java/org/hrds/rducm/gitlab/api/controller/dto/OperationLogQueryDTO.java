@@ -20,7 +20,7 @@ public class OperationLogQueryDTO {
     @ApiModelProperty(value = "开始日期")
     private Date startDate;
 
-    @ApiModelProperty(value = "开始日期")
+    @ApiModelProperty(value = "结束日期")
     private Date endDate;
 
     public Long getOpUserId() {

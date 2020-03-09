@@ -31,6 +31,13 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
     }
 
     @Override
+    public int selectCountByRepositoryId(Long repositoryId) {
+        RdmMember rdmMember = new RdmMember();
+        rdmMember.setRepositoryId(repositoryId);
+        return this.selectCount(rdmMember);
+    }
+
+    @Override
     public List<Member> queryMembersFromGitlab(Integer glProjectId) {
         return gitlabProjectApi.getMembers(glProjectId);
     }
