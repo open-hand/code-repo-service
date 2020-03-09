@@ -189,6 +189,28 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
+        <repository>
+            <id>choerodon-release</id>
+            <name>Choerodon Release</name>
+            <url>http://nexus.choerodon.com.cn/repository/choerodon-release/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+        </repository>
+        <repository>
+            <id>choerodon-snapshot</id>
+            <name>Choerodon Snapshot</name>
+            <url>https://nexus.choerodon.com.cn/repository/choerodon-snapshot/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>choerodon-maven</id>
+            <name>Choerodon Maven</name>
+            <url>https://nexus.choerodon.com.cn/repository/choerodon-maven/</url>
+        </repository>
         <!-- 按项目实际情况修改
             <repository>
             <id>HzeroRelease</id>
