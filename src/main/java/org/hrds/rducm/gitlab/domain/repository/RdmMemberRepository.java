@@ -25,19 +25,23 @@ public interface RdmMemberRepository extends BaseRepository<RdmMember> {
      */
     int selectCountByRepositoryId(Long repositoryId);
 
-    List<Member> queryMembersFromGitlab(Integer glProjectId);
+    void checkIsSyncGitlab(RdmMember m);
 
-    void batchAddOrUpdateMembersToGitlab(List<RdmMember> rdmMembers);
+//    List<Member> queryMembersFromGitlab(Integer glProjectId);
 
-    void insertMemberBefore(RdmMember param);
+//    void batchAddOrUpdateMembersToGitlab(List<RdmMember> rdmMembers);
 
-    /**
-     * 更新成员, 预更新(同步标识设为false, gitlab字段置空)
-     * 执行成功会设置主键和版本号
-     *
-     * @param rdmMember
-     */
-    void updateMemberBefore(RdmMember rdmMember);
+//    void insertMemberBefore(RdmMember param);
+//
+//    /**
+//     * 更新成员, 预更新(同步标识设为false, gitlab字段置空)
+//     * 执行成功会设置主键和版本号
+//     *
+//     * @param rdmMember
+//     */
+//    void updateMemberBefore(RdmMember rdmMember);
+//
+//    void updateMemberAfter(RdmMember m, Member member);
 
     /**
      * 批量新增或更新成员, 预更新(同步标识设为false, gitlab字段置空)
@@ -45,11 +49,11 @@ public interface RdmMemberRepository extends BaseRepository<RdmMember> {
      *
      * @param rdmMembers
      */
-    void batchAddOrUpdateMembersBefore(List<RdmMember> rdmMembers);
+//    void batchAddOrUpdateMembersBefore(List<RdmMember> rdmMembers);
 
-    void updateMemberToGitlab(RdmMember param);
+//    void updateMemberToGitlab(RdmMember param);
+//
+//    void removeMemberToGitlab(RdmMember param);
 
-    void removeMemberToGitlab(RdmMember param);
 
-    void checkIsSyncGitlab(RdmMember m);
 }

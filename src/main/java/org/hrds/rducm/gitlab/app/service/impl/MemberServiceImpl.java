@@ -19,14 +19,14 @@ import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
-import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
-import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
+import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.hzero.core.base.AopProxy;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +35,7 @@ import java.util.*;
 import static org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants.RDUCM_BATCH_ADD_MEMBERS;
 
 @Service
-public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMemberServiceImpl> {
+public class MemberServiceImpl implements RdmMemberService, AopProxy<MemberServiceImpl> {
     private final RdmMemberRepository rdmMemberRepository;
 
     @Autowired
@@ -45,9 +45,12 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
     private RdmUserRepository rdmUserRepository;
 
     @Autowired
+    private IRdmMemberService iRdmMemberService;
+
+    @Autowired
     private TransactionalProducer producer;
 
-    public RdmMemberServiceImpl(RdmMemberRepository rdmMemberRepository) {
+    public MemberServiceImpl(RdmMemberRepository rdmMemberRepository) {
         this.rdmMemberRepository = rdmMemberRepository;
     }
 
@@ -103,10 +106,10 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
         List<RdmMember> rdmMembers = convertGitlabMemberBatchDTO(projectId, rdmMemberBatchDTO);
 
         // <1> 数据库添加成员, 已存在需要更新
-        rdmMemberRepository.batchAddOrUpdateMembersBefore(rdmMembers);
+        iRdmMemberService.batchAddOrUpdateMembersBefore(rdmMembers);
 
-        // <2> 调用gitlab api添加成员 todo 事务一致性问题
-        rdmMemberRepository.batchAddOrUpdateMembersToGitlab(rdmMembers);
+        // <2> 异步调用gitlab api添加成员 todo 事务一致性问题
+        self().batchAddOrUpdateMembersToGitlabAsync(rdmMembers);
     }
 
     @Override
@@ -118,7 +121,8 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
 
         // 获取gitlab项目id和用户id todo 应从外部接口获取, 暂时从数据库获取
         RdmMember dbMember = rdmMemberRepository.selectByPrimaryKey(memberId);
-        rdmMemberRepository.checkIsSyncGitlab(dbMember);
+
+//        rdmMemberRepository.checkIsSyncGitlab(dbMember);
         rdmMember.setGlProjectId(dbMember.getGlProjectId());
         rdmMember.setGlUserId(dbMember.getGlUserId());
         rdmMember.setUserId(dbMember.getUserId());
@@ -128,12 +132,14 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
 
         // 设置过期标识
         rdmMember.setExpiredFlag(dbMember.checkExpiredFlag());
+        // 设置同步标识
+        rdmMember.setSyncGitlabFlag(dbMember.getSyncGitlabFlag());
 
         // <1> 数据库更新成员
-        rdmMemberRepository.updateMemberBefore(rdmMember);
+        iRdmMemberService.updateMemberBefore(rdmMember);
 
-        // <2> 调用gitlab api更新成员 todo 事务一致性问题
-        rdmMemberRepository.updateMemberToGitlab(rdmMember);
+        // <2> 调用gitlab api更新成员, 异步 todo 事务一致性问题
+        self().updateMemberToGitlabAsync(rdmMember);
     }
 
     @Override
@@ -141,28 +147,28 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
     public void removeMember(Long memberId) {
         // <1> 数据库更新成员, 预删除
         RdmMember dbMember = rdmMemberRepository.selectByPrimaryKey(memberId);
-        rdmMemberRepository.checkIsSyncGitlab(dbMember);
-        rdmMemberRepository.updateMemberBefore(dbMember);
 
-        // <2> 调用gitlab api删除成员 todo 事务一致性问题
-        rdmMemberRepository.removeMemberToGitlab(dbMember);
+        iRdmMemberService.updateMemberBefore(dbMember);
+
+        // <2> 调用gitlab api删除成员, 异步 todo 事务一致性问题
+        self().removeMemberToGitlabAsync(dbMember);
     }
 
-    /**
-     * 成员过期处理
-     *
-     * @param expiredRdmMembers 过期成员数据
-     */
-    private void batchExpireMembers(List<RdmMember> expiredRdmMembers) {
-        expiredRdmMembers.forEach(m -> {
-            // <1> 删除
-            rdmMemberRepository.deleteByPrimaryKey(m);
-
-            // <2> 发送事件
-            MemberEvent.EventParam eventParam = buildEventParam(m.getProjectId(), m.getRepositoryId(), m.getUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
-            OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.REMOVE_EXPIRED_MEMBER, eventParam));
-        });
-    }
+//    /**
+//     * 成员过期处理
+//     *
+//     * @param expiredRdmMembers 过期成员数据
+//     */
+//    private void batchExpireMembers(List<RdmMember> expiredRdmMembers) {
+//        expiredRdmMembers.forEach(m -> {
+//            // <1> 删除
+//            rdmMemberRepository.deleteByPrimaryKey(m);
+//
+//            // <2> 发送事件
+//            MemberEvent.EventParam eventParam = buildEventParam(m.getProjectId(), m.getRepositoryId(), m.getUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
+//            OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.REMOVE_EXPIRED_MEMBER, eventParam));
+//        });
+//    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -173,7 +179,7 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
         List<RdmMember> expiredRdmMembers = rdmMemberRepository.selectByCondition(condition);
 
         // <2> 处理过期成员
-        batchExpireMembers(expiredRdmMembers);
+        iRdmMemberService.batchExpireMembers(expiredRdmMembers);
     }
 
     @Override
@@ -184,7 +190,7 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
         List<RdmMember> rdmMembers = convertGitlabMemberBatchDTO(projectId, rdmMemberBatchDTO);
 
         // <1> 预更新, 数据库添加成员, 已存在需要更新
-        rdmMemberRepository.batchAddOrUpdateMembersBefore(rdmMembers);
+        iRdmMemberService.batchAddOrUpdateMembersBefore(rdmMembers);
 
         // 创建saga
         producer.apply(
@@ -196,6 +202,40 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
 //                        .withRefId(null)
                         .withSourceId(projectId),
                 builder -> {});
+    }
+
+    /**
+     * 批量新增或更新成员至Gitlab, 异步调用
+     *
+     * @param rdmMembers
+     */
+    @Async
+    @Transactional(rollbackFor = Exception.class)
+    public void batchAddOrUpdateMembersToGitlabAsync(List<RdmMember> rdmMembers) {
+        // <1> 调用gitlab api
+        iRdmMemberService.batchAddOrUpdateMembersToGitlab(rdmMembers);
+    }
+
+    /**
+     * 更新成员至gitlab, 异步
+     *
+     * @param rdmMember
+     */
+    @Async
+    @Transactional(rollbackFor = Exception.class)
+    public void updateMemberToGitlabAsync(RdmMember rdmMember) {
+        iRdmMemberService.updateMemberToGitlab(rdmMember);
+    }
+
+    /**
+     * 移除成员至gitlab, 异步
+     *
+     * @param rdmMember
+     */
+    @Async
+    @Transactional(rollbackFor = Exception.class)
+    public void removeMemberToGitlabAsync(RdmMember rdmMember) {
+        iRdmMemberService.removeMemberToGitlab(rdmMember);
     }
 
     /**
@@ -238,14 +278,14 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
         return rdmMembers;
     }
 
-    /**
-     * 构造审计所需报文参数
-     *
-     * @param targetUserId 目标用户id
-     * @param accessLevel  访问权限等级
-     * @param expiresAt    过期时间
-     */
-    private MemberEvent.EventParam buildEventParam(Long projectId, Long repositoryId, Long targetUserId, Integer accessLevel, Date expiresAt) {
-        return new MemberEvent.EventParam(projectId, repositoryId, targetUserId, accessLevel, expiresAt);
-    }
+//    /**
+//     * 构造审计所需报文参数
+//     *
+//     * @param targetUserId 目标用户id
+//     * @param accessLevel  访问权限等级
+//     * @param expiresAt    过期时间
+//     */
+//    private MemberEvent.EventParam buildEventParam(Long projectId, Long repositoryId, Long targetUserId, Integer accessLevel, Date expiresAt) {
+//        return new MemberEvent.EventParam(projectId, repositoryId, targetUserId, accessLevel, expiresAt);
+//    }
 }

@@ -20,12 +20,32 @@ public interface RdmMemberService {
      */
     PageInfo<RdmMemberViewDTO> pageByOptions(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query);
 
+    /**
+     * 批量新增或修改成员
+     *
+     * @param projectId 项目id
+     * @param rdmMemberBatchDTO 参数
+     */
     void batchAddOrUpdateMembers(Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO);
 
+    /**
+     * 修改成员
+     *
+     * @param memberId 成员id, 主键
+     * @param rdmMemberUpdateDTO 参数
+     */
     void updateMember(Long memberId, RdmMemberUpdateDTO rdmMemberUpdateDTO);
 
+    /**
+     * 移除成员
+     *
+     * @param memberId 成员id, 主键
+     */
     void removeMember(Long memberId);
 
+    /**
+     * 处理过期的成员(定时任务调用)
+     */
     void handleExpiredMembers();
 
     /**
