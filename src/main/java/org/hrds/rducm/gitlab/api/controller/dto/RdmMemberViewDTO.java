@@ -1,17 +1,25 @@
 package org.hrds.rducm.gitlab.api.controller.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 
 public class RdmMemberViewDTO {
+    @ApiModelProperty("用户名")
     private String realName;
 
+    @ApiModelProperty("登录名")
     private String loginName;
 
+    @ApiModelProperty("应用服务名")
     private String appServiceName;
 
+    @ApiModelProperty("项目角色")
     private String projectRoleName;
 
+    @ApiModelProperty("创建人")
     private String createdByName;
 
     /**
@@ -19,15 +27,25 @@ public class RdmMemberViewDTO {
      */
     private Long id;
 
+    @ApiModelProperty("项目id")
     private Long projectId;
 
+    @ApiModelProperty("代码库id")
     private Long repositoryId;
 
     private Long userId;
 
+    @ApiModelProperty("权限")
     private Integer glAccessLevel;
 
+    @ApiModelProperty("过期时间")
     private Date glExpiresAt;
+
+    @ApiModelProperty("Gitlab同步标识")
+    private Boolean syncGitlabFlag;
+
+    @ApiModelProperty("Gitlab同步时间")
+    private Date syncDateGitlab;
 
     private Long createdBy;
 
@@ -158,6 +176,24 @@ public class RdmMemberViewDTO {
 
     public RdmMemberViewDTO setObjectVersionNumber(Long objectVersionNumber) {
         this.objectVersionNumber = objectVersionNumber;
+        return this;
+    }
+
+    public Boolean getSyncGitlabFlag() {
+        return syncGitlabFlag;
+    }
+
+    public RdmMemberViewDTO setSyncGitlabFlag(Boolean syncGitlabFlag) {
+        this.syncGitlabFlag = syncGitlabFlag;
+        return this;
+    }
+
+    public Date getSyncDateGitlab() {
+        return syncDateGitlab;
+    }
+
+    public RdmMemberViewDTO setSyncDateGitlab(Date syncDateGitlab) {
+        this.syncDateGitlab = syncDateGitlab;
         return this;
     }
 }

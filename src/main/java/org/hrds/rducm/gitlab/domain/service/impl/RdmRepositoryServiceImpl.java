@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import org.gitlab4j.api.Constants;
 import org.gitlab4j.api.models.Commit;
 import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.api.controller.dto.repository.RepositoryOverViewDTO;
@@ -12,6 +13,7 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmRepositoryService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabCommitApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabMergeRequestApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
@@ -37,6 +39,8 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
     private GitlabProjectApi gitlabProjectApi;
     @Autowired
     private GitlabCommitApi gitlabCommitApi;
+    @Autowired
+    private GitlabMergeRequestApi gitlabMergeRequestApi;
 
     @Override
     public PageInfo<RepositoryOverViewDTO> pageOverviewByOptions(Long projectId, PageRequest pageRequest, List<Long> repositoryIds) {
@@ -59,7 +63,8 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
             // 查询成员数量
             int memberCount = rdmMemberRepository.selectCountByRepositoryId(repo.getRepositoryId());
 
-            // 查询合并分支 todo
+            // 查询合并分支
+            int openedMergeRequestCount = gitlabMergeRequestApi.getMergeRequests(repo.getGlProjectId(), Constants.MergeRequestState.OPENED).size();
 
             // 查询最近一次提交
             Commit latestCommit = gitlabCommitApi.getLatestCommit(repo.getGlProjectId());
@@ -70,7 +75,7 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
                     .setDefaultBranch(glProject.getDefaultBranch())
                     .setVisibility(glProject.getVisibility().toValue())
                     .setLastCommittedDate(latestCommit.getCommittedDate())
-                    .setOpenedMergeRequestCount(glProject.getApprovalsBeforeMerge()) // todo
+                    .setOpenedMergeRequestCount(openedMergeRequestCount)
                     .setRepositoryCreationDate(glProject.getCreatedAt());
 
             repositoryOverViewDTOS.add(repositoryOverViewDTO);
