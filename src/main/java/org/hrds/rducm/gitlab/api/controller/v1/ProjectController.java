@@ -1,8 +1,8 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import io.choerodon.core.annotation.Permission;
-import io.choerodon.core.domain.Page;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.swagger.annotations.ApiImplicitParam;
@@ -50,10 +50,10 @@ public class ProjectController extends BaseController {
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping("/gitlab/members")
-    public ResponseEntity<Page<RdmMemberViewDTO>> pageByOptions(@PathVariable Long projectId,
-                                                                PageRequest pageRequest,
-                                                                RdmMemberQueryDTO query) {
-        return Results.success(rdmMemberService.list(projectId, pageRequest, query));
+    public ResponseEntity<PageInfo<RdmMemberViewDTO>> pageByOptions(@PathVariable Long projectId,
+                                                                    PageRequest pageRequest,
+                                                                    RdmMemberQueryDTO query) {
+        return Results.success(rdmMemberService.pageByOptions(projectId, pageRequest, query));
     }
 
     @ApiOperation(value = "批量新增代码库成员(项目层)")
@@ -63,7 +63,7 @@ public class ProjectController extends BaseController {
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping("/gitlab/members/batch-add")
-    public ResponseEntity<Object> batchAddMembers(@PathVariable Long projectId,
+    public ResponseEntity<?> batchAddMembers(@PathVariable Long projectId,
                                                   @RequestBody RdmMemberBatchDTO rdmMemberBatchDTO) {
         validObject(rdmMemberBatchDTO);
         rdmMemberService.batchAddOrUpdateMembers(projectId, rdmMemberBatchDTO);

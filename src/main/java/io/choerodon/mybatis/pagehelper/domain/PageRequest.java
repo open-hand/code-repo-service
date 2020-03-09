@@ -18,7 +18,7 @@ public class PageRequest {
 	}
 
 	public PageRequest(int page, int size) {
-		this(page-1, size, null);
+		this(page, size, null);
 	}
 
 	/**
@@ -30,13 +30,13 @@ public class PageRequest {
 	 */
 	public PageRequest(int page, int size, Sort sort) {
 		//猪齿鱼前端是从1开始的 为了兼容 -1
-		this.page = page-1;
+		this.page = page - 1;
 		this.size = size;
 		this.sort = sort;
 	}
 
 	public PageRequest(int page, int size, Sort.Direction direction, String... properties) {
-		this(page-1, size, new Sort(direction, properties));
+		this(page, size, new Sort(direction, properties));
 	}
 
 	public int getPage() {
@@ -44,7 +44,7 @@ public class PageRequest {
 	}
 
 	public void setPage(int page) {
-		this.page = page-1;
+		this.page = page - 1;
 	}
 
 	public int getSize() {

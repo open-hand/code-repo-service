@@ -34,7 +34,7 @@ public class RdmMemberController extends BaseController {
     })
     @Permission(permissionPublic = true)
     @PutMapping("/{memberId}")
-    public ResponseEntity<Object> updateMember(@PathVariable Long projectId,
+    public ResponseEntity<?> updateMember(@PathVariable Long projectId,
                                                @PathVariable Long repositoryId,
                                                @PathVariable Long memberId,
                                                @RequestBody RdmMemberUpdateDTO rdmMemberUpdateDTO) {

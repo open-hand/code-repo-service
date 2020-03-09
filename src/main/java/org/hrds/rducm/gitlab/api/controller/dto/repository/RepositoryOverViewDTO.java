@@ -1,5 +1,8 @@
 package org.hrds.rducm.gitlab.api.controller.dto.repository;
 
+import io.swagger.annotations.ApiModelProperty;
+import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
+
 import java.util.Date;
 
 /**
@@ -7,13 +10,21 @@ import java.util.Date;
  * @date 2020/3/6
  */
 public class RepositoryOverViewDTO {
+    @ApiModelProperty(value = ApiInfoConstants.REPOSITORY_ID)
     private Long repositoryId;
+    @ApiModelProperty(value = "代码库名称")
     private String repositoryName;
+    @ApiModelProperty(value = "开发成员数量")
     private Integer developerCount;
+    @ApiModelProperty(value = "默认分支")
     private String defaultBranch;
+    @ApiModelProperty(value = "仓库可见性")
     private String visibility;
+    @ApiModelProperty(value = "最近一次提交日期")
     private Date lastCommittedDate;
-    private Integer approvalsBeforeMergeCount;
+    @ApiModelProperty(value = "待处理合并请求数")
+    private Integer openedMergeRequestCount;
+    @ApiModelProperty(value = "代码库创建日期")
     private Date repositoryCreationDate;
 
     public Long getRepositoryId() {
@@ -70,12 +81,12 @@ public class RepositoryOverViewDTO {
         return this;
     }
 
-    public Integer getApprovalsBeforeMergeCount() {
-        return approvalsBeforeMergeCount;
+    public Integer getOpenedMergeRequestCount() {
+        return openedMergeRequestCount;
     }
 
-    public RepositoryOverViewDTO setApprovalsBeforeMergeCount(Integer approvalsBeforeMergeCount) {
-        this.approvalsBeforeMergeCount = approvalsBeforeMergeCount;
+    public RepositoryOverViewDTO setOpenedMergeRequestCount(Integer openedMergeRequestCount) {
+        this.openedMergeRequestCount = openedMergeRequestCount;
         return this;
     }
 

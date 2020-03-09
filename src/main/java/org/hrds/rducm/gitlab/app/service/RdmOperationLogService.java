@@ -1,6 +1,6 @@
 package org.hrds.rducm.gitlab.app.service;
 
-import io.choerodon.core.domain.Page;
+import com.github.pagehelper.PageInfo;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
@@ -12,5 +12,5 @@ import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
  */
 public interface RdmOperationLogService {
 
-    Page<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId, Long repositoryId, PageRequest pageRequest, OperationLogQueryDTO queryDTO);
+    PageInfo<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId, Long repositoryId, PageRequest pageRequest, OperationLogQueryDTO queryDTO);
 }

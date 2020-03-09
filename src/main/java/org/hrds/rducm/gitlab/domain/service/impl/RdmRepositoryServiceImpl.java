@@ -28,28 +28,31 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
 
     @Override
     public List<RepositoryOverViewDTO> pageByOptions(Long projectId) {
-
-        RdmRepository rdmRepository = new RdmRepository();
-
+        // <1> 查询
         Condition condition = Condition.builder(RdmRepository.class)
                 .where(Sqls.custom().andEqualTo(RdmRepository.FIELD_PROJECT_ID, projectId))
                 .build();
 
         List<RdmRepository> rdmRepositories = rdmRepositoryRepository.selectByCondition(condition);
 
+        // <2> 封装展示参数
         List<RepositoryOverViewDTO> repositoryOverViewDTOS = new ArrayList<>();
         rdmRepositories.forEach(repo -> {
             RepositoryOverViewDTO repositoryOverViewDTO = new RepositoryOverViewDTO();
 
+            // 查询Gitlab项目
             Project glProject = gitlabProjectApi.getProject(repo.getGlProjectId());
+            // 查询成员 todo
+
+            // 查询合并分支 todo
 
             repositoryOverViewDTO.setRepositoryId(repo.getRepositoryId())
                     .setRepositoryName(repo.getRepositoryName())
-                    .setDeveloperCount(-1)
+                    .setDeveloperCount(-1) // todo
                     .setDefaultBranch(glProject.getDefaultBranch())
                     .setVisibility(glProject.getVisibility().toValue())
                     .setLastCommittedDate(glProject.getLastActivityAt()) // todo
-                    .setApprovalsBeforeMergeCount(glProject.getApprovalsBeforeMerge()) // todo
+                    .setOpenedMergeRequestCount(glProject.getApprovalsBeforeMerge()) // todo
                     .setRepositoryCreationDate(glProject.getCreatedAt());
 
             repositoryOverViewDTOS.add(repositoryOverViewDTO);

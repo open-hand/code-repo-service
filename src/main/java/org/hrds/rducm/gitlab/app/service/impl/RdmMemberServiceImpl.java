@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
+import com.github.pagehelper.PageInfo;
 import io.choerodon.asgard.saga.annotation.Saga;
-import io.choerodon.asgard.saga.annotation.SagaTask;
 import io.choerodon.asgard.saga.producer.StartSagaBuilder;
 import io.choerodon.asgard.saga.producer.TransactionalProducer;
 import io.choerodon.core.domain.Page;
@@ -22,6 +22,7 @@ import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
+import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.hzero.core.base.AopProxy;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
@@ -51,7 +52,7 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
     }
 
     @Override
-    public Page<RdmMemberViewDTO> list(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query) {
+    public PageInfo<RdmMemberViewDTO> pageByOptions(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query) {
         // <1> 封装查询条件
 
         // 获取用户名对应的userId数组
@@ -87,7 +88,7 @@ public class RdmMemberServiceImpl implements RdmMemberService, AopProxy<RdmMembe
             viewDTO.setProjectRoleName("项目成员");
         }
 
-        return rdmMemberViewDTOS;
+        return PageConvertUtils.convert(rdmMemberViewDTOS);
     }
 
     /**

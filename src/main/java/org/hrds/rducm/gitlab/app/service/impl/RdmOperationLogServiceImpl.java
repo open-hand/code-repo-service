@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
+import com.github.pagehelper.PageInfo;
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
@@ -10,6 +11,7 @@ import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hrds.rducm.gitlab.domain.repository.RdmOperationLogRepository;
 import org.hrds.rducm.gitlab.infra.audit.event.AbstractOperationEvent;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
+import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,7 @@ public class RdmOperationLogServiceImpl implements RdmOperationLogService {
     private RdmOperationLogRepository operationLogRepository;
 
     @Override
-    public Page<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId, Long repositoryId, PageRequest pageRequest, OperationLogQueryDTO queryDTO) {
+    public PageInfo<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId, Long repositoryId, PageRequest pageRequest, OperationLogQueryDTO queryDTO) {
         Long opUserId = queryDTO.getOpUserId();
         Date startDate = queryDTO.getStartDate();
         Date endDate = queryDTO.getEndDate();
@@ -56,6 +58,6 @@ public class RdmOperationLogServiceImpl implements RdmOperationLogService {
 
         Page<RdmOperationLog> page = PageHelper.doPageAndSort(pageRequest, () -> operationLogRepository.selectByCondition(condition));
 
-        return ConvertUtils.convertPage(page, OperationLogViewDTO.class);
+        return PageConvertUtils.convert(ConvertUtils.convertPage(page, OperationLogViewDTO.class));
     }
 }

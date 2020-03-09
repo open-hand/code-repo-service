@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
+import com.github.pagehelper.PageInfo;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
@@ -35,13 +36,13 @@ public class RdmOperationLogController extends BaseController {
     @ApiOperation(value = "查询成员管理操作日志列表")
     @Permission(level = ResourceLevel.PROJECT, permissionPublic = true)
     @GetMapping
-    public ResponseEntity<Page<OperationLogViewDTO>> pageByOptionsMemberLog(@PathVariable Long organizationId,
+    public ResponseEntity<PageInfo<OperationLogViewDTO>> pageByOptionsMemberLog(@PathVariable Long organizationId,
                                                                             @PathVariable Long projectId,
                                                                             @SortDefault(value = RdmOperationLog.FIELD_CREATION_DATE,
                                                                                     direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                                             OperationLogQueryDTO queryDTO) {
 
-        Page<OperationLogViewDTO> list = operationLogService.pageByOptionsMemberLog(projectId, null, pageRequest, queryDTO);
+        PageInfo<OperationLogViewDTO> list = operationLogService.pageByOptionsMemberLog(projectId, null, pageRequest, queryDTO);
         return Results.success(list);
     }
 
