@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author ying.xie@hand-china.com 2020-02-28 10:33:02
  */
 @RestController("gitlabOperationLogController.v1")
-@RequestMapping("/v1/{organizationId}/projects/{projectId}/gitlab/operation-logs")
+@RequestMapping("/v1/projects/{projectId}/gitlab/operation-logs")
 public class RdmOperationLogController extends BaseController {
 
     @Autowired
@@ -35,8 +35,7 @@ public class RdmOperationLogController extends BaseController {
     @ApiOperation(value = "查询成员管理操作日志列表")
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping
-    public ResponseEntity<PageInfo<OperationLogViewDTO>> pageByOptionsMemberLog(@PathVariable Long organizationId,
-                                                                                @PathVariable Long projectId,
+    public ResponseEntity<PageInfo<OperationLogViewDTO>> pageByOptionsMemberLog(@PathVariable Long projectId,
                                                                                 @SortDefault(value = RdmOperationLog.FIELD_CREATION_DATE,
                                                                                         direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                                                 OperationLogQueryDTO queryDTO) {
