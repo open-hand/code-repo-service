@@ -64,7 +64,7 @@ public class ProjectController extends BaseController {
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping("/gitlab/members/batch-add")
     public ResponseEntity<?> batchAddMembers(@PathVariable Long projectId,
-                                                  @RequestBody RdmMemberBatchDTO rdmMemberBatchDTO) {
+                                             @RequestBody RdmMemberBatchDTO rdmMemberBatchDTO) {
         validObject(rdmMemberBatchDTO);
         rdmMemberService.batchAddOrUpdateMembers(projectId, rdmMemberBatchDTO);
         return Results.created(null);
@@ -95,9 +95,10 @@ public class ProjectController extends BaseController {
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping("/gitlab/repositories/overview")
-    public ResponseEntity<List<RepositoryOverViewDTO>> pageOverviewByOptions(@PathVariable Long projectId,
-                                                                             @RequestParam(required = false) List<Long> repositoryIds) {
-        List<RepositoryOverViewDTO> repositoryOverViewDTOS = rdmRepositoryService.pageByOptions(projectId, repositoryIds);
+    public ResponseEntity<PageInfo<RepositoryOverViewDTO>> pageOverviewByOptions(@PathVariable Long projectId,
+                                                                                 PageRequest pageRequest,
+                                                                                 @RequestParam(required = false) List<Long> repositoryIds) {
+        PageInfo<RepositoryOverViewDTO> repositoryOverViewDTOS = rdmRepositoryService.pageOverviewByOptions(projectId, pageRequest, repositoryIds);
         return Results.success(repositoryOverViewDTOS);
     }
 }

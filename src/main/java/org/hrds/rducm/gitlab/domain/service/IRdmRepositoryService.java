@@ -1,5 +1,7 @@
 package org.hrds.rducm.gitlab.domain.service;
 
+import com.github.pagehelper.PageInfo;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.repository.RepositoryOverViewDTO;
 
 import java.util.List;
@@ -13,8 +15,9 @@ public interface IRdmRepositoryService {
      * 查询代码库总览信息
      *
      * @param projectId 项目id
+     * @param pageRequest
      * @param repositoryIds
      * @return
      */
-    List<RepositoryOverViewDTO> pageByOptions(Long projectId, List<Long> repositoryIds);
+    PageInfo<RepositoryOverViewDTO> pageOverviewByOptions(Long projectId, PageRequest pageRequest, List<Long> repositoryIds);
 }
