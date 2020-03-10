@@ -1,14 +1,13 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
 import io.choerodon.core.annotation.Permission;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.gitlab4j.api.models.ProtectedTag;
-import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.dto.tag.ProtectedTagDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.tag.TagDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.tag.TagQueryDTO;
 import org.hrds.rducm.gitlab.app.service.RdmTagAppService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
@@ -33,12 +32,14 @@ public class RdmTagController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
+            @ApiImplicitParam(name = "excludeProtectedFlag", value = "是否排除保护标记", paramType = "query", dataType = "boolean"),
     })
     @Permission(permissionPublic = true)
     @GetMapping
     public ResponseEntity<List<TagDTO>> getTags(@PathVariable Long projectId,
-                                                @PathVariable Long repositoryId) {
-        return Results.success(rdmTagAppService.getTags(repositoryId));
+                                                @PathVariable Long repositoryId,
+                                                TagQueryDTO tagQueryDTO) {
+        return Results.success(rdmTagAppService.getTags(repositoryId, tagQueryDTO));
     }
 
     @ApiOperation(value = "查询保护标签")
