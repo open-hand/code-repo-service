@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.hrds.rducm.gitlab.app.assembler.RdmMemberAssembler;
 
 import java.util.*;
 
@@ -46,6 +47,9 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
     @Autowired
     private IRdmMemberService iRdmMemberService;
+
+    @Autowired
+    private RdmMemberAssembler rdmMemberAssembler;
 
     @Autowired
     private TransactionalProducer producer;
@@ -104,7 +108,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Transactional(rollbackFor = Exception.class)
     public void batchAddOrUpdateMembers(Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
         // <0> 校验入参 + 转换
-        List<RdmMember> rdmMembers = convertGitlabMemberBatchDTO(projectId, rdmMemberBatchDTO);
+        List<RdmMember> rdmMembers = rdmMemberAssembler.rdmMemberBatchDTOToRdmMembers(projectId, rdmMemberBatchDTO);
 
         // <1> 数据库添加成员, 已存在需要更新, 发起一个新事务
         self().batchAddOrUpdateMembersBeforeRequestsNew(rdmMembers);
@@ -188,7 +192,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Transactional(rollbackFor = Exception.class)
     public void batchAddMemberSagaDemo(Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
         // <0> 校验入参 + 转换
-        List<RdmMember> rdmMembers = convertGitlabMemberBatchDTO(projectId, rdmMemberBatchDTO);
+        List<RdmMember> rdmMembers = rdmMemberAssembler.rdmMemberBatchDTOToRdmMembers(projectId, rdmMemberBatchDTO);
 
         // <1> 预更新, 数据库添加成员, 已存在需要更新
         iRdmMemberService.batchAddOrUpdateMembersBefore(rdmMembers);
@@ -227,46 +231,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         iRdmMemberService.updateMemberBefore(rdmMember);
     }
 
-    /**
-     * 将GitlabMemberBatchDTO转换为List<RdmMember>
-     *
-     * @param rdmMemberBatchDTO
-     * @return
-     */
-    private List<RdmMember> convertGitlabMemberBatchDTO(Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
-        // 查询gitlab项目id和用户id todo 应从外部接口获取, 暂时从数据库获取
-        Map<Long, Integer> repositoryIdToGlProjectIdMap = new HashMap<>();
-        rdmMemberBatchDTO.getRepositoryIds().forEach(repositoryId -> {
-            // 获取gitlab项目id
-            RdmRepository rdmRepository = rdmRepositoryRepository.selectOne(new RdmRepository().setRepositoryId(repositoryId));
-            repositoryIdToGlProjectIdMap.put(repositoryId, rdmRepository.getGlProjectId());
-        });
 
-        // 查询gitlab用户id todo 应从外部接口获取, 暂时从数据库获取
-        Map<Long, Integer> userIdToGlUserIdMap = new HashMap<>();
-        rdmMemberBatchDTO.getMembers().forEach(m -> {
-            RdmUser rdmUser = rdmUserRepository.selectOne(new RdmUser().setUserId(m.getUserId()));
-            userIdToGlUserIdMap.put(m.getUserId(), rdmUser.getGlUserId());
-        });
-
-        // 转换为List<RdmMember>格式
-        List<RdmMember> rdmMembers = new ArrayList<>();
-        for (Long repositoryId : rdmMemberBatchDTO.getRepositoryIds()) {
-            for (RdmMemberBatchDTO.GitlabMemberCreateDTO member : rdmMemberBatchDTO.getMembers()) {
-                RdmMember rdmMember = ConvertUtils.convertObject(member, RdmMember.class);
-                rdmMember.setProjectId(projectId);
-                rdmMember.setRepositoryId(repositoryId);
-
-                // 设置gitlab项目id和用户id
-                rdmMember.setGlProjectId(repositoryIdToGlProjectIdMap.get(repositoryId));
-                rdmMember.setGlUserId(userIdToGlUserIdMap.get(member.getUserId()));
-
-                rdmMembers.add(rdmMember);
-            }
-        }
-
-        return rdmMembers;
-    }
 
 //    /**
 //     * 构造审计所需报文参数

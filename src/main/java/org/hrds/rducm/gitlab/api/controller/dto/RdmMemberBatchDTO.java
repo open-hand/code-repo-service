@@ -16,10 +16,6 @@ public class RdmMemberBatchDTO {
     @ApiModelProperty(value = ApiInfoConstants.REPOSITORY_ID, dataType = "Long", required = true)
     private List<Long> repositoryIds;
 
-    @NotNull
-    @ApiModelProperty(value = "是否项目下所有成员", dataType = "Boolean", required = true)
-    private Boolean allMemberFlag;
-
     @NotEmpty
     @Valid
     @ApiModelProperty("新增成员信息")
@@ -71,15 +67,6 @@ public class RdmMemberBatchDTO {
 
     public RdmMemberBatchDTO setRepositoryIds(List<Long> repositoryIds) {
         this.repositoryIds = repositoryIds;
-        return this;
-    }
-
-    public Boolean getAllMemberFlag() {
-        return allMemberFlag;
-    }
-
-    public RdmMemberBatchDTO setAllMemberFlag(Boolean allMember) {
-        allMemberFlag = allMember;
         return this;
     }
 
