@@ -28,6 +28,7 @@ import org.hzero.mybatis.util.Sqls;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -105,11 +106,11 @@ public class MemberServiceImpl implements RdmMemberService, AopProxy<MemberServi
         // <0> 校验入参 + 转换
         List<RdmMember> rdmMembers = convertGitlabMemberBatchDTO(projectId, rdmMemberBatchDTO);
 
-        // <1> 数据库添加成员, 已存在需要更新
-        iRdmMemberService.batchAddOrUpdateMembersBefore(rdmMembers);
+        // <1> 数据库添加成员, 已存在需要更新, 发起一个新事务
+        self().batchAddOrUpdateMembersBeforeRequestsNew(rdmMembers);
 
-        // <2> 异步调用gitlab api添加成员 todo 事务一致性问题
-        self().batchAddOrUpdateMembersToGitlabAsync(rdmMembers);
+        // <2> 调用gitlab api添加成员 todo 事务一致性问题
+        iRdmMemberService.batchAddOrUpdateMembersToGitlab(rdmMembers);
     }
 
     @Override
@@ -135,23 +136,23 @@ public class MemberServiceImpl implements RdmMemberService, AopProxy<MemberServi
         // 设置同步标识
         rdmMember.setSyncGitlabFlag(dbMember.getSyncGitlabFlag());
 
-        // <1> 数据库更新成员
-        iRdmMemberService.updateMemberBefore(rdmMember);
+        // <1> 数据库预更新成员, 发起新事务
+        self().updateMemberBeforeRequestsNew(rdmMember);
 
-        // <2> 调用gitlab api更新成员, 异步 todo 事务一致性问题
-        self().updateMemberToGitlabAsync(rdmMember);
+        // <2> 调用gitlab api更新成员 todo 事务一致性问题
+        iRdmMemberService.updateMemberToGitlab(rdmMember);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void removeMember(Long memberId) {
-        // <1> 数据库更新成员, 预删除
         RdmMember dbMember = rdmMemberRepository.selectByPrimaryKey(memberId);
 
-        iRdmMemberService.updateMemberBefore(dbMember);
+        // <1> 数据库更新成员, 预删除, 发起新事务
+        self().updateMemberBeforeRequestsNew(dbMember);
 
-        // <2> 调用gitlab api删除成员, 异步 todo 事务一致性问题
-        self().removeMemberToGitlabAsync(dbMember);
+        // <2> 调用gitlab api删除成员 todo 事务一致性问题
+        iRdmMemberService.removeMemberToGitlab(dbMember);
     }
 
 //    /**
@@ -205,37 +206,24 @@ public class MemberServiceImpl implements RdmMemberService, AopProxy<MemberServi
     }
 
     /**
-     * 批量新增或更新成员至Gitlab, 异步调用
+     * 批量预新增或修改, 使用一个新事务
      *
      * @param rdmMembers
      */
-    @Async
-    @Transactional(rollbackFor = Exception.class)
-    public void batchAddOrUpdateMembersToGitlabAsync(List<RdmMember> rdmMembers) {
-        // <1> 调用gitlab api
-        iRdmMemberService.batchAddOrUpdateMembersToGitlab(rdmMembers);
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public void batchAddOrUpdateMembersBeforeRequestsNew(List<RdmMember> rdmMembers) {
+        // <1> 数据库添加成员, 已存在需要更新
+        iRdmMemberService.batchAddOrUpdateMembersBefore(rdmMembers);
     }
 
     /**
-     * 更新成员至gitlab, 异步
+     * 数据库预更新成员, 发起一个新事务
      *
      * @param rdmMember
      */
-    @Async
-    @Transactional(rollbackFor = Exception.class)
-    public void updateMemberToGitlabAsync(RdmMember rdmMember) {
-        iRdmMemberService.updateMemberToGitlab(rdmMember);
-    }
-
-    /**
-     * 移除成员至gitlab, 异步
-     *
-     * @param rdmMember
-     */
-    @Async
-    @Transactional(rollbackFor = Exception.class)
-    public void removeMemberToGitlabAsync(RdmMember rdmMember) {
-        iRdmMemberService.removeMemberToGitlab(rdmMember);
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public void updateMemberBeforeRequestsNew(RdmMember rdmMember) {
+        iRdmMemberService.updateMemberBefore(rdmMember);
     }
 
     /**

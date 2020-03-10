@@ -17,6 +17,7 @@ public class PageConvertUtils {
     public static <T> PageInfo<T> convert(Page<T> page) {
         com.github.pagehelper.Page<T> c7nPage = new com.github.pagehelper.Page<>(page.getNumber() + 1, page.getSize());
         c7nPage.addAll(page.getContent());
+        c7nPage.setTotal(page.getTotalElements());
 
         PageInfo<T> pageInfo = new PageInfo<>(c7nPage);
         pageInfo.setTotal(page.getTotalElements());

@@ -6,6 +6,11 @@ import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
+import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * @author xy

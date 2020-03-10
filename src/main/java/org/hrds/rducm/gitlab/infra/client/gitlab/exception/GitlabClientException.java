@@ -13,5 +13,8 @@ public class GitlabClientException extends CommonException {
 
     public GitlabClientException(Throwable cause, Object... parameters) {
         super(CODE, cause, parameters);
+        if (cause.getMessage().equals("404 Not found")) {
+            parameters[0] = "无法访问到该资源, 请检查Gitlab一致性";
+        }
     }
 }
