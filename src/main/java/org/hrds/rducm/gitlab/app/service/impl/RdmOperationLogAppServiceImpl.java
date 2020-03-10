@@ -6,7 +6,7 @@ import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
-import org.hrds.rducm.gitlab.app.service.RdmOperationLogService;
+import org.hrds.rducm.gitlab.app.service.RdmOperationLogAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hrds.rducm.gitlab.domain.repository.RdmOperationLogRepository;
 import org.hrds.rducm.gitlab.infra.audit.event.AbstractOperationEvent;
@@ -25,7 +25,7 @@ import java.util.Date;
  * @author ying.xie@hand-china.com 2020-02-28 10:33:02
  */
 @Service
-public class RdmOperationLogServiceImpl implements RdmOperationLogService {
+public class RdmOperationLogAppServiceImpl implements RdmOperationLogAppService {
     @Autowired
     private RdmOperationLogRepository operationLogRepository;
 

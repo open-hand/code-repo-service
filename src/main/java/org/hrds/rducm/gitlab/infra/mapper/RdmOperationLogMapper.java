@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.infra.mapper;
 
-import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import io.choerodon.mybatis.common.BaseMapper;
+import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 
 /**
  * 操作日志表Mapper

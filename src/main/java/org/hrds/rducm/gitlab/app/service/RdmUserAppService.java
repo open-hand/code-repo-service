@@ -5,7 +5,7 @@ import org.hrds.rducm.gitlab.api.controller.dto.RdmUserViewDTO;
 /**
  * @author xy
  */
-public interface RdmUserService {
+public interface RdmUserAppService {
     RdmUserViewDTO queryUserSelf();
 
     RdmUserViewDTO queryUser(Long userId);

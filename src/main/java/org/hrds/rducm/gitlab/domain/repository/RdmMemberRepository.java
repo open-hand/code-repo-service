@@ -1,10 +1,7 @@
 package org.hrds.rducm.gitlab.domain.repository;
 
-import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hzero.mybatis.base.BaseRepository;
-
-import java.util.List;
 
 public interface RdmMemberRepository extends BaseRepository<RdmMember> {
     /**

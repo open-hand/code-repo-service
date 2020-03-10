@@ -25,7 +25,7 @@ public class GitlabMergeRequestApi {
      * 获取MergeRequests
      *
      * @param projectId 项目id
-     * @param state 状态
+     * @param state     状态
      * @return
      */
     public List<MergeRequest> getMergeRequests(Integer projectId, Constants.MergeRequestState state) {

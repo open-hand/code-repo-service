@@ -2,7 +2,6 @@ package org.hrds.rducm.gitlab.app.eventhandler.constants;
 
 /**
  * 此类放sagaTopicCode常量
- *
  */
 public class SagaTopicCodeConstants {
     /**

@@ -4,7 +4,7 @@ import org.gitlab4j.api.models.ProtectedTag;
 import org.gitlab4j.api.models.Tag;
 import org.hrds.rducm.gitlab.api.controller.dto.tag.ProtectedTagDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.tag.TagDTO;
-import org.hrds.rducm.gitlab.app.service.RdmTagService;
+import org.hrds.rducm.gitlab.app.service.RdmTagAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmTagRepository;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class RdmTagServiceImpl implements RdmTagService {
+public class RdmTagAppServiceImpl implements RdmTagAppService {
     @Autowired
     private RdmTagRepository rdmTagRepository;
     @Autowired

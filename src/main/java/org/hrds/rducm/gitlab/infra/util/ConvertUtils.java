@@ -2,7 +2,6 @@ package org.hrds.rducm.gitlab.infra.util;
 
 
 import io.choerodon.core.domain.Page;
-import io.choerodon.core.domain.PageInfo;
 import io.choerodon.core.exception.CommonException;
 import org.springframework.beans.BeanUtils;
 

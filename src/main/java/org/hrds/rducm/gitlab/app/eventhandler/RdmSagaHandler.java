@@ -43,7 +43,8 @@ public class RdmSagaHandler {
             rdmMember.setUserId(-100086L);
             rdmMember.setState(data);
             rdmMemberRepository.insertSelective(rdmMember);
-            List<RdmMember> rdmMembers = objectMapper.readValue(data, new TypeReference<RdmMember>(){});
+            List<RdmMember> rdmMembers = objectMapper.readValue(data, new TypeReference<RdmMember>() {
+            });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

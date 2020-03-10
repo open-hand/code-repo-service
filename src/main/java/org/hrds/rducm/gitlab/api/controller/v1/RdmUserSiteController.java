@@ -6,7 +6,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmUserViewDTO;
-import org.hrds.rducm.gitlab.app.service.RdmUserService;
+import org.hrds.rducm.gitlab.app.service.RdmUserAppService;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +22,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1/gitlab/users")
 public class RdmUserSiteController extends BaseController {
     @Autowired
-    private RdmUserService rdmUserService;
+    private RdmUserAppService rdmUserAppService;
 
     @ApiOperation(value = "查询个人信息")
     @Permission(type = ResourceType.SITE, permissionPublic = true)
     @GetMapping("/self")
     public ResponseEntity<RdmUserViewDTO> queryUser() {
-        return Results.success(rdmUserService.queryUserSelf());
+        return Results.success(rdmUserAppService.queryUserSelf());
     }
 
     @ApiOperation(value = "新建用户")
@@ -38,7 +38,7 @@ public class RdmUserSiteController extends BaseController {
                                              @RequestParam String glEmail,
                                              @RequestParam String glUsername,
                                              @RequestParam String glName) {
-        rdmUserService.createUserWithRandomPassword(userId, glEmail, glUsername, glName);
+        rdmUserAppService.createUserWithRandomPassword(userId, glEmail, glUsername, glName);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

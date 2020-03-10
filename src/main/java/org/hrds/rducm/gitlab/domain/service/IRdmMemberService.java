@@ -1,12 +1,6 @@
 package org.hrds.rducm.gitlab.domain.service;
 
-import io.choerodon.core.domain.Page;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.gitlab4j.api.models.Member;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 
 import java.util.List;

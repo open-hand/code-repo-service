@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.infra.client.gitlab.api;
 
-import io.choerodon.core.exception.CommonException;
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.models.User;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;

@@ -5,7 +5,7 @@ import org.hrds.rducm.gitlab.api.controller.dto.branch.ProtectedBranchDTO;
 
 import java.util.List;
 
-public interface RdmBranchService {
+public interface RdmBranchAppService {
     List<BranchDTO> getBranches(Long repositoryId);
 
     List<ProtectedBranchDTO> getProtectedBranches(Long repositoryId);

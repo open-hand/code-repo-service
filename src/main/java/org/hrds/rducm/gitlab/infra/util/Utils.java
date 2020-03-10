@@ -5,6 +5,7 @@ package org.hrds.rducm.gitlab.infra.util;
  */
 public class Utils {
 
-    private Utils() {}
+    private Utils() {
+    }
 
 }

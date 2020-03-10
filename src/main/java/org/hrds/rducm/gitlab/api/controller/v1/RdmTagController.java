@@ -9,7 +9,7 @@ import org.gitlab4j.api.models.ProtectedTag;
 import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.dto.tag.ProtectedTagDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.tag.TagDTO;
-import org.hrds.rducm.gitlab.app.service.RdmTagService;
+import org.hrds.rducm.gitlab.app.service.RdmTagAppService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
@@ -27,7 +27,7 @@ public class RdmTagController extends BaseController {
     public static final String API_INFO_CREATE_ACCESS_LEVEL = "是否允许创建-权限级别(0|30|40)";
 
     @Autowired
-    private RdmTagService rdmTagService;
+    private RdmTagAppService rdmTagAppService;
 
     @ApiOperation(value = "查询标签")
     @ApiImplicitParams({
@@ -38,7 +38,7 @@ public class RdmTagController extends BaseController {
     @GetMapping
     public ResponseEntity<List<TagDTO>> getTags(@PathVariable Long projectId,
                                                 @PathVariable Long repositoryId) {
-        return Results.success(rdmTagService.getTags(repositoryId));
+        return Results.success(rdmTagAppService.getTags(repositoryId));
     }
 
     @ApiOperation(value = "查询保护标签")
@@ -50,7 +50,7 @@ public class RdmTagController extends BaseController {
     @GetMapping("/protected-tags")
     public ResponseEntity<List<ProtectedTagDTO>> getProtectedTags(@PathVariable Long projectId,
                                                                   @PathVariable Long repositoryId) {
-        return Results.success(rdmTagService.getProtectedTags(repositoryId));
+        return Results.success(rdmTagAppService.getProtectedTags(repositoryId));
     }
 
     @ApiOperation(value = "创建保护标签")
@@ -66,7 +66,7 @@ public class RdmTagController extends BaseController {
                                                               @PathVariable Long repositoryId,
                                                               @RequestParam String tagName,
                                                               @RequestParam Integer createAccessLevel) {
-        return Results.created(rdmTagService.protectTag(repositoryId, tagName, createAccessLevel));
+        return Results.created(rdmTagAppService.protectTag(repositoryId, tagName, createAccessLevel));
     }
 
     @ApiOperation(value = "修改保护标签")
@@ -82,7 +82,7 @@ public class RdmTagController extends BaseController {
                                                               @PathVariable Long repositoryId,
                                                               @RequestParam String tagName,
                                                               @RequestParam Integer createAccessLevel) {
-        return Results.created(rdmTagService.updateProtectedTag(repositoryId, tagName, createAccessLevel));
+        return Results.created(rdmTagAppService.updateProtectedTag(repositoryId, tagName, createAccessLevel));
     }
 
     @ApiOperation(value = "删除保护标签")
@@ -96,7 +96,7 @@ public class RdmTagController extends BaseController {
     public ResponseEntity<ProtectedTag> deleteProtectedTag(@PathVariable Long projectId,
                                                            @PathVariable Long repositoryId,
                                                            @RequestParam String tagName) {
-        rdmTagService.unprotectTag(repositoryId, tagName);
+        rdmTagAppService.unprotectTag(repositoryId, tagName);
         return Results.success();
     }
 }

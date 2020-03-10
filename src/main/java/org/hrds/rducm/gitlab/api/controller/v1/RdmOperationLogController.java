@@ -13,7 +13,7 @@ import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
-import org.hrds.rducm.gitlab.app.service.RdmOperationLogService;
+import org.hrds.rducm.gitlab.app.service.RdmOperationLogAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
@@ -37,7 +37,7 @@ import springfox.documentation.annotations.ApiIgnore;
 public class RdmOperationLogController extends BaseController {
 
     @Autowired
-    private RdmOperationLogService operationLogService;
+    private RdmOperationLogAppService operationLogService;
 
     @ApiOperation(value = "查询成员管理操作日志列表")
     @ApiImplicitParams({

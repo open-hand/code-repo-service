@@ -3,7 +3,7 @@ package org.hrds.rducm.gitlab.app.service.impl;
 import org.gitlab4j.api.models.ProtectedBranch;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.ProtectedBranchDTO;
-import org.hrds.rducm.gitlab.app.service.RdmBranchService;
+import org.hrds.rducm.gitlab.app.service.RdmBranchAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmBranchRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class RdmBranchServiceImpl implements RdmBranchService {
+public class RdmBranchAppServiceImpl implements RdmBranchAppService {
     @Autowired
     private RdmBranchRepository rdmBranchRepository;
     @Autowired

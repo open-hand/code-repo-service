@@ -10,9 +10,9 @@ import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
-import org.hrds.rducm.gitlab.app.service.RdmMemberService;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
@@ -26,7 +26,6 @@ import org.hzero.core.base.AopProxy;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +35,7 @@ import java.util.*;
 import static org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants.RDUCM_BATCH_ADD_MEMBERS;
 
 @Service
-public class MemberServiceImpl implements RdmMemberService, AopProxy<MemberServiceImpl> {
+public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<RdmMemberAppServiceImpl> {
     private final RdmMemberRepository rdmMemberRepository;
 
     @Autowired
@@ -51,7 +50,7 @@ public class MemberServiceImpl implements RdmMemberService, AopProxy<MemberServi
     @Autowired
     private TransactionalProducer producer;
 
-    public MemberServiceImpl(RdmMemberRepository rdmMemberRepository) {
+    public RdmMemberAppServiceImpl(RdmMemberRepository rdmMemberRepository) {
         this.rdmMemberRepository = rdmMemberRepository;
     }
 
@@ -97,6 +96,7 @@ public class MemberServiceImpl implements RdmMemberService, AopProxy<MemberServi
 
     /**
      * 批量新增或修改成员
+     *
      * @param projectId
      * @param
      */
@@ -202,7 +202,8 @@ public class MemberServiceImpl implements RdmMemberService, AopProxy<MemberServi
                         .withPayloadAndSerialize(rdmMembers)
 //                        .withRefId(null)
                         .withSourceId(projectId),
-                builder -> {});
+                builder -> {
+                });
     }
 
     /**
@@ -228,6 +229,7 @@ public class MemberServiceImpl implements RdmMemberService, AopProxy<MemberServi
 
     /**
      * 将GitlabMemberBatchDTO转换为List<RdmMember>
+     *
      * @param rdmMemberBatchDTO
      * @return
      */

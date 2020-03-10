@@ -1,20 +1,13 @@
 package org.hrds.rducm.gitlab.infra.repository.impl;
 
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.mybatis.domain.AuditDomain;
-import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
-import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
-import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
-import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.mybatis.base.impl.BaseRepositoryImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
-import java.util.List;
 
 @Repository
 public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> implements RdmMemberRepository {

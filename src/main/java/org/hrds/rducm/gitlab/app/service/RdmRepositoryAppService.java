@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @author ying.xie@hand-china.com 2020-02-26 14:03:22
  */
-public interface RdmRepositoryService {
+public interface RdmRepositoryAppService {
 
     List<RdmRepository> listByActive(Long projectId);
 }

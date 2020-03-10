@@ -15,7 +15,6 @@ import org.hrds.rducm.gitlab.domain.service.IRdmRepositoryService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabCommitApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabMergeRequestApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
-import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;

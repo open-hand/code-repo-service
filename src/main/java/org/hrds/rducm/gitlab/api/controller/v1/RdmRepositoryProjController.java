@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.dto.repository.RepositoryOverViewDTO;
-import org.hrds.rducm.gitlab.app.service.RdmRepositoryService;
+import org.hrds.rducm.gitlab.app.service.RdmRepositoryAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmRepositoryService;
 import org.hzero.core.base.BaseController;
@@ -26,7 +26,7 @@ import java.util.List;
 @RequestMapping("/v1/projects/{projectId}/gitlab/repositories")
 public class RdmRepositoryProjController extends BaseController {
     @Autowired
-    private RdmRepositoryService rdmRepositoryAppService;
+    private RdmRepositoryAppService rdmRepositoryAppService;
     @Autowired
     private IRdmRepositoryService rdmRepositoryService;
 

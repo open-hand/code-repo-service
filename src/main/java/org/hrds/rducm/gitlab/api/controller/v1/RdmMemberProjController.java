@@ -11,10 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
-import org.hrds.rducm.gitlab.app.service.RdmMemberService;
-import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
+import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.http.ResponseEntity;
@@ -27,10 +25,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController("rdmMemberProjController.v1")
 @RequestMapping("/v1/projects/{projectId}/gitlab/repositories")
 public class RdmMemberProjController extends BaseController {
-    private final RdmMemberService rdmMemberService;
+    private final RdmMemberAppService rdmMemberAppService;
 
-    public RdmMemberProjController(RdmMemberService rdmMemberService) {
-        this.rdmMemberService = rdmMemberService;
+    public RdmMemberProjController(RdmMemberAppService rdmMemberAppService) {
+        this.rdmMemberAppService = rdmMemberAppService;
     }
 
     @ApiOperation(value = "查询代码库成员(项目层)")
@@ -43,7 +41,7 @@ public class RdmMemberProjController extends BaseController {
     public ResponseEntity<PageInfo<RdmMemberViewDTO>> pageByOptions(@PathVariable Long projectId,
                                                                     PageRequest pageRequest,
                                                                     RdmMemberQueryDTO query) {
-        return Results.success(rdmMemberService.pageByOptions(projectId, pageRequest, query));
+        return Results.success(rdmMemberAppService.pageByOptions(projectId, pageRequest, query));
     }
 
     @ApiOperation(value = "批量新增代码库成员(项目层)")
@@ -56,7 +54,7 @@ public class RdmMemberProjController extends BaseController {
     public ResponseEntity<?> batchAddMembers(@PathVariable Long projectId,
                                              @RequestBody RdmMemberBatchDTO rdmMemberBatchDTO) {
         validObject(rdmMemberBatchDTO);
-        rdmMemberService.batchAddOrUpdateMembers(projectId, rdmMemberBatchDTO);
+        rdmMemberAppService.batchAddOrUpdateMembers(projectId, rdmMemberBatchDTO);
         return Results.created(null);
     }
 }

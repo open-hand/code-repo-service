@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.domain.repository;
 
-import org.hzero.mybatis.base.BaseRepository;
 import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
+import org.hzero.mybatis.base.BaseRepository;
 
 /**
  * 资源库

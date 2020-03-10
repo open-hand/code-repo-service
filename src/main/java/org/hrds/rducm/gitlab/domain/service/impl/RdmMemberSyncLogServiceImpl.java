@@ -2,11 +2,11 @@ package org.hrds.rducm.gitlab.domain.service.impl;
 
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
-import org.hrds.rducm.gitlab.domain.entity.MemberSyncAuditLog;
+import org.hrds.rducm.gitlab.domain.entity.RdmMemberSyncAuditLog;
 import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
-import org.hrds.rducm.gitlab.domain.service.IMemberSyncLogService;
+import org.hrds.rducm.gitlab.domain.service.IRdmMemberSyncLogService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * @date 2020/3/3
  */
 @Service
-public class MemberSyncLogServiceImpl implements IMemberSyncLogService {
+public class RdmMemberSyncLogServiceImpl implements IRdmMemberSyncLogService {
     @Autowired
     private RdmMemberRepository memberRepository;
 
@@ -47,7 +47,7 @@ public class MemberSyncLogServiceImpl implements IMemberSyncLogService {
         }
     }
 
-    public List<MemberSyncAuditLog> compareMemberPermissionByRepositoryId(Long repositoryId) {
+    public List<RdmMemberSyncAuditLog> compareMemberPermissionByRepositoryId(Long repositoryId) {
         // 查询仓库id
         RdmRepository repository = repositoryRepository.selectByUk(repositoryId);
         Integer glProjectId = repository.getGlProjectId();
@@ -60,7 +60,7 @@ public class MemberSyncLogServiceImpl implements IMemberSyncLogService {
         Map<Integer, RdmMember> dbMemberMap = dbMembers.stream().collect(Collectors.toMap(m -> m.getGlUserId(), m -> m));
 
         // 比较是否有差异
-        List<MemberSyncAuditLog> memberAudits = new ArrayList<>();
+        List<RdmMemberSyncAuditLog> memberAudits = new ArrayList<>();
         for (Member member : members) {
             boolean isDifferent = false;
 
@@ -101,12 +101,12 @@ public class MemberSyncLogServiceImpl implements IMemberSyncLogService {
         return memberAudits;
     }
 
-    public MemberSyncAuditLog buildMemberAudit(Long projectId,
-                                               Long repositoryId,
-                                               Integer glProjectId,
-                                               Member glMember,
-                                               RdmMember dbMember) {
-        MemberSyncAuditLog memberAudit = new MemberSyncAuditLog();
+    public RdmMemberSyncAuditLog buildMemberAudit(Long projectId,
+                                                  Long repositoryId,
+                                                  Integer glProjectId,
+                                                  Member glMember,
+                                                  RdmMember dbMember) {
+        RdmMemberSyncAuditLog memberAudit = new RdmMemberSyncAuditLog();
 
         if (glMember != null) {
             memberAudit.setGlUserId(glMember.getId())

@@ -5,7 +5,8 @@ package org.hrds.rducm.gitlab.infra.constant;
  */
 public class Constants {
 
-    private Constants() {}
+    private Constants() {
+    }
 
     public interface MemberState {
         String EXPIRED = "expired";

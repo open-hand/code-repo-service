@@ -1,8 +1,8 @@
 package org.hrds.rducm.gitlab.infra.repository.impl;
 
-import org.hzero.mybatis.base.impl.BaseRepositoryImpl;
 import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hrds.rducm.gitlab.domain.repository.RdmOperationLogRepository;
+import org.hzero.mybatis.base.impl.BaseRepositoryImpl;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,5 +13,5 @@ import org.springframework.stereotype.Component;
 @Component
 public class RdmOperationLogRepositoryImpl extends BaseRepositoryImpl<RdmOperationLog> implements RdmOperationLogRepository {
 
-  
+
 }

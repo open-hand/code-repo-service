@@ -14,7 +14,7 @@ public interface IRdmRepositoryService {
     /**
      * 查询代码库总览信息
      *
-     * @param projectId 项目id
+     * @param projectId     项目id
      * @param pageRequest
      * @param repositoryIds
      * @return

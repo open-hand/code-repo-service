@@ -4,7 +4,7 @@ import io.choerodon.core.exception.CommonException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.gitlab4j.api.models.User;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmUserViewDTO;
-import org.hrds.rducm.gitlab.app.service.RdmUserService;
+import org.hrds.rducm.gitlab.app.service.RdmUserAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author xy
  */
 @Service
-public class RdmUserServiceImpl implements RdmUserService {
+public class RdmUserAppServiceImpl implements RdmUserAppService {
     @Autowired
     private RdmUserRepository rdmUserRepository;
 

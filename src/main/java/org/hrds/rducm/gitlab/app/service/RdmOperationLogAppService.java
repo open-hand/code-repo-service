@@ -10,7 +10,7 @@ import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
  *
  * @author ying.xie@hand-china.com 2020-02-28 10:33:02
  */
-public interface RdmOperationLogService {
+public interface RdmOperationLogAppService {
 
     PageInfo<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId, Long repositoryId, PageRequest pageRequest, OperationLogQueryDTO queryDTO);
 }
