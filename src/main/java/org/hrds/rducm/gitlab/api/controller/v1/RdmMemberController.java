@@ -1,9 +1,11 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
 import io.choerodon.core.annotation.Permission;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
@@ -15,8 +17,8 @@ import org.springframework.web.bind.annotation.*;
 /**
  * @author ying.xie@hand-china.com
  */
-//@Api(tags = SwaggerTags.GITLAB_MEMBER)
-@RestController("gitlabMemberController.v1")
+@Api(tags = SwaggerTags.RDM_MEMBER)
+@RestController("rdmMemberController.v1")
 @RequestMapping("/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/members")
 public class RdmMemberController extends BaseController {
     private final RdmMemberService rdmMemberService;

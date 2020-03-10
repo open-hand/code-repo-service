@@ -2,7 +2,9 @@ package org.hrds.rducm.gitlab.api.controller.v1;
 
 import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmUserViewDTO;
 import org.hrds.rducm.gitlab.app.service.RdmUserService;
 import org.hzero.core.base.BaseController;
@@ -15,10 +17,10 @@ import org.springframework.web.bind.annotation.*;
 /**
  * API接口
  */
-//@Api(tags = SwaggerTags.GITLAB_USER)
-@RestController("gitlabUserController.v1")
+@Api(tags = SwaggerTags.RDM_USER)
+@RestController("rdmUserSiteController.v1")
 @RequestMapping("/v1/gitlab/users")
-public class RdmUserController extends BaseController {
+public class RdmUserSiteController extends BaseController {
     @Autowired
     private RdmUserService rdmUserService;
 

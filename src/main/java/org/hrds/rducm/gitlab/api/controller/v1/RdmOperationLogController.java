@@ -6,9 +6,11 @@ import io.choerodon.core.enums.ResourceType;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
 import org.hrds.rducm.gitlab.app.service.RdmOperationLogService;
@@ -29,8 +31,9 @@ import springfox.documentation.annotations.ApiIgnore;
  *
  * @author ying.xie@hand-china.com 2020-02-28 10:33:02
  */
-@RestController("gitlabOperationLogController.v1")
-@RequestMapping("/v1/projects/{projectId}/gitlab/operation-logs")
+@Api(tags = SwaggerTags.RDM_OPERATION_LOG)
+@RestController("rdmOperationLogController.v1")
+@RequestMapping("/v1/projects/{projectId}/gitlab/repositories/operation-logs")
 public class RdmOperationLogController extends BaseController {
 
     @Autowired

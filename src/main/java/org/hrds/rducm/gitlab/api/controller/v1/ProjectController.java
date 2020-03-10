@@ -30,45 +30,8 @@ import java.util.stream.Collectors;
 @RestController("projectController.v1")
 @RequestMapping("/v1/projects/{projectId}")
 public class ProjectController extends BaseController {
-    private final RdmMemberService rdmMemberService;
-
     @Autowired
     private RdmUserRepository rdmUserRepository;
-
-    @Autowired
-    private IRdmRepositoryService rdmRepositoryService;
-
-    public ProjectController(RdmMemberService rdmMemberService) {
-        this.rdmMemberService = rdmMemberService;
-    }
-
-    @ApiOperation(value = "查询代码库成员(项目层)")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", dataType = "Long", required = true),
-//            @ApiImplicitParam(name = "query", value = "查询参数", paramType = "query", dataType = "RdmMemberQueryDTO"),
-            @ApiImplicitParam(name = "repositoryIds", value = "应用服务id", paramType = "query", dataType = "Long", allowMultiple = true),
-    })
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
-    @GetMapping("/gitlab/members")
-    public ResponseEntity<PageInfo<RdmMemberViewDTO>> pageByOptions(@PathVariable Long projectId,
-                                                                    PageRequest pageRequest,
-                                                                    RdmMemberQueryDTO query) {
-        return Results.success(rdmMemberService.pageByOptions(projectId, pageRequest, query));
-    }
-
-    @ApiOperation(value = "批量新增代码库成员(项目层)")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
-            @ApiImplicitParam(name = "rdmMemberBatchDTO", value = "body参数", dataType = "RdmMemberBatchDTO", required = true),
-    })
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
-    @PostMapping("/gitlab/members/batch-add")
-    public ResponseEntity<?> batchAddMembers(@PathVariable Long projectId,
-                                             @RequestBody RdmMemberBatchDTO rdmMemberBatchDTO) {
-        validObject(rdmMemberBatchDTO);
-        rdmMemberService.batchAddOrUpdateMembers(projectId, rdmMemberBatchDTO);
-        return Results.created(null);
-    }
 
     @ApiOperation(value = "查询项目开发成员, 并排除自己(项目层)")
     @ApiImplicitParams({
@@ -88,17 +51,5 @@ public class ProjectController extends BaseController {
         return Results.success(collect);
     }
 
-    @ApiOperation(value = "查询项目总览(项目层)")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
-            @ApiImplicitParam(name = "repositoryIds", value = "应用服务id", paramType = "query", dataType = "Long", allowMultiple = true),
-    })
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
-    @GetMapping("/gitlab/repositories/overview")
-    public ResponseEntity<PageInfo<RepositoryOverViewDTO>> pageOverviewByOptions(@PathVariable Long projectId,
-                                                                                 PageRequest pageRequest,
-                                                                                 @RequestParam(required = false) List<Long> repositoryIds) {
-        PageInfo<RepositoryOverViewDTO> repositoryOverViewDTOS = rdmRepositoryService.pageOverviewByOptions(projectId, pageRequest, repositoryIds);
-        return Results.success(repositoryOverViewDTOS);
-    }
+
 }

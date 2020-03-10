@@ -1,9 +1,11 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
 import io.choerodon.core.annotation.Permission;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.ProtectedBranchDTO;
 import org.hrds.rducm.gitlab.app.service.RdmBranchService;
@@ -16,13 +18,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//@Api(tags = SwaggerTags.GITLAB_MEMBER)
-@RestController("gitlabBranchController.v1")
+@Api(tags = SwaggerTags.RDM_BRANCH)
+@RestController("rdmBranchController.v1")
 @RequestMapping("/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/branches")
 public class RdmBranchController extends BaseController {
     public static final String API_INFO_PUSH_ACCESS_LEVEL = "是否允许推送-权限级别(0|30|40)";
     public static final String API_INFO_MERGE_ACCESS_LEVEL = "是否允许合并-权限级别(0|30|40)";
-
 
     @Autowired
     private RdmBranchService rdmBranchService;

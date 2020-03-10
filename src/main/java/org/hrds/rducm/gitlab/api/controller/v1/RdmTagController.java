@@ -1,10 +1,12 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
 import io.choerodon.core.annotation.Permission;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.gitlab4j.api.models.ProtectedTag;
+import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.dto.tag.ProtectedTagDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.tag.TagDTO;
 import org.hrds.rducm.gitlab.app.service.RdmTagService;
@@ -17,8 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//@Api(tags = SwaggerTags.GITLAB_MEMBER)
-@RestController("gitlabTagController.v1")
+@Api(tags = SwaggerTags.RDM_TAG)
+@RestController("rdmTagController.v1")
 @RequestMapping("/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/tags")
 public class RdmTagController extends BaseController {
     public static final String API_INFO_TAG_NAME = "标签名(可使用通配符)";
