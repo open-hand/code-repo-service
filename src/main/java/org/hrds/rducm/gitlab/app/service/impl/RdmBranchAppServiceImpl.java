@@ -2,17 +2,20 @@ package org.hrds.rducm.gitlab.app.service.impl;
 
 import org.gitlab4j.api.models.ProtectedBranch;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.ProtectedBranchDTO;
 import org.hrds.rducm.gitlab.app.service.RdmBranchAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmBranchRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
+import org.hrds.rducm.gitlab.domain.service.IRdmBranchService;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,10 +23,17 @@ public class RdmBranchAppServiceImpl implements RdmBranchAppService {
     @Autowired
     private RdmBranchRepository rdmBranchRepository;
     @Autowired
+    private IRdmBranchService iRdmBranchService;
+    @Autowired
     private RdmRepositoryRepository repositoryRepository;
 
     @Override
-    public List<BranchDTO> getBranches(Long repositoryId) {
+    public List<BranchDTO> getBranches(Long repositoryId, BranchQueryDTO branchQueryDTO) {
+        // 参数处理
+        if (Optional.ofNullable(branchQueryDTO.getExcludeProtectedFlag()).orElse(false)) {
+            return iRdmBranchService.getBranchesWithExcludeProtected(repositoryId);
+        }
+
         // 获取对应Gitlab项目id todo 临时
         RdmRepository rdmRepository = repositoryRepository.selectByUk(repositoryId);
         return ConvertUtils.convertList(rdmBranchRepository.getBranchesFromGitlab(rdmRepository.getGlProjectId()), BranchDTO.class);
