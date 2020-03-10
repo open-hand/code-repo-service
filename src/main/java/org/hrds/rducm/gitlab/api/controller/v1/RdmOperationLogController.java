@@ -31,7 +31,7 @@ import springfox.documentation.annotations.ApiIgnore;
  *
  * @author ying.xie@hand-china.com 2020-02-28 10:33:02
  */
-@Api(tags = SwaggerTags.RDM_OPERATION_LOG)
+//@Api(tags = SwaggerTags.RDM_OPERATION_LOG)
 @RestController("rdmOperationLogController.v1")
 @RequestMapping("/v1/projects/{projectId}/gitlab/repositories/operation-logs")
 public class RdmOperationLogController extends BaseController {

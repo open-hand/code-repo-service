@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Api(tags = SwaggerTags.RDM_REPOSITORY)
+//@Api(tags = SwaggerTags.RDM_REPOSITORY)
 @RestController("rdmRepositoryProjController.v1")
 @RequestMapping("/v1/projects/{projectId}/gitlab/repositories")
 public class RdmRepositoryProjController extends BaseController {

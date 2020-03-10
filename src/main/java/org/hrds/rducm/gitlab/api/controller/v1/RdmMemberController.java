@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * @author ying.xie@hand-china.com
  */
-@Api(tags = SwaggerTags.RDM_MEMBER)
+//@Api(tags = SwaggerTags.RDM_MEMBER)
 @RestController("rdmMemberController.v1")
 @RequestMapping("/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/members")
 public class RdmMemberController extends BaseController {

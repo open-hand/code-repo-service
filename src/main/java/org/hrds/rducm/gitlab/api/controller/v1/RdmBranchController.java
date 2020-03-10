@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Api(value = SwaggerTags.RDM_BRANCH, tags = SwaggerTags.RDM_BRANCH)
+//@Api(tags = SwaggerTags.RDM_BRANCH)
 @RestController("rdmBranchController.v1")
 @RequestMapping("/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/branches")
 public class RdmBranchController extends BaseController {

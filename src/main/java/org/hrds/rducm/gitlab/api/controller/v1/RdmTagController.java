@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Api(tags = SwaggerTags.RDM_TAG)
+//@Api(tags = SwaggerTags.RDM_TAG)
 @RestController("rdmTagController.v1")
 @RequestMapping("/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/tags")
 public class RdmTagController extends BaseController {
