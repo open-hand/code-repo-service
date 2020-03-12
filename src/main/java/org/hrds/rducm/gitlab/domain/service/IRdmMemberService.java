@@ -47,6 +47,16 @@ public interface IRdmMemberService {
     void batchAddOrUpdateMembersToGitlab(List<RdmMember> rdmMembers);
 
     /**
+     * 添加成员至gitlab
+     * 成功后
+     * 1. 回写数据库
+     * 2. 发送操作审计事件
+     *
+     * @param param
+     */
+    void addMemberToGitlab(RdmMember param);
+
+    /**
      * 更新成员至gitlab
      * 成功后
      * 1. 回写数据库

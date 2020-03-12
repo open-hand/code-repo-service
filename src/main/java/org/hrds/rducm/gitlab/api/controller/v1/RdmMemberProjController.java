@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
  */
 //@Api(tags = SwaggerTags.RDM_MEMBER)
 @RestController("rdmMemberProjController.v1")
-@RequestMapping("/v1/projects/{projectId}/gitlab/repositories")
+@RequestMapping("/v1/projects/{projectId}/gitlab/repositories/members")
 public class RdmMemberProjController extends BaseController {
     private final RdmMemberAppService rdmMemberAppService;
 
@@ -37,7 +37,7 @@ public class RdmMemberProjController extends BaseController {
             @ApiImplicitParam(name = "repositoryIds", value = "应用服务id", paramType = "query", dataType = "Long", allowMultiple = true),
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
-    @GetMapping("/members")
+    @GetMapping
     public ResponseEntity<PageInfo<RdmMemberViewDTO>> pageByOptions(@PathVariable Long projectId,
                                                                     PageRequest pageRequest,
                                                                     RdmMemberQueryDTO query) {
@@ -50,7 +50,7 @@ public class RdmMemberProjController extends BaseController {
             @ApiImplicitParam(name = "rdmMemberBatchDTO", value = "body参数", dataType = "RdmMemberBatchDTO", required = true),
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
-    @PostMapping("/members/batch-add")
+    @PostMapping("/batch-add")
     public ResponseEntity<?> batchAddMembers(@PathVariable Long projectId,
                                              @RequestBody RdmMemberBatchDTO rdmMemberBatchDTO) {
         validObject(rdmMemberBatchDTO);

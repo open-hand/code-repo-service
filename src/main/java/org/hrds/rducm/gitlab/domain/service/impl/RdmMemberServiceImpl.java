@@ -123,6 +123,19 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     }
 
     @Override
+    public void addMemberToGitlab(RdmMember param) {
+        // 调用gitlab api添加成员
+        Member glMember = gitlabProjectApi.addMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+
+        // <2> 回写数据库
+        this.updateMemberAfter(param, glMember);
+
+        // <3> 发送事件
+        MemberEvent.EventParam eventParam = buildEventParam(param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+        OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.ADD_MEMBER, eventParam));
+    }
+
+    @Override
     public void updateMemberToGitlab(RdmMember param) {
         Member glMember;
         // 如果过期, Gitlab会直接移除成员, 所以需改成添加成员
