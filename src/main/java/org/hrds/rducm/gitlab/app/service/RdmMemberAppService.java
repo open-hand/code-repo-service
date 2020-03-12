@@ -2,10 +2,7 @@ package org.hrds.rducm.gitlab.app.service;
 
 import com.github.pagehelper.PageInfo;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.*;
 
 /**
  * @author xy
@@ -28,6 +25,15 @@ public interface RdmMemberAppService {
      * @param rdmMemberBatchDTO 参数
      */
     void batchAddOrUpdateMembers(Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO);
+
+    /**
+     * 新增成员
+     *
+     * @param projectId          项目id
+     * @param repositoryId       代码库id
+     * @param rdmMemberCreateDTO 参数
+     */
+    void addMember(Long projectId, Long repositoryId, RdmMemberCreateDTO rdmMemberCreateDTO);
 
     /**
      * 修改成员

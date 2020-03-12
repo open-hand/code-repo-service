@@ -8,10 +8,8 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.*;
+import org.hrds.rducm.gitlab.app.assembler.RdmMemberAssembler;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
@@ -29,9 +27,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.hrds.rducm.gitlab.app.assembler.RdmMemberAssembler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import static org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants.RDUCM_BATCH_ADD_MEMBERS;
 
@@ -119,6 +118,19 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void addMember(Long projectId, Long repositoryId, RdmMemberCreateDTO rdmMemberCreateDTO) {
+        // <0> 转换
+        final RdmMember param = rdmMemberAssembler.rdmMemberCreateDTOToRdmMember(projectId, repositoryId, rdmMemberCreateDTO);
+
+        // <1> 数据库预更新成员, 发起新事务
+        self().addMemberBeforeRequestsNew(param);
+
+        // <2> 调用gitlab api更新成员 todo 事务一致性问题
+        iRdmMemberService.addMemberToGitlab(param);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateMember(Long memberId, RdmMemberUpdateDTO rdmMemberUpdateDTO) {
         // <0> 校验入参 todo + 转换
         final RdmMember rdmMember = ConvertUtils.convertObject(rdmMemberUpdateDTO, RdmMember.class);
@@ -158,22 +170,6 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         // <2> 调用gitlab api删除成员 todo 事务一致性问题
         iRdmMemberService.removeMemberToGitlab(dbMember);
     }
-
-//    /**
-//     * 成员过期处理
-//     *
-//     * @param expiredRdmMembers 过期成员数据
-//     */
-//    private void batchExpireMembers(List<RdmMember> expiredRdmMembers) {
-//        expiredRdmMembers.forEach(m -> {
-//            // <1> 删除
-//            rdmMemberRepository.deleteByPrimaryKey(m);
-//
-//            // <2> 发送事件
-//            MemberEvent.EventParam eventParam = buildEventParam(m.getProjectId(), m.getRepositoryId(), m.getUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
-//            OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.REMOVE_EXPIRED_MEMBER, eventParam));
-//        });
-//    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -231,16 +227,15 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         iRdmMemberService.updateMemberBefore(rdmMember);
     }
 
+    /**
+     * 数据库预新增成员, 发起一个新事务
+     *
+     * @param rdmMember
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public void addMemberBeforeRequestsNew(RdmMember rdmMember) {
+        iRdmMemberService.insertMemberBefore(rdmMember);
+    }
 
 
-//    /**
-//     * 构造审计所需报文参数
-//     *
-//     * @param targetUserId 目标用户id
-//     * @param accessLevel  访问权限等级
-//     * @param expiresAt    过期时间
-//     */
-//    private MemberEvent.EventParam buildEventParam(Long projectId, Long repositoryId, Long targetUserId, Integer accessLevel, Date expiresAt) {
-//        return new MemberEvent.EventParam(projectId, repositoryId, targetUserId, accessLevel, expiresAt);
-//    }
 }

@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.app.assembler;
 
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberCreateDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
@@ -66,5 +67,34 @@ public class RdmMemberAssembler {
         }
 
         return rdmMembers;
+    }
+
+    /**
+     * 转换新增成员所需参数
+     *
+     * @param projectId
+     * @param repositoryId
+     * @param rdmMemberCreateDTO
+     * @return
+     */
+    public RdmMember rdmMemberCreateDTOToRdmMember(Long projectId, Long repositoryId, RdmMemberCreateDTO rdmMemberCreateDTO) {
+        final RdmMember param = ConvertUtils.convertObject(rdmMemberCreateDTO, RdmMember.class);
+
+        // 获取gitlab项目id和用户id todo 应从外部接口获取, 暂时从数据库获取
+        Integer glProjectId;
+        Integer glUserId;
+
+        RdmRepository rdmRepository = rdmRepositoryRepository.selectOne(new RdmRepository().setRepositoryId(repositoryId));
+        RdmUser rdmUser = rdmUserRepository.selectOne(new RdmUser().setUserId(param.getUserId()));
+
+        glProjectId = rdmRepository.getGlProjectId();
+        glUserId = rdmUser.getGlUserId();
+
+        param.setGlProjectId(glProjectId);
+        param.setGlUserId(glUserId);
+
+        param.setProjectId(projectId);
+        param.setRepositoryId(repositoryId);
+        return param;
     }
 }
