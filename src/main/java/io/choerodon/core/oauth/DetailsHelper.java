@@ -35,6 +35,8 @@ public class DetailsHelper {
     }
 
     public static final CustomUserDetails U10001;
+    public static final CustomUserDetails U10003;
+
     static {
         U10001 = new CustomUserDetails("cxh", "unknown", Collections.emptyList());
         U10001.setUserId(10001L);
@@ -43,6 +45,14 @@ public class DetailsHelper {
         U10001.setTenantIds(Collections.singletonList(BaseConstants.DEFAULT_TENANT_ID));
         U10001.setLanguage(BaseConstants.DEFAULT_LOCALE_STR);
         U10001.setTimeZone(BaseConstants.DEFAULT_TIME_ZONE);
+
+        U10003 = new CustomUserDetails("xy", "unknown", Collections.emptyList());
+        U10003.setUserId(10003L);
+        U10003.setOrganizationId(BaseConstants.DEFAULT_TENANT_ID);
+        U10003.setTenantId(BaseConstants.DEFAULT_TENANT_ID);
+        U10003.setTenantIds(Collections.singletonList(BaseConstants.DEFAULT_TENANT_ID));
+        U10003.setLanguage(BaseConstants.DEFAULT_LOCALE_STR);
+        U10003.setTimeZone(BaseConstants.DEFAULT_TIME_ZONE);
     }
 
     /**
@@ -74,7 +84,7 @@ public class DetailsHelper {
                 return (CustomUserDetails) decodedDetails;
             }
         }
-        return U10001;
+        return U10003;
     }
 
     /**

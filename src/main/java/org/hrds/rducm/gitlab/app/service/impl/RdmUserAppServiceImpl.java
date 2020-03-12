@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.oauth.DetailsHelper;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.gitlab4j.api.models.User;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmUserViewDTO;
@@ -22,9 +23,8 @@ public class RdmUserAppServiceImpl implements RdmUserAppService {
 
     @Override
     public RdmUserViewDTO queryUserSelf() {
-        // todo fixme 暂时写死
-//        Long userId = DetailsHelper.getUserDetails().getUserId();
-        Long userId = 10003L;
+        Long userId = DetailsHelper.getUserDetails().getUserId();
+
         RdmUser rdmUser = rdmUserRepository.selectByUk(userId);
         User glUser = rdmUserRepository.getUserFromGitlab(rdmUser.getGlUserId());
 

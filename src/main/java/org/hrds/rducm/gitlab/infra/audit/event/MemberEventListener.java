@@ -3,6 +3,7 @@ package org.hrds.rducm.gitlab.infra.audit.event;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.oauth.DetailsHelper;
 import org.gitlab4j.api.models.AccessLevel;
 import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
@@ -43,9 +44,7 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
 
     private void createOperationLog(MemberEvent event) {
         // 获取
-        // 暂时写死 todo fixme
-//        Long userId = DetailsHelper.getUserDetails().getUserId();
-        Long userId = 10002L;
+        Long userId = DetailsHelper.getUserDetails().getUserId();
 
         Long projectId = event.getEventParam().getProjectId();
         Long repositoryId = event.getEventParam().getRepositoryId();
@@ -90,9 +89,8 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
     }
 
     private Map<String, Object> buildTemplateMap(MemberEvent event) {
-        // 暂时写死 todo fixme
-//        Long userId = DetailsHelper.getUserDetails().getUserId();
-        Long userId = 10002L;
+        Long userId = DetailsHelper.getUserDetails().getUserId();
+
         Long targetUserId = event.getEventParam().getTargetUserId();
         Integer accessLevel = event.getEventParam().getAccessLevel();
         Date expiresAt = event.getEventParam().getExpiresAt();

@@ -76,7 +76,7 @@ public class RdmMemberApprovalProjController extends BaseController {
     }
 
     @ApiOperation(value = "成员权限申请-审批拒绝")
-    @Permission()
+    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping("/{id}/refuse")
     public ResponseEntity<?> refuse(@PathVariable Long id,
                                     @RequestParam Long objectVersionNumber) {
