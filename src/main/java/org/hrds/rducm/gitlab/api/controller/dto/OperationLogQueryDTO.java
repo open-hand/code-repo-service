@@ -9,11 +9,6 @@ import java.util.Date;
  * @date 2020/3/2
  */
 public class OperationLogQueryDTO {
-
-
-//    @ApiModelProperty(value = "代码仓库id", required = true)
-//    private Long repositoryId;
-
     @ApiModelProperty(value = "操作人，用户id")
     private Long opUserId;
 

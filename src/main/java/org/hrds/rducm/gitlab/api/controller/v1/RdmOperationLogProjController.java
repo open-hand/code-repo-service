@@ -6,10 +6,7 @@ import io.choerodon.core.enums.ResourceType;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
@@ -34,16 +31,17 @@ import springfox.documentation.annotations.ApiIgnore;
 //@Api(tags = SwaggerTags.RDM_OPERATION_LOG)
 @RestController("rdmOperationLogController.v1")
 @RequestMapping("/v1/projects/{projectId}/gitlab/repositories/operation-logs")
-public class RdmOperationLogController extends BaseController {
+public class RdmOperationLogProjController extends BaseController {
 
     @Autowired
     private RdmOperationLogAppService operationLogService;
 
-    @ApiOperation(value = "查询成员管理操作日志列表")
+    @ApiOperation(value = "查询成员管理操作日志列表(项目层)")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", dataType = "Long", required = true),
             @ApiImplicitParam(name = "page", paramType = "query", dataType = "Int"),
             @ApiImplicitParam(name = "size", paramType = "query", dataType = "Int"),
+            @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", dataType = "Long", required = true),
+            @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "query", dataType = "Long"),
             @ApiImplicitParam(name = "opUserId", value = "操作人，用户id", paramType = "query", dataType = "Long"),
             @ApiImplicitParam(name = "startDate", value = "开始日期", paramType = "query", dataType = "Date"),
             @ApiImplicitParam(name = "endDate", value = "结束日期", paramType = "query", dataType = "Date"),
@@ -54,9 +52,10 @@ public class RdmOperationLogController extends BaseController {
                                                                                 @SortDefault(value = RdmOperationLog.FIELD_CREATION_DATE,
                                                                                         direction = Sort.Direction.DESC)
                                                                                 @ApiIgnore PageRequest pageRequest,
+                                                                                Long repositoryId,
                                                                                 OperationLogQueryDTO queryDTO) {
 
-        PageInfo<OperationLogViewDTO> list = operationLogService.pageByOptionsMemberLog(projectId, null, pageRequest, queryDTO);
+        PageInfo<OperationLogViewDTO> list = operationLogService.pageByOptionsMemberLog(projectId, repositoryId, pageRequest, queryDTO);
         return Results.success(list);
     }
 
