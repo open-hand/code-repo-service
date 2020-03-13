@@ -27,10 +27,10 @@ public class MemberEvent extends AbstractOperationEvent {
         /**
          * 事件类型
          */
-        ADD_MEMBER("ADD_MEMBER", "添加成员", "${sourceUser}添加了成员${targetUser}的权限, 设置权限为${accessLevel}, 过期时间为${expiresAt}"),
-        UPDATE_MEMBER("UPDATE_MEMBER", "更新成员", "${sourceUser}修改了成员${targetUser}的权限, 设置权限为${accessLevel}, 过期时间为${expiresAt}"),
-        REMOVE_MEMBER("REMOVE_MEMBER", "移除成员", "${sourceUser}移除了成员${targetUser}"),
-        REMOVE_EXPIRED_MEMBER("REMOVE_EXPIRED_MEMBER", "移除过期成员", "成员${targetUser}在${expiresAt}过期, 于${opDate}由系统自动移除");
+        ADD_MEMBER("ADD_MEMBER", "添加成员", "${sourceUser}添加${targetUser}的权限, 设置权限为[${accessLevel}], 过期时间为[${expiresAt}]"),
+        UPDATE_MEMBER("UPDATE_MEMBER", "更新成员", "${sourceUser}修改${targetUser}的权限, 设置权限为[${accessLevel}], 过期时间为[${expiresAt}]"),
+        REMOVE_MEMBER("REMOVE_MEMBER", "移除成员", "${sourceUser}移除${targetUser}的权限"),
+        REMOVE_EXPIRED_MEMBER("REMOVE_EXPIRED_MEMBER", "移除过期成员", "${targetUser}的权限在[${expiresAt}]过期, 于[${opDate}]由系统自动移除");
 
         private String code;
         private String name;

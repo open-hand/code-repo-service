@@ -4,12 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.oauth.DetailsHelper;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.gitlab4j.api.models.AccessLevel;
 import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmOperationLogRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
 import org.hrds.rducm.gitlab.infra.util.PlaceholderUtils;
+import org.hzero.core.util.StringPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +110,10 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
         sourceUserIdStr = dbUserS.getGlUserName();
         targetUserIdStr = dbUserT.getGlUserName();
         accessLevelStr = AccessLevel.forValue(accessLevel).name();
-        expiresAtStr = Optional.ofNullable(objectMapper.convertValue(expiresAt, String.class)).orElse("不过期");
+
+        expiresAtStr = Optional.ofNullable(expiresAt)
+                .map(val -> DateFormatUtils.format(val, "yyyy-MM-dd"))
+                .orElse("不过期");
         opDateStr = Optional.ofNullable(objectMapper.convertValue(new Date(event.getTimestamp()), String.class)).orElseThrow(NullPointerException::new);
 
         // 添加操作日志, 替换占位符
