@@ -14,7 +14,7 @@
     <name>rducm</name>
 
     <properties>
-        <choerodon.starters.version>0.14.0.RELEASE</choerodon.starters.version>
+        <choerodon.starters.version>0.16.0.RELEASE</choerodon.starters.version>
     </properties>
 
     <dependencies>
