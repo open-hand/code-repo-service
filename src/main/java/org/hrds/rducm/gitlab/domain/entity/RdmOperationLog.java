@@ -34,7 +34,7 @@ public class RdmOperationLog extends AuditDomain {
     public static final String FIELD_OP_CONTENT = "opContent";
     public static final String FIELD_OP_ACTION = "opAction";
     public static final String FIELD_OP_DATE = "opDate";
-    public static final String FIELD_EVENT_TYPE = "eventType";
+    public static final String FIELD_OP_EVENT_TYPE = "opEventType";
 
     //
     // 业务方法(按public protected private顺序排列)

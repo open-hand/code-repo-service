@@ -18,6 +18,9 @@ public class OperationLogViewDTO {
     @ApiModelProperty(value = "代码仓库id", required = true)
     private Long repositoryId;
 
+    @ApiModelProperty(value = "代码仓库名称")
+    private String repositoryName;
+
     @ApiModelProperty(value = "操作人，用户id", required = true)
     private Long opUserId;
 
@@ -127,6 +130,15 @@ public class OperationLogViewDTO {
 
     public OperationLogViewDTO setOpDate(Date opDate) {
         this.opDate = opDate;
+        return this;
+    }
+
+    public String getRepositoryName() {
+        return repositoryName;
+    }
+
+    public OperationLogViewDTO setRepositoryName(String repositoryName) {
+        this.repositoryName = repositoryName;
         return this;
     }
 }

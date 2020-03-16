@@ -46,6 +46,7 @@ public class RdmOperationLogOrgController extends BaseController {
             @ApiImplicitParam(name = "opUserId", value = "操作人，用户id", paramType = "query", dataType = "Long"),
             @ApiImplicitParam(name = "startDate", value = "开始日期", paramType = "query", dataType = "Date"),
             @ApiImplicitParam(name = "endDate", value = "结束日期", paramType = "query", dataType = "Date"),
+            @ApiImplicitParam(name = "opEventTypes", value = "操作事件类型", paramType = "query", dataType = "String", allowMultiple = true),
     })
     @Permission(type = ResourceType.ORGANIZATION, permissionPublic = true)
     @GetMapping

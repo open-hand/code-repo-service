@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 操作日志表应用服务默认实现
@@ -34,6 +35,7 @@ public class RdmOperationLogAppServiceImpl implements RdmOperationLogAppService 
         Long opUserId = queryDTO.getOpUserId();
         Date startDate = queryDTO.getStartDate();
         Date endDate = queryDTO.getEndDate();
+        List<String> opEventTypes = queryDTO.getOpEventTypes();
 
         String opType = AbstractOperationEvent.OperationType.MEMBER_MANAGEMENT.getCode();
 
@@ -42,6 +44,7 @@ public class RdmOperationLogAppServiceImpl implements RdmOperationLogAppService 
                 .andEqualTo(RdmOperationLog.FIELD_PROJECT_ID, projectId, true)
                 .andEqualTo(RdmOperationLog.FIELD_REPOSITORY_ID, repositoryId, true)
                 .andEqualTo(RdmOperationLog.FIELD_OP_USER_ID, opUserId, true)
+                .andIn(RdmOperationLog.FIELD_OP_EVENT_TYPE, opEventTypes, true)
                 .andEqualTo(RdmOperationLog.FIELD_OP_TYPE, opType);
 
         if (startDate != null) {
