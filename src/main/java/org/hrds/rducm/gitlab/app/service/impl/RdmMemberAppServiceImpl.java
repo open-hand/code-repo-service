@@ -6,8 +6,10 @@ import io.choerodon.asgard.saga.producer.StartSagaBuilder;
 import io.choerodon.asgard.saga.producer.TransactionalProducer;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.mybatis.domain.AuditDomain;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.api.controller.dto.*;
 import org.hrds.rducm.gitlab.app.assembler.RdmMemberAssembler;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
@@ -18,6 +20,8 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
+import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
+import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.hzero.core.base.AopProxy;
@@ -110,10 +114,35 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         List<RdmMember> rdmMembers = rdmMemberAssembler.rdmMemberBatchDTOToRdmMembers(projectId, rdmMemberBatchDTO);
 
         // <1> 数据库添加成员, 已存在需要更新, 发起一个新事务
+        // 开启新事务的目的是使这一步操作独立执行, 保证预操作成功
         self().batchAddOrUpdateMembersBeforeRequestsNew(rdmMembers);
 
         // <2> 调用gitlab api添加成员 todo 事务一致性问题
-        iRdmMemberService.batchAddOrUpdateMembersToGitlab(rdmMembers);
+        rdmMembers.forEach((m) -> {
+            // <2.1> 判断新增或更新
+            boolean isExists;
+            if (m.get_status().equals(AuditDomain.RecordStatus.create)) {
+                isExists = false;
+            } else if (m.get_status().equals(AuditDomain.RecordStatus.update)) {
+                isExists = true;
+            } else {
+                throw new IllegalArgumentException("record status is invalid");
+            }
+
+            // <2.2> 新增或更新成员至gitlab
+            Member glMember = iRdmMemberService.addOrUpdateMembersToGitlab(m, isExists);
+
+            // <2.3> 回写数据库
+            iRdmMemberService.updateMemberAfter(m, glMember);
+
+            // <2.4> 发送事件
+            if (isExists) {
+                iRdmMemberService.publishMemberEvent(m, MemberEvent.EventType.UPDATE_MEMBER);
+            } else {
+                iRdmMemberService.publishMemberEvent(m, MemberEvent.EventType.ADD_MEMBER);
+            }
+        });
+//        iRdmMemberService.batchAddOrUpdateMembersToGitlab(rdmMembers);
     }
 
     @Override
@@ -126,37 +155,48 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         self().addMemberBeforeRequestsNew(param);
 
         // <2> 调用gitlab api更新成员 todo 事务一致性问题
-        iRdmMemberService.addMemberToGitlab(param);
+        Member glMember = iRdmMemberService.addMemberToGitlab(param);
+
+        // <3> 回写数据库
+        iRdmMemberService.updateMemberAfter(param, glMember);
+
+        // <4> 发送事件
+        iRdmMemberService.publishMemberEvent(param, MemberEvent.EventType.ADD_MEMBER);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateMember(Long memberId, RdmMemberUpdateDTO rdmMemberUpdateDTO) {
         // <0> 校验入参 todo + 转换
-        final RdmMember rdmMember = ConvertUtils.convertObject(rdmMemberUpdateDTO, RdmMember.class);
-        rdmMember.setId(memberId);
+        final RdmMember param = ConvertUtils.convertObject(rdmMemberUpdateDTO, RdmMember.class);
+        param.setId(memberId);
 
         // 获取gitlab项目id和用户id todo 应从外部接口获取, 暂时从数据库获取
         RdmMember dbMember = rdmMemberRepository.selectByPrimaryKey(memberId);
 
-//        rdmMemberRepository.checkIsSyncGitlab(dbMember);
-        rdmMember.setGlProjectId(dbMember.getGlProjectId());
-        rdmMember.setGlUserId(dbMember.getGlUserId());
-        rdmMember.setUserId(dbMember.getUserId());
+        param.setGlProjectId(dbMember.getGlProjectId());
+        param.setGlUserId(dbMember.getGlUserId());
+        param.setUserId(dbMember.getUserId());
 
-        rdmMember.setProjectId(dbMember.getProjectId());
-        rdmMember.setRepositoryId(dbMember.getRepositoryId());
+        param.setProjectId(dbMember.getProjectId());
+        param.setRepositoryId(dbMember.getRepositoryId());
 
         // 设置过期标识
-        rdmMember.setExpiredFlag(dbMember.checkExpiredFlag());
+        param.setExpiredFlag(dbMember.checkExpiredFlag());
         // 设置同步标识
-        rdmMember.setSyncGitlabFlag(dbMember.getSyncGitlabFlag());
+        param.setSyncGitlabFlag(dbMember.getSyncGitlabFlag());
 
         // <1> 数据库预更新成员, 发起新事务
-        self().updateMemberBeforeRequestsNew(rdmMember);
+        self().updateMemberBeforeRequestsNew(param);
 
         // <2> 调用gitlab api更新成员 todo 事务一致性问题
-        iRdmMemberService.updateMemberToGitlab(rdmMember);
+        Member glMember = iRdmMemberService.updateMemberToGitlab(param);
+
+        // <3> 回写数据库
+        iRdmMemberService.updateMemberAfter(param, glMember);
+
+        // <4> 发送事件
+        iRdmMemberService.publishMemberEvent(param, MemberEvent.EventType.UPDATE_MEMBER);
     }
 
     @Override
@@ -169,6 +209,12 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         // <2> 调用gitlab api删除成员 todo 事务一致性问题
         iRdmMemberService.removeMemberToGitlab(dbMember);
+
+        // <3> 数据库删除成员
+        rdmMemberRepository.deleteByPrimaryKey(dbMember.getId());
+
+        // <4> 发送事件
+        iRdmMemberService.publishMemberEvent(dbMember, MemberEvent.EventType.REMOVE_MEMBER);
     }
 
     @Override

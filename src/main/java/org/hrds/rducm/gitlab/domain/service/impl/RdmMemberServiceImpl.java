@@ -81,62 +81,53 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     }
 
     @Override
-    public void batchAddOrUpdateMembersToGitlab(List<RdmMember> rdmMembers) {
-        rdmMembers.forEach((m) -> {
-            // <1> 判断新增或更新
-            boolean isExists;
-            if (m.get_status().equals(AuditDomain.RecordStatus.create)) {
-                isExists = false;
-            } else if (m.get_status().equals(AuditDomain.RecordStatus.update)) {
-                isExists = true;
-            } else {
-                throw new IllegalArgumentException("record status is invalid");
-            }
+    public Member addOrUpdateMembersToGitlab(RdmMember param, boolean isExists) {
+        // <1> 判断新增或更新
+//        boolean isExists;
+//        if (param.get_status().equals(AuditDomain.RecordStatus.create)) {
+//            isExists = false;
+//        } else if (param.get_status().equals(AuditDomain.RecordStatus.update)) {
+//            isExists = true;
+//        } else {
+//            throw new IllegalArgumentException("record status is invalid");
+//        }
 
-            Member glMember;
-            if (isExists) {
-                // 如果过期, Gitlab会直接移除成员, 所以需改成添加成员
-                if (m.getExpiredFlag()) {
-                    // 调用gitlab api添加成员
-                    glMember = gitlabProjectApi.addMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
-                } else {
-                    // 调用gitlab api更新成员
-                    glMember = gitlabProjectApi.updateMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
-                }
-            } else {
+        Member glMember;
+        if (isExists) {
+            // 如果过期, Gitlab会直接移除成员, 所以需改成添加成员
+            if (param.getExpiredFlag()) {
                 // 调用gitlab api添加成员
-                glMember = gitlabProjectApi.addMember(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
-            }
-
-            // <2> 回写数据库
-            this.updateMemberAfter(m, glMember);
-
-
-            // <3> 发送事件
-            MemberEvent.EventParam eventParam = buildEventParam(m.getProjectId(), m.getRepositoryId(), m.getUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
-            if (isExists) {
-                OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.UPDATE_MEMBER, eventParam));
+                glMember = gitlabProjectApi.addMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
             } else {
-                OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.ADD_MEMBER, eventParam));
+                // 调用gitlab api更新成员
+                glMember = gitlabProjectApi.updateMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
             }
-        });
+        } else {
+            // 调用gitlab api添加成员
+            glMember = gitlabProjectApi.addMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+        }
+
+        return glMember;
     }
 
     @Override
-    public void addMemberToGitlab(RdmMember param) {
+    public Member addMemberToGitlab(RdmMember param) {
         // 调用gitlab api添加成员
         Member glMember = gitlabProjectApi.addMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
 
+        return glMember;
+
         // <2> 回写数据库
-        this.updateMemberAfter(param, glMember);
+//        this.updateMemberAfter(param, glMember);
 
         // <3> 发送事件
-        MemberEvent.EventParam eventParam = buildEventParam(param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
-        OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.ADD_MEMBER, eventParam));
+//        publishMemberEvent(param, MemberEvent.EventType.ADD_MEMBER);
+//        MemberEvent.EventParam eventParam = buildEventParam(param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+//        OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.ADD_MEMBER, eventParam));
     }
 
     @Override
-    public void updateMemberToGitlab(RdmMember param) {
+    public Member updateMemberToGitlab(RdmMember param) {
         Member glMember;
         // 如果过期, Gitlab会直接移除成员, 所以需改成添加成员
         if (param.getExpiredFlag()) {
@@ -145,24 +136,26 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             glMember = gitlabProjectApi.updateMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
         }
 
-        // <2> 回写数据库
-        this.updateMemberAfter(param, glMember);
+        return glMember;
 
-        // <3> 发送事件
-        MemberEvent.EventParam eventParam = buildEventParam(param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
-        OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.UPDATE_MEMBER, eventParam));
+//        // <2> 回写数据库
+//        this.updateMemberAfter(param, glMember);
+//
+//        // <3> 发送事件
+//        MemberEvent.EventParam eventParam = buildEventParam(param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+//        OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.UPDATE_MEMBER, eventParam));
     }
 
     @Override
     public void removeMemberToGitlab(RdmMember param) {
         gitlabProjectApi.removeMember(param.getGlProjectId(), param.getGlUserId());
 
-        // <1> 数据库删除成员
-        rdmMemberRepository.deleteByPrimaryKey(param.getId());
-
-        // <3> 发送事件
-        MemberEvent.EventParam eventParam = buildEventParam(param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
-        OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.REMOVE_MEMBER, eventParam));
+//        // <1> 数据库删除成员
+//        rdmMemberRepository.deleteByPrimaryKey(param.getId());
+//
+//        // <3> 发送事件
+//        MemberEvent.EventParam eventParam = buildEventParam(param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+//        OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.REMOVE_MEMBER, eventParam));
     }
 
     @Override
@@ -190,9 +183,17 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             rdmMemberRepository.deleteByPrimaryKey(m);
 
             // <2> 发送事件
-            MemberEvent.EventParam eventParam = buildEventParam(m.getProjectId(), m.getRepositoryId(), m.getUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
-            OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.REMOVE_EXPIRED_MEMBER, eventParam));
+            this.publishMemberEvent(m, MemberEvent.EventType.REMOVE_EXPIRED_MEMBER);
+//            MemberEvent.EventParam eventParam = buildEventParam(m.getProjectId(), m.getRepositoryId(), m.getUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
+//            OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.REMOVE_EXPIRED_MEMBER, eventParam));
         });
+    }
+
+    @Override
+    public void publishMemberEvent(RdmMember param, MemberEvent.EventType eventType) {
+        // 发送事件
+        MemberEvent.EventParam eventParam = buildEventParam(param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+        OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, eventType, eventParam));
     }
 
     /**

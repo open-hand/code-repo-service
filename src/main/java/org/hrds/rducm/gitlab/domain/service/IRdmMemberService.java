@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.domain.service;
 
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 
 import java.util.List;
 
@@ -36,41 +37,51 @@ public interface IRdmMemberService {
      */
     void updateMemberBefore(RdmMember param);
 
+//    /**
+//     * 批量新增或更新成员至gitlab
+//     * 成功后:
+//     * 1. 回写数据库
+//     * 2. 发送操作审计事件
+//     *
+//     * @param rdmMembers
+//     */
+//    void batchAddOrUpdateMembersToGitlab(List<RdmMember> rdmMembers);
+
     /**
-     * 批量新增或更新成员至gitlab
-     * 成功后:
-     * 1. 回写数据库
-     * 2. 发送操作审计事件
+     * 新增或更新成员至gitlab
      *
-     * @param rdmMembers
+     * @param param
+     * @param isExists 数据库是否存在该成员
+     * @return
      */
-    void batchAddOrUpdateMembersToGitlab(List<RdmMember> rdmMembers);
+    Member addOrUpdateMembersToGitlab(RdmMember param, boolean isExists);
 
     /**
      * 添加成员至gitlab
-     * 成功后
-     * 1. 回写数据库
-     * 2. 发送操作审计事件
      *
      * @param param
+     * @return
      */
-    void addMemberToGitlab(RdmMember param);
+    Member addMemberToGitlab(RdmMember param);
+
+    /**
+     * 发送成员操作审计事件
+     *
+     * @param param
+     * @param eventType
+     */
+    void publishMemberEvent(RdmMember param, MemberEvent.EventType eventType);
 
     /**
      * 更新成员至gitlab
-     * 成功后
-     * 1. 回写数据库
-     * 2. 发送操作审计事件
      *
      * @param param
+     * @return
      */
-    void updateMemberToGitlab(RdmMember param);
+    Member updateMemberToGitlab(RdmMember param);
 
     /**
      * 移除成员至gitlab
-     * 成功后
-     * 1. 删除数据库成员
-     * 2. 发送操作审计事件
      *
      * @param param
      */
