@@ -5,6 +5,7 @@ import org.gitlab4j.api.models.AccessLevel;
 import org.gitlab4j.api.models.ProtectedTag;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,6 +16,21 @@ public class GitlabTagsApi {
 
     public GitlabTagsApi(Gitlab4jClientWrapper gitlab4jClient) {
         this.gitlab4jClient = gitlab4jClient;
+    }
+
+    public ProtectedTag getProtectedTag(Object projectIdOrPath, String tagName) {
+        try {
+            return gitlab4jClient.getGitLabApi()
+                    .getTagsApi()
+                    .getProtectedTag(projectIdOrPath, tagName);
+        } catch (GitLabApiException e) {
+            // Gitlab查询到不存在的资源会返回404
+            if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                return null;
+            } else {
+                throw new GitlabClientException(e, e.getMessage());
+            }
+        }
     }
 
     public List<ProtectedTag> getProtectedTags(Object projectIdOrPath) {

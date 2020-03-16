@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
+import org.gitlab4j.api.models.Branch;
 import org.gitlab4j.api.models.ProtectedBranch;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchQueryDTO;
@@ -9,6 +10,9 @@ import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmBranchRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmBranchService;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProtectedBranchesApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabRepositoryApi;
+import org.hrds.rducm.gitlab.infra.util.AssertExtensionUtils;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +30,8 @@ public class RdmBranchAppServiceImpl implements RdmBranchAppService {
     private IRdmBranchService iRdmBranchService;
     @Autowired
     private RdmRepositoryRepository repositoryRepository;
+    @Autowired
+    private GitlabProtectedBranchesApi gitlabProtectedBranchesApi;
 
     @Override
     public List<BranchDTO> getBranches(Long repositoryId, BranchQueryDTO branchQueryDTO) {
@@ -57,6 +63,11 @@ public class RdmBranchAppServiceImpl implements RdmBranchAppService {
                                             Integer mergeAccessLevel) {
         // 获取对应Gitlab项目id todo 临时
         RdmRepository rdmRepository = repositoryRepository.selectByUk(repositoryId);
+
+        // 校验分支是否已被保护
+        ProtectedBranch glProtectedBranch = gitlabProtectedBranchesApi.getProtectedBranch(rdmRepository.getGlProjectId(), branchName);
+        AssertExtensionUtils.isNull(glProtectedBranch, "error.protected.branch.exist");
+
         ProtectedBranch protectedBranch = rdmBranchRepository.protectBranchToGitlab(rdmRepository.getGlProjectId(), branchName, pushAccessLevel, mergeAccessLevel);
         return ConvertUtils.convertObject(protectedBranch, ProtectedBranchDTO.class);
     }
