@@ -32,7 +32,7 @@ public class RdmRepositoryProjController extends BaseController {
 
     @ApiOperation(value = "查询所有已经启用的服务")
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
-    @GetMapping("/list_by_active")
+    @GetMapping("/list-by-active")
     public ResponseEntity<List<RdmRepository>> listByActive(@PathVariable(value = "projectId") Long projectId) {
         return ResponseEntity.ok(rdmRepositoryAppService.listByActive(projectId));
     }
