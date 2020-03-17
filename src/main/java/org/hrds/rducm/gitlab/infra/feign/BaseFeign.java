@@ -27,27 +27,27 @@ public interface BaseFeign {
     ResponseEntity<UserDTO> query(@PathVariable(name = "organization_id") Long organizationId,
                                   @PathVariable("id") Long id);
 
-    /**
-     * 获取当前用户所有的项目
-     */
-    void listProjects(Long organizationId);
-
-
-
-    /**
-     * 获取开发者角色的用户
-     */
-    void listDeveloperUsers(Long project);
-
-    /**
-     * 根据用户名或登录名模糊搜索用户信息
-     */
-    List getUserIdsByOptions(String username, String loginName);
-
-    /**
-     * 根据应用服务名模糊搜索应用服务信息
-     */
-    List getRepositoryIdsByOptions(String appServiceName);
+//    /**
+//     * 获取当前用户所有的项目
+//     */
+//    void listProjects(Long organizationId);
+//
+//
+//
+//    /**
+//     * 获取开发者角色的用户
+//     */
+//    void listDeveloperUsers(Long project);
+//
+//    /**
+//     * 根据用户名或登录名模糊搜索用户信息
+//     */
+//    List getUserIdsByOptions(String username, String loginName);
+//
+//    /**
+//     * 根据应用服务名模糊搜索应用服务信息
+//     */
+//    List getRepositoryIdsByOptions(String appServiceName);
 
 //    /**
 //     * 根据一组用户id,获取用户信息
