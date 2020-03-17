@@ -8,7 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
-import org.hrds.rducm.gitlab.infra.feign.BaseFeign;
+import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +29,6 @@ public class TempController extends BaseController {
     private RdmUserRepository rdmUserRepository;
     @Autowired
     private RdmMemberAppService rdmMemberAppService;
-    @Autowired
-    private BaseFeign baseFeign;
 
     @ApiOperation(value = "查询gitlab用户(平台层)")
     @Permission(type = ResourceType.SITE, permissionPublic = true)
@@ -59,14 +57,5 @@ public class TempController extends BaseController {
         validObject(rdmMemberBatchDTO);
         rdmMemberAppService.batchAddMemberSagaDemo(projectId, rdmMemberBatchDTO);
         return Results.created(null);
-    }
-
-    @ApiOperation(value = "feign测试")
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
-    @PostMapping("/projects/{projectId}/test-feign")
-    public ResponseEntity<Object> testFeign(@PathVariable Long projectId,
-                                            Long organizationId,
-                                            Long id) {
-        return Results.success(baseFeign.query(organizationId, id));
     }
 }
