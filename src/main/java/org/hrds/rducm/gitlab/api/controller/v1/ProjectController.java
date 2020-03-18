@@ -38,8 +38,8 @@ public class ProjectController extends BaseController {
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping("/c7n/members/developers")
-    public ResponseEntity<List<C7nUserDTO>> listProjectMembers(@PathVariable Long projectId,
-                                                               @RequestParam(required = false) String name) {
+    public ResponseEntity<List<C7nUserDTO>> listDeveloperProjectMembers(@PathVariable Long projectId,
+                                                                        @RequestParam(required = false) String name) {
         ResponseEntity<List<UserDTO>> responseEntity = baseServiceFeignClient.listProjectUsersByName(projectId, name);
 
         List<C7nUserDTO> c7nUserDTOS = Objects.requireNonNull(responseEntity.getBody()).stream().map(u -> {
