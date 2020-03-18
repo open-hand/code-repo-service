@@ -1,15 +1,16 @@
 package org.hrds.rducm.gitlab.infra.feign;
 
 import com.github.pagehelper.PageInfo;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.hrds.rducm.gitlab.infra.feign.config.LogConfiguration;
 import org.hrds.rducm.gitlab.infra.feign.fallback.DevOpsServiceFeignClientFallBack;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Set;

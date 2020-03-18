@@ -48,7 +48,6 @@ public class C7nAppServiceVO {
 //    private Boolean fail;
 
 
-
     @ApiModelProperty("应用服务数据库纪录的版本号")
     private Long objectVersionNumber;
 

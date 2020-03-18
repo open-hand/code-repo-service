@@ -71,7 +71,7 @@ public interface BaseServiceFeignClient {
     @GetMapping(value = "/v1/projects/{project_id}/users/list_by_ids")
     ResponseEntity<List<C7nUserVO>> listProjectUsersByIds(@PathVariable(name = "project_id") Long projectId,
                                                           @ApiParam(value = "多个用户id", required = true)
-                                                        @RequestParam(name = "user_ids") Set<Long> userIds);
+                                                          @RequestParam(name = "user_ids") Set<Long> userIds);
 
 //
 //    /**

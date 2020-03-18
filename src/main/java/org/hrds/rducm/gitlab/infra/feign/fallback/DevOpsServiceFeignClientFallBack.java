@@ -2,11 +2,8 @@ package org.hrds.rducm.gitlab.infra.feign.fallback;
 
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
-import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
