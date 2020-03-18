@@ -50,6 +50,10 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
 
     @Override
     public Map<Long, C7nUserVO> listC7nUserToMap(Long projectId, Set<Long> userIds) {
+        if (userIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
         // 查询用户信息
         ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listProjectUsersByIds(projectId, userIds);
 

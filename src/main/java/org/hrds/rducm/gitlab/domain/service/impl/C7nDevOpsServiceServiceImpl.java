@@ -48,6 +48,10 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
 
     @Override
     public Map<Long, C7nAppServiceVO> listC7nAppServiceToMap(Long projectId, Set<Long> repositoryIds) {
+        if (repositoryIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
         // 查询应用服务信息
         ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, repositoryIds, false);
 

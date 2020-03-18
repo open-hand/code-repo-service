@@ -11,6 +11,8 @@ import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmOperationLogRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
+import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.PlaceholderUtils;
 import org.hzero.core.util.StringPool;
 import org.slf4j.Logger;
@@ -35,6 +37,8 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
 
     @Autowired
     private RdmUserRepository userRepository;
+    @Autowired
+    private IC7nBaseServiceService ic7nBaseServiceService;
 
     @Override
     public void onApplicationEvent(MemberEvent event) {
@@ -94,6 +98,7 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
     private Map<String, Object> buildTemplateMap(MemberEvent event) {
         Long userId = DetailsHelper.getUserDetails().getUserId();
 
+        Long projectId = event.getEventParam().getProjectId();
         Long targetUserId = event.getEventParam().getTargetUserId();
         Integer accessLevel = event.getEventParam().getAccessLevel();
         Date expiresAt = event.getEventParam().getExpiresAt();
@@ -104,11 +109,11 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
         String expiresAtStr;
         String opDateStr;
 
-        RdmUser dbUserS = userRepository.selectOne(new RdmUser().setUserId(userId));
-        RdmUser dbUserT = userRepository.selectOne(new RdmUser().setUserId(targetUserId));
+        C7nUserVO c7nUserS = ic7nBaseServiceService.detailC7nUser(projectId, userId);
+        C7nUserVO c7nUserT = ic7nBaseServiceService.detailC7nUser(projectId, targetUserId);
 
-        sourceUserIdStr = dbUserS.getGlUserName();
-        targetUserIdStr = dbUserT.getGlUserName();
+        sourceUserIdStr = c7nUserS.getRealName() + "(" + c7nUserS.getLoginName() + ")";
+        targetUserIdStr = c7nUserT.getRealName() + "(" + c7nUserT.getLoginName() + ")";
         accessLevelStr = AccessLevel.forValue(accessLevel).name();
 
         expiresAtStr = Optional.ofNullable(expiresAt)

@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.infra.feign;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.hrds.rducm.gitlab.infra.feign.fallback.BaseServiceFeignClientFallBack;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,7 @@ import java.util.Set;
  * @author ying.xie@hand-china.com
  * @date 2020/3/16
  */
-@FeignClient(value = "base-service")
+@FeignClient(value = "base-service", fallback = BaseServiceFeignClientFallBack.class)
 public interface BaseServiceFeignClient {
 //    /**
 //     * 查询用户信息
