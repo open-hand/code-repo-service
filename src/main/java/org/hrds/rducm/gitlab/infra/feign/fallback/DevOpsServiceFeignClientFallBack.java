@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.infra.feign.fallback;
 
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
@@ -25,7 +26,7 @@ public class DevOpsServiceFeignClientFallBack implements DevOpsServiceFeignClien
     }
 
     @Override
-    public ResponseEntity<PageInfo<C7nAppServiceVO>> pageAppServiceByOptions(Long projectId, Boolean doPage, String params) {
+    public ResponseEntity<PageInfo<C7nAppServiceVO>> pageAppServiceByOptions(Long projectId, Boolean doPage, int page, int size) {
         throw new CommonException("error.feign.devops.service");
     }
 

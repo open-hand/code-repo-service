@@ -1,8 +1,10 @@
 package org.hrds.rducm.gitlab.infra.feign;
 
 import com.github.pagehelper.PageInfo;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.hrds.rducm.gitlab.infra.feign.config.LogConfiguration;
 import org.hrds.rducm.gitlab.infra.feign.fallback.DevOpsServiceFeignClientFallBack;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -27,16 +29,13 @@ public interface DevOpsServiceFeignClient {
     /**
      * @param projectId
      * @param doPage
-     * @param params
      */
     @ApiOperation(value = "项目下分页查询应用服务")
     @PostMapping("/v1/projects/{project_id}/app_service/page_by_options")
-    ResponseEntity<PageInfo<C7nAppServiceVO>> pageAppServiceByOptions(@ApiParam(value = "项目Id", required = true)
-                                                                      @PathVariable(value = "project_id") Long projectId,
-                                                                      @ApiParam(value = "是否分页")
-                                                                      @RequestParam(value = "doPage", required = false) Boolean doPage,
-                                                                      @ApiParam(value = "查询参数")
-                                                                      @RequestBody(required = false) String params);
+    ResponseEntity<PageInfo<C7nAppServiceVO>> pageAppServiceByOptions(@ApiParam(value = "项目Id", required = true) @PathVariable(value = "project_id") Long projectId,
+                                                                      @ApiParam(value = "是否分页") @RequestParam(value = "doPage", required = false) Boolean doPage,
+                                                                      @RequestParam(required = false) int page,
+                                                                      @RequestParam(required = false) int size);
 
 
     @ApiOperation(value = "批量查询应用服务")

@@ -26,6 +26,8 @@ public class RepositoryOverViewDTO {
     private Integer openedMergeRequestCount;
     @ApiModelProperty(value = "代码库创建日期")
     private Date repositoryCreationDate;
+    @ApiModelProperty(value = "Gitlab代码库id")
+    private Integer glProjectId;
 
     public Long getRepositoryId() {
         return repositoryId;
@@ -96,6 +98,15 @@ public class RepositoryOverViewDTO {
 
     public RepositoryOverViewDTO setRepositoryCreationDate(Date repositoryCreationDate) {
         this.repositoryCreationDate = repositoryCreationDate;
+        return this;
+    }
+
+    public Integer getGlProjectId() {
+        return glProjectId;
+    }
+
+    public RepositoryOverViewDTO setGlProjectId(Integer glProjectId) {
+        this.glProjectId = glProjectId;
         return this;
     }
 }
