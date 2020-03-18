@@ -176,11 +176,11 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateMember(Long memberId, RdmMemberUpdateDTO rdmMemberUpdateDTO) {
-        // <0> 校验入参 todo + 转换
+        // <0> 转换
         final RdmMember param = ConvertUtils.convertObject(rdmMemberUpdateDTO, RdmMember.class);
         param.setId(memberId);
 
-        // 获取gitlab项目id和用户id todo 应从外部接口获取, 暂时从数据库获取
+        // 获取gitlab项目id和用户id
         RdmMember dbMember = rdmMemberRepository.selectByPrimaryKey(memberId);
 
         param.setGlProjectId(dbMember.getGlProjectId());

@@ -26,7 +26,6 @@ public class RdmRepositoryAppServiceImpl implements RdmRepositoryAppService {
 
     /**
      * 查询所有[已启用]的服务
-     * todo 临时使用,需对接外围接口
      *
      * @return
      */

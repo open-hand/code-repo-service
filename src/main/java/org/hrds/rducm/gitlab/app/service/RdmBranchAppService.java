@@ -10,11 +10,12 @@ public interface RdmBranchAppService {
     /**
      * 获取分支列表
      *
+     * @param projectId
      * @param repositoryId
      * @param branchQueryDTO 参数
      * @return
      */
-    List<BranchDTO> getBranches(Long repositoryId, BranchQueryDTO branchQueryDTO);
+    List<BranchDTO> getBranches(Long projectId, Long repositoryId, BranchQueryDTO branchQueryDTO);
 
     /**
      * 获取保护分支列表

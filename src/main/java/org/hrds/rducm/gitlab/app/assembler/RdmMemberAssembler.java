@@ -11,6 +11,8 @@ import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
+import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
+import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
@@ -36,9 +38,9 @@ public class RdmMemberAssembler {
     @Autowired
     private RdmUserRepository rdmUserRepository;
     @Autowired
-    private BaseServiceFeignClient baseServiceFeignClient;
+    private IC7nDevOpsServiceService ic7nDevOpsServiceService;
     @Autowired
-    private DevOpsServiceFeignClient devOpsServiceFeignClient;
+    private IC7nBaseServiceService ic7nBaseServiceService;
 
     /**
      * 将GitlabMemberBatchDTO转换为List<RdmMember>
@@ -48,19 +50,19 @@ public class RdmMemberAssembler {
      * @return
      */
     public List<RdmMember> rdmMemberBatchDTOToRdmMembers(Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
-        // 查询gitlab项目id和用户id todo 应从外部接口获取, 暂时从数据库获取
+        // 查询gitlab项目id和用户id
         Map<Long, Integer> repositoryIdToGlProjectIdMap = new HashMap<>();
         rdmMemberBatchDTO.getRepositoryIds().forEach(repositoryId -> {
             // 获取gitlab项目id
-            RdmRepository rdmRepository = rdmRepositoryRepository.selectOne(new RdmRepository().setRepositoryId(repositoryId));
-            repositoryIdToGlProjectIdMap.put(repositoryId, rdmRepository.getGlProjectId());
+            Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(projectId, repositoryId);
+            repositoryIdToGlProjectIdMap.put(repositoryId, glProjectId);
         });
 
-        // 查询gitlab用户id todo 应从外部接口获取, 暂时从数据库获取
+        // 查询gitlab用户id
         Map<Long, Integer> userIdToGlUserIdMap = new HashMap<>();
         rdmMemberBatchDTO.getMembers().forEach(m -> {
-            RdmUser rdmUser = rdmUserRepository.selectOne(new RdmUser().setUserId(m.getUserId()));
-            userIdToGlUserIdMap.put(m.getUserId(), rdmUser.getGlUserId());
+            Integer glUserId = ic7nBaseServiceService.userIdToGlUserId(projectId, m.getUserId());
+            userIdToGlUserIdMap.put(m.getUserId(), glUserId);
         });
 
         // 转换为List<RdmMember>格式
@@ -131,12 +133,10 @@ public class RdmMemberAssembler {
         });
 
         // 查询用户信息
-        ResponseEntity<List<C7nUserVO>> userEntity = baseServiceFeignClient.listProjectUsersByIds(projectId, userIds);
-        Map<Long, C7nUserVO> userVOMap = userEntity.getBody().stream().collect(Collectors.toMap(C7nUserVO::getId, v -> v));
+        Map<Long, C7nUserVO> userVOMap = ic7nBaseServiceService.listC7nUserToMap(projectId, userIds);
 
         // 查询应用服务信息
-        ResponseEntity<PageInfo<C7nAppServiceVO>> appServiceEntity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, repositoryIds, false);
-        Map<Long, C7nAppServiceVO> appServiceVOMap = appServiceEntity.getBody().getList().stream().collect(Collectors.toMap(C7nAppServiceVO::getId, v -> v));
+        Map<Long, C7nAppServiceVO> appServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(projectId, repositoryIds);
 
         // 填充数据
         for (RdmMemberViewDTO viewDTO : rdmMemberViewDTOS.getContent()) {

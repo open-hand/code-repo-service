@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
-import org.gitlab4j.api.models.Branch;
 import org.gitlab4j.api.models.ProtectedBranch;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchQueryDTO;
@@ -9,9 +8,10 @@ import org.hrds.rducm.gitlab.app.service.RdmBranchAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmBranchRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
+import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.domain.service.IRdmBranchService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProtectedBranchesApi;
-import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabRepositoryApi;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.util.AssertExtensionUtils;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +32,19 @@ public class RdmBranchAppServiceImpl implements RdmBranchAppService {
     private RdmRepositoryRepository repositoryRepository;
     @Autowired
     private GitlabProtectedBranchesApi gitlabProtectedBranchesApi;
+    @Autowired
+    private IC7nDevOpsServiceService ic7nDevOpsServiceService;
 
     @Override
-    public List<BranchDTO> getBranches(Long repositoryId, BranchQueryDTO branchQueryDTO) {
+    public List<BranchDTO> getBranches(Long projectId, Long repositoryId, BranchQueryDTO branchQueryDTO) {
         // 参数处理
         if (Optional.ofNullable(branchQueryDTO.getExcludeProtectedFlag()).orElse(false)) {
             return iRdmBranchService.getBranchesWithExcludeProtected(repositoryId);
         }
 
-        // 获取对应Gitlab项目id todo 临时
-        RdmRepository rdmRepository = repositoryRepository.selectByUk(repositoryId);
-        return ConvertUtils.convertList(rdmBranchRepository.getBranchesFromGitlab(rdmRepository.getGlProjectId()), BranchDTO.class);
+        // 获取对应Gitlab项目id
+        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(projectId, repositoryId);
+        return ConvertUtils.convertList(rdmBranchRepository.getBranchesFromGitlab(glProjectId), BranchDTO.class);
     }
 
     @Override

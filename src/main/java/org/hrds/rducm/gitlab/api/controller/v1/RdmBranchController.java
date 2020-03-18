@@ -38,7 +38,7 @@ public class RdmBranchController extends BaseController {
     public ResponseEntity<List<BranchDTO>> getBranches(@PathVariable Long projectId,
                                                        @PathVariable Long repositoryId,
                                                        BranchQueryDTO branchQueryDTO) {
-        return Results.success(rdmBranchAppService.getBranches(repositoryId, branchQueryDTO));
+        return Results.success(rdmBranchAppService.getBranches(projectId, repositoryId, branchQueryDTO));
     }
 
     @ApiOperation(value = "查询保护分支")
