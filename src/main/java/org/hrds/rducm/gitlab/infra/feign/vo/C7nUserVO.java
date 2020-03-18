@@ -1,8 +1,11 @@
 package org.hrds.rducm.gitlab.infra.feign.vo;
 
-import java.util.Date;
+import io.swagger.annotations.ApiModelProperty;
 
-public class UserDTO {
+import java.util.Date;
+import java.util.List;
+
+public class C7nUserVO {
 
     private Long id;
 
@@ -40,11 +43,16 @@ public class UserDTO {
 
     private Integer passwordAttempt;
 
+    @ApiModelProperty("用户对应的gitlab用户id")
+    private Long gitlabUserId;
+
+    private List<C7nRoleVO> roles;
+
     public Long getId() {
         return id;
     }
 
-    public UserDTO setId(Long id) {
+    public C7nUserVO setId(Long id) {
         this.id = id;
         return this;
     }
@@ -53,7 +61,7 @@ public class UserDTO {
         return loginName;
     }
 
-    public UserDTO setLoginName(String loginName) {
+    public C7nUserVO setLoginName(String loginName) {
         this.loginName = loginName;
         return this;
     }
@@ -62,7 +70,7 @@ public class UserDTO {
         return email;
     }
 
-    public UserDTO setEmail(String email) {
+    public C7nUserVO setEmail(String email) {
         this.email = email;
         return this;
     }
@@ -71,7 +79,7 @@ public class UserDTO {
         return organizationId;
     }
 
-    public UserDTO setOrganizationId(Long organizationId) {
+    public C7nUserVO setOrganizationId(Long organizationId) {
         this.organizationId = organizationId;
         return this;
     }
@@ -80,7 +88,7 @@ public class UserDTO {
         return password;
     }
 
-    public UserDTO setPassword(String password) {
+    public C7nUserVO setPassword(String password) {
         this.password = password;
         return this;
     }
@@ -89,7 +97,7 @@ public class UserDTO {
         return realName;
     }
 
-    public UserDTO setRealName(String realName) {
+    public C7nUserVO setRealName(String realName) {
         this.realName = realName;
         return this;
     }
@@ -98,7 +106,7 @@ public class UserDTO {
         return phone;
     }
 
-    public UserDTO setPhone(String phone) {
+    public C7nUserVO setPhone(String phone) {
         this.phone = phone;
         return this;
     }
@@ -107,7 +115,7 @@ public class UserDTO {
         return imageUrl;
     }
 
-    public UserDTO setImageUrl(String imageUrl) {
+    public C7nUserVO setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
         return this;
     }
@@ -116,7 +124,7 @@ public class UserDTO {
         return profilePhoto;
     }
 
-    public UserDTO setProfilePhoto(String profilePhoto) {
+    public C7nUserVO setProfilePhoto(String profilePhoto) {
         this.profilePhoto = profilePhoto;
         return this;
     }
@@ -125,7 +133,7 @@ public class UserDTO {
         return isEnabled;
     }
 
-    public UserDTO setEnabled(Boolean enabled) {
+    public C7nUserVO setEnabled(Boolean enabled) {
         isEnabled = enabled;
         return this;
     }
@@ -134,7 +142,7 @@ public class UserDTO {
         return ldap;
     }
 
-    public UserDTO setLdap(Boolean ldap) {
+    public C7nUserVO setLdap(Boolean ldap) {
         this.ldap = ldap;
         return this;
     }
@@ -143,7 +151,7 @@ public class UserDTO {
         return language;
     }
 
-    public UserDTO setLanguage(String language) {
+    public C7nUserVO setLanguage(String language) {
         this.language = language;
         return this;
     }
@@ -152,7 +160,7 @@ public class UserDTO {
         return timeZone;
     }
 
-    public UserDTO setTimeZone(String timeZone) {
+    public C7nUserVO setTimeZone(String timeZone) {
         this.timeZone = timeZone;
         return this;
     }
@@ -161,7 +169,7 @@ public class UserDTO {
         return lastPasswordUpdatedAt;
     }
 
-    public UserDTO setLastPasswordUpdatedAt(Date lastPasswordUpdatedAt) {
+    public C7nUserVO setLastPasswordUpdatedAt(Date lastPasswordUpdatedAt) {
         this.lastPasswordUpdatedAt = lastPasswordUpdatedAt;
         return this;
     }
@@ -170,7 +178,7 @@ public class UserDTO {
         return lastLoginAt;
     }
 
-    public UserDTO setLastLoginAt(Date lastLoginAt) {
+    public C7nUserVO setLastLoginAt(Date lastLoginAt) {
         this.lastLoginAt = lastLoginAt;
         return this;
     }
@@ -179,7 +187,7 @@ public class UserDTO {
         return isLocked;
     }
 
-    public UserDTO setLocked(Boolean locked) {
+    public C7nUserVO setLocked(Boolean locked) {
         isLocked = locked;
         return this;
     }
@@ -188,7 +196,7 @@ public class UserDTO {
         return lockedUntilAt;
     }
 
-    public UserDTO setLockedUntilAt(Date lockedUntilAt) {
+    public C7nUserVO setLockedUntilAt(Date lockedUntilAt) {
         this.lockedUntilAt = lockedUntilAt;
         return this;
     }
@@ -197,8 +205,26 @@ public class UserDTO {
         return passwordAttempt;
     }
 
-    public UserDTO setPasswordAttempt(Integer passwordAttempt) {
+    public C7nUserVO setPasswordAttempt(Integer passwordAttempt) {
         this.passwordAttempt = passwordAttempt;
+        return this;
+    }
+
+    public Long getGitlabUserId() {
+        return gitlabUserId;
+    }
+
+    public C7nUserVO setGitlabUserId(Long gitlabUserId) {
+        this.gitlabUserId = gitlabUserId;
+        return this;
+    }
+
+    public List<C7nRoleVO> getRoles() {
+        return roles;
+    }
+
+    public C7nUserVO setRoles(List<C7nRoleVO> roles) {
+        this.roles = roles;
         return this;
     }
 }

@@ -31,7 +31,11 @@ public class GitlabCommitApi {
                     .getCommitsApi()
                     .getCommits(projectId, 1);
 
-            return commits.first().get(0);
+            if (commits.getTotalItems() > 0) {
+                return commits.first().get(0);
+            } else {
+                return new Commit();
+            }
         } catch (GitLabApiException e) {
             throw new GitlabClientException(e, e.getMessage());
         }

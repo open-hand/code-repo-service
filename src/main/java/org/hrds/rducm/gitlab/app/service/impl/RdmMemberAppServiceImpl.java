@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.asgard.saga.annotation.Saga;
 import io.choerodon.asgard.saga.producer.StartSagaBuilder;
@@ -14,14 +15,12 @@ import org.hrds.rducm.gitlab.api.controller.dto.*;
 import org.hrds.rducm.gitlab.app.assembler.RdmMemberAssembler;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
-import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
-import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
-import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
+import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.hzero.core.base.AopProxy;
@@ -32,9 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants.RDUCM_BATCH_ADD_MEMBERS;
 
@@ -55,6 +52,12 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     private RdmMemberAssembler rdmMemberAssembler;
 
     @Autowired
+    private DevOpsServiceFeignClient devOpsServiceFeignClient;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
     private TransactionalProducer producer;
 
     public RdmMemberAppServiceImpl(RdmMemberRepository rdmMemberRepository) {
@@ -64,12 +67,33 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Override
     public PageInfo<RdmMemberViewDTO> pageByOptions(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query) {
         // <1> 封装查询条件
+        String appServiceName = query.getAppServiceName();
 
         // 获取用户名对应的userId数组
         // 调用外部接口模糊查询的到userId todo
         List<Long> userIds = new ArrayList<>();
         // 获取应用服务对应的repositoryId数组
         // 调用外部接口模糊查询的到userId todo
+
+//        String param = "{}";
+//        if (appServiceName != null) {
+//            Map<String, Map<String, String>> paramMap = Maps.newHashMap();
+//
+//
+//            Map<String, String> searchParamMap = Maps.newHashMap();
+//            searchParamMap.put("name", appServiceName);
+//            paramMap.put("searchParam", searchParamMap);
+//
+//            try {
+//                param = objectMapper.writeValueAsString(paramMap);
+//            } catch (JsonProcessingException e) {
+//                throw new CommonException(e);
+//            }
+//        }
+//
+//        ResponseEntity<PageInfo<C7nAppServiceVO>> pageInfoResponseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, param);
+//        List<C7nAppServiceVO> appServiceVOS = pageInfoResponseEntity.getBody().getList();
+
         List<Long> repositoryIds = query.getRepositoryIds();
 
         Condition condition = Condition.builder(RdmMember.class)
@@ -81,25 +105,10 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectByCondition(condition));
 
-//        Page<RdmMember> page = PageHelper.doPage(pageRequest, () -> rdmMemberRepository.select(query));
-        Page<RdmMemberViewDTO> rdmMemberViewDTOS = ConvertUtils.convertPage(page, RdmMemberViewDTO.class);
-
-        // todo 关联查询, 需从接口获取数据, 暂时造数据
-        for (RdmMemberViewDTO viewDTO : rdmMemberViewDTOS.getContent()) {
-
-            RdmUser dbUser = rdmUserRepository.selectByUk(viewDTO.getUserId());
-            viewDTO.setRealName(dbUser.getGlUserName());
-            viewDTO.setLoginName(dbUser.getGlUserName());
-
-            RdmRepository dbRepository = rdmRepositoryRepository.selectByUk(viewDTO.getRepositoryId());
-            viewDTO.setAppServiceName(dbRepository.getRepositoryName());
-
-            viewDTO.setCreatedByName("张三");
-            viewDTO.setProjectRoleName("项目成员");
-        }
-
-        return PageConvertUtils.convert(rdmMemberViewDTOS);
+        return rdmMemberAssembler.pageToRdmMemberViewDTO(projectId, page);
     }
+
+
 
     /**
      * 批量新增或修改成员

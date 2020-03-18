@@ -7,7 +7,7 @@ package org.hrds.rducm.gitlab.infra.feign.fallback;
 //@Component
 //public class BaseFeignFallBack implements BaseServiceFeignClient {
 //    @Override
-//    public ResponseEntity<UserDTO> query(Long organizationId, Long id) {
+//    public ResponseEntity<C7nUserVO> query(Long organizationId, Long id) {
 //        throw new RuntimeException();
 //    }
 //}

@@ -3,6 +3,7 @@ package org.hrds.rducm.gitlab.api.controller.dto;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
+import java.util.List;
 
 
 public class RdmMemberViewDTO {
@@ -16,7 +17,7 @@ public class RdmMemberViewDTO {
     private String appServiceName;
 
     @ApiModelProperty("项目角色")
-    private String projectRoleName;
+    private List<String> roleNames;
 
     @ApiModelProperty("创建人")
     private String createdByName;
@@ -88,12 +89,12 @@ public class RdmMemberViewDTO {
         return this;
     }
 
-    public String getProjectRoleName() {
-        return projectRoleName;
+    public List<String> getRoleNames() {
+        return roleNames;
     }
 
-    public RdmMemberViewDTO setProjectRoleName(String projectRoleName) {
-        this.projectRoleName = projectRoleName;
+    public RdmMemberViewDTO setRoleNames(List<String> roleNames) {
+        this.roleNames = roleNames;
         return this;
     }
 
