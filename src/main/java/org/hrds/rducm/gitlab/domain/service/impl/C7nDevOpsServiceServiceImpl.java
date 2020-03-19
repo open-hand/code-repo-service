@@ -9,6 +9,7 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.util.FeignUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -101,13 +102,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
         int page = pageRequest.getPage() + 1;
         int size = pageRequest.getSize();
 
-        // todo 根据repositoryIds查询
-        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, repositoryIds, true, null, page, size, "{}");
-
-        if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
-            return responseEntity.getBody();
-        } else {
-            return PageInfo.of(Collections.emptyList());
-        }
+        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.listOrPageProjectAppServices(projectId, repositoryIds, true, page, size);
+        return FeignUtils.handleResponseEntity(responseEntity);
     }
 }

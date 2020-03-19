@@ -40,6 +40,11 @@ public class BaseServiceFeignClientFallBackFactory implements FallbackFactory<Ba
             public ResponseEntity<List<C7nUserVO>> listProjectUsersByIds(Long projectId, Set<Long> userIds) {
                 return null;
             }
+
+            @Override
+            public ResponseEntity<List<C7nUserVO>> listUsersByIds(Long[] ids, Boolean onlyEnabled) {
+                return null;
+            }
         };
     }
 }

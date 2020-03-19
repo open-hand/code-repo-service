@@ -56,4 +56,21 @@ public interface DevOpsServiceFeignClient {
                                                                          @RequestParam(required = false) Integer page,
                                                                          @RequestParam(required = false) Integer size,
                                                                          @RequestBody(required = false) String params);
+
+    /**
+     * 通过一组id分页查询或者不传id时进行分页查询
+     *
+     * @param projectId 项目Id
+     * @param ids       应用服务Ids
+     * @param doPage    是否分页
+     * @param page
+     * @param size
+     * @return
+     */
+    @GetMapping(value = "/v1/projects/{project_id}/app_service/list_by_ids_or_page")
+    ResponseEntity<PageInfo<C7nAppServiceVO>> listOrPageProjectAppServices(@PathVariable(value = "project_id") Long projectId,
+                                                                           @RequestParam(value = "ids", required = false) Set<Long> ids,
+                                                                           @RequestParam(value = "doPage", required = false, defaultValue = "true") Boolean doPage,
+                                                                           @RequestParam(required = false) Integer page,
+                                                                           @RequestParam(required = false) Integer size);
 }
