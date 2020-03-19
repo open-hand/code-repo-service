@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.domain.service;
 
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,4 +38,15 @@ public interface IC7nBaseServiceService {
      * @return
      */
     Map<Long, C7nUserVO> listC7nUserToMap(Long projectId, Set<Long> userIds);
+
+    /**
+     * 项目层
+     * 查询用户信息, 根据实际名称和登录名模糊查询
+     *
+     * @param projectId
+     * @param realName
+     * @param loginName
+     * @return
+     */
+    List<C7nUserVO> listC7nUsersByName(Long projectId, String realName, String loginName);
 }

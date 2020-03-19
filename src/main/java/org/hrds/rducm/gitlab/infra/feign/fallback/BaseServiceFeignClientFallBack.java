@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.infra.feign.fallback;
 
+import com.github.pagehelper.PageInfo;
 import io.choerodon.core.exception.CommonException;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
@@ -17,6 +18,11 @@ import java.util.Set;
 public class BaseServiceFeignClientFallBack implements BaseServiceFeignClient {
     @Override
     public ResponseEntity<List<C7nUserVO>> listProjectUsersByName(Long projectId, String param) {
+        throw new CommonException("error.feign.base.service");
+    }
+
+    @Override
+    public ResponseEntity<PageInfo<C7nUserVO>> pageUsersByOptionsOnProjectLevel(Long projectId, int page, int size, String loginName, String realName) {
         throw new CommonException("error.feign.base.service");
     }
 

@@ -1,6 +1,11 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Maps;
+import io.choerodon.core.exception.CommonException;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
@@ -21,6 +26,8 @@ import java.util.stream.Collectors;
 public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     @Autowired
     private DevOpsServiceFeignClient devOpsServiceFeignClient;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Override
     public Integer repositoryIdToGlProjectId(Long projectId, Long repositoryId) {
@@ -59,6 +66,47 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
             return entity.getBody().getList().stream().collect(Collectors.toMap(C7nAppServiceVO::getId, v -> v));
         } else {
             return Collections.emptyMap();
+        }
+    }
+
+    @Override
+    public List<C7nAppServiceVO> listC7nAppServicesByName(Long projectId, String appServiceName) {
+        // 将参数转换为json格式
+        String param = null;
+        if (appServiceName != null) {
+            Map<String, Map<String, String>> paramMap = Maps.newHashMap();
+            Map<String, String> searchParamMap = Maps.newHashMap();
+            searchParamMap.put("name", appServiceName);
+            paramMap.put("searchParam", searchParamMap);
+
+            try {
+                param = objectMapper.writeValueAsString(paramMap);
+            } catch (JsonProcessingException e) {
+                throw new CommonException(e);
+            }
+        }
+
+        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, null, null, param);
+
+        if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
+            return responseEntity.getBody().getList();
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public PageInfo<C7nAppServiceVO> pageC7nAppServices(Long projectId, PageRequest pageRequest, List<Long> repositoryIds) {
+        // 这里加1是因为在controller被-1
+        int page = pageRequest.getPage() + 1;
+        int size = pageRequest.getSize();
+        // todo 根据repositoryIds查询
+        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, true, page, size, "{}");
+
+        if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
+            return responseEntity.getBody();
+        } else {
+            return PageInfo.of(Collections.emptyList());
         }
     }
 }

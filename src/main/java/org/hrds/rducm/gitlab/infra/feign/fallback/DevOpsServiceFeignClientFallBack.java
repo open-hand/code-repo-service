@@ -23,7 +23,7 @@ public class DevOpsServiceFeignClientFallBack implements DevOpsServiceFeignClien
     }
 
     @Override
-    public ResponseEntity<PageInfo<C7nAppServiceVO>> pageAppServiceByOptions(Long projectId, Boolean doPage, int page, int size) {
+    public ResponseEntity<PageInfo<C7nAppServiceVO>> pageAppServiceByOptions(Long projectId, Boolean doPage, Integer page, Integer size, String params) {
         throw new CommonException("error.feign.devops.service");
     }
 

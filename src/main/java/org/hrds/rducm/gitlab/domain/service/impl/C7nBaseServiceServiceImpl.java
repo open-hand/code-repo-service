@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
+import com.github.pagehelper.PageInfo;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
@@ -8,10 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -61,6 +59,17 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
             return entity.getBody().stream().collect(Collectors.toMap(C7nUserVO::getId, v -> v));
         } else {
             return Collections.emptyMap();
+        }
+    }
+
+    @Override
+    public List<C7nUserVO> listC7nUsersByName(Long projectId, String realName, String loginName) {
+        ResponseEntity<PageInfo<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnProjectLevel(projectId, 0, 0, loginName, realName);
+
+        if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
+            return responseEntity.getBody().getList();
+        } else {
+            return Collections.emptyList();
         }
     }
 }

@@ -12,7 +12,9 @@ public class RdmMemberQueryDTO {
     @ApiModelProperty(value = "应用服务名称")
     private String appServiceName;
     @ApiModelProperty(value = "用户名")
-    private String username;
+    private String realName;
+    @ApiModelProperty(value = "登录名")
+    private String loginName;
     @ApiModelProperty(value = "通用参数")
     private String params;
 
@@ -34,12 +36,21 @@ public class RdmMemberQueryDTO {
         return this;
     }
 
-    public String getUsername() {
-        return username;
+    public String getRealName() {
+        return realName;
     }
 
-    public RdmMemberQueryDTO setUsername(String username) {
-        this.username = username;
+    public RdmMemberQueryDTO setRealName(String realName) {
+        this.realName = realName;
+        return this;
+    }
+
+    public String getLoginName() {
+        return loginName;
+    }
+
+    public RdmMemberQueryDTO setLoginName(String loginName) {
+        this.loginName = loginName;
         return this;
     }
 

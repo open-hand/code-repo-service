@@ -1,7 +1,11 @@
 package org.hrds.rducm.gitlab.domain.service;
 
+import com.github.pagehelper.PageInfo;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,4 +41,25 @@ public interface IC7nDevOpsServiceService {
      * @return
      */
     Map<Long, C7nAppServiceVO> listC7nAppServiceToMap(Long projectId, Set<Long> repositoryIds);
+
+    /**
+     * 项目层
+     * 查询应用服务信息, 根据应用服务名模糊查询
+     *
+     * @param projectId
+     * @param appServiceName
+     * @return
+     */
+    List<C7nAppServiceVO> listC7nAppServicesByName(Long projectId, String appServiceName);
+
+    /**
+     * 项目层
+     * 分页查询应用服务信息
+     *
+     * @param projectId
+     * @param pageRequest
+     * @param repositoryIds
+     * @return
+     */
+    PageInfo<C7nAppServiceVO> pageC7nAppServices(Long projectId, PageRequest pageRequest, List<Long> repositoryIds);
 }

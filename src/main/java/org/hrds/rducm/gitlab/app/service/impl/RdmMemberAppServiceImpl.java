@@ -18,11 +18,13 @@ import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
+import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
+import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
-import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
-import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.hzero.core.base.AopProxy;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
@@ -30,8 +32,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants.RDUCM_BATCH_ADD_MEMBERS;
 
@@ -49,10 +53,13 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     private IRdmMemberService iRdmMemberService;
 
     @Autowired
-    private RdmMemberAssembler rdmMemberAssembler;
+    private IC7nBaseServiceService ic7nBaseServiceService;
 
     @Autowired
-    private DevOpsServiceFeignClient devOpsServiceFeignClient;
+    private IC7nDevOpsServiceService ic7nDevOpsServiceService;
+
+    @Autowired
+    private RdmMemberAssembler rdmMemberAssembler;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -68,40 +75,39 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     public PageInfo<RdmMemberViewDTO> pageByOptions(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query) {
         // <1> 封装查询条件
         String appServiceName = query.getAppServiceName();
-
-        // 获取用户名对应的userId数组
-        // 调用外部接口模糊查询的到userId todo
-        List<Long> userIds = new ArrayList<>();
-        // 获取应用服务对应的repositoryId数组
-        // 调用外部接口模糊查询的到userId todo
-
-//        String param = "{}";
-//        if (appServiceName != null) {
-//            Map<String, Map<String, String>> paramMap = Maps.newHashMap();
-//
-//
-//            Map<String, String> searchParamMap = Maps.newHashMap();
-//            searchParamMap.put("name", appServiceName);
-//            paramMap.put("searchParam", searchParamMap);
-//
-//            try {
-//                param = objectMapper.writeValueAsString(paramMap);
-//            } catch (JsonProcessingException e) {
-//                throw new CommonException(e);
-//            }
-//        }
-//
-//        ResponseEntity<PageInfo<C7nAppServiceVO>> pageInfoResponseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, param);
-//        List<C7nAppServiceVO> appServiceVOS = pageInfoResponseEntity.getBody().getList();
-
+        String realName = query.getRealName();
+        String loginName = query.getLoginName();
         List<Long> repositoryIds = query.getRepositoryIds();
 
         Condition condition = Condition.builder(RdmMember.class)
                 .where(Sqls.custom()
                         .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
-                        .andIn(RdmMember.FIELD_USER_ID, userIds, true)
                         .andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIds, true))
                 .build();
+
+        // 调用外部接口模糊查询 用户名或登录名
+        if (!StringUtils.isEmpty(realName)|| !StringUtils.isEmpty(loginName)) {
+            List<C7nUserVO> c7nUserVOS = ic7nBaseServiceService.listC7nUsersByName(projectId, realName, loginName);
+            Set<Long> userIdsSet = c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
+
+            if (userIdsSet.isEmpty()) {
+                return PageInfo.of(Collections.emptyList());
+            }
+
+            condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
+        }
+
+        // 调用外部接口模糊查询 应用服务
+        if (!StringUtils.isEmpty(appServiceName)) {
+            List<C7nAppServiceVO> c7nAppServiceVOS = ic7nDevOpsServiceService.listC7nAppServicesByName(projectId, appServiceName);
+            Set<Long> repositoryIdSet = c7nAppServiceVOS.stream().map(C7nAppServiceVO::getId).collect(Collectors.toSet());
+
+            if (repositoryIdSet.isEmpty()) {
+                return PageInfo.of(Collections.emptyList());
+            }
+
+            condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
+        }
 
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectByCondition(condition));
 

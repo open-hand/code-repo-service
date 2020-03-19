@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.infra.feign;
 
+import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.hrds.rducm.gitlab.infra.feign.fallback.BaseServiceFeignClientFallBack;
@@ -39,18 +40,6 @@ public interface BaseServiceFeignClient {
      * 6. 根据一组应用服务id,获取应用服务信息(需包含gitlab代码库id) X
      */
 
-//    /**
-//     * 获取当前用户所有的项目
-//     */
-//    void listProjects(Long organizationId);
-//
-//
-//
-
-    /**
-     * 获取开发者角色的用户
-     */
-//    void listDeveloperUsers(Long project);
 
     /**
      * 获取开发者角色的用户 todo 暂时是所有项目成员
@@ -59,6 +48,15 @@ public interface BaseServiceFeignClient {
     @GetMapping(value = "/v1/projects/{project_id}/users/search_by_name")
     ResponseEntity<List<C7nUserVO>> listProjectUsersByName(@PathVariable(name = "project_id") Long projectId,
                                                            @RequestParam(required = false) String param);
+
+
+    @ApiOperation(value = "项目层分页查询用户列表（包括用户信息以及所分配的项目角色信息）")
+    @GetMapping("/v1/projects/{project_id}/users/search")
+    ResponseEntity<PageInfo<C7nUserVO>> pageUsersByOptionsOnProjectLevel(@PathVariable(name = "project_id") Long projectId,
+                                                                         @RequestParam(required = false) int page,
+                                                                         @RequestParam(required = false) int size,
+                                                                         @RequestParam(required = false) String loginName,
+                                                                         @RequestParam(required = false) String realName);
 
     /**
      * 根据一组id查询用户
@@ -73,29 +71,4 @@ public interface BaseServiceFeignClient {
                                                           @ApiParam(value = "多个用户id", required = true)
                                                           @RequestParam(name = "user_ids") Set<Long> userIds);
 
-//
-//    /**
-//     * 根据projectId和param模糊查询loginName和realName两列
-//     * 根据用户名或登录名模糊搜索用户信息
-//     */
-//    @GetMapping("/{project_id}/users/search_by_name")
-//    List getUserIdsByOptions(@PathVariable(name = "project_id") Long projectId,
-//                             @RequestParam(required = false) String param);
-//
-//    /**
-//     * 根据应用服务名模糊搜索应用服务信息
-//     */
-//    List getRepositoryIdsByOptions(String appServiceName);
-
-//    /**
-//     * 根据一组用户id,获取用户信息
-//     *
-//     */
-//    List listUsersByUserIds(List<Long> userIds);
-//
-//    /**
-//     * 根据一组代码库id,获取代码库信息
-//     *
-//     */
-//    List listRepositoriesByRepositoryIds(List<Long> repositoryIds);
 }
