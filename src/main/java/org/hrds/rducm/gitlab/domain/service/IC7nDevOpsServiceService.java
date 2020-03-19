@@ -3,7 +3,6 @@ package org.hrds.rducm.gitlab.domain.service;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
-import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 
 import java.util.List;
 import java.util.Map;
@@ -61,5 +60,5 @@ public interface IC7nDevOpsServiceService {
      * @param repositoryIds
      * @return
      */
-    PageInfo<C7nAppServiceVO> pageC7nAppServices(Long projectId, PageRequest pageRequest, List<Long> repositoryIds);
+    PageInfo<C7nAppServiceVO> pageC7nAppServices(Long projectId, PageRequest pageRequest, Set<Long> repositoryIds);
 }

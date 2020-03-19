@@ -32,7 +32,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     @Override
     public Integer repositoryIdToGlProjectId(Long projectId, Long repositoryId) {
         // 查询应用服务信息
-        ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, Collections.singleton(repositoryId), false);
+        ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, Collections.singleton(repositoryId), false, null, null, null, null);
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(entity.getBody()).getList())) {
             return Math.toIntExact(entity.getBody().getList().get(0).getGitlabProjectId());
@@ -44,7 +44,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     @Override
     public C7nAppServiceVO detailC7nAppService(Long projectId, Long repositoryId) {
         // 查询应用服务信息
-        ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, Collections.singleton(repositoryId), false);
+        ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, Collections.singleton(repositoryId), false, null, null, null, null);
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(entity.getBody()).getList())) {
             return entity.getBody().getList().get(0);
@@ -60,7 +60,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
         }
 
         // 查询应用服务信息
-        ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, repositoryIds, false);
+        ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, repositoryIds, false, null, null, null, null);
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(entity.getBody()).getList())) {
             return entity.getBody().getList().stream().collect(Collectors.toMap(C7nAppServiceVO::getId, v -> v));
@@ -86,7 +86,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
             }
         }
 
-        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, null, null, param);
+        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, null, true, null, null, null, param);
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
             return responseEntity.getBody().getList();
@@ -96,12 +96,13 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     }
 
     @Override
-    public PageInfo<C7nAppServiceVO> pageC7nAppServices(Long projectId, PageRequest pageRequest, List<Long> repositoryIds) {
+    public PageInfo<C7nAppServiceVO> pageC7nAppServices(Long projectId, PageRequest pageRequest, Set<Long> repositoryIds) {
         // 这里加1是因为在controller被-1
         int page = pageRequest.getPage() + 1;
         int size = pageRequest.getSize();
+
         // todo 根据repositoryIds查询
-        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, true, page, size, "{}");
+        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, repositoryIds, true, null, page, size, "{}");
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
             return responseEntity.getBody();

@@ -3,7 +3,9 @@ package org.hrds.rducm.gitlab.domain.service.impl;
 import com.github.pagehelper.PageInfo;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.hrds.rducm.gitlab.infra.util.FeignUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
 public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
     @Autowired
     private BaseServiceFeignClient baseServiceFeignClient;
+
+    /* 猪齿鱼用户相关方法 */
 
     @Override
     public Integer userIdToGlUserId(Long projectId, Long userId) {
@@ -71,5 +75,16 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    /* 猪齿鱼项目相关方法 */
+
+    @Override
+    public List<C7nProjectVO> listProjectsByUserIdOnOrgLevel(Long organizationId, Long userId, String name) {
+        ResponseEntity<List<C7nProjectVO>> responseEntity = baseServiceFeignClient.listProjectsByUserIdOnOrgLevel(organizationId, userId, name, null, null, null, null, null);
+
+        List<C7nProjectVO> c7nProjectVOS = FeignUtils.handleResponseEntity(responseEntity);
+
+        return c7nProjectVOS;
     }
 }

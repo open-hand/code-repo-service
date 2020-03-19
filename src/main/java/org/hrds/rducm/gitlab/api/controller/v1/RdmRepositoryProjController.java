@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 //@Api(tags = SwaggerTags.RDM_REPOSITORY)
 @RestController("rdmRepositoryProjController.v1")
@@ -46,7 +47,7 @@ public class RdmRepositoryProjController extends BaseController {
     @GetMapping("/overview")
     public ResponseEntity<PageInfo<RepositoryOverViewDTO>> pageOverviewByOptions(@PathVariable Long projectId,
                                                                                  PageRequest pageRequest,
-                                                                                 @RequestParam(required = false) List<Long> repositoryIds) {
+                                                                                 @RequestParam(required = false) Set<Long> repositoryIds) {
         PageInfo<RepositoryOverViewDTO> repositoryOverViewDTOS = rdmRepositoryService.pageOverviewByOptions(projectId, pageRequest, repositoryIds);
         return Results.success(repositoryOverViewDTOS);
     }

@@ -3,7 +3,8 @@ package org.hrds.rducm.gitlab.infra.feign;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.hrds.rducm.gitlab.infra.feign.fallback.BaseServiceFeignClientFallBack;
+import org.hrds.rducm.gitlab.infra.feign.fallback.BaseServiceFeignClientFallBackFactory;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -18,18 +19,30 @@ import java.util.Set;
  * @author ying.xie@hand-china.com
  * @date 2020/3/16
  */
-@FeignClient(value = "base-service", fallback = BaseServiceFeignClientFallBack.class)
+@FeignClient(value = "base-service", fallbackFactory = BaseServiceFeignClientFallBackFactory.class)
 public interface BaseServiceFeignClient {
-//    /**
-//     * 查询用户信息
-//     *
-//     * @param organizationId organizationId
-//     * @param id             id
-//     * @return C7nUserVO
-//     */
-//    @GetMapping(value = "/v1/organizations/{organization_id}/users/{id}")
-//    ResponseEntity<C7nUserVO> query(@PathVariable(name = "organization_id") Long organizationId,
-//                                  @PathVariable("id") Long id);
+    /**
+     * 查询当前组织下用户的项目列表
+     *
+     * @param organizationId
+     * @param userId
+     * @param name
+     * @param code
+     * @param category
+     * @param enabled
+     * @param createdBy
+     * @param params
+     * @return
+     */
+    @GetMapping(value = "/v1/organizations/{organization_id}/users/{user_id}/projects")
+    ResponseEntity<List<C7nProjectVO>> listProjectsByUserIdOnOrgLevel(@PathVariable(name = "organization_id") Long organizationId,
+                                                                      @PathVariable(name = "user_id") Long userId,
+                                                                      @RequestParam(required = false) String name,
+                                                                      @RequestParam(required = false) String code,
+                                                                      @RequestParam(required = false) String category,
+                                                                      @RequestParam(required = false) Boolean enabled,
+                                                                      @RequestParam(required = false) Long createdBy,
+                                                                      @RequestParam(required = false) String params);
 
     /**
      * 1. 获取当前用户所有的项目
@@ -50,7 +63,17 @@ public interface BaseServiceFeignClient {
                                                            @RequestParam(required = false) String param);
 
 
-    @ApiOperation(value = "项目层分页查询用户列表（包括用户信息以及所分配的项目角色信息）")
+    /**
+     * 项目层
+     * 分页查询用户列表（包括用户信息以及所分配的项目角色信息）
+     *
+     * @param projectId
+     * @param page
+     * @param size
+     * @param loginName
+     * @param realName
+     * @return
+     */
     @GetMapping("/v1/projects/{project_id}/users/search")
     ResponseEntity<PageInfo<C7nUserVO>> pageUsersByOptionsOnProjectLevel(@PathVariable(name = "project_id") Long projectId,
                                                                          @RequestParam(required = false) int page,
@@ -59,16 +82,14 @@ public interface BaseServiceFeignClient {
                                                                          @RequestParam(required = false) String realName);
 
     /**
-     * 根据一组id查询用户
+     * 根据多个id查询用户（包括用户信息以及所分配的项目角色信息以及GitlabUserId）
      *
      * @param projectId
-     * @param userIds
+     * @param userIds 多个用户id
      * @return
      */
     @ApiOperation(value = "根据多个id查询用户（包括用户信息以及所分配的项目角色信息以及GitlabUserId）")
     @GetMapping(value = "/v1/projects/{project_id}/users/list_by_ids")
     ResponseEntity<List<C7nUserVO>> listProjectUsersByIds(@PathVariable(name = "project_id") Long projectId,
-                                                          @ApiParam(value = "多个用户id", required = true)
                                                           @RequestParam(name = "user_ids") Set<Long> userIds);
-
 }

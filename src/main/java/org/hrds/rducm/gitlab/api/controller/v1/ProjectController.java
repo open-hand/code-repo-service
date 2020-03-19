@@ -27,8 +27,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/v1/projects/{projectId}")
 public class ProjectController extends BaseController {
     @Autowired
-    private RdmUserRepository rdmUserRepository;
-    @Autowired
     private BaseServiceFeignClient baseServiceFeignClient;
 
     @ApiOperation(value = "查询项目开发成员, 并排除自己(项目层)")

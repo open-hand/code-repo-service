@@ -13,15 +13,12 @@ import org.hrds.rducm.gitlab.domain.service.IRdmRepositoryService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabCommitApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabMergeRequestApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
-import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author ying.xie@hand-china.com
@@ -43,7 +40,7 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
     private IC7nDevOpsServiceService ic7nDevOpsServiceService;
 
     @Override
-    public PageInfo<RepositoryOverViewDTO> pageOverviewByOptions(Long projectId, PageRequest pageRequest, List<Long> repositoryIds) {
+    public PageInfo<RepositoryOverViewDTO> pageOverviewByOptions(Long projectId, PageRequest pageRequest, Set<Long> repositoryIds) {
         // <1> 查询
         // 调用devops服务查询
         PageInfo<C7nAppServiceVO> c7nRepositories = ic7nDevOpsServiceService.pageC7nAppServices(projectId, pageRequest, repositoryIds);

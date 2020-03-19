@@ -4,7 +4,7 @@ import com.github.pagehelper.PageInfo;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.repository.RepositoryOverViewDTO;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author ying.xie@hand-china.com
@@ -19,5 +19,5 @@ public interface IRdmRepositoryService {
      * @param repositoryIds
      * @return
      */
-    PageInfo<RepositoryOverViewDTO> pageOverviewByOptions(Long projectId, PageRequest pageRequest, List<Long> repositoryIds);
+    PageInfo<RepositoryOverViewDTO> pageOverviewByOptions(Long projectId, PageRequest pageRequest, Set<Long> repositoryIds);
 }

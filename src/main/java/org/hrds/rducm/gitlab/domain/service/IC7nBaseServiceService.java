@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.domain.service;
 
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 
 import java.util.List;
@@ -49,4 +50,15 @@ public interface IC7nBaseServiceService {
      * @return
      */
     List<C7nUserVO> listC7nUsersByName(Long projectId, String realName, String loginName);
+
+    /**
+     * 组织层
+     * 查询组织下用户的项目列表
+     *
+     * @param organizationId
+     * @param userId
+     * @param name 项目名称
+     * @return
+     */
+    List<C7nProjectVO> listProjectsByUserIdOnOrgLevel(Long organizationId, Long userId, String name);
 }
