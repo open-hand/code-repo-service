@@ -39,7 +39,7 @@ public class RdmTagController extends BaseController {
     public ResponseEntity<List<TagDTO>> getTags(@PathVariable Long projectId,
                                                 @PathVariable Long repositoryId,
                                                 TagQueryDTO tagQueryDTO) {
-        return Results.success(rdmTagAppService.getTags(repositoryId, tagQueryDTO));
+        return Results.success(rdmTagAppService.getTags(projectId, repositoryId, tagQueryDTO));
     }
 
     @ApiOperation(value = "查询保护标签")
@@ -51,7 +51,7 @@ public class RdmTagController extends BaseController {
     @GetMapping("/protected-tags")
     public ResponseEntity<List<ProtectedTagDTO>> getProtectedTags(@PathVariable Long projectId,
                                                                   @PathVariable Long repositoryId) {
-        return Results.success(rdmTagAppService.getProtectedTags(repositoryId));
+        return Results.success(rdmTagAppService.getProtectedTags(projectId, repositoryId));
     }
 
     @ApiOperation(value = "创建保护标签")
@@ -67,7 +67,7 @@ public class RdmTagController extends BaseController {
                                                               @PathVariable Long repositoryId,
                                                               @RequestParam String tagName,
                                                               @RequestParam Integer createAccessLevel) {
-        return Results.created(rdmTagAppService.protectTag(repositoryId, tagName, createAccessLevel));
+        return Results.created(rdmTagAppService.protectTag(projectId, repositoryId, tagName, createAccessLevel));
     }
 
     @ApiOperation(value = "修改保护标签")
@@ -83,7 +83,7 @@ public class RdmTagController extends BaseController {
                                                               @PathVariable Long repositoryId,
                                                               @RequestParam String tagName,
                                                               @RequestParam Integer createAccessLevel) {
-        return Results.created(rdmTagAppService.updateProtectedTag(repositoryId, tagName, createAccessLevel));
+        return Results.created(rdmTagAppService.updateProtectedTag(projectId, repositoryId, tagName, createAccessLevel));
     }
 
     @ApiOperation(value = "删除保护标签")
@@ -97,7 +97,7 @@ public class RdmTagController extends BaseController {
     public ResponseEntity<ProtectedTag> deleteProtectedTag(@PathVariable Long projectId,
                                                            @PathVariable Long repositoryId,
                                                            @RequestParam String tagName) {
-        rdmTagAppService.unprotectTag(repositoryId, tagName);
+        rdmTagAppService.unprotectTag(projectId, repositoryId, tagName);
         return Results.success();
     }
 }

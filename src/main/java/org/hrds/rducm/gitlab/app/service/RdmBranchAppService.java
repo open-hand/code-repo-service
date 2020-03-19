@@ -20,21 +20,25 @@ public interface RdmBranchAppService {
     /**
      * 获取保护分支列表
      *
+     *
+     * @param projectId
      * @param repositoryId
      * @return
      */
-    List<ProtectedBranchDTO> getProtectedBranches(Long repositoryId);
+    List<ProtectedBranchDTO> getProtectedBranches(Long projectId, Long repositoryId);
 
     /**
      * 设置保护分支
      *
+     *
+     * @param projectId
      * @param repositoryId
      * @param branchName
      * @param pushAccessLevel
      * @param mergeAccessLevel
      * @return
      */
-    ProtectedBranchDTO protectBranch(Long repositoryId,
+    ProtectedBranchDTO protectBranch(Long projectId, Long repositoryId,
                                      String branchName,
                                      Integer pushAccessLevel,
                                      Integer mergeAccessLevel);
@@ -42,13 +46,15 @@ public interface RdmBranchAppService {
     /**
      * 更新保护分支
      *
+     *
+     * @param projectId
      * @param repositoryId
      * @param branchName
      * @param pushAccessLevel
      * @param mergeAccessLevel
      * @return
      */
-    ProtectedBranchDTO updateProtectedBranch(Long repositoryId,
+    ProtectedBranchDTO updateProtectedBranch(Long projectId, Long repositoryId,
                                              String branchName,
                                              Integer pushAccessLevel,
                                              Integer mergeAccessLevel);
@@ -56,8 +62,9 @@ public interface RdmBranchAppService {
     /**
      * 取消保护分支
      *
+     * @param projectId
      * @param repositoryId
      * @param branchName
      */
-    void unprotectBranch(Long repositoryId, String branchName);
+    void unprotectBranch(Long projectId, Long repositoryId, String branchName);
 }

@@ -6,6 +6,7 @@ import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
+import org.hrds.rducm.gitlab.app.assembler.RdmOperationLogAssembler;
 import org.hrds.rducm.gitlab.app.service.RdmOperationLogAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hrds.rducm.gitlab.domain.repository.RdmOperationLogRepository;
@@ -29,6 +30,8 @@ import java.util.List;
 public class RdmOperationLogAppServiceImpl implements RdmOperationLogAppService {
     @Autowired
     private RdmOperationLogRepository operationLogRepository;
+    @Autowired
+    private RdmOperationLogAssembler rdmOperationLogAssembler;
 
     @Override
     public PageInfo<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId, Long repositoryId, PageRequest pageRequest, OperationLogQueryDTO queryDTO) {
@@ -61,6 +64,6 @@ public class RdmOperationLogAppServiceImpl implements RdmOperationLogAppService 
 
         Page<RdmOperationLog> page = PageHelper.doPageAndSort(pageRequest, () -> operationLogRepository.selectByCondition(condition));
 
-        return PageConvertUtils.convert(ConvertUtils.convertPage(page, OperationLogViewDTO.class));
+        return rdmOperationLogAssembler.pageToOperationLogViewDTO(projectId, page);
     }
 }

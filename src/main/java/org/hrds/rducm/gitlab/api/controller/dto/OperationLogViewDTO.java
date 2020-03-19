@@ -25,7 +25,10 @@ public class OperationLogViewDTO {
     private Long opUserId;
 
     @ApiModelProperty(value = "操作人，用户名", required = true)
-    private Long opUserName;
+    private String opUserName;
+
+    @ApiModelProperty(value = "操作人, 头像地址")
+    private String opUserImageUrl;
 
     @ApiModelProperty(value = "操作类型(成员管理|分支管理)", required = true)
     private String opType;
@@ -79,11 +82,11 @@ public class OperationLogViewDTO {
         return this;
     }
 
-    public Long getOpUserName() {
+    public String getOpUserName() {
         return opUserName;
     }
 
-    public OperationLogViewDTO setOpUserName(Long opUserName) {
+    public OperationLogViewDTO setOpUserName(String opUserName) {
         this.opUserName = opUserName;
         return this;
     }
@@ -139,6 +142,15 @@ public class OperationLogViewDTO {
 
     public OperationLogViewDTO setRepositoryName(String repositoryName) {
         this.repositoryName = repositoryName;
+        return this;
+    }
+
+    public String getOpUserImageUrl() {
+        return opUserImageUrl;
+    }
+
+    public OperationLogViewDTO setOpUserImageUrl(String opUserImageUrl) {
+        this.opUserImageUrl = opUserImageUrl;
         return this;
     }
 }

@@ -90,6 +90,27 @@ public class ConvertUtils {
     /**
      * convert page with default beanUtils
      *
+     * @param source    source page
+     * @param converter converter for list content of page
+     * @param <S>       the source content type
+     * @param <D>       the destination content type
+     * @return destination page
+     */
+    public static <S, D> Page<D> convertPage(Page<S> source, Function<S, D> converter) {
+        if (source == null) {
+            return null;
+        }
+        Page<D> destination = new Page<>();
+        BeanUtils.copyProperties(source, destination, "content");
+        if (source.getContent() != null) {
+            destination.setContent(source.getContent().stream().map(converter).collect(Collectors.toList()));
+        }
+        return destination;
+    }
+
+    /**
+     * convert page with default beanUtils
+     *
      * @param source source page
      * @param <S>    the source content type
      * @param <D>    the destination content type

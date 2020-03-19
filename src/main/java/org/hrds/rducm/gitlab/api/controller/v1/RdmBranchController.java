@@ -50,7 +50,7 @@ public class RdmBranchController extends BaseController {
     @GetMapping("/protected-branches")
     public ResponseEntity<List<ProtectedBranchDTO>> getProtectedBranches(@PathVariable Long projectId,
                                                                          @PathVariable Long repositoryId) {
-        return Results.success(rdmBranchAppService.getProtectedBranches(repositoryId));
+        return Results.success(rdmBranchAppService.getProtectedBranches(projectId, repositoryId));
     }
 
     @ApiOperation(value = "添加保护分支")
@@ -68,7 +68,7 @@ public class RdmBranchController extends BaseController {
                                                                     @RequestParam String branchName,
                                                                     @RequestParam Integer pushAccessLevel,
                                                                     @RequestParam Integer mergeAccessLevel) {
-        return Results.created(rdmBranchAppService.protectBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
+        return Results.created(rdmBranchAppService.protectBranch(projectId, repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
     }
 
     @ApiOperation(value = "修改保护分支")
@@ -86,7 +86,7 @@ public class RdmBranchController extends BaseController {
                                                                     @RequestParam String branchName,
                                                                     @RequestParam Integer pushAccessLevel,
                                                                     @RequestParam Integer mergeAccessLevel) {
-        return Results.created(rdmBranchAppService.updateProtectedBranch(repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
+        return Results.created(rdmBranchAppService.updateProtectedBranch(projectId, repositoryId, branchName, pushAccessLevel, mergeAccessLevel));
     }
 
     @ApiOperation(value = "删除保护分支")
@@ -100,7 +100,7 @@ public class RdmBranchController extends BaseController {
     public ResponseEntity<?> removeProtectedBranch(@PathVariable Long projectId,
                                                    @PathVariable Long repositoryId,
                                                    @RequestParam String branchName) {
-        rdmBranchAppService.unprotectBranch(repositoryId, branchName);
+        rdmBranchAppService.unprotectBranch(projectId, repositoryId, branchName);
         return Results.success();
     }
 }

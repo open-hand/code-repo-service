@@ -32,7 +32,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     @Override
     public Integer repositoryIdToGlProjectId(Long projectId, Long repositoryId) {
         // 查询应用服务信息
-        ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, Collections.singleton(repositoryId), false, null, null, null, null);
+        ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, Collections.singleton(repositoryId), false, null, null, null, "{}");
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(entity.getBody()).getList())) {
             return Math.toIntExact(entity.getBody().getList().get(0).getGitlabProjectId());
@@ -44,7 +44,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     @Override
     public C7nAppServiceVO detailC7nAppService(Long projectId, Long repositoryId) {
         // 查询应用服务信息
-        ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, Collections.singleton(repositoryId), false, null, null, null, null);
+        ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, Collections.singleton(repositoryId), false, null, null, null, "{}");
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(entity.getBody()).getList())) {
             return entity.getBody().getList().get(0);
@@ -60,7 +60,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
         }
 
         // 查询应用服务信息
-        ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, repositoryIds, false, null, null, null, null);
+        ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, repositoryIds, false, null, null, null, "{}");
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(entity.getBody()).getList())) {
             return entity.getBody().getList().stream().collect(Collectors.toMap(C7nAppServiceVO::getId, v -> v));
