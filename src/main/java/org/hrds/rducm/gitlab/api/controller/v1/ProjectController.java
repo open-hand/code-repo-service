@@ -1,15 +1,12 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import com.google.common.collect.Maps;
 import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.c7n.C7nUserDTO;
-import org.hrds.rducm.gitlab.domain.entity.RdmUser;
-import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
-import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
+import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
@@ -18,8 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 //@Api(tags = SwaggerTags.GITLAB_MEMBER)
@@ -27,7 +22,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/v1/projects/{projectId}")
 public class ProjectController extends BaseController {
     @Autowired
-    private BaseServiceFeignClient baseServiceFeignClient;
+    private IC7nBaseServiceService ic7nBaseServiceService;
 
     @ApiOperation(value = "查询项目开发成员, 并排除自己(项目层)")
     @ApiImplicitParams({
@@ -38,9 +33,9 @@ public class ProjectController extends BaseController {
     @GetMapping("/c7n/members/developers")
     public ResponseEntity<List<C7nUserDTO>> listDeveloperProjectMembers(@PathVariable Long projectId,
                                                                         @RequestParam(required = false) String name) {
-        ResponseEntity<List<C7nUserVO>> responseEntity = baseServiceFeignClient.listProjectUsersByName(projectId, name);
+        List<C7nUserVO> c7nUserVOS = ic7nBaseServiceService.listDeveloperProjectMembers(projectId, name);
 
-        List<C7nUserDTO> c7nUserDTOS = Objects.requireNonNull(responseEntity.getBody()).stream().map(u -> {
+        List<C7nUserDTO> c7nUserDTOS = c7nUserVOS.stream().map(u -> {
             C7nUserDTO c7nUserDTO = new C7nUserDTO();
             c7nUserDTO.setUserId(u.getId())
                     .setLoginName(u.getLoginName())

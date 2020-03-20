@@ -31,7 +31,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 //@Api(tags = SwaggerTags.RDM_OPERATION_LOG)
 @RestController("rdmOperationLogOrgController.v1")
-@RequestMapping("/v1/projects/gitlab/repositories/operation-logs")
+@RequestMapping("/v1/organizations/{organizationId}/projects/gitlab/repositories/operation-logs")
 public class RdmOperationLogOrgController extends BaseController {
 
     @Autowired
@@ -50,7 +50,8 @@ public class RdmOperationLogOrgController extends BaseController {
     })
     @Permission(type = ResourceType.ORGANIZATION, permissionPublic = true)
     @GetMapping
-    public ResponseEntity<PageInfo<OperationLogViewDTO>> pageByOptionsMemberLog(@SortDefault(value = RdmOperationLog.FIELD_CREATION_DATE,
+    public ResponseEntity<PageInfo<OperationLogViewDTO>> pageByOptionsMemberLog(@PathVariable Long organizationId,
+                                                                                @SortDefault(value = RdmOperationLog.FIELD_CREATION_DATE,
                                                                                         direction = Sort.Direction.DESC)
                                                                                 @ApiIgnore PageRequest pageRequest,
                                                                                 Long projectId,

@@ -52,6 +52,15 @@ public interface IC7nBaseServiceService {
     List<C7nUserVO> listC7nUsersByName(Long projectId, String realName, String loginName);
 
     /**
+     * 查询项目开发成员, 并排除自己(项目层)
+     *
+     * @param projectId
+     * @param name
+     * @return
+     */
+    List<C7nUserVO> listDeveloperProjectMembers(Long projectId, String name);
+
+    /**
      * 组织层
      * 查询组织下用户的项目列表
      *

@@ -1,6 +1,9 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Maps;
+import io.choerodon.core.exception.CommonException;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
@@ -75,6 +78,14 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    @Override
+    public List<C7nUserVO> listDeveloperProjectMembers(Long projectId, String name) {
+        ResponseEntity<List<C7nUserVO>> responseEntity = baseServiceFeignClient.listUsersWithRolesOnProjectLevel(projectId, null, name, null, null);
+
+        List<C7nUserVO> c7nUserVOS = FeignUtils.handleResponseEntity(responseEntity);
+        return c7nUserVOS;
     }
 
     /* 猪齿鱼项目相关方法 */
