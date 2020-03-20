@@ -2,11 +2,13 @@ package org.hrds.rducm.gitlab.domain.service.impl;
 
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import org.hrds.rducm.gitlab.api.controller.dto.DetectApplicantTypeDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApprovalCreateDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApplicantCreateDTO;
 import org.hrds.rducm.gitlab.app.assembler.RdmMemberApplicantAssembler;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
@@ -17,7 +19,6 @@ import org.hrds.rducm.gitlab.infra.enums.ApplicantTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.ApprovalStateEnum;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
-import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,26 +53,25 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
     }
 
     @Override
-    public String detectApplicantType(Long projectId, Long repositoryId) {
+    public DetectApplicantTypeDTO detectApplicantType(Long projectId, Long repositoryId) {
         Long userId = DetailsHelper.getUserDetails().getUserId();
 
         RdmMember dbMember = rdmMemberRepository.selectOneByUk(projectId, repositoryId, userId);
         if (dbMember == null) {
-            return ApplicantTypeEnum.MEMBER_JOIN.getCode();
+            return new DetectApplicantTypeDTO()
+                    .setApplicantType(ApplicantTypeEnum.MEMBER_JOIN.getCode());
         } else {
-            //
-            if (dbMember.getGlAccessLevel() >= RdmAccessLevel.OWNER.toValue()) {
-
-            }
-            return ApplicantTypeEnum.MEMBER_PERMISSION_CHANGE.getCode();
+            return new DetectApplicantTypeDTO()
+                    .setApplicantType(ApplicantTypeEnum.MEMBER_PERMISSION_CHANGE.getCode())
+                    .setOldAccessLevel(dbMember.getGlAccessLevel());
         }
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createApproval(Long projectId, MemberApprovalCreateDTO memberApprovalCreateDTO) {
+    public void createApproval(Long projectId, MemberApplicantCreateDTO memberApplicantCreateDTO) {
         // <1> 转换
-        RdmMemberApplicant param = ConvertUtils.convertObject(memberApprovalCreateDTO, RdmMemberApplicant.class);
+        RdmMemberApplicant param = ConvertUtils.convertObject(memberApplicantCreateDTO, RdmMemberApplicant.class);
 
         // <2> 创建成员权限申请
         param.setProjectId(projectId);

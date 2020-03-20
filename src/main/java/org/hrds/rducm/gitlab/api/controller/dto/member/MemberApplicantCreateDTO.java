@@ -1,8 +1,10 @@
 package org.hrds.rducm.gitlab.api.controller.dto.member;
 
 import io.swagger.annotations.ApiModelProperty;
-import springfox.documentation.annotations.ApiIgnore;
+import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -10,7 +12,7 @@ import javax.validation.constraints.NotNull;
  * @author ying.xie@hand-china.com
  * @date 2020/3/11
  */
-public class MemberApprovalCreateDTO {
+public class MemberApplicantCreateDTO {
     @ApiModelProperty(value = "代码库id", required = true)
     @NotNull
     private Long repositoryId;
@@ -23,8 +25,12 @@ public class MemberApprovalCreateDTO {
     @NotBlank
     private String applicantType;
 
+    /**
+     * 申请的权限不能超过Owner
+     */
     @ApiModelProperty(value = "权限等级", required = true)
     @NotNull
+    @Max(value = 40)
     private Integer accessLevel;
 
     @ApiModelProperty(value = "旧权限等级", hidden = true)
@@ -34,7 +40,7 @@ public class MemberApprovalCreateDTO {
         return repositoryId;
     }
 
-    public MemberApprovalCreateDTO setRepositoryId(Long repositoryId) {
+    public MemberApplicantCreateDTO setRepositoryId(Long repositoryId) {
         this.repositoryId = repositoryId;
         return this;
     }
@@ -43,7 +49,7 @@ public class MemberApprovalCreateDTO {
         return applicantUserId;
     }
 
-    public MemberApprovalCreateDTO setApplicantUserId(Long applicantUserId) {
+    public MemberApplicantCreateDTO setApplicantUserId(Long applicantUserId) {
         this.applicantUserId = applicantUserId;
         return this;
     }
@@ -52,7 +58,7 @@ public class MemberApprovalCreateDTO {
         return applicantType;
     }
 
-    public MemberApprovalCreateDTO setApplicantType(String applicantType) {
+    public MemberApplicantCreateDTO setApplicantType(String applicantType) {
         this.applicantType = applicantType;
         return this;
     }
@@ -61,7 +67,7 @@ public class MemberApprovalCreateDTO {
         return accessLevel;
     }
 
-    public MemberApprovalCreateDTO setAccessLevel(Integer accessLevel) {
+    public MemberApplicantCreateDTO setAccessLevel(Integer accessLevel) {
         this.accessLevel = accessLevel;
         return this;
     }
@@ -70,7 +76,7 @@ public class MemberApprovalCreateDTO {
         return oldAccessLevel;
     }
 
-    public MemberApprovalCreateDTO setOldAccessLevel(Integer oldAccessLevel) {
+    public MemberApplicantCreateDTO setOldAccessLevel(Integer oldAccessLevel) {
         this.oldAccessLevel = oldAccessLevel;
         return this;
     }

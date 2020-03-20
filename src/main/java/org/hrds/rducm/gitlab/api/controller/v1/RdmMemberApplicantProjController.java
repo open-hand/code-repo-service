@@ -7,11 +7,11 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.hrds.rducm.gitlab.api.controller.dto.DetectApplicantTypeDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApprovalCreateDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApplicantCreateDTO;
 import org.hrds.rducm.gitlab.api.controller.validator.RdmMemberApprovalValidator;
 import org.hrds.rducm.gitlab.app.service.RdmMemberApplicantAppService;
-import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberApplicantService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Future;
 import java.util.Date;
-import java.util.Optional;
 
 /**
  * 成员审批表 管理 API
@@ -52,29 +51,34 @@ public class RdmMemberApplicantProjController extends BaseController {
     @ApiOperation(value = "检测当前用户申请类型")
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping("/self/detect-applicant-type")
-    public ResponseEntity<String> detectApplicantType(@PathVariable Long projectId,
-                                                      @RequestParam Long repositoryId) {
-        String applicantType = iRdmMemberApplicantService.detectApplicantType(projectId, repositoryId);
-        return ResponseEntity.ok(applicantType);
+    public ResponseEntity<DetectApplicantTypeDTO> detectApplicantType(@PathVariable Long projectId,
+                                                                      @RequestParam Long repositoryId) {
+        DetectApplicantTypeDTO dto = iRdmMemberApplicantService.detectApplicantType(projectId, repositoryId);
+        return ResponseEntity.ok(dto);
     }
 
     @ApiOperation(value = "创建成员权限申请")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
-            @ApiImplicitParam(name = "memberApprovalCreateDTO", value = "参数", paramType = "body", dataType = "MemberApprovalCreateDTO", required = true)
+            @ApiImplicitParam(name = "memberApplicantCreateDTO", value = "参数", paramType = "body", dataType = "MemberApplicantCreateDTO", required = true)
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping
     public ResponseEntity<?> create(@PathVariable Long projectId,
-                                    @RequestBody MemberApprovalCreateDTO memberApprovalCreateDTO) {
-        validObject(memberApprovalCreateDTO);
-        rdmMemberApprovalValidator.validateCreateDTO(projectId, memberApprovalCreateDTO);
+                                    @RequestBody MemberApplicantCreateDTO memberApplicantCreateDTO) {
+        validObject(memberApplicantCreateDTO);
+        rdmMemberApprovalValidator.validateCreateDTO(projectId, memberApplicantCreateDTO);
 
-        iRdmMemberApplicantService.createApproval(projectId, memberApprovalCreateDTO);
+        iRdmMemberApplicantService.createApproval(projectId, memberApplicantCreateDTO);
         return Results.success();
     }
 
     @ApiOperation(value = "成员权限申请-审批通过")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "主键", paramType = "path", required = true),
+            @ApiImplicitParam(name = "objectVersionNumber", value = "版本号", paramType = "query", required = true),
+            @ApiImplicitParam(name = "expiresAt", value = "过期时间", paramType = "query")
+    })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping("/{id}/pass")
     public ResponseEntity<?> passAndHandleMember(@PathVariable Long id,

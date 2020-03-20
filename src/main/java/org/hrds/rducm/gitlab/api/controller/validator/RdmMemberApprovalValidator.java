@@ -2,7 +2,7 @@ package org.hrds.rducm.gitlab.api.controller.validator;
 
 import io.choerodon.core.exception.CommonException;
 import org.apache.commons.lang3.EnumUtils;
-import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApprovalCreateDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApplicantCreateDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberApplicantRepository;
@@ -24,12 +24,12 @@ public class RdmMemberApprovalValidator {
     @Autowired
     private RdmMemberRepository rdmMemberRepository;
 
-    public void validateCreateDTO(Long projectId, MemberApprovalCreateDTO memberApprovalCreateDTO) {
-        Long repositoryId = memberApprovalCreateDTO.getRepositoryId();
-        Long applicantUserId = memberApprovalCreateDTO.getApplicantUserId();
-        String applicantType = memberApprovalCreateDTO.getApplicantType();
+    public void validateCreateDTO(Long projectId, MemberApplicantCreateDTO memberApplicantCreateDTO) {
+        Long repositoryId = memberApplicantCreateDTO.getRepositoryId();
+        Long applicantUserId = memberApplicantCreateDTO.getApplicantUserId();
+        String applicantType = memberApplicantCreateDTO.getApplicantType();
 
-        Integer accessLevel = memberApprovalCreateDTO.getAccessLevel();
+        Integer accessLevel = memberApplicantCreateDTO.getAccessLevel();
 
         // 校验是否有为待审批的申请
         RdmMemberApplicant dbRdmMemberApplicant = rdmMemberApplicantRepository.selectOneWithPending(projectId, repositoryId, applicantUserId);
@@ -57,7 +57,7 @@ public class RdmMemberApprovalValidator {
                 }
 
                 // 设置旧权限
-                memberApprovalCreateDTO.setOldAccessLevel(dbMember.getGlAccessLevel());
+                memberApplicantCreateDTO.setOldAccessLevel(dbMember.getGlAccessLevel());
                 break;
             }
             default:

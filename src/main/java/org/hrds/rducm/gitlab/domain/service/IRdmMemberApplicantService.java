@@ -2,9 +2,9 @@ package org.hrds.rducm.gitlab.domain.service;
 
 import com.github.pagehelper.PageInfo;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import org.hrds.rducm.gitlab.api.controller.dto.DetectApplicantTypeDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApprovalCreateDTO;
-import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
+import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApplicantCreateDTO;
 
 /**
  * @author ying.xie@hand-china.com
@@ -27,16 +27,17 @@ public interface IRdmMemberApplicantService {
      *
      * @param projectId
      * @param repositoryId
+     * @return
      */
-    String detectApplicantType(Long projectId, Long repositoryId);
+    DetectApplicantTypeDTO detectApplicantType(Long projectId, Long repositoryId);
 
     /**
      * 创建成员申请
      *
      * @param projectId
-     * @param memberApprovalCreateDTO
+     * @param memberApplicantCreateDTO
      */
-    void createApproval(Long projectId, MemberApprovalCreateDTO memberApprovalCreateDTO);
+    void createApproval(Long projectId, MemberApplicantCreateDTO memberApplicantCreateDTO);
 
     /**
      * 审批通过

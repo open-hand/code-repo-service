@@ -60,7 +60,9 @@ public class RdmMemberApplicantAssembler {
             RdmMemberApplicantViewDTO viewDTO = ConvertUtils.convertObject(val, RdmMemberApplicantViewDTO.class);
             viewDTO.setRepositoryName(c7nAppServiceVO.getName());
             viewDTO.setApplicantUserName(c7nApplicantUserVO.getRealName());
+            viewDTO.setApplicantImageUrl(c7nApplicantUserVO.getImageUrl());
             viewDTO.setApprovalUserName(c7nApprovalUserVO.getRealName());
+            viewDTO.setApprovalImageUrl(c7nApprovalUserVO.getImageUrl());
             return viewDTO;
         }));
     }
