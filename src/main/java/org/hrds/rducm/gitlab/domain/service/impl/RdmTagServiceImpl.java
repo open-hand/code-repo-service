@@ -6,6 +6,7 @@ import org.hrds.rducm.gitlab.api.controller.dto.tag.TagDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmTagRepository;
+import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.domain.service.IRdmTagService;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,18 +25,18 @@ public class RdmTagServiceImpl implements IRdmTagService {
     @Autowired
     private RdmTagRepository rdmTagRepository;
     @Autowired
-    private RdmRepositoryRepository repositoryRepository;
+    private IC7nDevOpsServiceService ic7nDevOpsServiceService;
 
     @Override
-    public List<TagDTO> getTagsWithExcludeProtected(Long repositoryId) {
-        // 获取对应Gitlab项目id todo 临时
-        RdmRepository rdmRepository = repositoryRepository.selectByUk(repositoryId);
+    public List<TagDTO> getTagsWithExcludeProtected(Long projectId, Long repositoryId) {
+        // 获取对应Gitlab项目id
+        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(projectId, repositoryId);
 
         // 获取标记
-        List<Tag> tags = rdmTagRepository.getTagsFromGitlab(rdmRepository.getGlProjectId());
+        List<Tag> tags = rdmTagRepository.getTagsFromGitlab(glProjectId);
 
         // 获取保护标记
-        List<ProtectedTag> protectedTags = rdmTagRepository.getProtectedTagsFromGitlab(rdmRepository.getGlProjectId());
+        List<ProtectedTag> protectedTags = rdmTagRepository.getProtectedTagsFromGitlab(glProjectId);
         Set<String> tagNameSet = protectedTags.stream().map(pt -> pt.getName()).collect(Collectors.toSet());
 
 

@@ -1,9 +1,6 @@
 package org.hrds.rducm.gitlab.domain.service;
 
-import com.github.pagehelper.PageInfo;
-import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.repository.RepositoryOverViewDTO;
 
 import java.util.List;
 
@@ -15,8 +12,10 @@ public interface IRdmBranchService {
     /**
      * 获取分支列表(排除保护分支)
      *
+     *
+     * @param projectId
      * @param repositoryId
      * @return
      */
-    List<BranchDTO> getBranchesWithExcludeProtected(Long repositoryId);
+    List<BranchDTO> getBranchesWithExcludeProtected(Long projectId, Long repositoryId);
 }

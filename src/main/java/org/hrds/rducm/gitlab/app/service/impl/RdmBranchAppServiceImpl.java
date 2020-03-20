@@ -27,8 +27,6 @@ public class RdmBranchAppServiceImpl implements RdmBranchAppService {
     @Autowired
     private IRdmBranchService iRdmBranchService;
     @Autowired
-    private RdmRepositoryRepository repositoryRepository;
-    @Autowired
     private GitlabProtectedBranchesApi gitlabProtectedBranchesApi;
     @Autowired
     private IC7nDevOpsServiceService ic7nDevOpsServiceService;
@@ -37,7 +35,7 @@ public class RdmBranchAppServiceImpl implements RdmBranchAppService {
     public List<BranchDTO> getBranches(Long projectId, Long repositoryId, BranchQueryDTO branchQueryDTO) {
         // 参数处理
         if (Optional.ofNullable(branchQueryDTO.getExcludeProtectedFlag()).orElse(false)) {
-            return iRdmBranchService.getBranchesWithExcludeProtected(repositoryId);
+            return iRdmBranchService.getBranchesWithExcludeProtected(projectId, repositoryId);
         }
 
         // 获取对应Gitlab项目id

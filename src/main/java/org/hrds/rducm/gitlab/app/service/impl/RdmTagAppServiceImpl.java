@@ -26,8 +26,6 @@ public class RdmTagAppServiceImpl implements RdmTagAppService {
     @Autowired
     private RdmTagRepository rdmTagRepository;
     @Autowired
-    private RdmRepositoryRepository repositoryRepository;
-    @Autowired
     private IRdmTagService iRdmTagService;
     @Autowired
     private GitlabTagsApi gitlabTagsApi;
@@ -38,7 +36,7 @@ public class RdmTagAppServiceImpl implements RdmTagAppService {
     public List<TagDTO> getTags(Long projectId, Long repositoryId, TagQueryDTO tagQueryDTO) {
         // 参数处理
         if (Optional.ofNullable(tagQueryDTO.getExcludeProtectedFlag()).orElse(false)) {
-            return iRdmTagService.getTagsWithExcludeProtected(repositoryId);
+            return iRdmTagService.getTagsWithExcludeProtected(projectId, repositoryId);
         }
 
         // 获取对应Gitlab项目id

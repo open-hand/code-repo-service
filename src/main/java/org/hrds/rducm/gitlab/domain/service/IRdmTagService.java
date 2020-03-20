@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.domain.service;
 
-import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.tag.TagDTO;
 
 import java.util.List;
@@ -13,8 +12,10 @@ public interface IRdmTagService {
     /**
      * 获取分支列表(排除保护分支)
      *
+     *
+     * @param projectId
      * @param repositoryId
      * @return
      */
-    List<TagDTO> getTagsWithExcludeProtected(Long repositoryId);
+    List<TagDTO> getTagsWithExcludeProtected(Long projectId, Long repositoryId);
 }
