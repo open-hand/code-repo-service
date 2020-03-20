@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.domain.service;
 
 import com.github.pagehelper.PageInfo;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApprovalCreateDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
 
@@ -17,7 +18,7 @@ public interface IRdmMemberApplicantService {
      * @param pageRequest
      * @return
      */
-    PageInfo<RdmMemberApplicant> pageByOptions(Long projectId, PageRequest pageRequest);
+    PageInfo<RdmMemberApplicantViewDTO> pageByOptions(Long projectId, PageRequest pageRequest);
 
     /**
      * 检测申请类型

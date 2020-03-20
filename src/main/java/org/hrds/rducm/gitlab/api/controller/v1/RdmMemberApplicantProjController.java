@@ -7,6 +7,7 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApprovalCreateDTO;
 import org.hrds.rducm.gitlab.api.controller.validator.RdmMemberApprovalValidator;
 import org.hrds.rducm.gitlab.app.service.RdmMemberApplicantAppService;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Future;
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * 成员审批表 管理 API
@@ -28,8 +30,8 @@ import java.util.Date;
  * @author ying.xie@hand-china.com 2020-03-11 17:29:45
  */
 @RestController("rdmMemberApprovalProjController.v1")
-@RequestMapping("/v1/projects/{projectId}/gitlab/repositories/member-approvals")
-public class RdmMemberApprovalProjController extends BaseController {
+@RequestMapping("/v1/projects/{projectId}/gitlab/repositories/member-applicants")
+public class RdmMemberApplicantProjController extends BaseController {
 
     @Autowired
     private IRdmMemberApplicantService iRdmMemberApplicantService;
@@ -41,8 +43,8 @@ public class RdmMemberApprovalProjController extends BaseController {
     @ApiOperation(value = "成员权限申请列表")
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping
-    public ResponseEntity<PageInfo<RdmMemberApplicant>> list(@PathVariable Long projectId,
-                                                             PageRequest pageRequest) {
+    public ResponseEntity<PageInfo<RdmMemberApplicantViewDTO>> list(@PathVariable Long projectId,
+                                                                    PageRequest pageRequest) {
 
         return Results.success(iRdmMemberApplicantService.pageByOptions(projectId, pageRequest));
     }
@@ -78,7 +80,9 @@ public class RdmMemberApprovalProjController extends BaseController {
     public ResponseEntity<?> passAndHandleMember(@PathVariable Long id,
                                                  @RequestParam Long objectVersionNumber,
                                                  @Future @RequestParam(required = false) Date expiresAt) {
-        validObject(expiresAt);
+        if (expiresAt != null) {
+            validObject(expiresAt);
+        }
         rdmMemberApprovalValidator.validatePass(id);
 
         rdmMemberApplicantAppService.passAndHandleMember(id, objectVersionNumber, expiresAt);

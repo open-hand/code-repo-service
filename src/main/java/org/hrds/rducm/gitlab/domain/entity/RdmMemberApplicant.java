@@ -23,7 +23,7 @@ import java.util.Date;
 @VersionAudit
 @ModifyAudit
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
-@Table(name = "rducm_gitlab_member_approval")
+@Table(name = "rducm_gitlab_member_applicant")
 public class RdmMemberApplicant extends AuditDomain {
 
     public static final String FIELD_ID = "id";

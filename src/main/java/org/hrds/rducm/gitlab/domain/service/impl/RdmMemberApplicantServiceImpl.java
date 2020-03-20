@@ -5,7 +5,9 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApprovalCreateDTO;
+import org.hrds.rducm.gitlab.app.assembler.RdmMemberApplicantAssembler;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberApplicantRepository;
@@ -16,6 +18,8 @@ import org.hrds.rducm.gitlab.infra.enums.ApprovalStateEnum;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
+import org.hzero.mybatis.domian.Condition;
+import org.hzero.mybatis.util.Sqls;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +36,19 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
     private RdmMemberApplicantRepository rdmMemberApplicantRepository;
     @Autowired
     private RdmMemberRepository rdmMemberRepository;
+    @Autowired
+    private RdmMemberApplicantAssembler rdmMemberApplicantAssembler;
 
     @Override
-    public PageInfo<RdmMemberApplicant> pageByOptions(Long projectId, PageRequest pageRequest) {
-        Page<RdmMemberApplicant> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberApplicantRepository.selectAll());
-        return PageConvertUtils.convert(page);
+    public PageInfo<RdmMemberApplicantViewDTO> pageByOptions(Long projectId, PageRequest pageRequest) {
+        Condition condition = Condition.builder(RdmMemberApplicant.class)
+                .where(Sqls.custom().andEqualTo(RdmMemberApplicant.FIELD_PROJECT_ID, projectId))
+                .build();
+
+        Page<RdmMemberApplicant> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberApplicantRepository.selectByCondition(condition));
+
+        // 转换查询结果
+        return rdmMemberApplicantAssembler.pageToRdmMemberApplicantViewDTO(projectId, page);
     }
 
     @Override

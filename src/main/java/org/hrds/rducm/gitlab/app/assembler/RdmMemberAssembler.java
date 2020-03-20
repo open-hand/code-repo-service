@@ -95,15 +95,9 @@ public class RdmMemberAssembler {
     public RdmMember rdmMemberCreateDTOToRdmMember(Long projectId, Long repositoryId, RdmMemberCreateDTO rdmMemberCreateDTO) {
         final RdmMember param = ConvertUtils.convertObject(rdmMemberCreateDTO, RdmMember.class);
 
-        // 获取gitlab项目id和用户id todo 应从外部接口获取, 暂时从数据库获取
-        Integer glProjectId;
-        Integer glUserId;
-
-        RdmRepository rdmRepository = rdmRepositoryRepository.selectOne(new RdmRepository().setRepositoryId(repositoryId));
-        RdmUser rdmUser = rdmUserRepository.selectOne(new RdmUser().setUserId(param.getUserId()));
-
-        glProjectId = rdmRepository.getGlProjectId();
-        glUserId = rdmUser.getGlUserId();
+        // 获取gitlab项目id和用户id
+        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(projectId, repositoryId);
+        Integer glUserId = ic7nBaseServiceService.userIdToGlUserId(projectId, param.getUserId());
 
         param.setGlProjectId(glProjectId);
         param.setGlUserId(glUserId);
