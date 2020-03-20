@@ -68,7 +68,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     @Override
     public void updateMemberBefore(RdmMember param) {
         // 校验是否已和gitlab保持同步, 保证一致性
-        rdmMemberRepository.checkIsSyncGitlab(param);
+        param.checkIsSyncGitlab();
 
         RdmMember m = ConvertUtils.convertObject(param, RdmMember.class);
         m.setSyncGitlabFlag(false);

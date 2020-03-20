@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.annotation.ModifyAudit;
 import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
@@ -43,7 +44,7 @@ public class RdmMember extends AuditDomain {
     // ------------------------------------------------------------------------------
 
     /**
-     * 设置是否过期标识
+     * 校验是否过期标识
      */
     public boolean checkExpiredFlag() {
         // 当前时间 >= 过期时间
@@ -51,6 +52,17 @@ public class RdmMember extends AuditDomain {
             return true;
         } else {
             return false;
+        }
+    }
+
+    /**
+     * 检查当前记录是否处于"预更新"状态
+     *
+     */
+    public void checkIsSyncGitlab() {
+        if (!this.getSyncGitlabFlag()) {
+            // 当同步标记为false时, 表示上个事务还未结束
+            throw new CommonException("error.sync.flag.false");
         }
     }
 

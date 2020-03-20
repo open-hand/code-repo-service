@@ -9,9 +9,9 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApprovalCreateDTO;
 import org.hrds.rducm.gitlab.api.controller.validator.RdmMemberApprovalValidator;
-import org.hrds.rducm.gitlab.app.service.RdmMemberApprovalAppService;
-import org.hrds.rducm.gitlab.domain.entity.RdmMemberApproval;
-import org.hrds.rducm.gitlab.domain.service.IRdmMemberApprovalService;
+import org.hrds.rducm.gitlab.app.service.RdmMemberApplicantAppService;
+import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
+import org.hrds.rducm.gitlab.domain.service.IRdmMemberApplicantService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Future;
 import java.util.Date;
 
 /**
@@ -31,21 +32,29 @@ import java.util.Date;
 public class RdmMemberApprovalProjController extends BaseController {
 
     @Autowired
-    private IRdmMemberApprovalService iRdmMemberApprovalService;
+    private IRdmMemberApplicantService iRdmMemberApplicantService;
     @Autowired
-    private RdmMemberApprovalAppService rdmMemberApprovalAppService;
+    private RdmMemberApplicantAppService rdmMemberApplicantAppService;
     @Autowired
     private RdmMemberApprovalValidator rdmMemberApprovalValidator;
 
-    @ApiOperation(value = "成员审批表列表")
+    @ApiOperation(value = "成员权限申请列表")
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping
-    public ResponseEntity<PageInfo<RdmMemberApproval>> list(@PathVariable Long projectId,
-                                                            PageRequest pageRequest) {
+    public ResponseEntity<PageInfo<RdmMemberApplicant>> list(@PathVariable Long projectId,
+                                                             PageRequest pageRequest) {
 
-        return Results.success(iRdmMemberApprovalService.pageByOptions(projectId, pageRequest));
+        return Results.success(iRdmMemberApplicantService.pageByOptions(projectId, pageRequest));
     }
 
+    @ApiOperation(value = "检测当前用户申请类型")
+    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @PostMapping("/self/detect-applicant-type")
+    public ResponseEntity<String> detectApplicantType(@PathVariable Long projectId,
+                                                      @RequestParam Long repositoryId) {
+        String applicantType = iRdmMemberApplicantService.detectApplicantType(projectId, repositoryId);
+        return ResponseEntity.ok(applicantType);
+    }
 
     @ApiOperation(value = "创建成员权限申请")
     @ApiImplicitParams({
@@ -59,7 +68,7 @@ public class RdmMemberApprovalProjController extends BaseController {
         validObject(memberApprovalCreateDTO);
         rdmMemberApprovalValidator.validateCreateDTO(projectId, memberApprovalCreateDTO);
 
-        iRdmMemberApprovalService.createApproval(projectId, memberApprovalCreateDTO);
+        iRdmMemberApplicantService.createApproval(projectId, memberApprovalCreateDTO);
         return Results.success();
     }
 
@@ -68,10 +77,11 @@ public class RdmMemberApprovalProjController extends BaseController {
     @PostMapping("/{id}/pass")
     public ResponseEntity<?> passAndHandleMember(@PathVariable Long id,
                                                  @RequestParam Long objectVersionNumber,
-                                                 @RequestParam(required = false) Date expiresAt) {
+                                                 @Future @RequestParam(required = false) Date expiresAt) {
+        validObject(expiresAt);
         rdmMemberApprovalValidator.validatePass(id);
 
-        rdmMemberApprovalAppService.passAndHandleMember(id, objectVersionNumber, expiresAt);
+        rdmMemberApplicantAppService.passAndHandleMember(id, objectVersionNumber, expiresAt);
         return Results.success();
     }
 
@@ -79,10 +89,11 @@ public class RdmMemberApprovalProjController extends BaseController {
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping("/{id}/refuse")
     public ResponseEntity<?> refuse(@PathVariable Long id,
-                                    @RequestParam Long objectVersionNumber) {
+                                    @RequestParam Long objectVersionNumber,
+                                    @RequestBody String approvalMessage) {
         rdmMemberApprovalValidator.validateRefuse(id);
 
-        rdmMemberApprovalAppService.refuse(id, objectVersionNumber);
+        rdmMemberApplicantAppService.refuse(id, objectVersionNumber, approvalMessage);
         return Results.success();
     }
 }

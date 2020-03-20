@@ -15,16 +15,16 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
- * 成员审批表
+ * 成员申请表
  *
  * @author ying.xie@hand-china.com 2020-03-12 10:52:57
  */
-@ApiModel("成员审批表")
+@ApiModel("成员申请表")
 @VersionAudit
 @ModifyAudit
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 @Table(name = "rducm_gitlab_member_approval")
-public class RdmMemberApproval extends AuditDomain {
+public class RdmMemberApplicant extends AuditDomain {
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_PROJECT_ID = "projectId";
@@ -68,11 +68,15 @@ public class RdmMemberApproval extends AuditDomain {
     private Date applicantDate;
     @ApiModelProperty(value = "审批人，用户id")
     private Long approvalUserId;
-    @ApiModelProperty(value = "审批状态（待审批|通过）", required = true)
+    @ApiModelProperty(value = "审批状态（待审批|通过|不通过）", required = true)
     @NotBlank
     private String approvalState;
     @ApiModelProperty(value = "审批时间")
     private Date approvalDate;
+
+    @ApiModelProperty(value = "审批信息")
+    private String approvalMessage;
+
     @ApiModelProperty(value = "权限等级", required = true)
     @NotNull
     private Integer accessLevel;
@@ -208,4 +212,12 @@ public class RdmMemberApproval extends AuditDomain {
         this.oldAccessLevel = oldAccessLevel;
     }
 
+    public String getApprovalMessage() {
+        return approvalMessage;
+    }
+
+    public RdmMemberApplicant setApprovalMessage(String approvalMessage) {
+        this.approvalMessage = approvalMessage;
+        return this;
+    }
 }

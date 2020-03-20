@@ -22,35 +22,6 @@ public interface RdmMemberRepository extends BaseRepository<RdmMember> {
      */
     int selectCountByRepositoryId(Long repositoryId);
 
-    void checkIsSyncGitlab(RdmMember m);
-
-//    List<Member> queryMembersFromGitlab(Integer glProjectId);
-
-//    void batchAddOrUpdateMembersToGitlab(List<RdmMember> rdmMembers);
-
-//    void insertMemberBefore(RdmMember param);
-//
-//    /**
-//     * 更新成员, 预更新(同步标识设为false, gitlab字段置空)
-//     * 执行成功会设置主键和版本号
-//     *
-//     * @param rdmMember
-//     */
-//    void updateMemberBefore(RdmMember rdmMember);
-//
-//    void updateMemberAfter(RdmMember m, Member member);
-
-    /**
-     * 批量新增或更新成员, 预更新(同步标识设为false, gitlab字段置空)
-     * 执行成功后会设置主键和版本号
-     *
-     * @param rdmMembers
-     */
-//    void batchAddOrUpdateMembersBefore(List<RdmMember> rdmMembers);
-
-//    void updateMemberToGitlab(RdmMember param);
-//
-//    void removeMemberToGitlab(RdmMember param);
-
+//    void checkIsSyncGitlab(RdmMember m);
 
 }

@@ -35,18 +35,18 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
         return this.selectCount(rdmMember);
     }
 
-    /**
-     * 检查当前记录是否处于"预更新"状态
-     *
-     * @param m
-     */
-    @Override
-    public void checkIsSyncGitlab(RdmMember m) {
-        if (!m.getSyncGitlabFlag()) {
-            // 当同步标记为false时, 表示上个事务还未结束
-            throw new CommonException("error.sync.flag.false");
-        }
-    }
+//    /**
+//     * 检查当前记录是否处于"预更新"状态
+//     *
+//     * @param m
+//     */
+//    @Override
+//    public void checkIsSyncGitlab(RdmMember m) {
+//        if (!m.getSyncGitlabFlag()) {
+//            // 当同步标记为false时, 表示上个事务还未结束
+//            throw new CommonException("error.sync.flag.false");
+//        }
+//    }
 
     /**
      * 构造审计所需报文参数
