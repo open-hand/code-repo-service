@@ -23,7 +23,6 @@ public class OperationEventPublisherHelper implements ApplicationEventPublisherA
         AssertUtils.notNull(event.getEventParam().getProjectId(), "projectId cannot null");
         AssertUtils.notNull(event.getEventParam().getRepositoryId(), "repositoryId cannot null");
         AssertUtils.notNull(event.getEventParam().getTargetUserId(), "targetUserId cannot null");
-        AssertUtils.notNull(event.getEventParam().getAccessLevel(), "accessLevel cannot null");
 
         Class<?> clazz = event.getSource().getClass();
         LOGGER.info("[成员管理]操作审计: [{}], 发送了[{}]事件", clazz.getSimpleName(), event.getEventType().getName());

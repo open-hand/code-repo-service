@@ -114,7 +114,7 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
 
         sourceUserIdStr = c7nUserS.getRealName() + "(" + c7nUserS.getLoginName() + ")";
         targetUserIdStr = c7nUserT.getRealName() + "(" + c7nUserT.getLoginName() + ")";
-        accessLevelStr = AccessLevel.forValue(accessLevel).name();
+        accessLevelStr = accessLevel == null ? null : AccessLevel.forValue(accessLevel).name();
 
         expiresAtStr = Optional.ofNullable(expiresAt)
                 .map(val -> DateFormatUtils.format(val, "yyyy-MM-dd"))
