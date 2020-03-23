@@ -134,8 +134,8 @@ public class RdmMemberAssembler {
 
         // 填充数据
         for (RdmMemberViewDTO viewDTO : rdmMemberViewDTOS.getContent()) {
-            C7nUserVO c7nUserVO = userVOMap.get(viewDTO.getUserId());
-            C7nUserVO c7nCreateUserVO = userVOMap.get(viewDTO.getCreatedBy());
+            C7nUserVO c7nUserVO = Optional.ofNullable(userVOMap.get(viewDTO.getUserId())).orElse(new C7nUserVO());
+            C7nUserVO c7nCreateUserVO = Optional.ofNullable(userVOMap.get(viewDTO.getCreatedBy())).orElse(new C7nUserVO());
 
             C7nAppServiceVO c7nAppServiceVO = appServiceVOMap.get(viewDTO.getRepositoryId());
 
