@@ -36,7 +36,7 @@ public class DetailsHelper {
 
     public static final CustomUserDetails U10001;
     public static final CustomUserDetails U10003;
-    public static final CustomUserDetails U21080;
+    public static final CustomUserDetails user0303;
 
     static {
         U10001 = new CustomUserDetails("cxh", "unknown", Collections.emptyList());
@@ -55,13 +55,13 @@ public class DetailsHelper {
         U10003.setLanguage(BaseConstants.DEFAULT_LOCALE_STR);
         U10003.setTimeZone(BaseConstants.DEFAULT_TIME_ZONE);
 
-        U21080 = new CustomUserDetails("user0303@gmail.com", "unknown", Collections.emptyList());
-        U21080.setUserId(21080L);
-        U21080.setOrganizationId(BaseConstants.DEFAULT_TENANT_ID);
-        U21080.setTenantId(BaseConstants.DEFAULT_TENANT_ID);
-        U21080.setTenantIds(Collections.singletonList(BaseConstants.DEFAULT_TENANT_ID));
-        U21080.setLanguage(BaseConstants.DEFAULT_LOCALE_STR);
-        U21080.setTimeZone(BaseConstants.DEFAULT_TIME_ZONE);
+        user0303 = new CustomUserDetails("user0303@gmail.com", "unknown", Collections.emptyList());
+        user0303.setUserId(21193L);
+        user0303.setOrganizationId(BaseConstants.DEFAULT_TENANT_ID);
+        user0303.setTenantId(BaseConstants.DEFAULT_TENANT_ID);
+        user0303.setTenantIds(Collections.singletonList(BaseConstants.DEFAULT_TENANT_ID));
+        user0303.setLanguage(BaseConstants.DEFAULT_LOCALE_STR);
+        user0303.setTimeZone(BaseConstants.DEFAULT_TIME_ZONE);
     }
 
     /**
@@ -93,7 +93,7 @@ public class DetailsHelper {
                 return (CustomUserDetails) decodedDetails;
             }
         }
-        return U21080;
+        return user0303;
     }
 
     /**
