@@ -3,6 +3,7 @@ package org.hrds.rducm.gitlab.app.service.impl;
 import org.apache.commons.lang3.EnumUtils;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberCreateDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
+import org.hrds.rducm.gitlab.api.controller.validator.RdmMemberApplicantValidator;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.app.service.RdmMemberApplicantAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
@@ -32,14 +33,19 @@ public class RdmMemberApplicantAppServiceImpl implements RdmMemberApplicantAppSe
     private RdmMemberAppService rdmMemberAppService;
     @Autowired
     private RdmMemberRepository rdmMemberRepository;
+    @Autowired
+    private RdmMemberApplicantValidator rdmMemberApplicantValidator;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void passAndHandleMember(Long id, Long objectVersionNumber, Date expiresAt) {
+        // <0> 校验
+        rdmMemberApplicantValidator.validatePass(id);
+
         // <1> 查询审批记录
         RdmMemberApplicant dbMemberApproval = rdmMemberApplicantRepository.selectByPrimaryKey(id);
 
-        // <2> 新增成员|更新成员
+        // <2> 处理成员, 分为新增成员|更新成员
         ApplicantTypeEnum applicantTypeEnum = EnumUtils.getEnum(ApplicantTypeEnum.class, dbMemberApproval.getApplicantType());
         switch (applicantTypeEnum) {
             case MEMBER_JOIN: {
@@ -74,6 +80,9 @@ public class RdmMemberApplicantAppServiceImpl implements RdmMemberApplicantAppSe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void refuse(Long id, Long objectVersionNumber, String approvalMessage) {
+        // <0> 校验
+        rdmMemberApplicantValidator.validateRefuse(id);
+
         // <1> 审批拒绝
         iRdmMemberApplicantService.refuse(id, objectVersionNumber, approvalMessage);
     }

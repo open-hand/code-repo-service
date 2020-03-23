@@ -186,7 +186,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         final RdmMember param = ConvertUtils.convertObject(rdmMemberUpdateDTO, RdmMember.class);
         param.setId(memberId);
 
-        // 获取gitlab项目id和用户id
+        // 获取数据库成员
         RdmMember dbMember = rdmMemberRepository.selectByPrimaryKey(memberId);
 
         param.setGlProjectId(dbMember.getGlProjectId());
@@ -230,6 +230,19 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         // <4> 发送事件
         iRdmMemberService.publishMemberEvent(dbMember, MemberEvent.EventType.REMOVE_MEMBER);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void syncMember(Long memberId) {
+        // <1> 查询数据库成员
+        RdmMember dbMember = rdmMemberRepository.selectByPrimaryKey(memberId);
+
+        // <2> 将未同步成员同步至Gitlab
+        iRdmMemberService.syncMemberFromGitlab(dbMember);
+
+        // <3> 发送事件
+        iRdmMemberService.publishMemberEvent(dbMember, MemberEvent.EventType.SYNC_MEMBER);
     }
 
     @Override

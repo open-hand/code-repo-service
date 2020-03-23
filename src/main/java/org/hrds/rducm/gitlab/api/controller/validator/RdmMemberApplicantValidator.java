@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  * @date 2020/3/12
  */
 @Component
-public class RdmMemberApprovalValidator {
+public class RdmMemberApplicantValidator {
     @Autowired
     private RdmMemberApplicantRepository rdmMemberApplicantRepository;
     @Autowired
@@ -71,6 +71,32 @@ public class RdmMemberApprovalValidator {
 
         if(!dbMemberApproval.getApprovalState().equals(ApprovalStateEnum.PENDING.getCode())) {
             throw new CommonException("error.approval.state.not.pending");
+        }
+
+        // 校验成员是否已存在
+        Long projectId = dbMemberApproval.getProjectId();
+        Long repositoryId = dbMemberApproval.getRepositoryId();
+        Long applicantUserId = dbMemberApproval.getApplicantUserId();
+        String applicantType = dbMemberApproval.getApplicantType();
+
+        RdmMember dbMember = rdmMemberRepository.selectOneByUk(projectId, repositoryId, applicantUserId);
+
+        ApplicantTypeEnum applicantTypeEnum = EnumUtils.getEnum(ApplicantTypeEnum.class, applicantType);
+        switch (applicantTypeEnum) {
+            case MEMBER_JOIN: {
+                AssertExtensionUtils.isNull(dbMember, "error.member.exist");
+                break;
+            }
+            case MEMBER_PERMISSION_CHANGE: {
+                // 成员需存在
+                AssertExtensionUtils.notNull(dbMember, "error.member.not.exist");
+
+                // 成员同步状态需为已同步
+                dbMember.checkIsSyncGitlab();
+                break;
+            }
+            default:
+                break;
         }
     }
 

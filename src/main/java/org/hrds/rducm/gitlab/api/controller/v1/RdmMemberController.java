@@ -1,16 +1,17 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
 import io.choerodon.core.annotation.Permission;
-import io.swagger.annotations.Api;
+import io.choerodon.core.enums.ResourceType;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
+import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,9 @@ import org.springframework.web.bind.annotation.*;
 public class RdmMemberController extends BaseController {
     private final RdmMemberAppService rdmMemberAppService;
 
+    @Autowired
+    private IRdmMemberService rdmMemberService;
+
     public RdmMemberController(RdmMemberAppService rdmMemberAppService) {
         this.rdmMemberAppService = rdmMemberAppService;
     }
@@ -34,7 +38,7 @@ public class RdmMemberController extends BaseController {
             @ApiImplicitParam(name = "memberId", value = "成员id", paramType = "path", required = true),
             @ApiImplicitParam(name = "rdmMemberUpdateDTO", value = "参数", dataType = "RdmMemberUpdateDTO", required = true),
     })
-    @Permission(permissionPublic = true)
+    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PutMapping("/{memberId}")
     public ResponseEntity<?> updateMember(@PathVariable Long projectId,
                                           @PathVariable Long repositoryId,
@@ -42,7 +46,7 @@ public class RdmMemberController extends BaseController {
                                           @RequestBody RdmMemberUpdateDTO rdmMemberUpdateDTO) {
         validObject(rdmMemberUpdateDTO);
         rdmMemberAppService.updateMember(memberId, rdmMemberUpdateDTO);
-        return Results.created(null);
+        return Results.success();
     }
 
     @ApiOperation(value = "移除代码库成员")
@@ -51,12 +55,36 @@ public class RdmMemberController extends BaseController {
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "memberId", value = "成员id", paramType = "path", required = true)
     })
-    @Permission(permissionPublic = true)
+    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @DeleteMapping("/{memberId}")
     public ResponseEntity<?> removeMember(@PathVariable Long projectId,
                                           @PathVariable Long repositoryId,
                                           @PathVariable Long memberId) {
         rdmMemberAppService.removeMember(memberId);
-        return Results.created(null);
+        return Results.success();
+    }
+
+    @ApiOperation(value = "手动同步代码库成员")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
+            @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
+            @ApiImplicitParam(name = "memberId", value = "成员id", paramType = "path", required = true),
+    })
+    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @PostMapping("/{memberId}/sync")
+    public ResponseEntity<?> syncMember(@PathVariable Long projectId,
+                                        @PathVariable Long repositoryId,
+                                        @PathVariable Long memberId) {
+        rdmMemberAppService.syncMember(memberId);
+        return Results.success();
+    }
+
+    @ApiOperation(value = "同步Gitlab代码库成员到本服务")
+    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @PostMapping("/sync-from-gitlab")
+    public ResponseEntity<?> syncMembersFromGitlab(@PathVariable Long projectId,
+                                                   @PathVariable Long repositoryId) {
+        rdmMemberService.syncAllMembersFromGitlab(projectId, repositoryId);
+        return Results.success();
     }
 }

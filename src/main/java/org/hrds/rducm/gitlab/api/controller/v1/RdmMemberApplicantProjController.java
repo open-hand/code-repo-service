@@ -7,19 +7,24 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.time.DateUtils;
 import org.hrds.rducm.gitlab.api.controller.dto.DetectApplicantTypeDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantPassDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApplicantCreateDTO;
-import org.hrds.rducm.gitlab.api.controller.validator.RdmMemberApprovalValidator;
+import org.hrds.rducm.gitlab.api.controller.validator.RdmMemberApplicantValidator;
 import org.hrds.rducm.gitlab.app.service.RdmMemberApplicantAppService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberApplicantService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
+import org.hzero.core.util.ValidUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Future;
 import java.util.Date;
 
@@ -37,7 +42,7 @@ public class RdmMemberApplicantProjController extends BaseController {
     @Autowired
     private RdmMemberApplicantAppService rdmMemberApplicantAppService;
     @Autowired
-    private RdmMemberApprovalValidator rdmMemberApprovalValidator;
+    private RdmMemberApplicantValidator rdmMemberApplicantValidator;
 
     @ApiOperation(value = "成员权限申请列表")
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
@@ -67,7 +72,7 @@ public class RdmMemberApplicantProjController extends BaseController {
     public ResponseEntity<?> create(@PathVariable Long projectId,
                                     @RequestBody MemberApplicantCreateDTO memberApplicantCreateDTO) {
         validObject(memberApplicantCreateDTO);
-        rdmMemberApprovalValidator.validateCreateDTO(projectId, memberApplicantCreateDTO);
+        rdmMemberApplicantValidator.validateCreateDTO(projectId, memberApplicantCreateDTO);
 
         iRdmMemberApplicantService.createApproval(projectId, memberApplicantCreateDTO);
         return Results.success();
@@ -83,13 +88,10 @@ public class RdmMemberApplicantProjController extends BaseController {
     @PostMapping("/{id}/pass")
     public ResponseEntity<?> passAndHandleMember(@PathVariable Long id,
                                                  @RequestParam Long objectVersionNumber,
-                                                 @Future @RequestParam(required = false) Date expiresAt) {
-        if (expiresAt != null) {
-            validObject(expiresAt);
-        }
-        rdmMemberApprovalValidator.validatePass(id);
+                                                 RdmMemberApplicantPassDTO passDTO) {
+        validObject(passDTO);
 
-        rdmMemberApplicantAppService.passAndHandleMember(id, objectVersionNumber, expiresAt);
+        rdmMemberApplicantAppService.passAndHandleMember(id, objectVersionNumber, passDTO.getExpiresAt());
         return Results.success();
     }
 
@@ -99,8 +101,6 @@ public class RdmMemberApplicantProjController extends BaseController {
     public ResponseEntity<?> refuse(@PathVariable Long id,
                                     @RequestParam Long objectVersionNumber,
                                     @RequestBody String approvalMessage) {
-        rdmMemberApprovalValidator.validateRefuse(id);
-
         rdmMemberApplicantAppService.refuse(id, objectVersionNumber, approvalMessage);
         return Results.success();
     }

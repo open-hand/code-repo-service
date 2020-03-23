@@ -1,8 +1,10 @@
 package org.hrds.rducm.gitlab.domain.service;
 
 import org.gitlab4j.api.models.Member;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -63,6 +65,22 @@ public interface IRdmMemberService {
      * @return
      */
     Member addMemberToGitlab(RdmMember param);
+
+    /**
+     * 同步Gitlab成员(整个代码库)
+     *
+     * @param projectId
+     * @param repositoryId
+     * @return
+     */
+    int syncAllMembersFromGitlab(Long projectId, Long repositoryId);
+
+    /**
+     * 同步Gitlab成员(单个成员)
+     *
+     * @param param
+     */
+    void syncMemberFromGitlab(RdmMember param);
 
     /**
      * 发送成员操作审计事件

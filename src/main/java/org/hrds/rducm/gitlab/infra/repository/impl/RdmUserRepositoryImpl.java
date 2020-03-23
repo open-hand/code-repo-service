@@ -24,6 +24,14 @@ public class RdmUserRepositoryImpl extends BaseRepositoryImpl<RdmUser> implement
     }
 
     @Override
+    public RdmUser selectByUk(Integer glUserId) {
+        RdmUser rdmUser = new RdmUser();
+        rdmUser.setGlUserId(glUserId);
+        rdmUser = this.selectOne(rdmUser);
+        return rdmUser;
+    }
+
+    @Override
     public User getUserFromGitlab(Integer userId) {
         return gitlabUserApi.getUser(userId);
     }

@@ -3,6 +3,7 @@ package org.hrds.rducm.gitlab.app.service;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.*;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author xy
@@ -49,6 +50,13 @@ public interface RdmMemberAppService {
      * @param memberId 成员id, 主键
      */
     void removeMember(Long memberId);
+
+    /**
+     * 从Gitlab同步成员
+     *
+     * @param memberId
+     */
+    void syncMember(Long memberId);
 
     /**
      * 处理过期的成员(定时任务调用)

@@ -1,9 +1,14 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.domain.AuditDomain;
 import org.gitlab4j.api.models.Member;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
+import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
@@ -11,9 +16,11 @@ import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 成员管理领域服务类
@@ -27,6 +34,10 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     private RdmMemberRepository rdmMemberRepository;
     @Autowired
     private GitlabProjectApi gitlabProjectApi;
+    @Autowired
+    private IC7nDevOpsServiceService ic7nDevOpsServiceService;
+    @Autowired
+    private RdmUserRepository rdmUserRepository;
 
     @Override
     public void batchAddOrUpdateMembersBefore(List<RdmMember> rdmMembers) {
@@ -184,9 +195,59 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
 
             // <2> 发送事件
             this.publishMemberEvent(m, MemberEvent.EventType.REMOVE_EXPIRED_MEMBER);
-//            MemberEvent.EventParam eventParam = buildEventParam(m.getProjectId(), m.getRepositoryId(), m.getUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
-//            OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.REMOVE_EXPIRED_MEMBER, eventParam));
         });
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int syncAllMembersFromGitlab(Long projectId, Long repositoryId) {
+        // <1> 获取Gitlab项目id
+        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(projectId, repositoryId);
+
+        // <2> 查询Gitlab成员
+        List<Member> glMembers = gitlabProjectApi.getAllMembers(glProjectId);
+
+        // <3> 同步到数据库
+        glMembers.forEach(glMember -> {
+            // 查询Gitlab用户对应的userId todo 从数据库取还是猪齿鱼取
+            RdmUser dbUser = rdmUserRepository.selectByUk(glMember.getId());
+            Long userId = dbUser.getUserId();
+
+            RdmMember rdmMember = new RdmMember();
+            rdmMember.setProjectId(projectId)
+                    .setRepositoryId(repositoryId)
+                    .setUserId(userId)
+                    .setGlProjectId(glProjectId)
+                    .setGlUserId(glMember.getId())
+                    .setGlAccessLevel(glMember.getAccessLevel().toValue())
+                    .setGlExpiresAt(glMember.getExpiresAt())
+                    .setSyncGitlabFlag(Boolean.TRUE)
+                    .setSyncDateGitlab(new Date());
+
+            // 删除原成员
+            RdmMember deleteMember = new RdmMember();
+            deleteMember.setProjectId(projectId);
+            deleteMember.setRepositoryId(repositoryId);
+            rdmMemberRepository.delete(deleteMember);
+
+            // 重新插入
+            rdmMemberRepository.insertSelective(rdmMember);
+        });
+        return glMembers.size();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void syncMemberFromGitlab(RdmMember param) {
+        // <1> 获取Gitlab成员, 并更新数据库
+        Member glMember = gitlabProjectApi.getMember(Objects.requireNonNull(param.getGlProjectId()), Objects.requireNonNull(param.getGlUserId()));
+        if (glMember == null) {
+            // 移除数据库成员
+            rdmMemberRepository.deleteByPrimaryKey(param.getId());
+        } else {
+            // 更新数据库成员
+            updateMemberAfter(param, glMember);
+        }
     }
 
     @Override
