@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.infra.client.gitlab;
 
+import io.choerodon.core.helper.ApplicationContextHelper;
 import io.choerodon.core.oauth.DetailsHelper;
 import org.gitlab4j.api.GitLabApi;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
@@ -15,15 +16,13 @@ import java.util.Objects;
  */
 @Component
 public class Gitlab4jClientWrapper extends Gitlab4jClient {
-    @Autowired
-    private RdmUserRepository rdmUserRepository;
-
     @Override
     public GitLabApi getGitLabApi() {
         // 转换Gitlab userId todo
         Long userId = DetailsHelper.getUserDetails().getUserId();
 
         // 获取Gitlab用户id
+        RdmUserRepository rdmUserRepository = ApplicationContextHelper.getApplicationContext().getBean(RdmUserRepository.class);
         RdmUser dbUser = rdmUserRepository.selectByUk(userId);
         Integer glUserId = Objects.requireNonNull(dbUser.getGlUserId());
 
