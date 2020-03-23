@@ -5,7 +5,7 @@ import io.choerodon.core.enums.ResourceType;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.hrds.rducm.gitlab.api.controller.dto.c7n.C7nUserDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hzero.core.base.BaseController;
@@ -31,21 +31,21 @@ public class ProjectController extends BaseController {
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping("/c7n/members/developers")
-    public ResponseEntity<List<C7nUserDTO>> listDeveloperProjectMembers(@PathVariable Long projectId,
-                                                                        @RequestParam(required = false) String name) {
+    public ResponseEntity<List<BaseC7nUserViewDTO>> listDeveloperProjectMembers(@PathVariable Long projectId,
+                                                                                @RequestParam(required = false) String name) {
         List<C7nUserVO> c7nUserVOS = ic7nBaseServiceService.listDeveloperProjectMembers(projectId, name);
 
-        List<C7nUserDTO> c7nUserDTOS = c7nUserVOS.stream().map(u -> {
-            C7nUserDTO c7nUserDTO = new C7nUserDTO();
-            c7nUserDTO.setUserId(u.getId())
+        List<BaseC7nUserViewDTO> baseC7NUserViewDTOS = c7nUserVOS.stream().map(u -> {
+            BaseC7nUserViewDTO baseC7NUserViewDTO = new BaseC7nUserViewDTO();
+            baseC7NUserViewDTO.setUserId(u.getId())
                     .setLoginName(u.getLoginName())
                     .setEmail(u.getEmail())
                     .setOrganizationId(u.getOrganizationId())
                     .setRealName(u.getRealName())
                     .setImageUrl(u.getImageUrl());
-            return c7nUserDTO;
+            return baseC7NUserViewDTO;
         }).collect(Collectors.toList());
-        return Results.success(c7nUserDTOS);
+        return Results.success(baseC7NUserViewDTOS);
 
     }
 }

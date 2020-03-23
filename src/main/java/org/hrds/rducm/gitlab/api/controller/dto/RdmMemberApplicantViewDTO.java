@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.api.controller.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 
 import java.util.Date;
 
@@ -21,14 +22,17 @@ public class RdmMemberApplicantViewDTO {
     @ApiModelProperty(value = "代码库名称")
     private String repositoryName;
 
-    @ApiModelProperty(value = "申请人，用户id")
-    private Long applicantUserId;
+    @ApiModelProperty(value = "申请人")
+    private BaseC7nUserViewDTO applicantUser;
 
-    @ApiModelProperty(value = "申请人，用户名")
-    private String applicantUserName;
-
-    @ApiModelProperty(value = "申请人，头像地址")
-    private String applicantImageUrl;
+//    @ApiModelProperty(value = "申请人，用户id")
+//    private Long applicantUserId;
+//
+//    @ApiModelProperty(value = "申请人，用户名")
+//    private String applicantUserName;
+//
+//    @ApiModelProperty(value = "申请人，头像地址")
+//    private String applicantImageUrl;
 
     @ApiModelProperty(value = "申请类型（新成员|权限变更）")
     private String applicantType;
@@ -36,14 +40,17 @@ public class RdmMemberApplicantViewDTO {
     @ApiModelProperty(value = "申请时间")
     private Date applicantDate;
 
-    @ApiModelProperty(value = "审批人，用户id")
-    private Long approvalUserId;
+    @ApiModelProperty(value = "审批人")
+    private BaseC7nUserViewDTO approvalUser;
 
-    @ApiModelProperty(value = "审批人，用户名")
-    private String approvalUserName;
-
-    @ApiModelProperty(value = "审批人，头像地址")
-    private String approvalImageUrl;
+//    @ApiModelProperty(value = "审批人，用户id")
+//    private Long approvalUserId;
+//
+//    @ApiModelProperty(value = "审批人，用户名")
+//    private String approvalUserName;
+//
+//    @ApiModelProperty(value = "审批人，头像地址")
+//    private String approvalImageUrl;
 
     @ApiModelProperty(value = "审批状态（待审批|通过|不通过）")
     private String approvalState;
@@ -91,12 +98,21 @@ public class RdmMemberApplicantViewDTO {
         return this;
     }
 
-    public Long getApplicantUserId() {
-        return applicantUserId;
+    public String getRepositoryName() {
+        return repositoryName;
     }
 
-    public RdmMemberApplicantViewDTO setApplicantUserId(Long applicantUserId) {
-        this.applicantUserId = applicantUserId;
+    public RdmMemberApplicantViewDTO setRepositoryName(String repositoryName) {
+        this.repositoryName = repositoryName;
+        return this;
+    }
+
+    public BaseC7nUserViewDTO getApplicantUser() {
+        return applicantUser;
+    }
+
+    public RdmMemberApplicantViewDTO setApplicantUser(BaseC7nUserViewDTO applicantUser) {
+        this.applicantUser = applicantUser;
         return this;
     }
 
@@ -118,12 +134,12 @@ public class RdmMemberApplicantViewDTO {
         return this;
     }
 
-    public Long getApprovalUserId() {
-        return approvalUserId;
+    public BaseC7nUserViewDTO getApprovalUser() {
+        return approvalUser;
     }
 
-    public RdmMemberApplicantViewDTO setApprovalUserId(Long approvalUserId) {
-        this.approvalUserId = approvalUserId;
+    public RdmMemberApplicantViewDTO setApprovalUser(BaseC7nUserViewDTO approvalUser) {
+        this.approvalUser = approvalUser;
         return this;
     }
 
@@ -196,51 +212,6 @@ public class RdmMemberApplicantViewDTO {
 
     public RdmMemberApplicantViewDTO setObjectVersionNumber(Long objectVersionNumber) {
         this.objectVersionNumber = objectVersionNumber;
-        return this;
-    }
-
-    public String getRepositoryName() {
-        return repositoryName;
-    }
-
-    public RdmMemberApplicantViewDTO setRepositoryName(String repositoryName) {
-        this.repositoryName = repositoryName;
-        return this;
-    }
-
-    public String getApplicantUserName() {
-        return applicantUserName;
-    }
-
-    public RdmMemberApplicantViewDTO setApplicantUserName(String applicantUserName) {
-        this.applicantUserName = applicantUserName;
-        return this;
-    }
-
-    public String getApprovalUserName() {
-        return approvalUserName;
-    }
-
-    public RdmMemberApplicantViewDTO setApprovalUserName(String approvalUserName) {
-        this.approvalUserName = approvalUserName;
-        return this;
-    }
-
-    public String getApplicantImageUrl() {
-        return applicantImageUrl;
-    }
-
-    public RdmMemberApplicantViewDTO setApplicantImageUrl(String applicantImageUrl) {
-        this.applicantImageUrl = applicantImageUrl;
-        return this;
-    }
-
-    public String getApprovalImageUrl() {
-        return approvalImageUrl;
-    }
-
-    public RdmMemberApplicantViewDTO setApprovalImageUrl(String approvalImageUrl) {
-        this.approvalImageUrl = approvalImageUrl;
         return this;
     }
 }

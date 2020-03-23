@@ -1,7 +1,6 @@
 package org.hrds.rducm.gitlab.infra.feign;
 
 import com.github.pagehelper.PageInfo;
-import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.infra.feign.fallback.BaseServiceFeignClientFallBackFactory;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
@@ -86,26 +85,39 @@ public interface BaseServiceFeignClient {
                                                                          @RequestParam(required = false) String realName);
 
     /**
+     * 项目层
      * 根据多个id查询用户（包括用户信息以及所分配的项目角色信息以及GitlabUserId）
      *
      * @param projectId
      * @param userIds   多个用户id
      * @return
      */
-    @ApiOperation(value = "根据多个id查询用户（包括用户信息以及所分配的项目角色信息以及GitlabUserId）")
     @GetMapping(value = "/v1/projects/{project_id}/users/list_by_ids")
     ResponseEntity<List<C7nUserVO>> listProjectUsersByIds(@PathVariable(name = "project_id") Long projectId,
                                                           @RequestParam(name = "user_ids") Set<Long> userIds);
 
 
     /**
-     * 根据id批量查询用户信息列表
+     * 组织层
+     * 根据多个id查询用户（包括用户信息以及所分配的组织角色信息以及GitlabUserId）
      *
-     * @param ids
-     * @param onlyEnabled
+     * @param organizationId 组织id
+     * @param userIds        多个用户id
      * @return
      */
-    @PostMapping(value = "/v1/users/ids")
-    ResponseEntity<List<C7nUserVO>> listUsersByIds(@RequestBody Long[] ids,
-                                                   @RequestParam(value = "only_enabled", defaultValue = "true", required = false) Boolean onlyEnabled);
+    @GetMapping(value = "v1/organizations/{organization_id}/users/list_by_ids")
+    ResponseEntity<List<C7nUserVO>> listUsersWithRolesAndGitlabUserIdByIds(@PathVariable(name = "organization_id") Long organizationId,
+                                                                           @RequestParam(name = "user_ids") Set<Long> userIds);
+
+
+//    /**
+//     * 根据id批量查询用户信息列表
+//     *
+//     * @param ids
+//     * @param onlyEnabled
+//     * @return
+//     */
+//    @PostMapping(value = "/v1/users/ids")
+//    ResponseEntity<List<C7nUserVO>> listUsersByIds(@RequestBody Long[] ids,
+//                                                   @RequestParam(value = "only_enabled", defaultValue = "true", required = false) Boolean onlyEnabled);
 }

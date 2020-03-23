@@ -38,6 +38,11 @@ public class DevOpsServiceFeignClientFallBackFactory implements FallbackFactory<
             public ResponseEntity<PageInfo<C7nAppServiceVO>> listOrPageProjectAppServices(Long projectId, Set<Long> ids, Boolean doPage, Integer page, Integer size) {
                 return null;
             }
+
+            @Override
+            public ResponseEntity<PageInfo<C7nAppServiceVO>> listAppServiceByIds(Set<Long> ids) {
+                return null;
+            }
         };
     }
 }

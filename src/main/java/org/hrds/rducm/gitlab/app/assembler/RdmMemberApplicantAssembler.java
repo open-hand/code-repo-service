@@ -3,6 +3,7 @@ package org.hrds.rducm.gitlab.app.assembler;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
@@ -59,10 +60,18 @@ public class RdmMemberApplicantAssembler {
 
             RdmMemberApplicantViewDTO viewDTO = ConvertUtils.convertObject(val, RdmMemberApplicantViewDTO.class);
             viewDTO.setRepositoryName(c7nAppServiceVO.getName());
-            viewDTO.setApplicantUserName(c7nApplicantUserVO.getRealName());
-            viewDTO.setApplicantImageUrl(c7nApplicantUserVO.getImageUrl());
-            viewDTO.setApprovalUserName(c7nApprovalUserVO.getRealName());
-            viewDTO.setApprovalImageUrl(c7nApprovalUserVO.getImageUrl());
+            // 申请人
+            viewDTO.setApplicantUser(new BaseC7nUserViewDTO()
+                    .setUserId(val.getApplicantUserId())
+                    .setRealName(c7nApplicantUserVO.getRealName())
+                    .setLoginName(c7nApplicantUserVO.getLoginName())
+                    .setImageUrl(c7nApplicantUserVO.getImageUrl()));
+            // 审批人
+            viewDTO.setApprovalUser(new BaseC7nUserViewDTO()
+                    .setUserId(val.getApprovalUserId())
+                    .setRealName(c7nApprovalUserVO.getRealName())
+                    .setLoginName(c7nApprovalUserVO.getLoginName())
+                    .setImageUrl(c7nApprovalUserVO.getImageUrl()));
             return viewDTO;
         }));
     }

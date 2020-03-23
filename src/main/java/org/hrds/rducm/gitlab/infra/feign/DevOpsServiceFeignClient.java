@@ -73,4 +73,14 @@ public interface DevOpsServiceFeignClient {
                                                                            @RequestParam(value = "doPage", required = false, defaultValue = "true") Boolean doPage,
                                                                            @RequestParam(required = false) Integer page,
                                                                            @RequestParam(required = false) Integer size);
+
+
+    /**
+     * 批量查询应用服务
+     *
+     * @param ids 应用服务Ids, 不能为空，也不能为空数组
+     * @return
+     */
+    @GetMapping(value = "/v1/app_service/list_app_service_by_ids")
+    ResponseEntity<PageInfo<C7nAppServiceVO>> listAppServiceByIds(@RequestParam(value = "ids") Set<Long> ids);
 }
