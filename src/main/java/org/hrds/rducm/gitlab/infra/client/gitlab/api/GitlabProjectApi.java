@@ -58,7 +58,7 @@ public class GitlabProjectApi {
             // 需要查询所有成员
             return gitlab4jClient.getGitLabApi()
                     .getProjectApi()
-                    .getMembers(projectId, GitlabClientConstants.DEFAULT_PER_PAGE)
+                    .getAllMembers(projectId, GitlabClientConstants.DEFAULT_PER_PAGE)
                     .all();
         } catch (GitLabApiException e) {
             throw new GitlabClientException(e, e.getMessage());

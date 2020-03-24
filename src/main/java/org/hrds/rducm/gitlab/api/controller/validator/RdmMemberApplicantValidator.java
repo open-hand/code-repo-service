@@ -9,9 +9,12 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberApplicantRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.infra.enums.ApplicantTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.ApprovalStateEnum;
+import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.util.AssertExtensionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 /**
  * @author ying.xie@hand-china.com
@@ -50,6 +53,9 @@ public class RdmMemberApplicantValidator {
 
                 // 成员同步状态需为已同步
                 dbMember.checkIsSyncGitlab();
+
+                // 旧权限为Owner以上无法申请
+                validateOldAccessLevelIsOwner(dbMember.getGlAccessLevel());
 
                 // 旧权限和新权限不能相同
                 if (dbMember.getGlAccessLevel().equals(accessLevel)) {
@@ -108,5 +114,15 @@ public class RdmMemberApplicantValidator {
             throw new CommonException("error.approval.state.not.pending");
         }
     }
+
+    /* 通用校验 */
+
+    public static void validateOldAccessLevelIsOwner(Integer oldAccessLevel) {
+        // 旧权限为Owner以上无法申请
+        if (oldAccessLevel > RdmAccessLevel.MAINTAINER.toValue()) {
+            throw new CommonException("error.old.access.level.can.not.update", Objects.requireNonNull(RdmAccessLevel.forValue(oldAccessLevel)).toDesc());
+        }
+    }
+
 }
 

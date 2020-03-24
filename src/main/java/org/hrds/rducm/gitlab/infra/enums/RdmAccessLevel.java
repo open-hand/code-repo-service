@@ -7,20 +7,22 @@ public enum RdmAccessLevel {
     /**
      * Gitlab成员的权限等级
      */
-    INVALID(-1),
-    NONE(0),
-    GUEST(10),
-    REPORTER(20),
-    DEVELOPER(30),
-    @Deprecated MASTER(40),
-    MAINTAINER(40),
-    OWNER(50),
-    ADMIN(60);
+    INVALID(-1, "Invalid"),
+    NONE(0, "None"),
+    GUEST(10, "Guest"),
+    REPORTER(20, "Reporter"),
+    DEVELOPER(30, "Developer"),
+    @Deprecated MASTER(40, "Master"),
+    MAINTAINER(40, "Maintainer"),
+    OWNER(50, "Owner"),
+    ADMIN(60, "Admin");
 
     public final Integer value;
+    public final String desc;
 
-    RdmAccessLevel(int value) {
+    RdmAccessLevel(int value, String desc) {
         this.value = value;
+        this.desc = desc;
     }
 
     private static Map<Integer, RdmAccessLevel> valuesMap = new HashMap<Integer, RdmAccessLevel>(9);
@@ -46,6 +48,10 @@ public enum RdmAccessLevel {
 
     public Integer toValue() {
         return (value);
+    }
+
+    public String toDesc() {
+        return (desc);
     }
 
     @Override

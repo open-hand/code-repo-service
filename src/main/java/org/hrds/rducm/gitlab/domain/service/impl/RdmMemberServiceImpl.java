@@ -208,6 +208,11 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         List<Member> glMembers = gitlabProjectApi.getAllMembers(glProjectId);
 
         // <3> 同步到数据库
+        // 删除原成员
+        RdmMember deleteMember = new RdmMember();
+        deleteMember.setProjectId(projectId);
+        deleteMember.setRepositoryId(repositoryId);
+        rdmMemberRepository.delete(deleteMember);
         glMembers.forEach(glMember -> {
             // 查询Gitlab用户对应的userId todo 从数据库取还是猪齿鱼取
             RdmUser dbUser = rdmUserRepository.selectByUk(glMember.getId());
@@ -223,12 +228,6 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
                     .setGlExpiresAt(glMember.getExpiresAt())
                     .setSyncGitlabFlag(Boolean.TRUE)
                     .setSyncDateGitlab(new Date());
-
-            // 删除原成员
-            RdmMember deleteMember = new RdmMember();
-            deleteMember.setProjectId(projectId);
-            deleteMember.setRepositoryId(repositoryId);
-            rdmMemberRepository.delete(deleteMember);
 
             // 重新插入
             rdmMemberRepository.insertSelective(rdmMember);

@@ -9,6 +9,7 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.DetectApplicantTypeDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApplicantCreateDTO;
+import org.hrds.rducm.gitlab.api.controller.validator.RdmMemberApplicantValidator;
 import org.hrds.rducm.gitlab.app.assembler.RdmMemberApplicantAssembler;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
@@ -61,6 +62,9 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
             return new DetectApplicantTypeDTO()
                     .setApplicantType(ApplicantTypeEnum.MEMBER_JOIN.getCode());
         } else {
+            // 旧权限为Owner以上无法申请
+            RdmMemberApplicantValidator.validateOldAccessLevelIsOwner(dbMember.getGlAccessLevel());
+
             return new DetectApplicantTypeDTO()
                     .setApplicantType(ApplicantTypeEnum.MEMBER_PERMISSION_CHANGE.getCode())
                     .setOldAccessLevel(dbMember.getGlAccessLevel());
