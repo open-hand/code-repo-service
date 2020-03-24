@@ -34,10 +34,11 @@ public interface IRdmMemberApplicantService {
     /**
      * 创建成员申请
      *
+     * @param organizationId
      * @param projectId
      * @param memberApplicantCreateDTO
      */
-    void createApproval(Long projectId, MemberApplicantCreateDTO memberApplicantCreateDTO);
+    void createApproval(Long organizationId, Long projectId, MemberApplicantCreateDTO memberApplicantCreateDTO);
 
     /**
      * 审批通过

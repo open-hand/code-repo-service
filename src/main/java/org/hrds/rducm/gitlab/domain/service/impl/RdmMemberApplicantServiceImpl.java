@@ -2,7 +2,6 @@ package org.hrds.rducm.gitlab.domain.service.impl;
 
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.domain.Page;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
@@ -18,7 +17,6 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberApplicantService;
 import org.hrds.rducm.gitlab.infra.enums.ApplicantTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.ApprovalStateEnum;
-import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
@@ -73,11 +71,12 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createApproval(Long projectId, MemberApplicantCreateDTO memberApplicantCreateDTO) {
+    public void createApproval(Long organizationId, Long projectId, MemberApplicantCreateDTO memberApplicantCreateDTO) {
         // <1> 转换
         RdmMemberApplicant param = ConvertUtils.convertObject(memberApplicantCreateDTO, RdmMemberApplicant.class);
 
         // <2> 创建成员权限申请
+        param.setOrganizationId(organizationId);
         param.setProjectId(projectId);
         param.setApplicantDate(new Date());
         param.setApprovalState(ApprovalStateEnum.PENDING.getCode());

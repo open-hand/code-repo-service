@@ -4,11 +4,21 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
+import java.util.Set;
 
 @ApiModel
 public class RdmMemberQueryDTO {
+    /**
+     * 组织层
+     */
+    @ApiModelProperty(value = "项目id")
+    private Set<Long> projectIds;
+    /**
+     * 项目层
+     */
     @ApiModelProperty(value = "应用服务id")
-    private List<Long> repositoryIds;
+    private Set<Long> repositoryIds;
+
     @ApiModelProperty(value = "应用服务名称")
     private String appServiceName;
     @ApiModelProperty(value = "用户名")
@@ -18,11 +28,20 @@ public class RdmMemberQueryDTO {
     @ApiModelProperty(value = "通用参数")
     private String params;
 
-    public List<Long> getRepositoryIds() {
+    public Set<Long> getProjectIds() {
+        return projectIds;
+    }
+
+    public RdmMemberQueryDTO setProjectIds(Set<Long> projectIds) {
+        this.projectIds = projectIds;
+        return this;
+    }
+
+    public Set<Long> getRepositoryIds() {
         return repositoryIds;
     }
 
-    public RdmMemberQueryDTO setRepositoryIds(List<Long> repositoryIds) {
+    public RdmMemberQueryDTO setRepositoryIds(Set<Long> repositoryIds) {
         this.repositoryIds = repositoryIds;
         return this;
     }

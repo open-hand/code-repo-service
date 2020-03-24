@@ -20,6 +20,7 @@ public class OperationEventPublisherHelper implements ApplicationEventPublisherA
 
     public static void publishMemberEvent(MemberEvent event) {
         // 校验
+        AssertUtils.notNull(event.getEventParam().getOrganizationId(), "organizationId cannot null");
         AssertUtils.notNull(event.getEventParam().getProjectId(), "projectId cannot null");
         AssertUtils.notNull(event.getEventParam().getRepositoryId(), "repositoryId cannot null");
         AssertUtils.notNull(event.getEventParam().getTargetUserId(), "targetUserId cannot null");

@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 //@Api(tags = SwaggerTags.RDM_MEMBER)
 @RestController("rdmMemberProjController.v1")
-@RequestMapping("/v1/projects/{projectId}/gitlab/repositories/members")
+@RequestMapping("/v1/organizations/{organizationId}/projects/{projectId}/gitlab/repositories/members")
 public class RdmMemberProjController extends BaseController {
     private final RdmMemberAppService rdmMemberAppService;
 
@@ -45,7 +45,8 @@ public class RdmMemberProjController extends BaseController {
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping
-    public ResponseEntity<PageInfo<RdmMemberViewDTO>> pageByOptions(@PathVariable Long projectId,
+    public ResponseEntity<PageInfo<RdmMemberViewDTO>> pageByOptions(@PathVariable Long organizationId,
+                                                                    @PathVariable Long projectId,
                                                                     PageRequest pageRequest,
                                                                     RdmMemberQueryDTO query) {
         return Results.success(rdmMemberAppService.pageByOptions(projectId, pageRequest, query));
@@ -58,10 +59,11 @@ public class RdmMemberProjController extends BaseController {
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping("/batch-add")
-    public ResponseEntity<?> batchAddMembers(@PathVariable Long projectId,
+    public ResponseEntity<?> batchAddMembers(@PathVariable Long organizationId,
+                                             @PathVariable Long projectId,
                                              @RequestBody RdmMemberBatchDTO rdmMemberBatchDTO) {
         validObject(rdmMemberBatchDTO);
-        rdmMemberAppService.batchAddOrUpdateMembers(projectId, rdmMemberBatchDTO);
+        rdmMemberAppService.batchAddOrUpdateMembers(organizationId, projectId, rdmMemberBatchDTO);
         return Results.created(null);
     }
 
@@ -78,7 +80,8 @@ public class RdmMemberProjController extends BaseController {
             @ApiImplicitParam(name = "loginName", value = "登录名(模糊)", paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "exportType", value = "导出类型", paramType = "query", dataType = "String", defaultValue = "DATA", required = true),
     })
-    public ResponseEntity<Page<MemberExportDTO>> export(@PathVariable Long projectId,
+    public ResponseEntity<Page<MemberExportDTO>> export(@PathVariable Long organizationId,
+                                                        @PathVariable Long projectId,
                                                         PageRequest pageRequest,
                                                         RdmMemberQueryDTO query,
                                                         ExportParam exportParam,

@@ -7,21 +7,14 @@ import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberCreateDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
-import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
-import org.hrds.rducm.gitlab.domain.entity.RdmUser;
-import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
-import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
-import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
-import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -34,10 +27,6 @@ import java.util.stream.Collectors;
 @Component
 public class RdmMemberAssembler {
     @Autowired
-    private RdmRepositoryRepository rdmRepositoryRepository;
-    @Autowired
-    private RdmUserRepository rdmUserRepository;
-    @Autowired
     private IC7nDevOpsServiceService ic7nDevOpsServiceService;
     @Autowired
     private IC7nBaseServiceService ic7nBaseServiceService;
@@ -45,11 +34,13 @@ public class RdmMemberAssembler {
     /**
      * 将GitlabMemberBatchDTO转换为List<RdmMember>
      *
+     *
+     * @param organizationId
      * @param projectId
      * @param rdmMemberBatchDTO
      * @return
      */
-    public List<RdmMember> rdmMemberBatchDTOToRdmMembers(Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
+    public List<RdmMember> rdmMemberBatchDTOToRdmMembers(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
         // 查询gitlab项目id和用户id
         Map<Long, Integer> repositoryIdToGlProjectIdMap = new HashMap<>();
         rdmMemberBatchDTO.getRepositoryIds().forEach(repositoryId -> {
@@ -70,6 +61,7 @@ public class RdmMemberAssembler {
         for (Long repositoryId : rdmMemberBatchDTO.getRepositoryIds()) {
             for (RdmMemberBatchDTO.GitlabMemberCreateDTO member : rdmMemberBatchDTO.getMembers()) {
                 RdmMember rdmMember = ConvertUtils.convertObject(member, RdmMember.class);
+                rdmMember.setOrganizationId(organizationId);
                 rdmMember.setProjectId(projectId);
                 rdmMember.setRepositoryId(repositoryId);
 
@@ -87,12 +79,14 @@ public class RdmMemberAssembler {
     /**
      * 转换新增成员所需参数
      *
+     *
+     * @param organizationId
      * @param projectId
      * @param repositoryId
      * @param rdmMemberCreateDTO
      * @return
      */
-    public RdmMember rdmMemberCreateDTOToRdmMember(Long projectId, Long repositoryId, RdmMemberCreateDTO rdmMemberCreateDTO) {
+    public RdmMember rdmMemberCreateDTOToRdmMember(Long organizationId, Long projectId, Long repositoryId, RdmMemberCreateDTO rdmMemberCreateDTO) {
         final RdmMember param = ConvertUtils.convertObject(rdmMemberCreateDTO, RdmMember.class);
 
         // 获取gitlab项目id和用户id
@@ -102,6 +96,7 @@ public class RdmMemberAssembler {
         param.setGlProjectId(glProjectId);
         param.setGlUserId(glUserId);
 
+        param.setOrganizationId(organizationId);
         param.setProjectId(projectId);
         param.setRepositoryId(repositoryId);
         return param;

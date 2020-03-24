@@ -30,7 +30,7 @@ import springfox.documentation.annotations.ApiIgnore;
  */
 //@Api(tags = SwaggerTags.RDM_OPERATION_LOG)
 @RestController("rdmOperationLogController.v1")
-@RequestMapping("/v1/projects/{projectId}/gitlab/repositories/operation-logs")
+@RequestMapping("/v1/organizations/{organizationId}/projects/{projectId}/gitlab/repositories/operation-logs")
 public class RdmOperationLogProjController extends BaseController {
 
     @Autowired

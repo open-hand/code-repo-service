@@ -84,7 +84,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         String appServiceName = query.getAppServiceName();
         String realName = query.getRealName();
         String loginName = query.getLoginName();
-        List<Long> repositoryIds = query.getRepositoryIds();
+        Set<Long> repositoryIds = query.getRepositoryIds();
 
         Condition condition = Condition.builder(RdmMember.class)
                 .where(Sqls.custom()
@@ -121,7 +121,50 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         return rdmMemberAssembler.pageToRdmMemberViewDTO(projectId, page);
     }
 
+    public PageInfo<RdmMemberViewDTO> pageByOptionsSite(Long organizationId, PageRequest pageRequest, RdmMemberQueryDTO query) {
+        // <1> 封装查询条件
+        String appServiceName = query.getAppServiceName();
+        String realName = query.getRealName();
+        String loginName = query.getLoginName();
+        Set<Long> projectIds = query.getProjectIds();
+        Set<Long> repositoryIds = query.getRepositoryIds();
 
+        Condition condition = Condition.builder(RdmMember.class)
+                .where(Sqls.custom()
+                        .andIn(RdmMember.FIELD_ORGANIZATION_ID, Collections.singleton(organizationId))
+                        .andIn(RdmMember.FIELD_PROJECT_ID, projectIds, true)
+                        .andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIds, true))
+                .build();
+
+        // 调用外部接口模糊查询 用户名或登录名
+//        if (!StringUtils.isEmpty(realName)|| !StringUtils.isEmpty(loginName)) {
+//            List<C7nUserVO> c7nUserVOS = ic7nBaseServiceService.listC7nUsersByName(projectId, realName, loginName);
+//            Set<Long> userIdsSet = c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
+//
+//            if (userIdsSet.isEmpty()) {
+//                return PageInfo.of(Collections.emptyList());
+//            }
+//
+//            condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
+//        }
+
+        // 调用外部接口模糊查询 应用服务
+//        if (!StringUtils.isEmpty(appServiceName)) {
+//            List<C7nAppServiceVO> c7nAppServiceVOS = ic7nDevOpsServiceService.listC7nAppServicesByName(projectId, appServiceName);
+//            Set<Long> repositoryIdSet = c7nAppServiceVOS.stream().map(C7nAppServiceVO::getId).collect(Collectors.toSet());
+//
+//            if (repositoryIdSet.isEmpty()) {
+//                return PageInfo.of(Collections.emptyList());
+//            }
+//
+//            condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
+//        }
+
+        Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectByCondition(condition));
+
+//        return rdmMemberAssembler.pageToRdmMemberViewDTO(projectId, page);
+        return PageInfo.of(Collections.emptyList());
+    }
 
     /**
      * 批量新增或修改成员
@@ -131,9 +174,9 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void batchAddOrUpdateMembers(Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
+    public void batchAddOrUpdateMembers(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
         // <0> 校验入参 + 转换
-        List<RdmMember> rdmMembers = rdmMemberAssembler.rdmMemberBatchDTOToRdmMembers(projectId, rdmMemberBatchDTO);
+        List<RdmMember> rdmMembers = rdmMemberAssembler.rdmMemberBatchDTOToRdmMembers(organizationId, projectId, rdmMemberBatchDTO);
 
         // <1> 数据库添加成员, 已存在需要更新, 发起一个新事务
         // 开启新事务的目的是使这一步操作独立执行, 保证预操作成功
@@ -169,9 +212,9 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addMember(Long projectId, Long repositoryId, RdmMemberCreateDTO rdmMemberCreateDTO) {
+    public void addMember(Long organizationId, Long projectId, Long repositoryId, RdmMemberCreateDTO rdmMemberCreateDTO) {
         // <0> 转换
-        final RdmMember param = rdmMemberAssembler.rdmMemberCreateDTOToRdmMember(projectId, repositoryId, rdmMemberCreateDTO);
+        final RdmMember param = rdmMemberAssembler.rdmMemberCreateDTOToRdmMember(organizationId, projectId, repositoryId, rdmMemberCreateDTO);
 
         // <1> 数据库预更新成员, 发起新事务
         self().addMemberBeforeRequestsNew(param);
@@ -282,9 +325,9 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Override
     @Saga(code = RDUCM_BATCH_ADD_MEMBERS, description = "批量添加代码库成员")
     @Transactional(rollbackFor = Exception.class)
-    public void batchAddMemberSagaDemo(Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
+    public void batchAddMemberSagaDemo(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
         // <0> 校验入参 + 转换
-        List<RdmMember> rdmMembers = rdmMemberAssembler.rdmMemberBatchDTOToRdmMembers(projectId, rdmMemberBatchDTO);
+        List<RdmMember> rdmMembers = rdmMemberAssembler.rdmMemberBatchDTOToRdmMembers(organizationId, projectId, rdmMemberBatchDTO);
 
         // <1> 预更新, 数据库添加成员, 已存在需要更新
         iRdmMemberService.batchAddOrUpdateMembersBefore(rdmMembers);

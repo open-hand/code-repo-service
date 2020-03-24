@@ -8,7 +8,6 @@ import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
-import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,11 +50,12 @@ public class TempController extends BaseController {
             @ApiImplicitParam(name = "rdmMemberBatchDTO", value = "body参数", dataType = "RdmMemberBatchDTO", required = true),
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
-    @PostMapping("/projects/{projectId}/members/batch-add")
-    public ResponseEntity<Object> batchAddMembersTemp(@PathVariable Long projectId,
+    @PostMapping("/organizations/{organizationId}/projects/{projectId}/members/batch-add")
+    public ResponseEntity<Object> batchAddMembersTemp(@PathVariable Long organizationId,
+                                                      @PathVariable Long projectId,
                                                       @RequestBody RdmMemberBatchDTO rdmMemberBatchDTO) {
         validObject(rdmMemberBatchDTO);
-        rdmMemberAppService.batchAddMemberSagaDemo(projectId, rdmMemberBatchDTO);
+        rdmMemberAppService.batchAddMemberSagaDemo(organizationId, projectId, rdmMemberBatchDTO);
         return Results.created(null);
     }
 }

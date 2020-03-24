@@ -55,7 +55,7 @@ public class RdmMemberApplicantAppServiceImpl implements RdmMemberApplicantAppSe
                 rdmMemberCreateDTO.setGlAccessLevel(dbMemberApproval.getAccessLevel());
                 rdmMemberCreateDTO.setGlExpiresAt(expiresAt);
 
-                rdmMemberAppService.addMember(dbMemberApproval.getProjectId(), dbMemberApproval.getRepositoryId(), rdmMemberCreateDTO);
+                rdmMemberAppService.addMember(dbMemberApproval.getOrganizationId(), dbMemberApproval.getProjectId(), dbMemberApproval.getRepositoryId(), rdmMemberCreateDTO);
                 break;
             }
             case MEMBER_PERMISSION_CHANGE: {

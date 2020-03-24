@@ -6,7 +6,6 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.*;
 import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
 import org.hzero.export.vo.ExportParam;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,19 +26,21 @@ public interface RdmMemberAppService {
     /**
      * 批量新增或修改成员
      *
+     * @param organizationId    组织id
      * @param projectId         项目id
      * @param rdmMemberBatchDTO 参数
      */
-    void batchAddOrUpdateMembers(Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO);
+    void batchAddOrUpdateMembers(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO);
 
     /**
      * 新增成员
      *
+     * @param organizationId
      * @param projectId          项目id
      * @param repositoryId       代码库id
      * @param rdmMemberCreateDTO 参数
      */
-    void addMember(Long projectId, Long repositoryId, RdmMemberCreateDTO rdmMemberCreateDTO);
+    void addMember(Long organizationId, Long projectId, Long repositoryId, RdmMemberCreateDTO rdmMemberCreateDTO);
 
     /**
      * 修改成员
@@ -83,8 +84,9 @@ public interface RdmMemberAppService {
     /**
      * saga测试demo
      *
+     * @param organizationId
      * @param projectId
      * @param rdmMemberBatchDTO
      */
-    void batchAddMemberSagaDemo(Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO);
+    void batchAddMemberSagaDemo(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO);
 }

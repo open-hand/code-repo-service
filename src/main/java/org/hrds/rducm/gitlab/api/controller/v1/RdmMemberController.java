@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  */
 //@Api(tags = SwaggerTags.RDM_MEMBER)
 @RestController("rdmMemberController.v1")
-@RequestMapping("/v1/projects/{projectId}/gitlab/repositories/{repositoryId}/members")
+@RequestMapping("/v1/organizations/{organizationId}/projects/{projectId}/gitlab/repositories/{repositoryId}/members")
 public class RdmMemberController extends BaseController {
     private final RdmMemberAppService rdmMemberAppService;
 
@@ -40,7 +40,8 @@ public class RdmMemberController extends BaseController {
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PutMapping("/{memberId}")
-    public ResponseEntity<?> updateMember(@PathVariable Long projectId,
+    public ResponseEntity<?> updateMember(@PathVariable Long organizationId,
+                                          @PathVariable Long projectId,
                                           @PathVariable Long repositoryId,
                                           @PathVariable Long memberId,
                                           @RequestBody RdmMemberUpdateDTO rdmMemberUpdateDTO) {
@@ -57,7 +58,8 @@ public class RdmMemberController extends BaseController {
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @DeleteMapping("/{memberId}")
-    public ResponseEntity<?> removeMember(@PathVariable Long projectId,
+    public ResponseEntity<?> removeMember(@PathVariable Long organizationId,
+                                          @PathVariable Long projectId,
                                           @PathVariable Long repositoryId,
                                           @PathVariable Long memberId) {
         rdmMemberAppService.removeMember(memberId);
@@ -72,7 +74,8 @@ public class RdmMemberController extends BaseController {
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping("/{memberId}/sync")
-    public ResponseEntity<?> syncMember(@PathVariable Long projectId,
+    public ResponseEntity<?> syncMember(@PathVariable Long organizationId,
+                                        @PathVariable Long projectId,
                                         @PathVariable Long repositoryId,
                                         @PathVariable Long memberId) {
         rdmMemberAppService.syncMember(memberId);
@@ -82,7 +85,8 @@ public class RdmMemberController extends BaseController {
     @ApiOperation(value = "同步Gitlab代码库成员到本服务")
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping("/sync-from-gitlab")
-    public ResponseEntity<?> syncMembersFromGitlab(@PathVariable Long projectId,
+    public ResponseEntity<?> syncMembersFromGitlab(@PathVariable Long organizationId,
+                                                   @PathVariable Long projectId,
                                                    @PathVariable Long repositoryId) {
         rdmMemberService.syncAllMembersFromGitlab(projectId, repositoryId);
         return Results.success();

@@ -27,6 +27,7 @@ import java.util.Date;
 public class RdmOperationLog extends AuditDomain {
 
     public static final String FIELD_ID = "id";
+    public static final String FIELD_ORGANIZATION_ID = "organizationId";
     public static final String FIELD_PROJECT_ID = "projectId";
     public static final String FIELD_REPOSITORY_ID = "repositoryId";
     public static final String FIELD_OP_USER_ID = "opUserId";
@@ -49,6 +50,10 @@ public class RdmOperationLog extends AuditDomain {
     @Id
     @GeneratedValue
     private Long id;
+
+    @ApiModelProperty(value = "组织id", required = true)
+    @NotNull
+    private Long organizationId;
 
     @ApiModelProperty(value = "项目层，项目id", required = true)
     @NotNull
@@ -95,6 +100,15 @@ public class RdmOperationLog extends AuditDomain {
 
     public RdmOperationLog setId(Long id) {
         this.id = id;
+        return this;
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public RdmOperationLog setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
         return this;
     }
 

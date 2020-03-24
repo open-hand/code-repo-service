@@ -47,15 +47,4 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
 //            throw new CommonException("error.sync.flag.false");
 //        }
 //    }
-
-    /**
-     * 构造审计所需报文参数
-     *
-     * @param targetUserId 目标用户id
-     * @param accessLevel  访问权限等级
-     * @param expiresAt    过期时间
-     */
-    private MemberEvent.EventParam buildEventParam(Long projectId, Long repositoryId, Long targetUserId, Integer accessLevel, Date expiresAt) {
-        return new MemberEvent.EventParam(projectId, repositoryId, targetUserId, accessLevel, expiresAt);
-    }
 }

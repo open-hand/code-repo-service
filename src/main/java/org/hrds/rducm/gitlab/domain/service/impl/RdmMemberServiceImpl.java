@@ -1,9 +1,7 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.domain.AuditDomain;
 import org.gitlab4j.api.models.Member;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
@@ -252,18 +250,21 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     @Override
     public void publishMemberEvent(RdmMember param, MemberEvent.EventType eventType) {
         // 发送事件
-        MemberEvent.EventParam eventParam = buildEventParam(param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+        MemberEvent.EventParam eventParam = buildEventParam(param.getOrganizationId(), param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
         OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, eventType, eventParam));
     }
 
     /**
      * 构造审计所需报文参数
      *
+     * @param organizationId
+     * @param projectId
+     * @param repositoryId
      * @param targetUserId 目标用户id
      * @param accessLevel  访问权限等级
      * @param expiresAt    过期时间
      */
-    private MemberEvent.EventParam buildEventParam(Long projectId, Long repositoryId, Long targetUserId, Integer accessLevel, Date expiresAt) {
-        return new MemberEvent.EventParam(projectId, repositoryId, targetUserId, accessLevel, expiresAt);
+    private MemberEvent.EventParam buildEventParam(Long organizationId, Long projectId, Long repositoryId, Long targetUserId, Integer accessLevel, Date expiresAt) {
+        return new MemberEvent.EventParam(organizationId, projectId, repositoryId, targetUserId, accessLevel, expiresAt);
     }
 }

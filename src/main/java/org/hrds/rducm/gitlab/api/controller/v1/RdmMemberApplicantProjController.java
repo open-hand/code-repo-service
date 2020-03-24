@@ -7,7 +7,6 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.time.DateUtils;
 import org.hrds.rducm.gitlab.api.controller.dto.DetectApplicantTypeDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantPassDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
@@ -18,15 +17,9 @@ import org.hrds.rducm.gitlab.domain.service.IRdmMemberApplicantService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
-import org.hzero.core.util.ValidUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import javax.validation.constraints.Future;
-import java.util.Date;
 
 /**
  * 成员审批表 管理 API
@@ -34,7 +27,7 @@ import java.util.Date;
  * @author ying.xie@hand-china.com 2020-03-11 17:29:45
  */
 @RestController("rdmMemberApprovalProjController.v1")
-@RequestMapping("/v1/projects/{projectId}/gitlab/repositories/member-applicants")
+@RequestMapping("/v1/organizations/{organizationId}/projects/{projectId}/gitlab/repositories/member-applicants")
 public class RdmMemberApplicantProjController extends BaseController {
 
     @Autowired
@@ -69,12 +62,13 @@ public class RdmMemberApplicantProjController extends BaseController {
     })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @PostMapping
-    public ResponseEntity<?> create(@PathVariable Long projectId,
+    public ResponseEntity<?> create(@PathVariable Long organizationId,
+                                    @PathVariable Long projectId,
                                     @RequestBody MemberApplicantCreateDTO memberApplicantCreateDTO) {
         validObject(memberApplicantCreateDTO);
         rdmMemberApplicantValidator.validateCreateDTO(projectId, memberApplicantCreateDTO);
 
-        iRdmMemberApplicantService.createApproval(projectId, memberApplicantCreateDTO);
+        iRdmMemberApplicantService.createApproval(organizationId, projectId, memberApplicantCreateDTO);
         return Results.success();
     }
 

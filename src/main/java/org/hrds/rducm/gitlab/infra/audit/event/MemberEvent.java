@@ -57,18 +57,24 @@ public class MemberEvent extends AbstractOperationEvent {
     }
 
     public static class EventParam {
+        private Long organizationId;
         private Long projectId;
         private Long repositoryId;
         private Long targetUserId;
         private Integer accessLevel;
         private Date expiresAt;
 
-        public EventParam(Long projectId, Long repositoryId, Long targetUserId, Integer accessLevel, Date expiresAt) {
+        public EventParam(Long organizationId, Long projectId, Long repositoryId, Long targetUserId, Integer accessLevel, Date expiresAt) {
+            this.organizationId = organizationId;
             this.projectId = projectId;
             this.repositoryId = repositoryId;
             this.targetUserId = targetUserId;
             this.accessLevel = accessLevel;
             this.expiresAt = expiresAt;
+        }
+
+        public Long getOrganizationId() {
+            return organizationId;
         }
 
         public Long getProjectId() {

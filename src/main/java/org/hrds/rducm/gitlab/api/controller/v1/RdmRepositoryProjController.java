@@ -24,7 +24,7 @@ import java.util.Set;
 
 //@Api(tags = SwaggerTags.RDM_REPOSITORY)
 @RestController("rdmRepositoryProjController.v1")
-@RequestMapping("/v1/projects/{projectId}/gitlab/repositories")
+@RequestMapping("/v1/organizations/{organizationId}/projects/{projectId}/gitlab/repositories")
 public class RdmRepositoryProjController extends BaseController {
     @Autowired
     private RdmRepositoryAppService rdmRepositoryAppService;

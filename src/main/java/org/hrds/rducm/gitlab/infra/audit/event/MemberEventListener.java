@@ -53,6 +53,7 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
         // 获取
         Long userId = DetailsHelper.getUserDetails().getUserId();
 
+        Long organizationId = event.getEventParam().getOrganizationId();
         Long projectId = event.getEventParam().getProjectId();
         Long repositoryId = event.getEventParam().getRepositoryId();
 
@@ -67,6 +68,7 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
         // 插入数据库
         RdmOperationLog operationLog = new RdmOperationLog();
         operationLog.setOpUserId(userId)
+                .setOrganizationId(organizationId)
                 .setProjectId(projectId)
                 .setRepositoryId(repositoryId)
                 .setOpType(event.getOpType().getCode())
