@@ -1,9 +1,7 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
 import com.github.pagehelper.PageInfo;
-import com.google.common.collect.Sets;
 import io.choerodon.core.annotation.Permission;
-import io.choerodon.core.domain.Page;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.swagger.annotations.ApiImplicitParam;
@@ -12,16 +10,11 @@ import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
-import org.hzero.export.annotation.ExcelExport;
-import org.hzero.export.vo.ExportParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author ying.xie@hand-china.com
