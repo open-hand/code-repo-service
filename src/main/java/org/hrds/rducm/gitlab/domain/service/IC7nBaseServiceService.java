@@ -52,6 +52,17 @@ public interface IC7nBaseServiceService {
     List<C7nUserVO> listC7nUsersByName(Long projectId, String realName, String loginName);
 
     /**
+     * 组织层
+     * 查询用户信息, 根据实际名称和登录名模糊查询
+     *
+     * @param organizationId
+     * @param realName
+     * @param loginName
+     * @return
+     */
+    List<C7nUserVO> listC7nUsersByNameOnOrgLevel(Long organizationId, String realName, String loginName);
+
+    /**
      * 查询项目开发成员, 并排除自己(项目层)
      *
      * @param projectId

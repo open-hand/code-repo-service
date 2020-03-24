@@ -49,7 +49,7 @@ public class RdmOperationLogAssembler {
 
         // 获取操作人用户信息
         Map<Long, C7nUserVO> c7nUserVOMap = ic7nBaseServiceService.listC7nUserToMap(projectId, opUserIds);
-        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(projectId, repositoryIds);
+        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(repositoryIds);
 
         return PageConvertUtils.convert(ConvertUtils.convertPage(page, val -> {
             C7nAppServiceVO c7nAppServiceVO = Optional.ofNullable(c7nAppServiceVOMap.get(val.getRepositoryId())).orElse(new C7nAppServiceVO());

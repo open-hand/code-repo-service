@@ -71,7 +71,20 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
 
     @Override
     public List<C7nUserVO> listC7nUsersByName(Long projectId, String realName, String loginName) {
+        // 0为不分页
         ResponseEntity<PageInfo<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnProjectLevel(projectId, 0, 0, loginName, realName);
+
+        if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
+            return responseEntity.getBody().getList();
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public List<C7nUserVO> listC7nUsersByNameOnOrgLevel(Long organizationId, String realName, String loginName) {
+        // 0为不分页
+        ResponseEntity<PageInfo<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnOrganizationLevel(organizationId, 0, 0, loginName, realName);
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
             return responseEntity.getBody().getList();

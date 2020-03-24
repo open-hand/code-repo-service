@@ -88,7 +88,7 @@ public class RdmMemberController extends BaseController {
     public ResponseEntity<?> syncMembersFromGitlab(@PathVariable Long organizationId,
                                                    @PathVariable Long projectId,
                                                    @PathVariable Long repositoryId) {
-        rdmMemberService.syncAllMembersFromGitlab(projectId, repositoryId);
+        rdmMemberService.syncAllMembersFromGitlab(organizationId, projectId, repositoryId);
         return Results.success();
     }
 }

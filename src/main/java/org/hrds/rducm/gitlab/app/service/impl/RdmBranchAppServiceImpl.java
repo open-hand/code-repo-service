@@ -6,7 +6,6 @@ import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.ProtectedBranchDTO;
 import org.hrds.rducm.gitlab.app.service.RdmBranchAppService;
 import org.hrds.rducm.gitlab.domain.repository.RdmBranchRepository;
-import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.domain.service.IRdmBranchService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProtectedBranchesApi;
@@ -39,14 +38,14 @@ public class RdmBranchAppServiceImpl implements RdmBranchAppService {
         }
 
         // 获取对应Gitlab项目id
-        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(projectId, repositoryId);
+        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(repositoryId);
         return ConvertUtils.convertList(rdmBranchRepository.getBranchesFromGitlab(glProjectId), BranchDTO.class);
     }
 
     @Override
     public List<ProtectedBranchDTO> getProtectedBranches(Long projectId, Long repositoryId) {
         // 获取对应Gitlab项目id
-        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(projectId, repositoryId);
+        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(repositoryId);
 
         List<ProtectedBranch> protectedBranches = rdmBranchRepository.getProtectedBranchesFromGitlab(glProjectId);
         List<ProtectedBranchDTO> protectedBranchDTOS = ConvertUtils.convertList(protectedBranches, ProtectedBranchDTO.class);
@@ -61,7 +60,7 @@ public class RdmBranchAppServiceImpl implements RdmBranchAppService {
                                             Integer pushAccessLevel,
                                             Integer mergeAccessLevel) {
         // 获取对应Gitlab项目id
-        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(projectId, repositoryId);
+        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(repositoryId);
 
         // 校验分支是否已被保护
         ProtectedBranch glProtectedBranch = gitlabProtectedBranchesApi.getProtectedBranch(glProjectId, branchName);
@@ -78,7 +77,7 @@ public class RdmBranchAppServiceImpl implements RdmBranchAppService {
                                                     Integer pushAccessLevel,
                                                     Integer mergeAccessLevel) {
         // 获取对应Gitlab项目id
-        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(projectId, repositoryId);
+        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(repositoryId);
 
         // 由于Gitlab不提供修改保护分支的api, 故只能先删除, 再新增
         rdmBranchRepository.unprotectBranchToGitlab(glProjectId, branchName);
@@ -89,7 +88,7 @@ public class RdmBranchAppServiceImpl implements RdmBranchAppService {
     @Override
     public void unprotectBranch(Long projectId, Long repositoryId, String branchName) {
         // 获取对应Gitlab项目id
-        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(projectId, repositoryId);
+        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(repositoryId);
         rdmBranchRepository.unprotectBranchToGitlab(glProjectId, branchName);
     }
 }

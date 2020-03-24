@@ -24,6 +24,16 @@ public interface RdmMemberAppService {
     PageInfo<RdmMemberViewDTO> pageByOptions(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query);
 
     /**
+     * 组织层 todo
+     * 分页查询成员
+     * @param organizationId
+     * @param pageRequest
+     * @param query
+     * @return
+     */
+    PageInfo<RdmMemberViewDTO> pageByOptionsOnOrg(Long organizationId, PageRequest pageRequest, RdmMemberQueryDTO query);
+
+    /**
      * 批量新增或修改成员
      *
      * @param organizationId    组织id

@@ -198,9 +198,9 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int syncAllMembersFromGitlab(Long projectId, Long repositoryId) {
+    public int syncAllMembersFromGitlab(Long organizationId, Long projectId, Long repositoryId) {
         // <1> 获取Gitlab项目id
-        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(projectId, repositoryId);
+        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(repositoryId);
 
         // <2> 查询Gitlab成员
         List<Member> glMembers = gitlabProjectApi.getAllMembers(glProjectId);
@@ -217,7 +217,8 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             Long userId = dbUser.getUserId();
 
             RdmMember rdmMember = new RdmMember();
-            rdmMember.setProjectId(projectId)
+            rdmMember.setOrganizationId(organizationId)
+                    .setProjectId(projectId)
                     .setRepositoryId(repositoryId)
                     .setUserId(userId)
                     .setGlProjectId(glProjectId)

@@ -121,7 +121,8 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         return rdmMemberAssembler.pageToRdmMemberViewDTO(projectId, page);
     }
 
-    public PageInfo<RdmMemberViewDTO> pageByOptionsSite(Long organizationId, PageRequest pageRequest, RdmMemberQueryDTO query) {
+    @Override
+    public PageInfo<RdmMemberViewDTO> pageByOptionsOnOrg(Long organizationId, PageRequest pageRequest, RdmMemberQueryDTO query) {
         // <1> 封装查询条件
         String appServiceName = query.getAppServiceName();
         String realName = query.getRealName();
@@ -131,39 +132,38 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         Condition condition = Condition.builder(RdmMember.class)
                 .where(Sqls.custom()
-                        .andIn(RdmMember.FIELD_ORGANIZATION_ID, Collections.singleton(organizationId))
+                        .andEqualTo(RdmMember.FIELD_ORGANIZATION_ID, organizationId)
                         .andIn(RdmMember.FIELD_PROJECT_ID, projectIds, true)
                         .andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIds, true))
                 .build();
 
         // 调用外部接口模糊查询 用户名或登录名
-//        if (!StringUtils.isEmpty(realName)|| !StringUtils.isEmpty(loginName)) {
-//            List<C7nUserVO> c7nUserVOS = ic7nBaseServiceService.listC7nUsersByName(projectId, realName, loginName);
-//            Set<Long> userIdsSet = c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
-//
-//            if (userIdsSet.isEmpty()) {
-//                return PageInfo.of(Collections.emptyList());
-//            }
-//
-//            condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
-//        }
+        if (!StringUtils.isEmpty(realName)|| !StringUtils.isEmpty(loginName)) {
+            List<C7nUserVO> c7nUserVOS = ic7nBaseServiceService.listC7nUsersByNameOnOrgLevel(organizationId, realName, loginName);
+            Set<Long> userIdsSet = c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
+
+            if (userIdsSet.isEmpty()) {
+                return PageInfo.of(Collections.emptyList());
+            }
+
+            condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
+        }
 
         // 调用外部接口模糊查询 应用服务
-//        if (!StringUtils.isEmpty(appServiceName)) {
-//            List<C7nAppServiceVO> c7nAppServiceVOS = ic7nDevOpsServiceService.listC7nAppServicesByName(projectId, appServiceName);
-//            Set<Long> repositoryIdSet = c7nAppServiceVOS.stream().map(C7nAppServiceVO::getId).collect(Collectors.toSet());
-//
-//            if (repositoryIdSet.isEmpty()) {
-//                return PageInfo.of(Collections.emptyList());
-//            }
-//
-//            condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
-//        }
+        if (!StringUtils.isEmpty(appServiceName)) {
+            List<C7nAppServiceVO> c7nAppServiceVOS = ic7nDevOpsServiceService.listC7nAppServicesByName(-1L, appServiceName);
+            Set<Long> repositoryIdSet = c7nAppServiceVOS.stream().map(C7nAppServiceVO::getId).collect(Collectors.toSet());
+
+            if (repositoryIdSet.isEmpty()) {
+                return PageInfo.of(Collections.emptyList());
+            }
+
+            condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
+        }
 
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectByCondition(condition));
 
-//        return rdmMemberAssembler.pageToRdmMemberViewDTO(projectId, page);
-        return PageInfo.of(Collections.emptyList());
+        return rdmMemberAssembler.pageToRdmMemberViewDTOOnOrg(organizationId, page);
     }
 
     /**
@@ -243,6 +243,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         param.setGlUserId(dbMember.getGlUserId());
         param.setUserId(dbMember.getUserId());
 
+        param.setOrganizationId(dbMember.getOrganizationId());
         param.setProjectId(dbMember.getProjectId());
         param.setRepositoryId(dbMember.getRepositoryId());
 

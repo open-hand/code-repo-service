@@ -6,7 +6,9 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Set;
@@ -71,7 +73,7 @@ public interface BaseServiceFeignClient {
      * 分页查询用户列表（包括用户信息以及所分配的项目角色信息）
      *
      * @param projectId
-     * @param page
+     * @param page      0 为不分页
      * @param size
      * @param loginName
      * @param realName
@@ -83,6 +85,25 @@ public interface BaseServiceFeignClient {
                                                                          @RequestParam(required = false) int size,
                                                                          @RequestParam(required = false) String loginName,
                                                                          @RequestParam(required = false) String realName);
+
+    /**
+     * 组织层
+     * 组织层分页查询用户列表（包括用户信息以及所分配的组织角色信息）
+     *
+     * @param organizationId
+     * @param page           0为不分页
+     * @param size
+     * @param loginName
+     * @param realName
+     * @return
+     */
+    @GetMapping(value = "/v1/organizations/{organization_id}/users/search")
+    ResponseEntity<PageInfo<C7nUserVO>> pageUsersByOptionsOnOrganizationLevel(@PathVariable(name = "organization_id") Long organizationId,
+                                                                                @RequestParam(required = false) int page,
+                                                                                @RequestParam(required = false) int size,
+                                                                                @RequestParam(required = false) String loginName,
+                                                                                @RequestParam(required = false) String realName);
+
 
     /**
      * 项目层
@@ -109,6 +130,17 @@ public interface BaseServiceFeignClient {
     ResponseEntity<List<C7nUserVO>> listUsersWithRolesAndGitlabUserIdByIds(@PathVariable(name = "organization_id") Long organizationId,
                                                                            @RequestParam(name = "user_ids") Set<Long> userIds);
 
+
+//    /**
+//     * 查询组织下所有项目
+//     *
+//     * @param organizationId
+//     * @return
+//     */
+//    @GetMapping(value = "/all")
+//    public ResponseEntity<List<ProjectDTO>> listProjectsByOrgId(@PathVariable(name = "organization_id") Long organizationId) {
+//        return new ResponseEntity<>(organizationProjectService.listProjectsByOrgId(organizationId), HttpStatus.OK);
+//    }
 
 //    /**
 //     * 根据id批量查询用户信息列表

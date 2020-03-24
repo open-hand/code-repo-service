@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.app.assembler;
 
 import com.github.pagehelper.PageInfo;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberCreateDTO;
@@ -45,7 +45,7 @@ public class RdmMemberAssembler {
         Map<Long, Integer> repositoryIdToGlProjectIdMap = new HashMap<>();
         rdmMemberBatchDTO.getRepositoryIds().forEach(repositoryId -> {
             // 获取gitlab项目id
-            Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(projectId, repositoryId);
+            Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(repositoryId);
             repositoryIdToGlProjectIdMap.put(repositoryId, glProjectId);
         });
 
@@ -90,7 +90,7 @@ public class RdmMemberAssembler {
         final RdmMember param = ConvertUtils.convertObject(rdmMemberCreateDTO, RdmMember.class);
 
         // 获取gitlab项目id和用户id
-        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(projectId, repositoryId);
+        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(repositoryId);
         Integer glUserId = ic7nBaseServiceService.userIdToGlUserId(projectId, param.getUserId());
 
         param.setGlProjectId(glProjectId);
@@ -125,7 +125,60 @@ public class RdmMemberAssembler {
         Map<Long, C7nUserVO> userVOMap = ic7nBaseServiceService.listC7nUserToMap(projectId, userIds);
 
         // 查询应用服务信息
-        Map<Long, C7nAppServiceVO> appServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(projectId, repositoryIds);
+        Map<Long, C7nAppServiceVO> appServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(repositoryIds);
+
+        // 填充数据
+        for (RdmMemberViewDTO viewDTO : rdmMemberViewDTOS.getContent()) {
+            C7nUserVO c7nUserVO = Optional.ofNullable(userVOMap.get(viewDTO.getUserId())).orElse(new C7nUserVO().setRoles(Collections.emptyList()));
+            C7nUserVO c7nCreateUserVO = Optional.ofNullable(userVOMap.get(viewDTO.getCreatedBy())).orElse(new C7nUserVO());
+
+            C7nAppServiceVO c7nAppServiceVO = Optional.ofNullable(appServiceVOMap.get(viewDTO.getRepositoryId())).orElse(new C7nAppServiceVO());
+
+            viewDTO.setRealName(c7nUserVO.getRealName());
+            viewDTO.setLoginName(c7nUserVO.getLoginName());
+            viewDTO.setRoleNames(c7nUserVO.getRoles().stream().map(C7nRoleVO::getName).collect(Collectors.toList()));
+
+            viewDTO.setCreatedByName(c7nCreateUserVO.getRealName());
+
+            viewDTO.setAppServiceName(c7nAppServiceVO.getName());
+        }
+
+        return PageConvertUtils.convert(rdmMemberViewDTOS);
+    }
+
+    /**
+     * 成员查询dto转换(组织层)
+     *
+     * @param page
+     * @return
+     */
+    public PageInfo<RdmMemberViewDTO> pageToRdmMemberViewDTOOnOrg(Long organizationId, Page<RdmMember> page) {
+        Page<RdmMemberViewDTO> rdmMemberViewDTOS = ConvertUtils.convertPage(page, RdmMemberViewDTO.class);
+
+        // 获取用户id集合
+//        Set<String> projectIdAndUserIds = Sets.newHashSet();
+
+//        Map<Long, Set<Long>> projectIdAndUserIds = Maps.newHashMap();
+        Multimap<Long, Long> projectIdAndUserIds = HashMultimap.create();
+        // 获取代码库id集合
+        Set<Long> repositoryIds = Sets.newHashSet();
+        rdmMemberViewDTOS.getContent().forEach(dto -> {
+            projectIdAndUserIds.put(dto.getProjectId(), dto.getUserId());
+            projectIdAndUserIds.put(dto.getProjectId(), dto.getCreatedBy());
+            repositoryIds.add(dto.getRepositoryId());
+        });
+
+        // 查询用户信息
+        Map<Long, C7nUserVO> userVOMap = new HashMap<>();
+
+        projectIdAndUserIds.asMap().forEach((projectId, userIds) -> {
+            Map<Long, C7nUserVO> tempMap = ic7nBaseServiceService.listC7nUserToMap(projectId, Sets.newHashSet(userIds));
+            userVOMap.putAll(tempMap);
+        });
+//        Map<Long, C7nUserVO> userVOMap = ic7nBaseServiceService.listC7nUserToMap(projectId, userIds);
+
+        // 查询应用服务信息
+        Map<Long, C7nAppServiceVO> appServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(repositoryIds);
 
         // 填充数据
         for (RdmMemberViewDTO viewDTO : rdmMemberViewDTOS.getContent()) {

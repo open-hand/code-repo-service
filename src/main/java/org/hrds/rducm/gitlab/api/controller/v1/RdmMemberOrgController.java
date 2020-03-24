@@ -30,7 +30,7 @@ public class RdmMemberOrgController extends BaseController {
         this.rdmMemberAppService = rdmMemberAppService;
     }
 
-    @ApiOperation(value = "查询代码库成员(项目层)")
+    @ApiOperation(value = "查询代码库成员(组织层)")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "organizationId", value = "组织id", paramType = "path", dataType = "Long", required = true),
             @ApiImplicitParam(name = "projectIds", value = "项目id", paramType = "query", dataType = "Long", allowMultiple = true),
@@ -39,13 +39,11 @@ public class RdmMemberOrgController extends BaseController {
             @ApiImplicitParam(name = "realName", value = "用户名(模糊)", paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "loginName", value = "登录名(模糊)", paramType = "query", dataType = "String"),
     })
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(type = ResourceType.ORGANIZATION, permissionPublic = true)
     @GetMapping
     public ResponseEntity<PageInfo<RdmMemberViewDTO>> pageByOptions(@PathVariable Long organizationId,
-                                                                    @RequestParam(required = false) Set<Long> projectIds,
                                                                     PageRequest pageRequest,
                                                                     RdmMemberQueryDTO query) {
-//        rdmMemberAppService.pageByOptions(projectId, pageRequest, query);
-        return Results.success();
+        return Results.success(rdmMemberAppService.pageByOptionsOnOrg(organizationId, pageRequest, query));
     }
 }

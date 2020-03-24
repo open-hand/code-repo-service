@@ -31,7 +31,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     private ObjectMapper objectMapper;
 
     @Override
-    public Integer repositoryIdToGlProjectId(Long projectId, Long repositoryId) {
+    public Integer repositoryIdToGlProjectId(Long repositoryId) {
         // 查询应用服务信息
         ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.listAppServiceByIds(Collections.singleton(repositoryId));
 
@@ -43,7 +43,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     }
 
     @Override
-    public C7nAppServiceVO detailC7nAppService(Long projectId, Long repositoryId) {
+    public C7nAppServiceVO detailC7nAppService(Long repositoryId) {
         // 查询应用服务信息
         ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.listAppServiceByIds(Collections.singleton(repositoryId));
 
@@ -55,7 +55,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     }
 
     @Override
-    public Map<Long, C7nAppServiceVO> listC7nAppServiceToMap(Long projectId, Set<Long> repositoryIds) {
+    public Map<Long, C7nAppServiceVO> listC7nAppServiceToMap(Set<Long> repositoryIds) {
         if (repositoryIds.isEmpty()) {
             return Collections.emptyMap();
         }

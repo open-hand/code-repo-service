@@ -42,6 +42,11 @@ public class BaseServiceFeignClientFallBackFactory implements FallbackFactory<Ba
             }
 
             @Override
+            public ResponseEntity<PageInfo<C7nUserVO>> pageUsersByOptionsOnOrganizationLevel(Long organizationId, int page, int size, String loginName, String realName) {
+                return null;
+            }
+
+            @Override
             public ResponseEntity<List<C7nUserVO>> listProjectUsersByIds(Long projectId, Set<Long> userIds) {
                 return null;
             }
