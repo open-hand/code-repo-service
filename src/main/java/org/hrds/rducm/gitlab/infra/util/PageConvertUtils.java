@@ -25,4 +25,15 @@ public class PageConvertUtils {
 
         return pageInfo;
     }
+
+    /**
+     * 猪齿鱼分页转hzero分页
+     *
+     * @param pageInfo
+     * @param <T>
+     * @return
+     */
+    public static <T> Page<T> convert(PageInfo<T> pageInfo) {
+        return new Page<>(pageInfo.getList(), new io.choerodon.core.domain.PageInfo(pageInfo.getPageNum() - 1, pageInfo.getPageSize()), pageInfo.getTotal());
+    }
 }

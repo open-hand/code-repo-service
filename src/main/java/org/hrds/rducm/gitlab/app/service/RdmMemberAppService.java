@@ -1,9 +1,14 @@
 package org.hrds.rducm.gitlab.app.service;
 
 import com.github.pagehelper.PageInfo;
+import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.*;
+import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
+import org.hzero.export.vo.ExportParam;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author xy
@@ -57,6 +62,18 @@ public interface RdmMemberAppService {
      * @param memberId
      */
     void syncMember(Long memberId);
+
+    /**
+     * 成员导出
+     *
+     * @param projectId
+     * @param pageRequest
+     * @param query
+     * @param exportParam
+     * @param response
+     * @return
+     */
+    Page<MemberExportDTO> export(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query, ExportParam exportParam, HttpServletResponse response);
 
     /**
      * 处理过期的成员(定时任务调用)
