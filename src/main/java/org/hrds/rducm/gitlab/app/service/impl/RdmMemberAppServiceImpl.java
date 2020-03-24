@@ -312,6 +312,21 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     }
 
     @Override
+    @ExcelExport(MemberExportDTO.class)
+    public Page<MemberExportDTO> exportOnOrg(Long organizationId, PageRequest pageRequest, RdmMemberQueryDTO query, ExportParam exportParam, HttpServletResponse response) {
+        PageInfo<RdmMemberViewDTO> pageInfo = this.pageByOptionsOnOrg(organizationId, pageRequest, query);
+
+        PageInfo<MemberExportDTO> exportDTOPageInfo = ConvertUtils.convertPageInfo(pageInfo, dto -> {
+            MemberExportDTO exportDTO = new MemberExportDTO();
+            BeanUtils.copyProperties(dto, exportDTO);
+            exportDTO.setGlAccessLevel(dto.getGlAccessLevel() == null ? null : Objects.requireNonNull(RdmAccessLevel.forValue(dto.getGlAccessLevel())).toDesc());
+            return exportDTO;
+        });
+
+        return PageConvertUtils.convert(exportDTOPageInfo);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void handleExpiredMembers() {
         // <1> 查询已过期的成员

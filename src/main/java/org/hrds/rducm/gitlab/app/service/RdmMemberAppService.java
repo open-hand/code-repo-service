@@ -26,6 +26,7 @@ public interface RdmMemberAppService {
     /**
      * 组织层 todo
      * 分页查询成员
+     *
      * @param organizationId
      * @param pageRequest
      * @param query
@@ -85,6 +86,19 @@ public interface RdmMemberAppService {
      * @return
      */
     Page<MemberExportDTO> export(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query, ExportParam exportParam, HttpServletResponse response);
+
+    /**
+     * 组织层
+     * 成员导出
+     *
+     * @param organizationId
+     * @param pageRequest
+     * @param query
+     * @param exportParam
+     * @param response
+     * @return
+     */
+    Page<MemberExportDTO> exportOnOrg(Long organizationId, PageRequest pageRequest, RdmMemberQueryDTO query, ExportParam exportParam, HttpServletResponse response);
 
     /**
      * 处理过期的成员(定时任务调用)
