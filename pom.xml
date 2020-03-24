@@ -40,7 +40,11 @@
 <!--            <groupId>org.hzero.starter</groupId>-->
 <!--            <artifactId>hzero-starter-dynamic-route</artifactId>-->
 <!--        </dependency>-->
-
+        <!-- 导出组件 -->
+        <dependency>
+            <groupId>org.hzero.starter</groupId>
+            <artifactId>hzero-starter-export</artifactId>
+        </dependency>
         <!-- hzero boot -->
 
         <dependency>
