@@ -12,13 +12,18 @@ import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApplicantCreateDTO;
  */
 public interface IRdmMemberApplicantService {
     /**
-     * 查询成员权限审批记录
+     * 查询成员权限申请记录
      *
      * @param projectId
      * @param pageRequest
+     * @param applicantUserName 申请人名称(模糊)
+     * @param approvalState 审批状态
      * @return
      */
-    PageInfo<RdmMemberApplicantViewDTO> pageByOptions(Long projectId, PageRequest pageRequest);
+    PageInfo<RdmMemberApplicantViewDTO> pageByOptions(Long projectId,
+                                                      PageRequest pageRequest,
+                                                      String applicantUserName,
+                                                      String approvalState);
 
     /**
      * 检测申请类型

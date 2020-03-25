@@ -40,9 +40,14 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
     private RdmMemberApplicantAssembler rdmMemberApplicantAssembler;
 
     @Override
-    public PageInfo<RdmMemberApplicantViewDTO> pageByOptions(Long projectId, PageRequest pageRequest) {
+    public PageInfo<RdmMemberApplicantViewDTO> pageByOptions(Long projectId,
+                                                             PageRequest pageRequest,
+                                                             String applicantUserName,
+                                                             String approvalState) {
         Condition condition = Condition.builder(RdmMemberApplicant.class)
-                .where(Sqls.custom().andEqualTo(RdmMemberApplicant.FIELD_PROJECT_ID, projectId))
+                .where(Sqls.custom()
+                        .andEqualTo(RdmMemberApplicant.FIELD_PROJECT_ID, projectId)
+                        .andEqualTo(RdmMemberApplicant.FIELD_APPROVAL_STATE, approvalState, true))
                 .build();
 
         Page<RdmMemberApplicant> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberApplicantRepository.selectByCondition(condition));

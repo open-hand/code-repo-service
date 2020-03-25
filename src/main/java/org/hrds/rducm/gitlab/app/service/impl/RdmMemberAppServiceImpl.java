@@ -304,7 +304,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         PageInfo<MemberExportDTO> exportDTOPageInfo = ConvertUtils.convertPageInfo(pageInfo, dto -> {
             MemberExportDTO exportDTO = new MemberExportDTO();
             BeanUtils.copyProperties(dto, exportDTO);
-            exportDTO.setGlAccessLevel(Objects.requireNonNull(RdmAccessLevel.forValue(dto.getGlAccessLevel())).toDesc());
+            exportDTO.setGlAccessLevel(dto.getGlAccessLevel() == null ? null : RdmAccessLevel.forValue(dto.getGlAccessLevel()).toDesc());
             return exportDTO;
         });
 
@@ -319,7 +319,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         PageInfo<MemberExportDTO> exportDTOPageInfo = ConvertUtils.convertPageInfo(pageInfo, dto -> {
             MemberExportDTO exportDTO = new MemberExportDTO();
             BeanUtils.copyProperties(dto, exportDTO);
-            exportDTO.setGlAccessLevel(dto.getGlAccessLevel() == null ? null : Objects.requireNonNull(RdmAccessLevel.forValue(dto.getGlAccessLevel())).toDesc());
+            exportDTO.setGlAccessLevel(dto.getGlAccessLevel() == null ? null : RdmAccessLevel.forValue(dto.getGlAccessLevel()).toDesc());
             return exportDTO;
         });
 

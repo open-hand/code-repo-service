@@ -21,6 +21,9 @@ public class OperationLogViewDTO {
     @ApiModelProperty(value = "代码仓库名称")
     private String repositoryName;
 
+    @ApiModelProperty(value = "代码仓库图片")
+    private String repositoryImageUrl;
+
     @ApiModelProperty(value = "操作人，用户id", required = true)
     private Long opUserId;
 
@@ -151,6 +154,15 @@ public class OperationLogViewDTO {
 
     public OperationLogViewDTO setOpUserImageUrl(String opUserImageUrl) {
         this.opUserImageUrl = opUserImageUrl;
+        return this;
+    }
+
+    public String getRepositoryImageUrl() {
+        return repositoryImageUrl;
+    }
+
+    public OperationLogViewDTO setRepositoryImageUrl(String repositoryImageUrl) {
+        this.repositoryImageUrl = repositoryImageUrl;
         return this;
     }
 }

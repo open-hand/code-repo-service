@@ -38,12 +38,19 @@ public class RdmMemberApplicantProjController extends BaseController {
     private RdmMemberApplicantValidator rdmMemberApplicantValidator;
 
     @ApiOperation(value = "成员权限申请列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
+            @ApiImplicitParam(name = "applicantUserName", value = "申请人(模糊)", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "approvalState", value = "审批状态", paramType = "query", dataType = "String"),
+    })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping
-    public ResponseEntity<PageInfo<RdmMemberApplicantViewDTO>> list(@PathVariable Long projectId,
-                                                                    PageRequest pageRequest) {
+    public ResponseEntity<PageInfo<RdmMemberApplicantViewDTO>> pageByOptions(@PathVariable Long projectId,
+                                                                             PageRequest pageRequest,
+                                                                             @RequestParam(required = false) String applicantUserName,
+                                                                             @RequestParam(required = false) String approvalState) {
 
-        return Results.success(iRdmMemberApplicantService.pageByOptions(projectId, pageRequest));
+        return Results.success(iRdmMemberApplicantService.pageByOptions(projectId, pageRequest, applicantUserName, approvalState));
     }
 
     @ApiOperation(value = "检测当前用户申请类型")

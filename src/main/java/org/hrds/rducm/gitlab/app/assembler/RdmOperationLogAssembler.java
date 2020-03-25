@@ -57,6 +57,7 @@ public class RdmOperationLogAssembler {
 
             OperationLogViewDTO operationLogViewDTO = ConvertUtils.convertObject(val, OperationLogViewDTO.class);
             operationLogViewDTO.setRepositoryName(c7nAppServiceVO.getName());
+            operationLogViewDTO.setRepositoryImageUrl(c7nAppServiceVO.getImgUrl());
             operationLogViewDTO.setOpUserName(c7nUserVO.getRealName());
             operationLogViewDTO.setOpUserImageUrl(c7nUserVO.getImageUrl());
             return operationLogViewDTO;

@@ -99,11 +99,29 @@ public interface BaseServiceFeignClient {
      */
     @GetMapping(value = "/v1/organizations/{organization_id}/users/search")
     ResponseEntity<PageInfo<C7nUserVO>> pageUsersByOptionsOnOrganizationLevel(@PathVariable(name = "organization_id") Long organizationId,
-                                                                                @RequestParam(required = false) int page,
-                                                                                @RequestParam(required = false) int size,
-                                                                                @RequestParam(required = false) String loginName,
-                                                                                @RequestParam(required = false) String realName);
+                                                                              @RequestParam(required = false) int page,
+                                                                              @RequestParam(required = false) int size,
+                                                                              @RequestParam(required = false) String loginName,
+                                                                              @RequestParam(required = false) String realName);
 
+    /**
+     * 全局层分页查询用户列表（包括用户信息以及所分配的全局角色信息）
+     *
+     * @param Pageable
+     * @param organizationName
+     * @param loginName
+     * @param realName
+     * @param roleName
+     * @param enabled
+     * @param locked
+     * @param params
+     * @return
+     */
+    @GetMapping(value = "/v1/users/search")
+    ResponseEntity<PageInfo<C7nUserVO>> pagingQueryUsersWithRolesOnSiteLevel(@RequestParam(required = false) int page,
+                                                                             @RequestParam(required = false) int size,
+                                                                             @RequestParam(required = false) String loginName,
+                                                                             @RequestParam(required = false) String realName);
 
     /**
      * 项目层
