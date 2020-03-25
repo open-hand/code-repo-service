@@ -93,7 +93,7 @@ public class DetailsHelper {
                 return (CustomUserDetails) decodedDetails;
             }
         }
-        return UXY;
+        return user0303;
     }
 
     /**
