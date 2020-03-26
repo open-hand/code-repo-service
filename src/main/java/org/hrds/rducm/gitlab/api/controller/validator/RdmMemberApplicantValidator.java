@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.api.controller.validator;
 
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.oauth.DetailsHelper;
 import org.apache.commons.lang3.EnumUtils;
 import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApplicantCreateDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
@@ -29,7 +30,8 @@ public class RdmMemberApplicantValidator {
 
     public void validateCreateDTO(Long projectId, MemberApplicantCreateDTO memberApplicantCreateDTO) {
         Long repositoryId = memberApplicantCreateDTO.getRepositoryId();
-        Long applicantUserId = memberApplicantCreateDTO.getApplicantUserId();
+        // todo 暂时写死
+        Long applicantUserId = DetailsHelper.UXY.getUserId();
         String applicantType = memberApplicantCreateDTO.getApplicantType();
 
         Integer accessLevel = memberApplicantCreateDTO.getAccessLevel();

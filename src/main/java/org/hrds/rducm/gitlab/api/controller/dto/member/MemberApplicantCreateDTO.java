@@ -17,10 +17,6 @@ public class MemberApplicantCreateDTO {
     @NotNull
     private Long repositoryId;
 
-    @ApiModelProperty(value = "申请人，用户id", required = true)
-    @NotNull
-    private Long applicantUserId;
-
     @ApiModelProperty(value = "申请类型（新成员|权限变更）", required = true)
     @NotBlank
     private String applicantType;
@@ -42,15 +38,6 @@ public class MemberApplicantCreateDTO {
 
     public MemberApplicantCreateDTO setRepositoryId(Long repositoryId) {
         this.repositoryId = repositoryId;
-        return this;
-    }
-
-    public Long getApplicantUserId() {
-        return applicantUserId;
-    }
-
-    public MemberApplicantCreateDTO setApplicantUserId(Long applicantUserId) {
-        this.applicantUserId = applicantUserId;
         return this;
     }
 
