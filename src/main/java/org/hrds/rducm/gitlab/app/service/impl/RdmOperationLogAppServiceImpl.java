@@ -11,15 +11,15 @@ import org.hrds.rducm.gitlab.app.service.RdmOperationLogAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hrds.rducm.gitlab.domain.repository.RdmOperationLogRepository;
 import org.hrds.rducm.gitlab.infra.audit.event.AbstractOperationEvent;
-import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
-import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 操作日志表应用服务默认实现
@@ -34,7 +34,37 @@ public class RdmOperationLogAppServiceImpl implements RdmOperationLogAppService 
     private RdmOperationLogAssembler rdmOperationLogAssembler;
 
     @Override
-    public PageInfo<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId, Long repositoryId, PageRequest pageRequest, OperationLogQueryDTO queryDTO) {
+    public PageInfo<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId,
+                                                                Set<Long> repositoryIds,
+                                                                PageRequest pageRequest,
+                                                                OperationLogQueryDTO queryDTO) {
+        return pageByOptionsMemberLogCommon(null, Collections.singleton(projectId), repositoryIds, pageRequest, queryDTO);
+    }
+
+    @Override
+    public PageInfo<OperationLogViewDTO> pageByOptionsMemberLogOnOrg(Long organizationId,
+                                                                     Set<Long> projectIds,
+                                                                     Set<Long> repositoryIds,
+                                                                     PageRequest pageRequest,
+                                                                     OperationLogQueryDTO queryDTO) {
+        return pageByOptionsMemberLogCommon(Collections.singleton(organizationId), projectIds, repositoryIds, pageRequest, queryDTO);
+    }
+
+    /**
+     * 查询成员操作日志(可复用)
+     *
+     * @param organizationIds
+     * @param projectIds
+     * @param repositoryIds
+     * @param pageRequest
+     * @param queryDTO
+     * @return
+     */
+    private PageInfo<OperationLogViewDTO> pageByOptionsMemberLogCommon(Set<Long> organizationIds,
+                                                                       Set<Long> projectIds,
+                                                                       Set<Long> repositoryIds,
+                                                                       PageRequest pageRequest,
+                                                                       OperationLogQueryDTO queryDTO) {
         Long opUserId = queryDTO.getOpUserId();
         Date startDate = queryDTO.getStartDate();
         Date endDate = queryDTO.getEndDate();
@@ -44,8 +74,9 @@ public class RdmOperationLogAppServiceImpl implements RdmOperationLogAppService 
 
         // 封装查询条件
         Sqls sqls = Sqls.custom()
-                .andEqualTo(RdmOperationLog.FIELD_PROJECT_ID, projectId, true)
-                .andEqualTo(RdmOperationLog.FIELD_REPOSITORY_ID, repositoryId, true)
+                .andIn(RdmOperationLog.FIELD_ORGANIZATION_ID, organizationIds, true)
+                .andIn(RdmOperationLog.FIELD_PROJECT_ID, projectIds, true)
+                .andIn(RdmOperationLog.FIELD_REPOSITORY_ID, repositoryIds, true)
                 .andEqualTo(RdmOperationLog.FIELD_OP_USER_ID, opUserId, true)
                 .andIn(RdmOperationLog.FIELD_OP_EVENT_TYPE, opEventTypes, true)
                 .andEqualTo(RdmOperationLog.FIELD_OP_TYPE, opType);
@@ -64,6 +95,6 @@ public class RdmOperationLogAppServiceImpl implements RdmOperationLogAppService 
 
         Page<RdmOperationLog> page = PageHelper.doPageAndSort(pageRequest, () -> operationLogRepository.selectByCondition(condition));
 
-        return rdmOperationLogAssembler.pageToOperationLogViewDTO(projectId, page);
+        return rdmOperationLogAssembler.pageToOperationLogViewDTO(page);
     }
 }

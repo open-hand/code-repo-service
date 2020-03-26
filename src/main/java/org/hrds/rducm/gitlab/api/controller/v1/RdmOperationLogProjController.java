@@ -17,11 +17,10 @@ import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.Set;
 
 /**
  * 操作日志表 管理 API
@@ -41,7 +40,7 @@ public class RdmOperationLogProjController extends BaseController {
             @ApiImplicitParam(name = "page", paramType = "query", dataType = "Int"),
             @ApiImplicitParam(name = "size", paramType = "query", dataType = "Int"),
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", dataType = "Long", required = true),
-            @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "query", dataType = "Long"),
+            @ApiImplicitParam(name = "repositoryIds", value = ApiInfoConstants.REPOSITORY_ID, paramType = "query", dataType = "Long", allowMultiple = true),
             @ApiImplicitParam(name = "opUserId", value = "操作人，用户id", paramType = "query", dataType = "Long"),
             @ApiImplicitParam(name = "startDate", value = "开始日期", paramType = "query", dataType = "Date"),
             @ApiImplicitParam(name = "endDate", value = "结束日期", paramType = "query", dataType = "Date"),
@@ -53,10 +52,10 @@ public class RdmOperationLogProjController extends BaseController {
                                                                                 @SortDefault(value = RdmOperationLog.FIELD_CREATION_DATE,
                                                                                         direction = Sort.Direction.DESC)
                                                                                 @ApiIgnore PageRequest pageRequest,
-                                                                                Long repositoryId,
+                                                                                @RequestParam(required = false) Set<Long> repositoryIds,
                                                                                 OperationLogQueryDTO queryDTO) {
 
-        PageInfo<OperationLogViewDTO> list = operationLogService.pageByOptionsMemberLog(projectId, repositoryId, pageRequest, queryDTO);
+        PageInfo<OperationLogViewDTO> list = operationLogService.pageByOptionsMemberLog(projectId, repositoryIds, pageRequest, queryDTO);
         return Results.success(list);
     }
 

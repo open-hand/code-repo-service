@@ -5,6 +5,8 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
 
+import java.util.Set;
+
 /**
  * 操作日志表应用服务
  *
@@ -12,13 +14,34 @@ import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
  */
 public interface RdmOperationLogAppService {
     /**
+     * 项目层
      * 按条件查询成员操作日志
      *
      * @param projectId
-     * @param repositoryId
+     * @param repositoryIds
      * @param pageRequest
      * @param queryDTO
      * @return
      */
-    PageInfo<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId, Long repositoryId, PageRequest pageRequest, OperationLogQueryDTO queryDTO);
+    PageInfo<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId,
+                                                         Set<Long> repositoryIds,
+                                                         PageRequest pageRequest,
+                                                         OperationLogQueryDTO queryDTO);
+
+    /**
+     * 组织层
+     * 按条件查询成员操作日志
+     *
+     * @param organizationId
+     * @param projectIds
+     * @param repositoryIds
+     * @param pageRequest
+     * @param queryDTO
+     * @return
+     */
+    PageInfo<OperationLogViewDTO> pageByOptionsMemberLogOnOrg(Long organizationId,
+                                                              Set<Long> projectIds,
+                                                              Set<Long> repositoryIds,
+                                                              PageRequest pageRequest,
+                                                              OperationLogQueryDTO queryDTO);
 }

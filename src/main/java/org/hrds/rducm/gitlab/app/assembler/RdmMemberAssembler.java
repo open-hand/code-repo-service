@@ -156,9 +156,6 @@ public class RdmMemberAssembler {
         Page<RdmMemberViewDTO> rdmMemberViewDTOS = ConvertUtils.convertPage(page, RdmMemberViewDTO.class);
 
         // 获取用户id集合
-//        Set<String> projectIdAndUserIds = Sets.newHashSet();
-
-//        Map<Long, Set<Long>> projectIdAndUserIds = Maps.newHashMap();
         Multimap<Long, Long> projectIdAndUserIds = HashMultimap.create();
         // 获取代码库id集合
         Set<Long> repositoryIds = Sets.newHashSet();
