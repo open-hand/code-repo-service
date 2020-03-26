@@ -3,7 +3,9 @@ package org.hrds.rducm.gitlab.api.controller.v1;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
+import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -13,6 +15,8 @@ import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApplicantCreateDTO;
 import org.hrds.rducm.gitlab.api.controller.validator.RdmMemberApplicantValidator;
 import org.hrds.rducm.gitlab.app.service.RdmMemberApplicantAppService;
+import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
+import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberApplicantService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
@@ -46,7 +50,8 @@ public class RdmMemberApplicantProjController extends BaseController {
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping
     public ResponseEntity<PageInfo<RdmMemberApplicantViewDTO>> pageByOptions(@PathVariable Long projectId,
-                                                                             PageRequest pageRequest,
+                                                                             @SortDefault(value = RdmMemberApplicant.FIELD_CREATION_DATE,
+                                                                                     direction = Sort.Direction.DESC) PageRequest pageRequest,
                                                                              @RequestParam(required = false) String applicantUserName,
                                                                              @RequestParam(required = false) String approvalState) {
 
