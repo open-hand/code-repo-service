@@ -113,7 +113,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectByCondition(condition));
 
-        return rdmMemberAssembler.pageToRdmMemberViewDTO(projectId, page);
+        return rdmMemberAssembler.pageToRdmMemberViewDTO(page);
     }
 
     @Override
@@ -156,7 +156,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectByCondition(condition));
 
-        return rdmMemberAssembler.pageToRdmMemberViewDTOOnOrg(organizationId, page);
+        return rdmMemberAssembler.pageToRdmMemberViewDTO(page);
     }
 
     /**

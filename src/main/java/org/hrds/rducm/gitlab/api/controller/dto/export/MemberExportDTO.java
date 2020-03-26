@@ -48,9 +48,6 @@ public class MemberExportDTO {
     public static class SyncGitlabFlagValueRenderer implements ValueRenderer {
         @Override
         public Object render(Object value, Object data) {
-            System.out.println("------------------------" + value);
-            System.out.println(data);
-
             return (Boolean) value ? "已同步" : "未同步";
         }
     }
