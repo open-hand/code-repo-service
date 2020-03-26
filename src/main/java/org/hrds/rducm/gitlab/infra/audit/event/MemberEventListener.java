@@ -12,6 +12,7 @@ import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmOperationLogRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
+import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.PlaceholderUtils;
 import org.hzero.core.util.StringPool;
@@ -116,7 +117,7 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
 
         sourceUserIdStr = c7nUserS.getRealName() + "(" + c7nUserS.getLoginName() + ")";
         targetUserIdStr = c7nUserT.getRealName() + "(" + c7nUserT.getLoginName() + ")";
-        accessLevelStr = accessLevel == null ? null : AccessLevel.forValue(accessLevel).name();
+        accessLevelStr = accessLevel == null ? null : RdmAccessLevel.forValue(accessLevel).toDesc();
 
         expiresAtStr = Optional.ofNullable(expiresAt)
                 .map(val -> DateFormatUtils.format(val, "yyyy-MM-dd"))
