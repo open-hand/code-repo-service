@@ -1,9 +1,6 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.pagehelper.PageInfo;
-import com.google.common.collect.Maps;
-import io.choerodon.core.exception.CommonException;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
@@ -70,26 +67,41 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
     }
 
     @Override
-    public List<C7nUserVO> listC7nUsersByName(Long projectId, String realName, String loginName) {
+    public Set<Long> listC7nUserIdsByNameOnProjectLevel(Long projectId, String realName, String loginName) {
         // 0为不分页
         ResponseEntity<PageInfo<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnProjectLevel(projectId, 0, 0, loginName, realName);
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
-            return responseEntity.getBody().getList();
+            List<C7nUserVO> c7nUserVOS = responseEntity.getBody().getList();
+            return c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
         } else {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
     }
 
     @Override
-    public List<C7nUserVO> listC7nUsersByNameOnOrgLevel(Long organizationId, String realName, String loginName) {
+    public Set<Long> listC7nUserIdsByNameOnOrgLevel(Long organizationId, String realName, String loginName) {
         // 0为不分页
         ResponseEntity<PageInfo<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnOrganizationLevel(organizationId, 0, 0, loginName, realName);
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
-            return responseEntity.getBody().getList();
+            List<C7nUserVO> c7nUserVOS = responseEntity.getBody().getList();
+            return c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
         } else {
-            return Collections.emptyList();
+            return Collections.emptySet();
+        }
+    }
+
+    @Override
+    public Set<Long> listC7nUserIdsByNameOnSiteLevel(String realName, String loginName) {
+        // 0为不分页
+        ResponseEntity<PageInfo<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnSiteLevel(0, 0, loginName, realName);
+
+        if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
+            List<C7nUserVO> c7nUserVOS = responseEntity.getBody().getList();
+            return c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
+        } else {
+            return Collections.emptySet();
         }
     }
 

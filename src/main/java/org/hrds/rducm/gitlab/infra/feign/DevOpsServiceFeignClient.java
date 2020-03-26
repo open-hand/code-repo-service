@@ -23,17 +23,18 @@ public interface DevOpsServiceFeignClient {
     ResponseEntity<List<C7nAppServiceVO>> listRepositoriesByActive(@PathVariable Long projectId);
 
     /**
+     * 项目下分页查询应用服务
+     *
      * @param projectId
      * @param doPage
      * @param params
      */
-//    @ApiOperation(value = "项目下分页查询应用服务")
-//    @PostMapping("/v1/projects/{project_id}/app_service/page_by_options")
-//    ResponseEntity<PageInfo<C7nAppServiceVO>> pageAppServiceByOptions(@ApiParam(value = "项目Id", required = true) @PathVariable(value = "project_id") Long projectId,
-//                                                                      @ApiParam(value = "是否分页") @RequestParam(value = "doPage", required = false) Boolean doPage,
-//                                                                      @RequestParam(required = false) Integer page,
-//                                                                      @RequestParam(required = false) Integer size,
-//                                                                      @ApiParam(value = "查询参数") @RequestBody(required = false) String params);
+    @PostMapping("/v1/projects/{project_id}/app_service/page_by_options")
+    ResponseEntity<PageInfo<C7nAppServiceVO>> pageAppServiceByOptions(@PathVariable(value = "project_id") Long projectId,
+                                                                      @RequestParam(value = "doPage", required = false) Boolean doPage,
+                                                                      @RequestParam(required = false) Integer page,
+                                                                      @RequestParam(required = false) Integer size,
+                                                                      @RequestBody(required = false) String params);
 
 
     /**
@@ -48,14 +49,14 @@ public interface DevOpsServiceFeignClient {
      * @param params      查询参数
      * @return
      */
-    @PostMapping(value = "/v1/projects/{project_id}/app_service/list_app_service_ids")
-    ResponseEntity<PageInfo<C7nAppServiceVO>> pageProjectAppServiceByIds(@PathVariable(value = "project_id") Long projectId,
-                                                                         @RequestParam(value = "ids") Set<Long> ids,
-                                                                         @RequestParam(value = "doPage", required = false) Boolean doPage,
-                                                                         @RequestParam(value = "with_version", required = false, defaultValue = "true") Boolean withVersion,
-                                                                         @RequestParam(required = false) Integer page,
-                                                                         @RequestParam(required = false) Integer size,
-                                                                         @RequestBody(required = false) String params);
+//    @PostMapping(value = "/v1/projects/{project_id}/app_service/list_app_service_ids")
+//    ResponseEntity<PageInfo<C7nAppServiceVO>> pageProjectAppServiceByIds(@PathVariable(value = "project_id") Long projectId,
+//                                                                         @RequestParam(value = "ids") Set<Long> ids,
+//                                                                         @RequestParam(value = "doPage", required = false) Boolean doPage,
+//                                                                         @RequestParam(value = "with_version", required = false, defaultValue = "true") Boolean withVersion,
+//                                                                         @RequestParam(required = false) Integer page,
+//                                                                         @RequestParam(required = false) Integer size,
+//                                                                         @RequestBody(required = false) String params);
 
     /**
      * 通过一组id分页查询或者不传id时进行分页查询

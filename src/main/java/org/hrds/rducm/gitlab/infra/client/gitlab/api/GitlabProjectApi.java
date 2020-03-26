@@ -48,6 +48,23 @@ public class GitlabProjectApi {
     }
 
     /**
+     * 获取项目单个成员, 包括继承的成员
+     *
+     * @param projectId
+     * @return
+     */
+    public Member getAllMember(Integer projectId, Integer userId) {
+        try {
+            // 需要查询所有成员
+            return gitlab4jClient.getGitLabApi()
+                    .getProjectApi()
+                    .getAllMember(projectId, userId);
+        } catch (GitLabApiException e) {
+            throw new GitlabClientException(e, e.getMessage());
+        }
+    }
+
+    /**
      * 获取项目所有成员, 包括继承的成员
      *
      * @param projectId

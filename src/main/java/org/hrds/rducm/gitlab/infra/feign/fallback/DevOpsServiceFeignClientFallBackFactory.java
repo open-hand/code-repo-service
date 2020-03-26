@@ -30,7 +30,7 @@ public class DevOpsServiceFeignClientFallBackFactory implements FallbackFactory<
             }
 
             @Override
-            public ResponseEntity<PageInfo<C7nAppServiceVO>> pageProjectAppServiceByIds(Long projectId, Set<Long> ids, Boolean doPage, Boolean withVersion, Integer page, Integer size, String params) {
+            public ResponseEntity<PageInfo<C7nAppServiceVO>> pageAppServiceByOptions(Long projectId, Boolean doPage, Integer page, Integer size, String params) {
                 return null;
             }
 

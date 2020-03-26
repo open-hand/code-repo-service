@@ -7,8 +7,10 @@ import com.google.common.collect.Maps;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
+import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
 public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     @Autowired
     private DevOpsServiceFeignClient devOpsServiceFeignClient;
+    @Autowired
+    private BaseServiceFeignClient baseServiceFeignClient;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -71,7 +75,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     }
 
     @Override
-    public List<C7nAppServiceVO> listC7nAppServicesByName(Long projectId, String appServiceName) {
+    public Set<Long> listC7nAppServiceIdsByNameOnProjectLevel(Long projectId, String appServiceName) {
         // 将参数转换为json格式
         String param = null;
         if (appServiceName != null) {
@@ -87,13 +91,33 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
             }
         }
 
-        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageProjectAppServiceByIds(projectId, null, true, null, null, null, param);
+        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, 0, 0, param);
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
-            return responseEntity.getBody().getList();
+            List<C7nAppServiceVO> c7nAppServiceVOS = responseEntity.getBody().getList();
+            return c7nAppServiceVOS.stream().map(C7nAppServiceVO::getId).collect(Collectors.toSet());
+
         } else {
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
+    }
+
+    @Override
+    public Set<Long> listC7nAppServiceIdsByNameOnOrgLevel(Long organizationId, String appServiceName) {
+        // 查询该组织所有项目
+        Set<Long> projectIds;
+        ResponseEntity<List<C7nProjectVO>> responseEntity = baseServiceFeignClient.listProjectsByOrgId(organizationId);
+        List<C7nProjectVO> c7nProjectVOS = FeignUtils.handleResponseEntity(responseEntity);
+        projectIds = c7nProjectVOS.stream().map(C7nProjectVO::getId).collect(Collectors.toSet());
+
+        // 查询项目的应用服务
+        Set<Long> appServiceIds = new HashSet<>();
+        projectIds.forEach(projectId -> {
+            Set<Long> asIds = listC7nAppServiceIdsByNameOnProjectLevel(projectId, appServiceName);
+            appServiceIds.addAll(asIds);
+        });
+
+        return appServiceIds;
     }
 
     @Override

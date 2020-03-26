@@ -105,23 +105,20 @@ public interface BaseServiceFeignClient {
                                                                               @RequestParam(required = false) String realName);
 
     /**
+     * 全局层
      * 全局层分页查询用户列表（包括用户信息以及所分配的全局角色信息）
      *
-     * @param Pageable
-     * @param organizationName
+     * @param page      0为不分页
+     * @param size
      * @param loginName
      * @param realName
-     * @param roleName
-     * @param enabled
-     * @param locked
-     * @param params
      * @return
      */
     @GetMapping(value = "/v1/users/search")
-    ResponseEntity<PageInfo<C7nUserVO>> pagingQueryUsersWithRolesOnSiteLevel(@RequestParam(required = false) int page,
-                                                                             @RequestParam(required = false) int size,
-                                                                             @RequestParam(required = false) String loginName,
-                                                                             @RequestParam(required = false) String realName);
+    ResponseEntity<PageInfo<C7nUserVO>> pageUsersByOptionsOnSiteLevel(@RequestParam(required = false) int page,
+                                                                      @RequestParam(required = false) int size,
+                                                                      @RequestParam(required = false) String loginName,
+                                                                      @RequestParam(required = false) String realName);
 
     /**
      * 项目层
@@ -148,6 +145,15 @@ public interface BaseServiceFeignClient {
     ResponseEntity<List<C7nUserVO>> listUsersWithRolesAndGitlabUserIdByIds(@PathVariable(name = "organization_id") Long organizationId,
                                                                            @RequestParam(name = "user_ids") Set<Long> userIds);
 
+
+    /**
+     * 查询组织下所有项目
+     *
+     * @param organizationId
+     * @return
+     */
+    @GetMapping(value = "/v1/organizations/{organization_id}/projects/all")
+    ResponseEntity<List<C7nProjectVO>> listProjectsByOrgId(@PathVariable(name = "organization_id") Long organizationId);
 
 //    /**
 //     * 查询组织下所有项目

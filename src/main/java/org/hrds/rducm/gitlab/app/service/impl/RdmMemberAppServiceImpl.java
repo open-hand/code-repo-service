@@ -24,8 +24,6 @@ import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
-import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
-import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.hzero.core.base.AopProxy;
@@ -42,7 +40,6 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants.RDUCM_BATCH_ADD_MEMBERS;
 
@@ -94,8 +91,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         // 调用外部接口模糊查询 用户名或登录名
         if (!StringUtils.isEmpty(realName)|| !StringUtils.isEmpty(loginName)) {
-            List<C7nUserVO> c7nUserVOS = ic7nBaseServiceService.listC7nUsersByName(projectId, realName, loginName);
-            Set<Long> userIdsSet = c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
+            Set<Long> userIdsSet = ic7nBaseServiceService.listC7nUserIdsByNameOnProjectLevel(projectId, realName, loginName);
 
             if (userIdsSet.isEmpty()) {
                 return PageInfo.of(Collections.emptyList());
@@ -106,8 +102,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         // 调用外部接口模糊查询 应用服务
         if (!StringUtils.isEmpty(appServiceName)) {
-            List<C7nAppServiceVO> c7nAppServiceVOS = ic7nDevOpsServiceService.listC7nAppServicesByName(projectId, appServiceName);
-            Set<Long> repositoryIdSet = c7nAppServiceVOS.stream().map(C7nAppServiceVO::getId).collect(Collectors.toSet());
+            Set<Long> repositoryIdSet = ic7nDevOpsServiceService.listC7nAppServiceIdsByNameOnProjectLevel(projectId, appServiceName);
 
             if (repositoryIdSet.isEmpty()) {
                 return PageInfo.of(Collections.emptyList());
@@ -139,8 +134,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         // 调用外部接口模糊查询 用户名或登录名
         if (!StringUtils.isEmpty(realName)|| !StringUtils.isEmpty(loginName)) {
-            List<C7nUserVO> c7nUserVOS = ic7nBaseServiceService.listC7nUsersByNameOnOrgLevel(organizationId, realName, loginName);
-            Set<Long> userIdsSet = c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
+            Set<Long> userIdsSet = ic7nBaseServiceService.listC7nUserIdsByNameOnSiteLevel(realName, loginName);
 
             if (userIdsSet.isEmpty()) {
                 return PageInfo.of(Collections.emptyList());
@@ -151,8 +145,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         // 调用外部接口模糊查询 应用服务
         if (!StringUtils.isEmpty(appServiceName)) {
-            List<C7nAppServiceVO> c7nAppServiceVOS = ic7nDevOpsServiceService.listC7nAppServicesByName(-1L, appServiceName);
-            Set<Long> repositoryIdSet = c7nAppServiceVOS.stream().map(C7nAppServiceVO::getId).collect(Collectors.toSet());
+            Set<Long> repositoryIdSet = ic7nDevOpsServiceService.listC7nAppServiceIdsByNameOnOrgLevel(organizationId, appServiceName);
 
             if (repositoryIdSet.isEmpty()) {
                 return PageInfo.of(Collections.emptyList());

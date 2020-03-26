@@ -238,7 +238,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     @Transactional(rollbackFor = Exception.class)
     public void syncMemberFromGitlab(RdmMember param) {
         // <1> 获取Gitlab成员, 并更新数据库
-        Member glMember = gitlabProjectApi.getMember(Objects.requireNonNull(param.getGlProjectId()), Objects.requireNonNull(param.getGlUserId()));
+        Member glMember = gitlabProjectApi.getAllMember(Objects.requireNonNull(param.getGlProjectId()), Objects.requireNonNull(param.getGlUserId()));
         if (glMember == null) {
             // 移除数据库成员
             rdmMemberRepository.deleteByPrimaryKey(param.getId());

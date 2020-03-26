@@ -4,7 +4,6 @@ import com.github.pagehelper.PageInfo;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,13 +39,23 @@ public interface IC7nDevOpsServiceService {
 
     /**
      * 项目层
-     * 查询应用服务信息, 根据应用服务名模糊查询
+     * 查询应用服务ids, 根据应用服务名模糊查询
      *
      * @param projectId
      * @param appServiceName
      * @return
      */
-    List<C7nAppServiceVO> listC7nAppServicesByName(Long projectId, String appServiceName);
+    Set<Long> listC7nAppServiceIdsByNameOnProjectLevel(Long projectId, String appServiceName);
+
+    /**
+     * 组织层
+     * 查询应用服务ids, 根据应用服务名模糊查询
+     *
+     * @param organizationId
+     * @param appServiceName
+     * @return
+     */
+    Set<Long> listC7nAppServiceIdsByNameOnOrgLevel(Long organizationId, String appServiceName);
 
     /**
      * 项目层

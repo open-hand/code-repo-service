@@ -47,7 +47,7 @@ public class BaseServiceFeignClientFallBackFactory implements FallbackFactory<Ba
             }
 
             @Override
-            public ResponseEntity<PageInfo<C7nUserVO>> pagingQueryUsersWithRolesOnSiteLevel(int page, int size, String loginName, String realName) {
+            public ResponseEntity<PageInfo<C7nUserVO>> pageUsersByOptionsOnSiteLevel(int page, int size, String loginName, String realName) {
                 return null;
             }
 
@@ -58,6 +58,11 @@ public class BaseServiceFeignClientFallBackFactory implements FallbackFactory<Ba
 
             @Override
             public ResponseEntity<List<C7nUserVO>> listUsersWithRolesAndGitlabUserIdByIds(Long organizationId, Set<Long> userIds) {
+                return null;
+            }
+
+            @Override
+            public ResponseEntity<List<C7nProjectVO>> listProjectsByOrgId(Long organizationId) {
                 return null;
             }
         };
