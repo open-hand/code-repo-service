@@ -14,6 +14,7 @@ import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberApplicantRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberApplicantService;
 import org.hrds.rducm.gitlab.infra.enums.ApplicantTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.ApprovalStateEnum;
@@ -23,8 +24,11 @@ import org.hzero.mybatis.util.Sqls;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * @author ying.xie@hand-china.com
@@ -38,17 +42,32 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
     private RdmMemberRepository rdmMemberRepository;
     @Autowired
     private RdmMemberApplicantAssembler rdmMemberApplicantAssembler;
+    @Autowired
+    private IC7nBaseServiceService ic7nBaseServiceService;
 
     @Override
     public PageInfo<RdmMemberApplicantViewDTO> pageByOptions(Long projectId,
                                                              PageRequest pageRequest,
+                                                             Set<Long> repositoryIds,
                                                              String applicantUserName,
                                                              String approvalState) {
         Condition condition = Condition.builder(RdmMemberApplicant.class)
                 .where(Sqls.custom()
                         .andEqualTo(RdmMemberApplicant.FIELD_PROJECT_ID, projectId)
+                        .andIn(RdmMemberApplicant.FIELD_REPOSITORY_ID, repositoryIds, true)
                         .andEqualTo(RdmMemberApplicant.FIELD_APPROVAL_STATE, approvalState, true))
                 .build();
+
+        // 调用外部接口模糊查询
+        if (!StringUtils.isEmpty(applicantUserName)) {
+            Set<Long> userIdsSet = ic7nBaseServiceService.listC7nUserIdsByNameOnProjectLevel(projectId, applicantUserName, null);
+
+            if (userIdsSet.isEmpty()) {
+                return PageInfo.of(Collections.emptyList());
+            }
+
+            condition.and().andIn(RdmMemberApplicant.FIELD_APPLICANT_USER_ID, userIdsSet);
+        }
 
         Page<RdmMemberApplicant> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberApplicantRepository.selectByCondition(condition));
 

@@ -16,7 +16,6 @@ import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApplicantCreateDTO;
 import org.hrds.rducm.gitlab.api.controller.validator.RdmMemberApplicantValidator;
 import org.hrds.rducm.gitlab.app.service.RdmMemberApplicantAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
-import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberApplicantService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
@@ -24,6 +23,9 @@ import org.hzero.core.util.Results;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.Set;
 
 /**
  * 成员审批表 管理 API
@@ -43,7 +45,10 @@ public class RdmMemberApplicantProjController extends BaseController {
 
     @ApiOperation(value = "成员权限申请列表")
     @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", paramType = "query", dataType = "Int"),
+            @ApiImplicitParam(name = "size", paramType = "query", dataType = "Int"),
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
+            @ApiImplicitParam(name = "repositoryIds", value = "代码库id", paramType = "query", dataType = "Long", allowMultiple = true),
             @ApiImplicitParam(name = "applicantUserName", value = "申请人(模糊)", paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "approvalState", value = "审批状态", paramType = "query", dataType = "String"),
     })
@@ -51,11 +56,13 @@ public class RdmMemberApplicantProjController extends BaseController {
     @GetMapping
     public ResponseEntity<PageInfo<RdmMemberApplicantViewDTO>> pageByOptions(@PathVariable Long projectId,
                                                                              @SortDefault(value = RdmMemberApplicant.FIELD_CREATION_DATE,
-                                                                                     direction = Sort.Direction.DESC) PageRequest pageRequest,
+                                                                                     direction = Sort.Direction.DESC)
+                                                                             @ApiIgnore PageRequest pageRequest,
+                                                                             @RequestParam(required = false) Set<Long> repositoryIds,
                                                                              @RequestParam(required = false) String applicantUserName,
                                                                              @RequestParam(required = false) String approvalState) {
 
-        return Results.success(iRdmMemberApplicantService.pageByOptions(projectId, pageRequest, applicantUserName, approvalState));
+        return Results.success(iRdmMemberApplicantService.pageByOptions(projectId, pageRequest, repositoryIds, applicantUserName, approvalState));
     }
 
     @ApiOperation(value = "检测当前用户申请类型")

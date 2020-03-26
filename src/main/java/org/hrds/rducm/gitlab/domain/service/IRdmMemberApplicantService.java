@@ -6,6 +6,8 @@ import org.hrds.rducm.gitlab.api.controller.dto.DetectApplicantTypeDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApplicantCreateDTO;
 
+import java.util.Set;
+
 /**
  * @author ying.xie@hand-china.com
  * @date 2020/3/12
@@ -16,12 +18,14 @@ public interface IRdmMemberApplicantService {
      *
      * @param projectId
      * @param pageRequest
+     * @param repositoryIds
      * @param applicantUserName 申请人名称(模糊)
      * @param approvalState 审批状态
      * @return
      */
     PageInfo<RdmMemberApplicantViewDTO> pageByOptions(Long projectId,
                                                       PageRequest pageRequest,
+                                                      Set<Long> repositoryIds,
                                                       String applicantUserName,
                                                       String approvalState);
 
