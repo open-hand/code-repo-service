@@ -71,23 +71,18 @@ public class RdmOperationLogAssembler {
      * @return
      */
     public PageInfo<OperationLogViewDTO> pageToOperationLogViewDTO(Page<RdmOperationLog> page) {
-        // 操作人用户id, 格式如: {projectId: [userId1, userId2]}
-        Multimap<Long, Long> projectIdAndOpUserIds = HashMultimap.create();
+        // 操作人用户id
+        Set<Long> opUserIds = new HashSet<>();
         // 代码库id
         Set<Long> repositoryIds = new HashSet<>();
 
         page.getContent().forEach(v -> {
-            projectIdAndOpUserIds.put(v.getProjectId(), v.getOpUserId());
+            opUserIds.add(v.getOpUserId());
             repositoryIds.add(v.getRepositoryId());
         });
 
         // 获取操作人用户信息
-        Map<Long, C7nUserVO> c7nUserVOMap = new HashMap<>();
-
-        projectIdAndOpUserIds.asMap().forEach((projectId, userIds) -> {
-            Map<Long, C7nUserVO> tempMap = ic7nBaseServiceService.listC7nUserToMap(projectId, Sets.newHashSet(userIds));
-            c7nUserVOMap.putAll(tempMap);
-        });
+        Map<Long, C7nUserVO> c7nUserVOMap = ic7nBaseServiceService.listC7nUserToMap(opUserIds);
 
         // 获取应用服务信息
         Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(repositoryIds);

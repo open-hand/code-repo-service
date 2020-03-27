@@ -27,9 +27,9 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
     /* 猪齿鱼用户相关方法 */
 
     @Override
-    public Integer userIdToGlUserId(Long projectId, Long userId) {
+    public Integer userIdToGlUserId(Long userId) {
         // 查询用户信息
-        ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listProjectUsersByIds(projectId, Collections.singleton(userId));
+        ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listUsersByIds(null, Collections.singleton(userId));
 
         if (!CollectionUtils.isEmpty(entity.getBody())) {
             return Math.toIntExact(entity.getBody().get(0).getGitlabUserId());
@@ -39,9 +39,9 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
     }
 
     @Override
-    public C7nUserVO detailC7nUser(Long projectId, Long userId) {
+    public C7nUserVO detailC7nUser(Long userId) {
         // 查询用户信息
-        ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listProjectUsersByIds(projectId, Collections.singleton(userId));
+        ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listUsersByIds(null, Collections.singleton(userId));
 
         if (!CollectionUtils.isEmpty(entity.getBody())) {
             return entity.getBody().get(0);
@@ -51,12 +51,28 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
     }
 
     @Override
-    public Map<Long, C7nUserVO> listC7nUserToMap(Long projectId, Set<Long> userIds) {
+    public Map<Long, C7nUserVO> listC7nUserToMap(Set<Long> userIds) {
         if (userIds.isEmpty()) {
             return Collections.emptyMap();
         }
 
         // 查询用户信息
+        ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listUsersByIds(null, userIds);
+
+        if (!CollectionUtils.isEmpty(entity.getBody())) {
+            return entity.getBody().stream().collect(Collectors.toMap(C7nUserVO::getId, v -> v));
+        } else {
+            return Collections.emptyMap();
+        }
+    }
+
+    @Override
+    public Map<Long, C7nUserVO> listC7nUserToMapOnProjectLevel(Long projectId, Set<Long> userIds) {
+        if (userIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        // 查询用户信息, 附带角色信息
         ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listProjectUsersByIds(projectId, userIds);
 
         if (!CollectionUtils.isEmpty(entity.getBody())) {

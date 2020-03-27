@@ -72,7 +72,7 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
         Page<RdmMemberApplicant> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberApplicantRepository.selectByCondition(condition));
 
         // 转换查询结果
-        return rdmMemberApplicantAssembler.pageToRdmMemberApplicantViewDTO(projectId, page);
+        return rdmMemberApplicantAssembler.pageToRdmMemberApplicantViewDTO(page);
     }
 
     @Override

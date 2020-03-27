@@ -5,17 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.oauth.DetailsHelper;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.DateUtils;
-import org.gitlab4j.api.models.AccessLevel;
 import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
-import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmOperationLogRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.PlaceholderUtils;
-import org.hzero.core.util.StringPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,8 +108,8 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
         String expiresAtStr;
         String opDateStr;
 
-        C7nUserVO c7nUserS = ic7nBaseServiceService.detailC7nUser(projectId, userId);
-        C7nUserVO c7nUserT = ic7nBaseServiceService.detailC7nUser(projectId, targetUserId);
+        C7nUserVO c7nUserS = ic7nBaseServiceService.detailC7nUser(userId);
+        C7nUserVO c7nUserT = ic7nBaseServiceService.detailC7nUser(targetUserId);
 
         sourceUserIdStr = c7nUserS.getRealName() + "(" + c7nUserS.getLoginName() + ")";
         targetUserIdStr = c7nUserT.getRealName() + "(" + c7nUserT.getLoginName() + ")";

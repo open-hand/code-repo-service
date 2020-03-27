@@ -52,7 +52,7 @@ public class RdmMemberAssembler {
         // 查询gitlab用户id
         Map<Long, Integer> userIdToGlUserIdMap = new HashMap<>();
         rdmMemberBatchDTO.getMembers().forEach(m -> {
-            Integer glUserId = ic7nBaseServiceService.userIdToGlUserId(projectId, m.getUserId());
+            Integer glUserId = ic7nBaseServiceService.userIdToGlUserId(m.getUserId());
             userIdToGlUserIdMap.put(m.getUserId(), glUserId);
         });
 
@@ -91,7 +91,7 @@ public class RdmMemberAssembler {
 
         // 获取gitlab项目id和用户id
         Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(repositoryId);
-        Integer glUserId = ic7nBaseServiceService.userIdToGlUserId(projectId, param.getUserId());
+        Integer glUserId = ic7nBaseServiceService.userIdToGlUserId(param.getUserId());
 
         param.setGlProjectId(glProjectId);
         param.setGlUserId(glUserId);
@@ -155,7 +155,7 @@ public class RdmMemberAssembler {
     public PageInfo<RdmMemberViewDTO> pageToRdmMemberViewDTO(Page<RdmMember> page) {
         Page<RdmMemberViewDTO> rdmMemberViewDTOS = ConvertUtils.convertPage(page, RdmMemberViewDTO.class);
 
-        // 获取用户id集合
+        // 获取用户id集合, 格式如: {projectId: [userId1, userId2]}
         Multimap<Long, Long> projectIdAndUserIds = HashMultimap.create();
         // 获取代码库id集合
         Set<Long> repositoryIds = Sets.newHashSet();
@@ -169,7 +169,7 @@ public class RdmMemberAssembler {
         Map<Long, C7nUserVO> userVOMap = new HashMap<>();
 
         projectIdAndUserIds.asMap().forEach((projectId, userIds) -> {
-            Map<Long, C7nUserVO> tempMap = ic7nBaseServiceService.listC7nUserToMap(projectId, Sets.newHashSet(userIds));
+            Map<Long, C7nUserVO> tempMap = ic7nBaseServiceService.listC7nUserToMapOnProjectLevel(projectId, Sets.newHashSet(userIds));
             userVOMap.putAll(tempMap);
         });
 

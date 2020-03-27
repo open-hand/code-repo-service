@@ -16,29 +16,36 @@ public interface IC7nBaseServiceService {
      * 根据用户id获取Gitlab用户id
      * todo 高频调用, 是否使用缓存
      *
-     * @param projectId
      * @param userId
      * @return
      */
-    Integer userIdToGlUserId(Long projectId, Long userId);
+    Integer userIdToGlUserId(Long userId);
 
     /**
      * 查询用户信息
      *
-     * @param projectId
      * @param userId
      * @return
      */
-    C7nUserVO detailC7nUser(Long projectId, Long userId);
+    C7nUserVO detailC7nUser(Long userId);
 
     /**
      * 查询一组用户信息, 并转换成Map
+     *
+     * @param userIds
+     * @return
+     */
+    Map<Long, C7nUserVO> listC7nUserToMap(Set<Long> userIds);
+
+    /**
+     * 查询一组用户信息, 并转换成Map
+     * 附带角色信息
      *
      * @param projectId
      * @param userIds
      * @return
      */
-    Map<Long, C7nUserVO> listC7nUserToMap(Long projectId, Set<Long> userIds);
+    Map<Long, C7nUserVO> listC7nUserToMapOnProjectLevel(Long projectId, Set<Long> userIds);
 
     /**
      * 项目层
@@ -62,6 +69,14 @@ public interface IC7nBaseServiceService {
      */
     Set<Long> listC7nUserIdsByNameOnOrgLevel(Long organizationId, String realName, String loginName);
 
+    /**
+     * 平台层
+     * 查询用户ids, 根据实际名称和登录名模糊查询
+     *
+     * @param realName
+     * @param loginName
+     * @return
+     */
     Set<Long> listC7nUserIdsByNameOnSiteLevel(String realName, String loginName);
 
     /**
@@ -79,7 +94,7 @@ public interface IC7nBaseServiceService {
      *
      * @param organizationId
      * @param userId
-     * @param name 项目名称
+     * @param name           项目名称
      * @return
      */
     List<C7nProjectVO> listProjectsByUserIdOnOrgLevel(Long organizationId, Long userId, String name);

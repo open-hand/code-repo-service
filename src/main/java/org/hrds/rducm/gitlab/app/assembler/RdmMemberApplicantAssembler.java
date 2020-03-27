@@ -33,11 +33,10 @@ public class RdmMemberApplicantAssembler {
     /**
      * 查询结果转换
      *
-     * @param projectId
      * @param page
      * @return
      */
-    public PageInfo<RdmMemberApplicantViewDTO> pageToRdmMemberApplicantViewDTO(Long projectId, Page<RdmMemberApplicant> page) {
+    public PageInfo<RdmMemberApplicantViewDTO> pageToRdmMemberApplicantViewDTO(Page<RdmMemberApplicant> page) {
         // 用户id
         Set<Long> opUserIds = new HashSet<>();
         // 代码库id
@@ -50,7 +49,7 @@ public class RdmMemberApplicantAssembler {
         });
 
         // 获取操作人用户信息
-        Map<Long, C7nUserVO> c7nUserVOMap = ic7nBaseServiceService.listC7nUserToMap(projectId, opUserIds);
+        Map<Long, C7nUserVO> c7nUserVOMap = ic7nBaseServiceService.listC7nUserToMap(opUserIds);
         Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(repositoryIds);
 
         return PageConvertUtils.convert(ConvertUtils.convertPage(page, val -> {
