@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.domain.service.impl;
 
 import io.choerodon.mybatis.domain.AuditDomain;
 import org.gitlab4j.api.models.Member;
+import org.gitlab4j.api.models.User;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
@@ -11,6 +12,7 @@ import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabUserApi;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,8 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     private RdmMemberRepository rdmMemberRepository;
     @Autowired
     private GitlabProjectApi gitlabProjectApi;
+    @Autowired
+    private GitlabUserApi gitlabUserApi;
     @Autowired
     private IC7nDevOpsServiceService ic7nDevOpsServiceService;
     @Autowired
@@ -238,7 +242,10 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     @Transactional(rollbackFor = Exception.class)
     public void syncMemberFromGitlab(RdmMember param) {
         // <1> 获取Gitlab成员, 并更新数据库
-        Member glMember = gitlabProjectApi.getAllMember(Objects.requireNonNull(param.getGlProjectId()), Objects.requireNonNull(param.getGlUserId()));
+        Integer glUserId = Objects.requireNonNull(param.getGlUserId());
+        User glUser = gitlabUserApi.getUser(glUserId);
+        Member glMember = gitlabProjectApi.getAllMember(Objects.requireNonNull(param.getGlProjectId()), Objects.requireNonNull(glUser.getUsername()));
+        // 理论上只会查询到一个成员
         if (glMember == null) {
             // 移除数据库成员
             rdmMemberRepository.deleteByPrimaryKey(param.getId());

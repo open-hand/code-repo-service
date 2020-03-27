@@ -8,7 +8,9 @@ import org.hrds.rducm.gitlab.infra.client.gitlab.constant.GitlabClientConstants;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -49,16 +51,30 @@ public class GitlabProjectApi {
 
     /**
      * 获取项目单个成员, 包括继承的成员
+     * 由于当前Gitlab版本不支持
      *
      * @param projectId
+     * @param userName 用户名
      * @return
      */
-    public Member getAllMember(Integer projectId, Integer userId) {
+    public Member getAllMember(Integer projectId, String userName) {
         try {
             // 需要查询所有成员
-            return gitlab4jClient.getGitLabApi()
+            List<Member> allMembers = gitlab4jClient.getGitLabApi()
                     .getProjectApi()
-                    .getAllMember(projectId, userId);
+                    .getAllMembers(projectId, userName);
+            if (allMembers.isEmpty()) {
+                return null;
+            } else if (allMembers.size() == 1) {
+                return allMembers.get(0);
+            } else {
+                // 获取username匹配的那个成员
+                return allMembers.stream()
+                        .filter(member -> member.getUsername().equals(userName))
+                        .findFirst()
+                        .orElse(null);
+            }
+
         } catch (GitLabApiException e) {
             throw new GitlabClientException(e, e.getMessage());
         }
@@ -75,7 +91,7 @@ public class GitlabProjectApi {
             // 需要查询所有成员
             return gitlab4jClient.getGitLabApi()
                     .getProjectApi()
-                    .getAllMembers(projectId, GitlabClientConstants.DEFAULT_PER_PAGE)
+                    .getAllMembers(projectId, GitlabClientConstants.DEFAULT_PER_PAGE, null)
                     .all();
         } catch (GitLabApiException e) {
             throw new GitlabClientException(e, e.getMessage());
