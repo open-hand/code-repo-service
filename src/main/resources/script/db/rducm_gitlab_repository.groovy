@@ -13,6 +13,7 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_repository.groovy') {
         }
         createTable(tableName: "rducm_gitlab_repository", remarks: "代码库表") {
             column(name: "id", type: "bigint(20)", autoIncrement: true, remarks: "主键") { constraints(primaryKey: true) }
+            column(name: "organization_id", type: "bigint(20)", remarks: "组织id") { constraints(nullable: "false") }
             column(name: "project_id", type: "bigint(20)", remarks: "项目id") { constraints(nullable: "false") }
             column(name: "repository_id", type: "bigint(20)", remarks: "代码库id") { constraints(nullable: "false") }
             column(name: "repository_name", type: "varchar(" + 40 * weight + ")", remarks: "代码库名称（即应用服务名称）")

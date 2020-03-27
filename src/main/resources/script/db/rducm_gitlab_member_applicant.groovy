@@ -13,6 +13,7 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member_applicant.groo
         }
         createTable(tableName: "rducm_gitlab_member_applicant", remarks: "成员权限申请表") {
             column(name: "id", type: "bigint(20)", autoIncrement: true, remarks: "表ID，主键") { constraints(primaryKey: true) }
+            column(name: "organization_id", type: "bigint(20)", remarks: "组织id") { constraints(nullable: "false") }
             column(name: "project_id", type: "bigint(20)", remarks: "项目id") { constraints(nullable: "false") }
             column(name: "repository_id", type: "bigint(20)", remarks: "代码库id") { constraints(nullable: "false") }
             column(name: "applicant_user_id", type: "bigint(20)", remarks: "申请人，用户id") { constraints(nullable: "false") }

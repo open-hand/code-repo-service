@@ -13,6 +13,7 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_operation_log.groovy'
         }
         createTable(tableName: "rducm_gitlab_operation_log", remarks: "操作日志表") {
             column(name: "id", type: "bigint(20)", autoIncrement: true, remarks: "主键") { constraints(primaryKey: true) }
+            column(name: "organization_id", type: "bigint(20)", remarks: "组织id") { constraints(nullable: "false") }
             column(name: "project_id", type: "bigint(20)", remarks: "项目层，项目id") { constraints(nullable: "false") }
             column(name: "repository_id", type: "bigint(20)", remarks: "代码仓库id") { constraints(nullable: "false") }
             column(name: "op_user_id", type: "bigint(20)", remarks: "操作人，用户id") { constraints(nullable: "false") }
