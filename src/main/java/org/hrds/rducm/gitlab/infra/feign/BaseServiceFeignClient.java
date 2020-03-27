@@ -6,9 +6,7 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
@@ -128,9 +126,9 @@ public interface BaseServiceFeignClient {
      * @param userIds   多个用户id
      * @return
      */
-    @GetMapping(value = "/v1/projects/{project_id}/users/list_by_ids")
+    @PostMapping(value = "/v1/projects/{project_id}/users/list_by_ids")
     ResponseEntity<List<C7nUserVO>> listProjectUsersByIds(@PathVariable(name = "project_id") Long projectId,
-                                                          @RequestParam(name = "user_ids") Set<Long> userIds);
+                                                          @RequestBody Set<Long> userIds);
 
 
     /**
@@ -141,10 +139,21 @@ public interface BaseServiceFeignClient {
      * @param userIds        多个用户id
      * @return
      */
-    @GetMapping(value = "v1/organizations/{organization_id}/users/list_by_ids")
+    @PostMapping(value = "v1/organizations/{organization_id}/users/list_by_ids")
     ResponseEntity<List<C7nUserVO>> listUsersWithRolesAndGitlabUserIdByIds(@PathVariable(name = "organization_id") Long organizationId,
-                                                                           @RequestParam(name = "user_ids") Set<Long> userIds);
+                                                                           @RequestBody Set<Long> userIds);
 
+
+    /**
+     * 根据id批量查询带有gitlab用户id的用户信息列表
+     *
+     * @param onlyEnabled 是否只查询启用的用户
+     * @param ids         用户id集合
+     * @return
+     */
+    @PostMapping(value = "/v1/users/list_by_ids")
+    ResponseEntity<List<C7nUserVO>> listUsersByIds(@RequestParam(value = "only_enabled", defaultValue = "true", required = false) Boolean onlyEnabled,
+                                                   @RequestBody Set<Long> ids);
 
     /**
      * 查询组织下所有项目

@@ -68,9 +68,9 @@ public interface DevOpsServiceFeignClient {
      * @param size
      * @return
      */
-    @GetMapping(value = "/v1/projects/{project_id}/app_service/list_by_ids_or_page")
+    @PostMapping(value = "/v1/projects/{project_id}/app_service/list_by_ids_or_page")
     ResponseEntity<PageInfo<C7nAppServiceVO>> listOrPageProjectAppServices(@PathVariable(value = "project_id") Long projectId,
-                                                                           @RequestParam(value = "ids", required = false) Set<Long> ids,
+                                                                           @RequestBody(required = false) Set<Long> ids,
                                                                            @RequestParam(value = "doPage", required = false, defaultValue = "true") Boolean doPage,
                                                                            @RequestParam(required = false) Integer page,
                                                                            @RequestParam(required = false) Integer size);
@@ -82,6 +82,6 @@ public interface DevOpsServiceFeignClient {
      * @param ids 应用服务Ids, 不能为空，也不能为空数组
      * @return
      */
-    @GetMapping(value = "/v1/app_service/list_app_service_by_ids")
-    ResponseEntity<PageInfo<C7nAppServiceVO>> listAppServiceByIds(@RequestParam(value = "ids") Set<Long> ids);
+    @PostMapping(value = "/v1/app_service/list_app_service_by_ids")
+    ResponseEntity<PageInfo<C7nAppServiceVO>> listAppServiceByIds(@RequestBody Set<Long> ids);
 }
