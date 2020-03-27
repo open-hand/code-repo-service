@@ -29,7 +29,7 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
     @Override
     public Integer userIdToGlUserId(Long userId) {
         // 查询用户信息
-        ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listUsersByIds(null, Collections.singleton(userId));
+        ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listUsersByIds(false, Collections.singleton(userId));
 
         if (!CollectionUtils.isEmpty(entity.getBody())) {
             return Math.toIntExact(entity.getBody().get(0).getGitlabUserId());
@@ -41,7 +41,7 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
     @Override
     public C7nUserVO detailC7nUser(Long userId) {
         // 查询用户信息
-        ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listUsersByIds(null, Collections.singleton(userId));
+        ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listUsersByIds(false, Collections.singleton(userId));
 
         if (!CollectionUtils.isEmpty(entity.getBody())) {
             return entity.getBody().get(0);
@@ -57,7 +57,7 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
         }
 
         // 查询用户信息
-        ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listUsersByIds(null, userIds);
+        ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listUsersByIds(false, userIds);
 
         if (!CollectionUtils.isEmpty(entity.getBody())) {
             return entity.getBody().stream().collect(Collectors.toMap(C7nUserVO::getId, v -> v));
