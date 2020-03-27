@@ -126,7 +126,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
         int page = pageRequest.getPage() + 1;
         int size = pageRequest.getSize();
 
-        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.listOrPageProjectAppServices(projectId, repositoryIds, true, page, size);
+        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.listOrPageProjectAppServices(projectId, Optional.ofNullable(repositoryIds).orElse(Collections.emptySet()), true, page, size);
         return FeignUtils.handleResponseEntity(responseEntity);
     }
 }
