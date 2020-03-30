@@ -59,7 +59,7 @@ public class RdmMemberProjController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
             @ApiImplicitParam(name = "rdmMemberBatchDTO", value = "body参数", dataType = "RdmMemberBatchDTO", required = true),
     })
-    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER}, permissionPublic = true)
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER}) //todo
     @PostMapping("/batch-add")
     public ResponseEntity<?> batchAddMembers(@PathVariable Long organizationId,
                                              @PathVariable Long projectId,
