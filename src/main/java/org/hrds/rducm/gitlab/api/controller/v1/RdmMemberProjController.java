@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.iam.InitRoleCode;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -58,7 +59,7 @@ public class RdmMemberProjController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
             @ApiImplicitParam(name = "rdmMemberBatchDTO", value = "body参数", dataType = "RdmMemberBatchDTO", required = true),
     })
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER}, permissionPublic = true)
     @PostMapping("/batch-add")
     public ResponseEntity<?> batchAddMembers(@PathVariable Long organizationId,
                                              @PathVariable Long projectId,
