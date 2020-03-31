@@ -56,7 +56,8 @@ public class RdmMemberProjController extends BaseController {
 
     @ApiOperation(value = "批量新增代码库成员(项目层)")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
+            @ApiImplicitParam(name = "organizationId", value = "组织id", paramType = "path", dataType = "Long", required = true),
+            @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", dataType = "Long", required = true),
             @ApiImplicitParam(name = "rdmMemberBatchDTO", value = "body参数", dataType = "RdmMemberBatchDTO", required = true),
     })
     @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER}, permissionPublic = true)
