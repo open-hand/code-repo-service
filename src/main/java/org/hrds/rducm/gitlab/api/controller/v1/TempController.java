@@ -54,7 +54,7 @@ public class TempController extends BaseController {
     public ResponseEntity<Object> batchAddMembersTemp(@PathVariable Long organizationId,
                                                       @PathVariable Long projectId,
                                                       @RequestBody RdmMemberBatchDTO rdmMemberBatchDTO) {
-        validObject(rdmMemberBatchDTO);
+//        validObject(rdmMemberBatchDTO);
         rdmMemberAppService.batchAddMemberSagaDemo(organizationId, projectId, rdmMemberBatchDTO);
         return Results.created(null);
     }

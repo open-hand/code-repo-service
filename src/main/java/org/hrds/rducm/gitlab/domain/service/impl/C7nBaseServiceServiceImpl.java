@@ -139,4 +139,15 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
 
         return c7nProjectVOS;
     }
+
+    @Override
+    public Set<Long> listProjectIds(Long organizationId) {
+        // 查询该组织所有项目
+        Set<Long> projectIds;
+        ResponseEntity<List<C7nProjectVO>> responseEntity = baseServiceFeignClient.listProjectsByOrgId(organizationId);
+        List<C7nProjectVO> c7nProjectVOS = FeignUtils.handleResponseEntity(responseEntity);
+        projectIds = c7nProjectVOS.stream().map(C7nProjectVO::getId).collect(Collectors.toSet());
+
+        return projectIds;
+    }
 }

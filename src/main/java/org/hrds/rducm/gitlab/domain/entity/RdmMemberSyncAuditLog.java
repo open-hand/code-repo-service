@@ -4,32 +4,90 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.choerodon.mybatis.annotation.ModifyAudit;
 import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-@ModifyAudit
+/**
+ * 成员权限审计日志表
+ *
+ * @author ying.xie@hand-china.com 2020-03-30 14:09:52
+ */
+@ApiModel("成员权限审计日志表")
 @VersionAudit
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@ModifyAudit
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 @Table(name = "rducm_gitlab_member_sync_audit_log")
 public class RdmMemberSyncAuditLog extends AuditDomain {
+
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_ORGANIZATION_ID = "organizationId";
+    public static final String FIELD_PROJECT_ID = "projectId";
+    public static final String FIELD_REPOSITORY_ID = "repositoryId";
+    public static final String FIELD_USER_ID = "userId";
+    public static final String FIELD_STATE = "state";
+    public static final String FIELD_ACCESS_LEVEL = "accessLevel";
+    public static final String FIELD_EXPIRES_AT = "expiresAt";
+    public static final String FIELD_GL_PROJECT_ID = "glProjectId";
+    public static final String FIELD_GL_USER_ID = "glUserId";
+    public static final String FIELD_GL_STATE = "glState";
+    public static final String FIELD_GL_ACCESS_LEVEL = "glAccessLevel";
+    public static final String FIELD_GL_EXPIRES_AT = "glExpiresAt";
+
+    //
+    // 业务方法(按public protected private顺序排列)
+    // ------------------------------------------------------------------------------
+
+    //
+    // 数据库字段
+    // ------------------------------------------------------------------------------
+
+
+    @ApiModelProperty("主键")
     @Id
     @GeneratedValue
     private Long id;
-
+    @ApiModelProperty(value = "组织id", required = true)
+    @NotNull
+    private Long organizationId;
+    @ApiModelProperty(value = "项目层，项目id", required = true)
+    @NotNull
+    private Long projectId;
+    @ApiModelProperty(value = "代码仓库id", required = true)
+    @NotNull
     private Long repositoryId;
+    @ApiModelProperty(value = "用户id")
     private Long userId;
+    @ApiModelProperty(value = "gitlab成员状态(本系统)")
     private String state;
+    @ApiModelProperty(value = "gitlab成员权限级别(本系统)")
     private Integer accessLevel;
+    @ApiModelProperty(value = "gitlab成员过期时间(本系统)")
     private Date expiresAt;
-
+    @ApiModelProperty(value = "gitlab项目id", required = true)
+    @NotNull
     private Integer glProjectId;
+    @ApiModelProperty(value = "gitlab用户id")
     private Integer glUserId;
+    @ApiModelProperty(value = "gitlab成员状态(Gitlab)")
     private String glState;
+    @ApiModelProperty(value = "gitlab成员权限级别(Gitlab)")
     private Integer glAccessLevel;
+    @ApiModelProperty(value = "gitlab成员过期时间(Gitlab)")
     private Date glExpiresAt;
+
+    //
+    // 非数据库字段
+    // ------------------------------------------------------------------------------
+
+    //
+    // getter/setter
+    // ------------------------------------------------------------------------------
 
     public Long getId() {
         return id;
@@ -37,6 +95,24 @@ public class RdmMemberSyncAuditLog extends AuditDomain {
 
     public RdmMemberSyncAuditLog setId(Long id) {
         this.id = id;
+        return this;
+    }
+
+    public Long getOrganizationId() {
+        return organizationId;
+    }
+
+    public RdmMemberSyncAuditLog setOrganizationId(Long organizationId) {
+        this.organizationId = organizationId;
+        return this;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public RdmMemberSyncAuditLog setProjectId(Long projectId) {
+        this.projectId = projectId;
         return this;
     }
 

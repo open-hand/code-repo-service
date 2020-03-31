@@ -98,4 +98,12 @@ public interface IC7nBaseServiceService {
      * @return
      */
     List<C7nProjectVO> listProjectsByUserIdOnOrgLevel(Long organizationId, Long userId, String name);
+
+    /**
+     * 获取组织下所有项目id
+     *
+     * @param organizationId
+     * @return
+     */
+    Set<Long> listProjectIds(Long organizationId);
 }

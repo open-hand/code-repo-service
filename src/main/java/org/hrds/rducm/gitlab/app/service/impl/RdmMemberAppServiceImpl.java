@@ -48,12 +48,6 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     private final RdmMemberRepository rdmMemberRepository;
 
     @Autowired
-    private RdmRepositoryRepository rdmRepositoryRepository;
-
-    @Autowired
-    private RdmUserRepository rdmUserRepository;
-
-    @Autowired
     private IRdmMemberService iRdmMemberService;
 
     @Autowired
@@ -336,10 +330,12 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Transactional(rollbackFor = Exception.class)
     public void batchAddMemberSagaDemo(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
         // <0> 校验入参 + 转换
-        List<RdmMember> rdmMembers = rdmMemberAssembler.rdmMemberBatchDTOToRdmMembers(organizationId, projectId, rdmMemberBatchDTO);
+//        List<RdmMember> rdmMembers = rdmMemberAssembler.rdmMemberBatchDTOToRdmMembers(organizationId, projectId, rdmMemberBatchDTO);
+//
+//        // <1> 预更新, 数据库添加成员, 已存在需要更新
+//        iRdmMemberService.batchAddOrUpdateMembersBefore(rdmMembers);
 
-        // <1> 预更新, 数据库添加成员, 已存在需要更新
-        iRdmMemberService.batchAddOrUpdateMembersBefore(rdmMembers);
+        System.out.println("-------------- saga 001");
 
         // 创建saga
         producer.apply(
@@ -347,7 +343,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                         .withLevel(ResourceLevel.PROJECT)
 //                        .withRefType("hrds-code-repo")
                         .withSagaCode(RDUCM_BATCH_ADD_MEMBERS)
-                        .withPayloadAndSerialize(rdmMembers)
+                        .withPayloadAndSerialize("hello")
 //                        .withRefId(null)
                         .withSourceId(projectId),
                 builder -> {

@@ -6,16 +6,19 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
+import org.hrds.rducm.gitlab.infra.util.TypeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.TypeUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,6 +34,8 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     private DevOpsServiceFeignClient devOpsServiceFeignClient;
     @Autowired
     private BaseServiceFeignClient baseServiceFeignClient;
+    @Autowired
+    private IC7nBaseServiceService ic7nBaseServiceService;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -77,21 +82,9 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     @Override
     public Set<Long> listC7nAppServiceIdsByNameOnProjectLevel(Long projectId, String appServiceName) {
         // 将参数转换为json格式
-        String param = null;
-        if (appServiceName != null) {
-            Map<String, Map<String, String>> paramMap = Maps.newHashMap();
-            Map<String, String> searchParamMap = Maps.newHashMap();
-            searchParamMap.put("name", appServiceName);
-            paramMap.put("searchParam", searchParamMap);
+        String params = TypeUtil.castToSearchParam("name", appServiceName);
 
-            try {
-                param = objectMapper.writeValueAsString(paramMap);
-            } catch (JsonProcessingException e) {
-                throw new CommonException(e);
-            }
-        }
-
-        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, 0, 0, param);
+        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, 0, 0, params);
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
             List<C7nAppServiceVO> c7nAppServiceVOS = responseEntity.getBody().getList();
@@ -105,10 +98,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     @Override
     public Set<Long> listC7nAppServiceIdsByNameOnOrgLevel(Long organizationId, String appServiceName) {
         // 查询该组织所有项目
-        Set<Long> projectIds;
-        ResponseEntity<List<C7nProjectVO>> responseEntity = baseServiceFeignClient.listProjectsByOrgId(organizationId);
-        List<C7nProjectVO> c7nProjectVOS = FeignUtils.handleResponseEntity(responseEntity);
-        projectIds = c7nProjectVOS.stream().map(C7nProjectVO::getId).collect(Collectors.toSet());
+        Set<Long> projectIds = ic7nBaseServiceService.listProjectIds(organizationId);
 
         // 查询项目的应用服务
         Set<Long> appServiceIds = new HashSet<>();
@@ -128,5 +118,22 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
 
         ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.listOrPageProjectAppServices(projectId, Optional.ofNullable(repositoryIds).orElse(Collections.emptySet()), true, page, size);
         return FeignUtils.handleResponseEntity(responseEntity);
+    }
+
+    @Override
+    public Map<Long, Long> listC7nAppServiceIdsMapOnProjectLevel(Long projectId) {
+        // 将参数转换为json格式
+
+        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, 0, 0, null);
+
+        if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
+            List<C7nAppServiceVO> c7nAppServiceVOS = responseEntity.getBody().getList();
+            return c7nAppServiceVOS.stream()
+                    .filter(v -> v.getId() != null && v.getGitlabProjectId() != null)
+                    .collect(Collectors.toMap(C7nAppServiceVO::getId, C7nAppServiceVO::getGitlabProjectId));
+
+        } else {
+            return Collections.emptyMap();
+        }
     }
 }

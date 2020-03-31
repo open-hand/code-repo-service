@@ -67,4 +67,13 @@ public interface IC7nDevOpsServiceService {
      * @return
      */
     PageInfo<C7nAppServiceVO> pageC7nAppServices(Long projectId, PageRequest pageRequest, Set<Long> repositoryIds);
+
+    /**
+     * 项目层
+     * 获取项目的应用服务id对应Gitlab项目id的map
+     *
+     * @param projectId
+     * @return
+     */
+    Map<Long, Long> listC7nAppServiceIdsMapOnProjectLevel(Long projectId);
 }

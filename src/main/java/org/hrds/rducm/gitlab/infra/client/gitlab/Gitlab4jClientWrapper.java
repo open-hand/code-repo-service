@@ -23,7 +23,7 @@ public class Gitlab4jClientWrapper extends Gitlab4jClient implements Application
 
     @Override
     public GitLabApi getGitLabApi() {
-        // 转换Gitlab userId todo
+        // 转换Gitlab userId
         Long userId = DetailsHelper.getUserDetails().getUserId();
 
         // 获取Gitlab用户id
@@ -33,6 +33,11 @@ public class Gitlab4jClientWrapper extends Gitlab4jClient implements Application
 
         // 获取当前用户的gitlab客户端
         return getGitLabApiUser(glUserId);
+    }
+
+    public GitLabApi getAdminGitLabApi() {
+        // 获取管理员的gitlab客户端
+        return super.getGitLabApi();
     }
 
     @Override

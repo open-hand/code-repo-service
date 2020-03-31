@@ -8,9 +8,7 @@ import org.hrds.rducm.gitlab.infra.client.gitlab.constant.GitlabClientConstants;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.CollectionUtils;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 

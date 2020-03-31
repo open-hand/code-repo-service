@@ -34,8 +34,7 @@ public class RdmSagaHandler {
             seq = 1)
     public String batchAddOrUpdateMembersToGitlab(String data) {
         try {
-            System.out.println(data);
-            LOGGER.info(data);
+            LOGGER.info("------------ saga 002" + data);
 
             RdmMember rdmMember = new RdmMember();
             rdmMember.setProjectId(-3L);
