@@ -3,6 +3,7 @@ package org.hrds.rducm.gitlab.infra.client.gitlab.api;
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.models.Member;
 import org.gitlab4j.api.models.Project;
+import org.gitlab4j.api.models.User;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.constant.GitlabClientConstants;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 public class GitlabProjectApi {
@@ -52,27 +54,13 @@ public class GitlabProjectApi {
      * 由于当前Gitlab版本不支持
      *
      * @param projectId
-     * @param userName 用户名
+     * @param userId Gitlab用户id
      * @return
      */
-    public Member getAllMember(Integer projectId, String userName) {
+    public Member getAllMember(Integer projectId, Integer userId) {
         try {
-            // 需要查询所有成员
-            List<Member> allMembers = gitlab4jClient.getGitLabApi()
-                    .getProjectApi()
-                    .getAllMembers(projectId, userName);
-            if (allMembers.isEmpty()) {
-                return null;
-            } else if (allMembers.size() == 1) {
-                return allMembers.get(0);
-            } else {
-                // 获取username匹配的那个成员
-                return allMembers.stream()
-                        .filter(member -> member.getUsername().equals(userName))
-                        .findFirst()
-                        .orElse(null);
-            }
-
+            User glUser = gitlab4jClient.getGitLabApi().getUserApi().getUser(userId);
+            return this.getAllMember(projectId, Objects.requireNonNull(glUser.getUsername()));
         } catch (GitLabApiException e) {
             throw new GitlabClientException(e, e.getMessage());
         }
@@ -150,4 +138,34 @@ public class GitlabProjectApi {
         }
     }
 
+    /* private方法 */
+    /**
+     * 获取项目单个成员, 包括继承的成员
+     * 由于当前Gitlab版本不支持
+     *
+     * @param projectId
+     * @param userName 用户名
+     * @return
+     */
+    private Member getAllMember(Integer projectId, String userName) {
+        try {
+            // 需要查询所有成员
+            List<Member> allMembers = gitlab4jClient.getGitLabApi()
+                    .getProjectApi()
+                    .getAllMembers(projectId, userName);
+            if (allMembers.isEmpty()) {
+                return null;
+            } else if (allMembers.size() == 1) {
+                return allMembers.get(0);
+            } else {
+                // 获取username匹配的那个成员
+                return allMembers.stream()
+                        .filter(member -> member.getUsername().equals(userName))
+                        .findFirst()
+                        .orElse(null);
+            }
+        } catch (GitLabApiException e) {
+            throw new GitlabClientException(e, e.getMessage());
+        }
+    }
 }

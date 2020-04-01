@@ -114,6 +114,23 @@ public interface IRdmMemberService {
     void updateMemberAfter(RdmMember m, Member member);
 
     /**
+     * 移除成员并新增成员至Gitlab
+     * 移除前会先检查Gitlab是否有成员
+     *
+     * @param param
+     * @return
+     */
+    Member tryRemoveAndAddMemberToGitlab(RdmMember param);
+
+    /**
+     * 移除Gitlab成员
+     * 移除前会先检查Gitlab是否有成员
+     *
+     * @param param
+     */
+    void tryRemoveMemberToGitlab(RdmMember param);
+
+    /**
      * 成员过期处理
      *
      * @param expiredRdmMembers 过期成员数据

@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.domain.AuditDomain;
 import org.gitlab4j.api.models.Member;
 import org.gitlab4j.api.models.User;
@@ -13,6 +14,7 @@ import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabUserApi;
+import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,8 +36,6 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     private RdmMemberRepository rdmMemberRepository;
     @Autowired
     private GitlabProjectApi gitlabProjectApi;
-    @Autowired
-    private GitlabUserApi gitlabUserApi;
     @Autowired
     private IC7nDevOpsServiceService ic7nDevOpsServiceService;
     @Autowired
@@ -94,17 +94,9 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     }
 
     @Override
+    @Deprecated
     public Member addOrUpdateMembersToGitlab(RdmMember param, boolean isExists) {
         // <1> 判断新增或更新
-//        boolean isExists;
-//        if (param.get_status().equals(AuditDomain.RecordStatus.create)) {
-//            isExists = false;
-//        } else if (param.get_status().equals(AuditDomain.RecordStatus.update)) {
-//            isExists = true;
-//        } else {
-//            throw new IllegalArgumentException("record status is invalid");
-//        }
-
         Member glMember;
         if (isExists) {
             // 如果过期, Gitlab会直接移除成员, 所以需改成添加成员
@@ -126,20 +118,11 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     @Override
     public Member addMemberToGitlab(RdmMember param) {
         // 调用gitlab api添加成员
-        Member glMember = gitlabProjectApi.addMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
-
-        return glMember;
-
-        // <2> 回写数据库
-//        this.updateMemberAfter(param, glMember);
-
-        // <3> 发送事件
-//        publishMemberEvent(param, MemberEvent.EventType.ADD_MEMBER);
-//        MemberEvent.EventParam eventParam = buildEventParam(param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
-//        OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.ADD_MEMBER, eventParam));
+        return gitlabProjectApi.addMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
     }
 
     @Override
+    @Deprecated
     public Member updateMemberToGitlab(RdmMember param) {
         Member glMember;
         // 如果过期, Gitlab会直接移除成员, 所以需改成添加成员
@@ -150,25 +133,11 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         }
 
         return glMember;
-
-//        // <2> 回写数据库
-//        this.updateMemberAfter(param, glMember);
-//
-//        // <3> 发送事件
-//        MemberEvent.EventParam eventParam = buildEventParam(param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
-//        OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.UPDATE_MEMBER, eventParam));
     }
 
     @Override
     public void removeMemberToGitlab(RdmMember param) {
         gitlabProjectApi.removeMember(param.getGlProjectId(), param.getGlUserId());
-
-//        // <1> 数据库删除成员
-//        rdmMemberRepository.deleteByPrimaryKey(param.getId());
-//
-//        // <3> 发送事件
-//        MemberEvent.EventParam eventParam = buildEventParam(param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
-//        OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, MemberEvent.EventType.REMOVE_MEMBER, eventParam));
     }
 
     @Override
@@ -188,6 +157,40 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         m.setSyncDateGitlab(new Date());
         rdmMemberRepository.updateOptional(m, fields);
     }
+
+    @Override
+    public Member tryRemoveAndAddMemberToGitlab(RdmMember param) {
+        // 尝试移除成员
+        this.tryRemoveMemberToGitlab(param);
+        // 添加新成员
+        return this.addMemberToGitlab(param);
+    }
+
+    @Override
+    public void tryRemoveMemberToGitlab(RdmMember param) {
+        // 先查询Gitlab用户
+        Member glMember = gitlabProjectApi.getAllMember(param.getGlProjectId(), param.getGlUserId());
+
+        if (glMember != null) {
+            if (glMember.getAccessLevel().toValue() >= RdmAccessLevel.OWNER.toValue()) {
+                throw new CommonException("error.not.allow.remove.owner", glMember.getName());
+            }
+            this.removeMemberToGitlab(param);
+        }
+    }
+
+//    private boolean compareMember(RdmMember rdmMember, Member glMember) {
+//        Integer accessLevel = rdmMember.getGlAccessLevel();
+//        Date expiresAt = rdmMember.getGlExpiresAt();
+//        Integer glAccessLevel = glMember.getAccessLevel() == null ? null : glMember.getAccessLevel().toValue();
+//        Date glExpiresAt = glMember.getExpiresAt();
+//
+//        if (accessLevel.equals(glAccessLevel)) {
+//            return Objects.equals(expiresAt, glExpiresAt);
+//        }
+//
+//        return false;
+//    }
 
     @Override
     public void batchExpireMembers(List<RdmMember> expiredRdmMembers) {
@@ -243,8 +246,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     public void syncMemberFromGitlab(RdmMember param) {
         // <1> 获取Gitlab成员, 并更新数据库
         Integer glUserId = Objects.requireNonNull(param.getGlUserId());
-        User glUser = gitlabUserApi.getUser(glUserId);
-        Member glMember = gitlabProjectApi.getAllMember(Objects.requireNonNull(param.getGlProjectId()), Objects.requireNonNull(glUser.getUsername()));
+        Member glMember = gitlabProjectApi.getAllMember(Objects.requireNonNull(param.getGlProjectId()), glUserId);
         // 理论上只会查询到一个成员
         if (glMember == null) {
             // 移除数据库成员

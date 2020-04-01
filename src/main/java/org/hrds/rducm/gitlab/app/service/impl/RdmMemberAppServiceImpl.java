@@ -182,7 +182,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             }
 
             // <2.2> 新增或更新成员至gitlab
-            Member glMember = iRdmMemberService.addOrUpdateMembersToGitlab(m, isExists);
+            Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(m);
 
             // <2.3> 回写数据库
             iRdmMemberService.updateMemberAfter(m, glMember);
@@ -207,7 +207,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         self().addMemberBeforeRequestsNew(param);
 
         // <2> 调用gitlab api更新成员 todo 事务一致性问题
-        Member glMember = iRdmMemberService.addMemberToGitlab(param);
+        Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(param);
 
         // <3> 回写数据库
         iRdmMemberService.updateMemberAfter(param, glMember);
@@ -243,7 +243,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         self().updateMemberBeforeRequestsNew(param);
 
         // <2> 调用gitlab api更新成员 todo 事务一致性问题
-        Member glMember = iRdmMemberService.updateMemberToGitlab(param);
+        Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(param);
 
         // <3> 回写数据库
         iRdmMemberService.updateMemberAfter(param, glMember);
@@ -261,7 +261,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         self().updateMemberBeforeRequestsNew(dbMember);
 
         // <2> 调用gitlab api删除成员 todo 事务一致性问题
-        iRdmMemberService.removeMemberToGitlab(dbMember);
+        iRdmMemberService.tryRemoveMemberToGitlab(dbMember);
 
         // <3> 数据库删除成员
         rdmMemberRepository.deleteByPrimaryKey(dbMember.getId());
