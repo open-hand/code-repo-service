@@ -65,7 +65,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void batchCompare(Long organizationId) {
+    public List<RdmMemberAuditRecord> batchCompare(Long organizationId) {
         Stopwatch started = Stopwatch.createStarted();
 
         // <0> 删除原有数据
@@ -87,11 +87,13 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         // <1> 对比组织所有成员
         List<RdmMemberAuditRecord> list = compareMembersByOrganizationId(organizationId);
 
-        // <2> 批量插入数据库
+        // <2> 批量插入数据库 todo 可优化为批量插入
         rdmMemberAuditRecordRepository.batchInsertSelective(list);
 
         long elapsed = started.elapsed(TimeUnit.SECONDS);
         LOGGER.info("执行时长:{}", elapsed);
+
+        return list;
     }
 
     private List<RdmMemberAuditRecord> compareMembersByOrganizationId(Long organizationId) {

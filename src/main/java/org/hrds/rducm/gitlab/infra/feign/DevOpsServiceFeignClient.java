@@ -3,6 +3,7 @@ package org.hrds.rducm.gitlab.infra.feign;
 import com.github.pagehelper.PageInfo;
 import org.hrds.rducm.gitlab.infra.feign.fallback.DevOpsServiceFeignClientFallBackFactory;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nGlUserVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -84,4 +85,13 @@ public interface DevOpsServiceFeignClient {
      */
     @PostMapping(value = "/v1/app_service/list_app_service_by_ids")
     ResponseEntity<PageInfo<C7nAppServiceVO>> listAppServiceByIds(@RequestBody Set<Long> ids);
+
+    /**
+     * 根据一组Gitlab用户id查询用户信息
+     *
+     * @param gitlabUserIds
+     * @return
+     */
+    @PostMapping(value = "v1/users/list_by_gitlab_user_ids")
+    ResponseEntity<List<C7nGlUserVO>> listUsersByGitlabUserIds(@RequestBody Set<Integer> gitlabUserIds);
 }

@@ -5,6 +5,7 @@ import feign.hystrix.FallbackFactory;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nGlUserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +42,11 @@ public class DevOpsServiceFeignClientFallBackFactory implements FallbackFactory<
 
             @Override
             public ResponseEntity<PageInfo<C7nAppServiceVO>> listAppServiceByIds(Set<Long> ids) {
+                return null;
+            }
+
+            @Override
+            public ResponseEntity<List<C7nGlUserVO>> listUsersByGitlabUserIds(Set<Integer> gitlabUserIds) {
                 return null;
             }
         };

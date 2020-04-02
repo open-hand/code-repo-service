@@ -3,6 +3,9 @@ package org.hrds.rducm.gitlab.domain.service;
 import com.github.pagehelper.PageInfo;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
+import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
+
+import java.util.List;
 
 /**
  * @author ying.xie@hand-china.com
@@ -23,6 +26,7 @@ public interface IRdmMemberAuditRecordService {
      * 比对组织下的所有应用服务的成员权限
      *
      * @param organizationId
+     * @return
      */
-    void batchCompare(Long organizationId);
+    List<RdmMemberAuditRecord> batchCompare(Long organizationId);
 }

@@ -76,4 +76,13 @@ public interface IC7nDevOpsServiceService {
      * @return
      */
     Map<Long, Long> listC7nAppServiceIdsMapOnProjectLevel(Long projectId);
+
+    /**
+     * 根据Gitlab用户id获取用户id
+     * [glUserId1, glUserId2] => Map<glUserId, userId>
+     *
+     * @param glUserIds
+     * @return
+     */
+    Map<Integer, Long> mapGlUserIdsToUserIds(Set<Integer> glUserIds);
 }

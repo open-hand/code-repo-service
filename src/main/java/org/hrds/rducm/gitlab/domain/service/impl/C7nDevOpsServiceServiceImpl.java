@@ -11,6 +11,7 @@ import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nGlUserVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
 import org.hrds.rducm.gitlab.infra.util.TypeUtil;
@@ -135,5 +136,17 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
         } else {
             return Collections.emptyMap();
         }
+    }
+
+    @Override
+    public Map<Integer, Long> mapGlUserIdsToUserIds(Set<Integer> glUserIds) {
+        ResponseEntity<List<C7nGlUserVO>> responseEntity = devOpsServiceFeignClient.listUsersByGitlabUserIds(glUserIds);
+
+        List<C7nGlUserVO> c7nGlUserVOS = FeignUtils.handleResponseEntity(responseEntity);
+
+        Map<Integer, Long> result = new HashMap<>();
+        c7nGlUserVOS.forEach(vo -> result.put(Math.toIntExact(vo.getGitlabUserId()), vo.getIamUserId()));
+
+        return result;
     }
 }
