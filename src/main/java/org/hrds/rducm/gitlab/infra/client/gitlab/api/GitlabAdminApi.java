@@ -40,12 +40,12 @@ public class GitlabAdminApi {
         }
     }
 
-    public List<Member> getMembers(Integer projectId) {
+    public List<Member> getAllMembers(Integer projectId) {
         try {
             // 需要查询所有成员
             return gitlab4jClient.getAdminGitLabApi()
                     .getProjectApi()
-                    .getMembers(projectId, GitlabClientConstants.DEFAULT_PER_PAGE)
+                    .getAllMembers(projectId, GitlabClientConstants.DEFAULT_PER_PAGE, null)
                     .all();
         } catch (GitLabApiException e) {
             throw new GitlabClientException(e, e.getMessage());

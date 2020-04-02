@@ -124,7 +124,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     public Map<Long, Long> listC7nAppServiceIdsMapOnProjectLevel(Long projectId) {
         // 将参数转换为json格式
 
-        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, 0, 0, null);
+        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, 0, 0, "");
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
             List<C7nAppServiceVO> c7nAppServiceVOS = responseEntity.getBody().getList();

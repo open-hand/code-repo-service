@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.api.controller.dto.base;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 
 /**
  * 通用的展示用户信息的DTO
@@ -28,6 +29,19 @@ public class BaseC7nUserViewDTO {
 
     @ApiModelProperty(value = "组织id")
     private Long organizationId;
+
+    //
+    // 工具方法
+    // ------------------------------------------------------------------------------
+
+    public static BaseC7nUserViewDTO convert(C7nUserVO c7nUserVO) {
+        return new BaseC7nUserViewDTO()
+                .setUserId(c7nUserVO.getId())
+                .setRealName(c7nUserVO.getRealName())
+                .setLoginName(c7nUserVO.getLoginName())
+                .setImageUrl(c7nUserVO.getImageUrl())
+                .setEmail(c7nUserVO.getEmail());
+    }
 
     public Long getUserId() {
         return userId;

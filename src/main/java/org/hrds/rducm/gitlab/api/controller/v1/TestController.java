@@ -4,9 +4,7 @@ import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.oauth.DetailsHelper;
 import io.swagger.annotations.ApiOperation;
-import org.hrds.rducm.gitlab.domain.service.impl.RdmMemberSyncLogServiceImpl;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
-import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hzero.core.base.BaseController;
 import org.slf4j.Logger;
@@ -27,7 +25,7 @@ public class TestController extends BaseController {
     private Gitlab4jClientWrapper gitlab4jClientWrapper;
 //
 //    @Autowired
-//    private RdmMemberSyncLogServiceImpl securityAudit;
+//    private RdmMemberAuditRecordServiceImpl securityAudit;
 //
 //    @Autowired
 //    private BaseServiceFeignClient baseServiceFeignClient;
