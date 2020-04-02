@@ -14,6 +14,7 @@ import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabUserApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,7 +176,12 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             if (glMember.getAccessLevel().toValue() >= RdmAccessLevel.OWNER.toValue()) {
                 throw new CommonException("error.not.allow.remove.owner", glMember.getName());
             }
-            this.removeMemberToGitlab(param);
+
+            try {
+                this.removeMemberToGitlab(param);
+            } catch (GitlabClientException e) {
+                throw new CommonException("error.member.not.allow.change", glMember.getName());
+            }
         }
     }
 
