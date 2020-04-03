@@ -38,7 +38,7 @@ public class RdmMemberAuditRecordProjController extends BaseController {
 
     @ApiOperation(value = "同步")
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
-    @GetMapping("/{id}/sync")
+    @PostMapping("/{id}/sync")
     public ResponseEntity<?> sync(@PathVariable Long id, @RequestParam int syncStrategy) {
         rdmMemberAuditAppService.syncByStrategy(id, syncStrategy);
         return Results.success();
