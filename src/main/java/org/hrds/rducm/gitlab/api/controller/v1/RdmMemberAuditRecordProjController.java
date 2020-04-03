@@ -12,10 +12,7 @@ import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 成员权限审计日志表 管理 API
@@ -41,8 +38,8 @@ public class RdmMemberAuditRecordProjController extends BaseController {
 
     @ApiOperation(value = "同步")
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
-    @GetMapping("/sync")
-    public ResponseEntity<?> sync(Long id, int syncStrategy) {
+    @GetMapping("/{id}/sync")
+    public ResponseEntity<?> sync(@PathVariable Long id, @RequestParam int syncStrategy) {
         rdmMemberAuditAppService.syncByStrategy(id, syncStrategy);
         return Results.success();
     }
