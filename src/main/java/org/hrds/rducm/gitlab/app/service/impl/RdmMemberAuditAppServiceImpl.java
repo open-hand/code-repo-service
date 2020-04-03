@@ -11,6 +11,7 @@ import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.util.AssertExtensionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
@@ -32,6 +33,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     private IC7nDevOpsServiceService ic7nDevOpsServiceService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void syncByStrategy(Long id, int syncStrategy) {
         RdmMemberAuditRecord dbRecord = rdmMemberAuditRecordRepository.selectByPrimaryKey(id);
         AssertExtensionUtils.notNull(dbRecord, "该记录不存在");
@@ -99,14 +101,13 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                                               Integer accessLevel,
                                               Date expiresAt) {
         // Gitlab -> 本系统
-        RdmMember dbMember = null;
+        RdmMember dbMember = new RdmMember();
         if (userId == null) {
             // 同步并新增
             // 查询Gitlab用户对应的userId
             userId = ic7nDevOpsServiceService.glUserIdToUserId(glUserId);
 
-            RdmMember rdmMember = new RdmMember();
-            rdmMember.setOrganizationId(organizationId)
+            dbMember.setOrganizationId(organizationId)
                     .setProjectId(projectId)
                     .setRepositoryId(repositoryId)
                     .setUserId(userId)
@@ -118,7 +119,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                     .setSyncDateGitlab(new Date());
 
             // 重新插入
-            rdmMemberRepository.insertSelective(rdmMember);
+            rdmMemberRepository.insertSelective(dbMember);
         } else {
             // 同步并修改
             dbMember = rdmMemberRepository.selectOneByUk(projectId, repositoryId, userId);
