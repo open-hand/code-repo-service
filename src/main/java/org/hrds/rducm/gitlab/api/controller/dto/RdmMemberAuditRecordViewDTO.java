@@ -58,6 +58,12 @@ public class RdmMemberAuditRecordViewDTO {
     @ApiModelProperty(value = "gitlab成员过期时间(Gitlab)")
     private Date glExpiresAt;
 
+    @ApiModelProperty(value = "权限级别是否一致")
+    private Boolean accessLevelSyncFlag;
+
+    @ApiModelProperty(value = "过期日期是否一致")
+    private Boolean expiresAtSyncFlag;
+
     public Long getId() {
         return id;
     }
@@ -190,6 +196,24 @@ public class RdmMemberAuditRecordViewDTO {
 
     public RdmMemberAuditRecordViewDTO setGlExpiresAt(Date glExpiresAt) {
         this.glExpiresAt = glExpiresAt;
+        return this;
+    }
+
+    public Boolean getAccessLevelSyncFlag() {
+        return accessLevelSyncFlag;
+    }
+
+    public RdmMemberAuditRecordViewDTO setAccessLevelSyncFlag(Boolean accessLevelSyncFlag) {
+        this.accessLevelSyncFlag = accessLevelSyncFlag;
+        return this;
+    }
+
+    public Boolean getExpiresAtSyncFlag() {
+        return expiresAtSyncFlag;
+    }
+
+    public RdmMemberAuditRecordViewDTO setExpiresAtSyncFlag(Boolean expiresAtSyncFlag) {
+        this.expiresAtSyncFlag = expiresAtSyncFlag;
         return this;
     }
 }

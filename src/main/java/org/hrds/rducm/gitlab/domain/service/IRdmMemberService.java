@@ -4,6 +4,7 @@ import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -59,14 +60,16 @@ public interface IRdmMemberService {
     /**
      * 添加成员至gitlab
      *
-     * @param param
+     * @param glProjectId
+     * @param glUserId
+     * @param accessLevel
+     * @param expiresAt
      * @return
      */
-    Member addMemberToGitlab(RdmMember param);
+    Member addMemberToGitlab(Integer glProjectId, Integer glUserId, Integer accessLevel, Date expiresAt);
 
     /**
      * 同步Gitlab成员(整个代码库)
-     *
      *
      * @param organizationId
      * @param projectId
@@ -101,9 +104,10 @@ public interface IRdmMemberService {
     /**
      * 移除成员至gitlab
      *
-     * @param param
+     * @param glProjectId
+     * @param glUserId
      */
-    void removeMemberToGitlab(RdmMember param);
+    void removeMemberToGitlab(Integer glProjectId, Integer glUserId);
 
     /**
      * 回写数据库
@@ -117,18 +121,22 @@ public interface IRdmMemberService {
      * 移除成员并新增成员至Gitlab
      * 移除前会先检查Gitlab是否有成员
      *
-     * @param param
+     * @param glProjectId
+     * @param glUserId
+     * @param accessLevel
+     * @param expiresAt
      * @return
      */
-    Member tryRemoveAndAddMemberToGitlab(RdmMember param);
+    Member tryRemoveAndAddMemberToGitlab(Integer glProjectId, Integer glUserId, Integer accessLevel, Date expiresAt);
 
     /**
      * 移除Gitlab成员
      * 移除前会先检查Gitlab是否有成员
      *
-     * @param param
+     * @param glProjectId
+     * @param glUserId
      */
-    void tryRemoveMemberToGitlab(RdmMember param);
+    void tryRemoveMemberToGitlab(Integer glProjectId, Integer glUserId);
 
     /**
      * 成员过期处理

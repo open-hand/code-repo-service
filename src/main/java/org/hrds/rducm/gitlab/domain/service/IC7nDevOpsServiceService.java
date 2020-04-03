@@ -85,4 +85,12 @@ public interface IC7nDevOpsServiceService {
      * @return
      */
     Map<Integer, Long> mapGlUserIdsToUserIds(Set<Integer> glUserIds);
+
+    /**
+     * 根据Gitlab用户id获取用户id
+     *
+     * @param glUserId
+     * @return
+     */
+    Long glUserIdToUserId(Integer glUserId);
 }

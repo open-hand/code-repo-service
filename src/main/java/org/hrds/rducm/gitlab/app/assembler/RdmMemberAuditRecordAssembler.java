@@ -76,15 +76,9 @@ public class RdmMemberAuditRecordAssembler {
             RdmMemberAuditRecordViewDTO viewDTO = ConvertUtils.convertObject(val, RdmMemberAuditRecordViewDTO.class);
             viewDTO.setUser(BaseC7nUserViewDTO.convert(c7nUserVO));
             viewDTO.setRepositoryName(c7nAppServiceVO.getName());
+            viewDTO.setAccessLevelSyncFlag(Objects.equals(viewDTO.getAccessLevel(), viewDTO.getGlAccessLevel()));
+            viewDTO.setExpiresAtSyncFlag(Objects.equals(viewDTO.getExpiresAt(), viewDTO.getGlExpiresAt()));
             return viewDTO;
         }));
     }
-
-//    private Set<Long> glUserIdsToUserIds(Set<Integer> glUserIds) {
-//        // 查询Gitlab用户id对应的猪齿鱼用户id
-//        // todo
-//        Map<Integer, Long> glToUserIds = ic7nDevOpsServiceService.mapGlUserIdsToUserIds(glUserIds);
-//
-//        return Collections.emptySet();
-//    }
 }

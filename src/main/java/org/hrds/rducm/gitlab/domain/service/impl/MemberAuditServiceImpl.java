@@ -1,21 +1,20 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
+import io.choerodon.core.domain.Page;
+import io.choerodon.mybatis.pagehelper.PageHelper;
 import org.hrds.rducm.gitlab.domain.entity.MemberAuditLog;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.repository.MemberAuditLogRepository;
 import org.hrds.rducm.gitlab.domain.service.IMemberAuditService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
+import org.hzero.mybatis.domian.Condition;
+import org.hzero.mybatis.util.Sqls;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -29,6 +28,19 @@ public class MemberAuditServiceImpl implements IMemberAuditService {
     private IRdmMemberAuditRecordService iRdmMemberAuditRecordService;
     @Autowired
     private MemberAuditLogRepository memberAuditLogRepository;
+
+    @Override
+    public MemberAuditLog detailLatestAuditLog(Long organizationId, Long projectId) {
+        Condition condition = Condition.builder(MemberAuditLog.class)
+                .where(Sqls.custom()
+                        .andEqualTo(MemberAuditLog.FIELD_ORGANIZATION_ID, organizationId)
+                        .andEqualTo(MemberAuditLog.FIELD_PROJECT_ID, projectId))
+                .orderByDesc(MemberAuditLog.FIELD_CREATION_DATE)
+                .build();
+        Page<MemberAuditLog> page = PageHelper.doPage(0, 1, () -> memberAuditLogRepository.selectByCondition(condition));
+
+        return page.getContent().isEmpty() ? new MemberAuditLog() : page.getContent().get(0);
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

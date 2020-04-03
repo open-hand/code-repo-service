@@ -6,6 +6,7 @@ import io.choerodon.core.enums.ResourceType;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
+import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
@@ -26,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class RdmMemberAuditRecordProjController extends BaseController {
     @Autowired
     private IRdmMemberAuditRecordService rdmMemberSyncLogService;
+    @Autowired
+    private RdmMemberAuditAppService rdmMemberAuditAppService;
 
     @ApiOperation(value = "查询权限审计结果")
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
@@ -36,5 +39,11 @@ public class RdmMemberAuditRecordProjController extends BaseController {
         return Results.success(rdmMemberSyncLogService.pageByOptions(organizationId, projectId, pageRequest));
     }
 
-
+    @ApiOperation(value = "同步")
+    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @GetMapping("/sync")
+    public ResponseEntity<?> sync(Long id, int syncStrategy) {
+        rdmMemberAuditAppService.syncByStrategy(id, syncStrategy);
+        return Results.success();
+    }
 }

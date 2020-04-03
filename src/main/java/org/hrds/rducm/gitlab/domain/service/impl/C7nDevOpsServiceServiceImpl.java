@@ -1,10 +1,7 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageInfo;
-import com.google.common.collect.Maps;
-import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
@@ -12,14 +9,12 @@ import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nGlUserVO;
-import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
 import org.hrds.rducm.gitlab.infra.util.TypeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.TypeUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -148,5 +143,18 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
         c7nGlUserVOS.forEach(vo -> result.put(Math.toIntExact(vo.getGitlabUserId()), vo.getIamUserId()));
 
         return result;
+    }
+
+    @Override
+    public Long glUserIdToUserId(Integer glUserId) {
+        ResponseEntity<List<C7nGlUserVO>> responseEntity = devOpsServiceFeignClient.listUsersByGitlabUserIds(Collections.singleton(glUserId));
+
+        List<C7nGlUserVO> c7nGlUserVOS = FeignUtils.handleResponseEntity(responseEntity);
+
+        if (!CollectionUtils.isEmpty(c7nGlUserVOS)) {
+            return c7nGlUserVOS.get(0).getIamUserId();
+        } else {
+            return null;
+        }
     }
 }

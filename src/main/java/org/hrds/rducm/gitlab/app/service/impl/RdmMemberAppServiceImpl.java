@@ -17,8 +17,6 @@ import org.hrds.rducm.gitlab.app.assembler.RdmMemberAssembler;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
-import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
-import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
@@ -182,7 +180,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             }
 
             // <2.2> 新增或更新成员至gitlab
-            Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(m);
+            Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
 
             // <2.3> 回写数据库
             iRdmMemberService.updateMemberAfter(m, glMember);
@@ -207,7 +205,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         self().addMemberBeforeRequestsNew(param);
 
         // <2> 调用gitlab api更新成员 todo 事务一致性问题
-        Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(param);
+        Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
 
         // <3> 回写数据库
         iRdmMemberService.updateMemberAfter(param, glMember);
@@ -243,7 +241,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         self().updateMemberBeforeRequestsNew(param);
 
         // <2> 调用gitlab api更新成员 todo 事务一致性问题
-        Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(param);
+        Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
 
         // <3> 回写数据库
         iRdmMemberService.updateMemberAfter(param, glMember);
@@ -261,7 +259,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         self().updateMemberBeforeRequestsNew(dbMember);
 
         // <2> 调用gitlab api删除成员 todo 事务一致性问题
-        iRdmMemberService.tryRemoveMemberToGitlab(dbMember);
+        iRdmMemberService.tryRemoveMemberToGitlab(dbMember.getGlProjectId(), dbMember.getGlUserId());
 
         // <3> 数据库删除成员
         rdmMemberRepository.deleteByPrimaryKey(dbMember.getId());
@@ -276,7 +274,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         // <1> 查询数据库成员
         RdmMember dbMember = rdmMemberRepository.selectByPrimaryKey(memberId);
 
-        // <2> 将未同步成员同步至Gitlab
+        // <2> 拉取Gitlab成员, 同步到db
         iRdmMemberService.syncMemberFromGitlab(dbMember);
 
         // <3> 发送事件

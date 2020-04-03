@@ -3,7 +3,6 @@ package org.hrds.rducm.gitlab.domain.service.impl;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.domain.AuditDomain;
 import org.gitlab4j.api.models.Member;
-import org.gitlab4j.api.models.User;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
@@ -13,7 +12,6 @@ import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
-import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabUserApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
@@ -117,9 +115,9 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     }
 
     @Override
-    public Member addMemberToGitlab(RdmMember param) {
+    public Member addMemberToGitlab(Integer glProjectId, Integer glUserId, Integer accessLevel, Date expiresAt) {
         // 调用gitlab api添加成员
-        return gitlabProjectApi.addMember(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
+        return gitlabProjectApi.addMember(glProjectId, glUserId, accessLevel, expiresAt);
     }
 
     @Override
@@ -137,8 +135,8 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     }
 
     @Override
-    public void removeMemberToGitlab(RdmMember param) {
-        gitlabProjectApi.removeMember(param.getGlProjectId(), param.getGlUserId());
+    public void removeMemberToGitlab(Integer glProjectId, Integer glUserId) {
+        gitlabProjectApi.removeMember(glProjectId, glUserId);
     }
 
     @Override
@@ -160,17 +158,17 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     }
 
     @Override
-    public Member tryRemoveAndAddMemberToGitlab(RdmMember param) {
+    public Member tryRemoveAndAddMemberToGitlab(Integer glProjectId, Integer glUserId, Integer accessLevel, Date expiresAt) {
         // 尝试移除成员
-        this.tryRemoveMemberToGitlab(param);
+        this.tryRemoveMemberToGitlab(glProjectId, glUserId);
         // 添加新成员
-        return this.addMemberToGitlab(param);
+        return this.addMemberToGitlab(glProjectId, glUserId, accessLevel, expiresAt);
     }
 
     @Override
-    public void tryRemoveMemberToGitlab(RdmMember param) {
+    public void tryRemoveMemberToGitlab(Integer glProjectId, Integer glUserId) {
         // 先查询Gitlab用户
-        Member glMember = gitlabProjectApi.getAllMember(param.getGlProjectId(), param.getGlUserId());
+        Member glMember = gitlabProjectApi.getAllMember(glProjectId, glUserId);
 
         if (glMember != null) {
             if (glMember.getAccessLevel().toValue() >= RdmAccessLevel.OWNER.toValue()) {
@@ -178,7 +176,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             }
 
             try {
-                this.removeMemberToGitlab(param);
+                this.removeMemberToGitlab(glProjectId, glUserId);
             } catch (GitlabClientException e) {
                 throw new CommonException("error.member.not.allow.change", glMember.getName());
             }
@@ -225,9 +223,8 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         deleteMember.setRepositoryId(repositoryId);
         rdmMemberRepository.delete(deleteMember);
         glMembers.forEach(glMember -> {
-            // 查询Gitlab用户对应的userId todo 从数据库取还是猪齿鱼取
-            RdmUser dbUser = rdmUserRepository.selectByUk(glMember.getId());
-            Long userId = dbUser.getUserId();
+            // 查询Gitlab用户对应的userId
+            Long userId = ic7nDevOpsServiceService.glUserIdToUserId(glMember.getId());
 
             RdmMember rdmMember = new RdmMember();
             rdmMember.setOrganizationId(organizationId)

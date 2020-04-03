@@ -15,7 +15,10 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
+import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabAdminApi;
+import org.hrds.rducm.gitlab.infra.util.AssertExtensionUtils;
+import org.hzero.core.util.AssertUtils;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
 import org.slf4j.Logger;
@@ -49,6 +52,8 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
     private IC7nBaseServiceService ic7nBaseServiceService;
     @Autowired
     private RdmMemberAuditRecordAssembler rdmMemberAuditRecordAssembler;
+    @Autowired
+    private IRdmMemberService iRdmMemberService;
 
     @Override
     public PageInfo<RdmMemberAuditRecordViewDTO> pageByOptions(Long organizationId, Long projectId, PageRequest pageRequest) {
@@ -70,19 +75,6 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
 
         // <0> 删除原有数据
         rdmMemberAuditRecordRepository.delete(new RdmMemberAuditRecord().setOrganizationId(organizationId));
-
-//        // todo test
-//        Pager<Project> projectsPageable = gitlabAdminApi.getProjectsPageable();
-//        while (projectsPageable.hasNext()) {
-//            if (projectsPageable.getCurrentPage() > 50) {
-//                break;
-//            }
-//            List<Project> glProjects = projectsPageable.next();
-//
-//            glProjects.forEach(glProject -> {
-//                compareMemberPermissionByRepositoryId(organizationId, 1L, 1L, glProject.getId());
-//            });
-//        }
 
         // <1> 对比组织所有成员
         List<RdmMemberAuditRecord> list = compareMembersByOrganizationId(organizationId);
@@ -225,14 +217,12 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
 
         if (glMember != null) {
             memberAudit.setGlUserId(glMember.getId())
-//                    .setGlProjectId(glProjectId)
                     .setGlAccessLevel(glMember.getAccessLevel().toValue())
                     .setGlExpiresAt(glMember.getExpiresAt());
         }
 
         if (dbMember != null) {
             memberAudit.setUserId(dbMember.getUserId())
-//                    .setRepositoryId(dbMember.getRepositoryId())
                     .setAccessLevel(dbMember.getGlAccessLevel())
                     .setExpiresAt(dbMember.getGlExpiresAt());
         }
