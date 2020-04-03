@@ -67,6 +67,9 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
             default:
                 break;
         }
+
+        // <2> 同步结束, 删除审计记录
+        rdmMemberAuditRecordRepository.deleteByPrimaryKey(id);
     }
 
     private void syncMemberToGitlabStrategy(Long organizationId,
