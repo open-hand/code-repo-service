@@ -23,8 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/organizations/{organizationId}/member-audit-records")
 public class RdmMemberAuditRecordOrgController extends BaseController {
     @Autowired
-    private IRdmMemberAuditRecordService rdmMemberSyncLogService;
-    @Autowired
     private IMemberAuditService iMemberAuditService;
 
     @ApiOperation(value = "对组织下所有成员进行权限审计")
