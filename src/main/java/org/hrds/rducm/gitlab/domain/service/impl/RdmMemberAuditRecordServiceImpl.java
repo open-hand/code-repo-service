@@ -60,6 +60,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
     public PageInfo<RdmMemberAuditRecordViewDTO> pageByOptions(Long organizationId, Long projectId, PageRequest pageRequest, Set<Long> repositoryIds) {
         Condition condition = Condition.builder(RdmMemberAuditRecord.class)
                 .where(Sqls.custom()
+                        .andEqualTo(RdmMemberAuditRecord.FIELD_SYNC_FLAG, false)
                         .andIn(RdmMemberAuditRecord.FIELD_ORGANIZATION_ID, Collections.singleton(organizationId))
                         .andIn(RdmMemberAuditRecord.FIELD_PROJECT_ID, Collections.singleton(projectId))
                         .andIn(RdmMemberAuditRecord.FIELD_REPOSITORY_ID, repositoryIds, true))

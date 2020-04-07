@@ -38,6 +38,7 @@ public class RdmMemberAuditRecord extends AuditDomain {
     public static final String FIELD_GL_STATE = "glState";
     public static final String FIELD_GL_ACCESS_LEVEL = "glAccessLevel";
     public static final String FIELD_GL_EXPIRES_AT = "glExpiresAt";
+    public static final String FIELD_SYNC_FLAG = "syncFlag";
 
     //
     // 业务方法(按public protected private顺序排列)
