@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -67,6 +68,15 @@ public interface IC7nDevOpsServiceService {
      * @return
      */
     PageInfo<C7nAppServiceVO> pageC7nAppServices(Long projectId, PageRequest pageRequest, Set<Long> repositoryIds);
+
+    /**
+     * 项目层
+     * 获取项目的所有应用服务信息
+     *
+     * @param projectId
+     * @return
+     */
+    List<C7nAppServiceVO> listC7nAppServiceOnProjectLevel(Long projectId);
 
     /**
      * 项目层

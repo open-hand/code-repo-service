@@ -1,6 +1,10 @@
 package org.hrds.rducm.gitlab.domain.service;
 
+import com.github.pagehelper.PageInfo;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.gitlab4j.api.models.Member;
+import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 
@@ -14,6 +18,30 @@ import java.util.List;
  * @date 2020/3/5
  */
 public interface IRdmMemberService {
+    /**
+     * 查询成员权限占比
+     *
+     * @param organizationId
+     * @param projectId
+     * @param pageRequest
+     * @return
+     */
+    PageInfo<MemberAuthDetailViewDTO> pageMembersRepositoryAuthorized(Long organizationId, Long projectId, PageRequest pageRequest);
+
+    /**
+     * 查询某个成员的在所有代码库的权限情况
+     *
+     * @param organizationId
+     * @param projectId
+     * @param userId
+     * @param pageRequest
+     * @return
+     */
+    PageInfo<RdmMemberViewDTO> pageMemberPermissions(Long organizationId,
+                                                     Long projectId,
+                                                     Long userId,
+                                                     PageRequest pageRequest);
+
     /**
      * 批量新增或更新成员, 预更新(同步标识设为false, gitlab字段置空)
      * 执行成功后会设置主键和版本号

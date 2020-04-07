@@ -1,7 +1,10 @@
 package org.hrds.rducm.gitlab.domain.repository;
 
+import org.hrds.rducm.gitlab.domain.aggregate.MemberAuthDetailAgg;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hzero.mybatis.base.BaseRepository;
+
+import java.util.List;
 
 public interface RdmMemberRepository extends BaseRepository<RdmMember> {
     /**
@@ -21,6 +24,15 @@ public interface RdmMemberRepository extends BaseRepository<RdmMember> {
      * @return 成员数量
      */
     int selectCountByRepositoryId(Long repositoryId);
+
+    /**
+     * 查询成员已授权服务数
+     *
+     * @param organizationId
+     * @param projectId
+     * @return
+     */
+    List<MemberAuthDetailAgg> selectMembersRepositoryAuthorized(Long organizationId, Long projectId);
 
 //    void checkIsSyncGitlab(RdmMember m);
 

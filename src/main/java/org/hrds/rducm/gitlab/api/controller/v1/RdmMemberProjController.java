@@ -10,14 +10,17 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
+import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.hzero.export.vo.ExportParam;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +34,9 @@ import javax.servlet.http.HttpServletResponse;
 @RequestMapping("/v1/organizations/{organizationId}/projects/{projectId}/gitlab/repositories/members")
 public class RdmMemberProjController extends BaseController {
     private final RdmMemberAppService rdmMemberAppService;
+
+    @Autowired
+    private IRdmMemberService iRdmMemberService;
 
     public RdmMemberProjController(RdmMemberAppService rdmMemberAppService) {
         this.rdmMemberAppService = rdmMemberAppService;
@@ -92,5 +98,17 @@ public class RdmMemberProjController extends BaseController {
         exportParam.setIds(Sets.newHashSet(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L));
 
         return Results.success(rdmMemberAppService.export(projectId, pageRequest, query, exportParam, response));
+    }
+
+    @ApiOperation(value = "查询成员授权情况")
+    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @GetMapping("/audit/security-audit")
+    @ApiImplicitParams({
+
+    })
+    public ResponseEntity<PageInfo<MemberAuthDetailViewDTO>> pageSecurityAudit(@PathVariable Long organizationId,
+                                                                               @PathVariable Long projectId,
+                                                                               PageRequest pageRequest) {
+        return Results.success(iRdmMemberService.pageMembersRepositoryAuthorized(organizationId, projectId, pageRequest));
     }
 }

@@ -1,12 +1,20 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
+import com.github.pagehelper.PageInfo;
+import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.domain.AuditDomain;
+import io.choerodon.mybatis.pagehelper.PageHelper;
+import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.gitlab4j.api.models.Member;
+import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
+import org.hrds.rducm.gitlab.domain.aggregate.MemberAuthDetailAgg;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
-import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
+import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
@@ -14,14 +22,16 @@ import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
+import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.math.BigDecimal;
+import java.util.*;
 
 /**
  * 成员管理领域服务类
@@ -38,7 +48,83 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     @Autowired
     private IC7nDevOpsServiceService ic7nDevOpsServiceService;
     @Autowired
+    private IC7nBaseServiceService ic7nBaseServiceService;
+    @Autowired
     private RdmUserRepository rdmUserRepository;
+
+    @Override
+    public PageInfo<MemberAuthDetailViewDTO> pageMembersRepositoryAuthorized(Long organizationId, Long projectId, PageRequest pageRequest) {
+        Page<MemberAuthDetailAgg> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectMembersRepositoryAuthorized(organizationId, projectId));
+
+        // 查询应用服务总数
+        int allRepositoryCount = ic7nDevOpsServiceService.listC7nAppServiceOnProjectLevel(projectId).size();
+        BigDecimal allRepositoryCountBigD = new BigDecimal(allRepositoryCount);
+
+        // 用户id
+        Set<Long> userIds = new HashSet<>();
+
+        page.getContent().forEach(v -> {
+            userIds.add(v.getUserId());
+        });
+
+        // 获取操作人用户信息
+        Map<Long, C7nUserVO> c7nUserVOMap = ic7nBaseServiceService.listC7nUserToMap(userIds);
+
+
+        Page<MemberAuthDetailViewDTO> pageReturn = ConvertUtils.convertPage(page, (v) -> {
+            MemberAuthDetailViewDTO viewDTO = ConvertUtils.convertObject(v, MemberAuthDetailViewDTO.class);
+            C7nUserVO c7nUserVO = c7nUserVOMap.get(v.getUserId());
+
+            viewDTO.setAllRepositoryCount(allRepositoryCount);
+            viewDTO.setUser(BaseC7nUserViewDTO.convert(c7nUserVO));
+            BigDecimal authorizedRepositoryCountBigD = Optional.ofNullable(viewDTO.getAuthorizedRepositoryCount()).map(BigDecimal::new).orElse(BigDecimal.ZERO);
+            viewDTO.setAuthorizedRepositoryPercent(authorizedRepositoryCountBigD.divide(allRepositoryCountBigD, 4, BigDecimal.ROUND_HALF_UP));
+
+            return viewDTO;
+        });
+
+        return PageConvertUtils.convert(pageReturn);
+    }
+
+    @Override
+    public PageInfo<RdmMemberViewDTO> pageMemberPermissions(Long organizationId,
+                                                            Long projectId,
+                                                            Long userId,
+                                                            PageRequest pageRequest) {
+        RdmMember condition = new RdmMember();
+        condition.setOrganizationId(organizationId);
+        condition.setProjectId(projectId);
+        condition.setUserId(userId);
+
+        Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.select(condition));
+
+        // 用户id
+        Set<Long> userIds = new HashSet<>();
+        // 代码库id
+        Set<Long> repositoryIds = new HashSet<>();
+
+        page.getContent().forEach(v -> {
+            userIds.add(v.getUserId());
+            repositoryIds.add(v.getRepositoryId());
+        });
+
+        // 获取操作人用户信息
+        Map<Long, C7nUserVO> c7nUserVOMap = ic7nBaseServiceService.listC7nUserToMap(userIds);
+        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(repositoryIds);
+
+
+        Page<RdmMemberViewDTO> pageReturn = ConvertUtils.convertPage(page, (v) -> {
+            RdmMemberViewDTO viewDTO = ConvertUtils.convertObject(v, RdmMemberViewDTO.class);
+            C7nUserVO c7nUserVO = c7nUserVOMap.get(v.getUserId());
+
+            viewDTO.setRealName(c7nUserVO.getRealName());
+            viewDTO.setLoginName(c7nUserVO.getLoginName());
+            viewDTO.setAppServiceName(c7nAppServiceVOMap.get(v.getRepositoryId()).getName());
+            return viewDTO;
+        });
+
+        return PageConvertUtils.convert(pageReturn);
+    }
 
     @Override
     public void batchAddOrUpdateMembersBefore(List<RdmMember> rdmMembers) {
@@ -273,9 +359,9 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
      * @param organizationId
      * @param projectId
      * @param repositoryId
-     * @param targetUserId 目标用户id
-     * @param accessLevel  访问权限等级
-     * @param expiresAt    过期时间
+     * @param targetUserId   目标用户id
+     * @param accessLevel    访问权限等级
+     * @param expiresAt      过期时间
      */
     private MemberEvent.EventParam buildEventParam(Long organizationId, Long projectId, Long repositoryId, Long targetUserId, Integer accessLevel, Date expiresAt) {
         return new MemberEvent.EventParam(organizationId, projectId, repositoryId, targetUserId, accessLevel, expiresAt);

@@ -117,17 +117,25 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     }
 
     @Override
-    public Map<Long, Long> listC7nAppServiceIdsMapOnProjectLevel(Long projectId) {
+    public List<C7nAppServiceVO> listC7nAppServiceOnProjectLevel(Long projectId) {
         // 将参数转换为json格式
-
         ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, 0, 0, "");
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
             List<C7nAppServiceVO> c7nAppServiceVOS = responseEntity.getBody().getList();
-            return c7nAppServiceVOS.stream()
-                    .filter(v -> v.getId() != null && v.getGitlabProjectId() != null)
-                    .collect(Collectors.toMap(C7nAppServiceVO::getId, C7nAppServiceVO::getGitlabProjectId));
+            return c7nAppServiceVOS;
+        } else {
+            return Collections.emptyList();
+        }
+    }
 
+    @Override
+    public Map<Long, Long> listC7nAppServiceIdsMapOnProjectLevel(Long projectId) {
+        List<C7nAppServiceVO> list = this.listC7nAppServiceOnProjectLevel(projectId);
+
+        if (!CollectionUtils.isEmpty(list)) {
+            return list.stream()
+                    .collect(Collectors.toMap(C7nAppServiceVO::getId, C7nAppServiceVO::getGitlabProjectId));
         } else {
             return Collections.emptyMap();
         }

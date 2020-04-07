@@ -113,6 +113,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
 
         List<RdmMemberAuditRecord> list = appServiceIdMap.entrySet()
                 .stream()
+                .filter(entry -> entry.getKey() != null && entry.getValue() != null)
                 .map((entry) -> {
                     Long repositoryId = entry.getKey();
                     Integer glProjectId = Math.toIntExact(entry.getValue());
