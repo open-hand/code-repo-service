@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper">
+
+    <select id="selectMembersRepositoryAuthorized" resultType="org.hrds.rducm.gitlab.domain.aggregate.MemberAuthDetailAgg">
+        select count(rgm.repository_id) as authorized_repository_count, rgm.user_id
+        from rducm_gitlab_member rgm
+        where rgm.organization_id = #{organizationId}
+          and rgm.project_id = #{projectId}
+        group by rgm.user_id
+    </select>
+</mapper>

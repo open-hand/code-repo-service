@@ -27,7 +27,7 @@ public class RdmProjectController extends BaseController {
     @Autowired
     private IRdmMemberService iRdmMemberService;
 
-    @ApiOperation(value = "查询成员授权情况")
+    @ApiOperation(value = "查询成员所有应用服务的权限")
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping("/members/{userId}/permissions")
     @ApiImplicitParams({
