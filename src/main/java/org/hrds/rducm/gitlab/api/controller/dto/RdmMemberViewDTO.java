@@ -51,6 +51,8 @@ public class RdmMemberViewDTO {
 
     private Date creationDate;
 
+    private Date lastUpdateDate;
+
     private Long objectVersionNumber;
 
     public Long getId() {
@@ -194,6 +196,15 @@ public class RdmMemberViewDTO {
 
     public RdmMemberViewDTO setSyncDateGitlab(Date syncDateGitlab) {
         this.syncDateGitlab = syncDateGitlab;
+        return this;
+    }
+
+    public Date getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public RdmMemberViewDTO setLastUpdateDate(Date lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
         return this;
     }
 }
