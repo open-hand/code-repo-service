@@ -17,8 +17,6 @@ import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabAdminApi;
-import org.hrds.rducm.gitlab.infra.util.AssertExtensionUtils;
-import org.hzero.core.util.AssertUtils;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
 import org.slf4j.Logger;
@@ -26,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -57,12 +54,12 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
     private IRdmMemberService iRdmMemberService;
 
     @Override
-    public PageInfo<RdmMemberAuditRecordViewDTO> pageByOptions(Long organizationId, Long projectId, PageRequest pageRequest, Set<Long> repositoryIds) {
+    public PageInfo<RdmMemberAuditRecordViewDTO> pageByOptions(Long organizationId, Set<Long> projectIds, Set<Long> repositoryIds, PageRequest pageRequest) {
         Condition condition = Condition.builder(RdmMemberAuditRecord.class)
                 .where(Sqls.custom()
                         .andEqualTo(RdmMemberAuditRecord.FIELD_SYNC_FLAG, false)
                         .andIn(RdmMemberAuditRecord.FIELD_ORGANIZATION_ID, Collections.singleton(organizationId))
-                        .andIn(RdmMemberAuditRecord.FIELD_PROJECT_ID, Collections.singleton(projectId))
+                        .andIn(RdmMemberAuditRecord.FIELD_PROJECT_ID, projectIds, true)
                         .andIn(RdmMemberAuditRecord.FIELD_REPOSITORY_ID, repositoryIds, true))
                 .build();
 

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -25,7 +26,7 @@ import java.util.Set;
 @RequestMapping("/v1/organizations/{organizationId}/projects/{projectId}/member-audit-records")
 public class RdmMemberAuditRecordProjController extends BaseController {
     @Autowired
-    private IRdmMemberAuditRecordService rdmMemberSyncLogService;
+    private IRdmMemberAuditRecordService iRdmMemberAuditRecordService;
     @Autowired
     private RdmMemberAuditAppService rdmMemberAuditAppService;
 
@@ -34,9 +35,9 @@ public class RdmMemberAuditRecordProjController extends BaseController {
     @GetMapping
     public ResponseEntity<PageInfo<RdmMemberAuditRecordViewDTO>> pageByOptions(@PathVariable Long organizationId,
                                                                                @PathVariable Long projectId,
-                                                                               PageRequest pageRequest,
-                                                                               @RequestParam(required = false) Set<Long> repositoryIds) {
-        return Results.success(rdmMemberSyncLogService.pageByOptions(organizationId, projectId, pageRequest, repositoryIds));
+                                                                               @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                               PageRequest pageRequest) {
+        return Results.success(iRdmMemberAuditRecordService.pageByOptions(organizationId, Collections.singleton(projectId), repositoryIds, pageRequest));
     }
 
     @ApiOperation(value = "同步")

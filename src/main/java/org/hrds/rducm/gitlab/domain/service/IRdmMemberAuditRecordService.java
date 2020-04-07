@@ -17,13 +17,13 @@ public interface IRdmMemberAuditRecordService {
      * 分页查询权限审计记录
      *
      * @param organizationId
-     * @param projectId
-     * @param pageRequest
+     * @param projectIds
      * @param repositoryIds
      *
+     * @param pageRequest
      * @return
      */
-    PageInfo<RdmMemberAuditRecordViewDTO> pageByOptions(Long organizationId, Long projectId, PageRequest pageRequest, Set<Long> repositoryIds);
+    PageInfo<RdmMemberAuditRecordViewDTO> pageByOptions(Long organizationId, Set<Long> projectIds, Set<Long> repositoryIds, PageRequest pageRequest);
 
     /**
      * 比对组织下的所有应用服务的成员权限
