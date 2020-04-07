@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 /**
  * 成员权限审计日志表 管理 API
  *
@@ -32,8 +34,9 @@ public class RdmMemberAuditRecordProjController extends BaseController {
     @GetMapping
     public ResponseEntity<PageInfo<RdmMemberAuditRecordViewDTO>> pageByOptions(@PathVariable Long organizationId,
                                                                                @PathVariable Long projectId,
-                                                                               PageRequest pageRequest) {
-        return Results.success(rdmMemberSyncLogService.pageByOptions(organizationId, projectId, pageRequest));
+                                                                               PageRequest pageRequest,
+                                                                               @RequestParam(required = false) Set<Long> repositoryIds) {
+        return Results.success(rdmMemberSyncLogService.pageByOptions(organizationId, projectId, pageRequest, repositoryIds));
     }
 
     @ApiOperation(value = "同步")

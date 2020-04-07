@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -56,11 +57,12 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
     private IRdmMemberService iRdmMemberService;
 
     @Override
-    public PageInfo<RdmMemberAuditRecordViewDTO> pageByOptions(Long organizationId, Long projectId, PageRequest pageRequest) {
+    public PageInfo<RdmMemberAuditRecordViewDTO> pageByOptions(Long organizationId, Long projectId, PageRequest pageRequest, Set<Long> repositoryIds) {
         Condition condition = Condition.builder(RdmMemberAuditRecord.class)
                 .where(Sqls.custom()
                         .andIn(RdmMemberAuditRecord.FIELD_ORGANIZATION_ID, Collections.singleton(organizationId))
-                        .andIn(RdmMemberAuditRecord.FIELD_PROJECT_ID, Collections.singleton(projectId)))
+                        .andIn(RdmMemberAuditRecord.FIELD_PROJECT_ID, Collections.singleton(projectId))
+                        .andIn(RdmMemberAuditRecord.FIELD_REPOSITORY_ID, repositoryIds, true))
                 .build();
 
         Page<RdmMemberAuditRecord> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberAuditRecordRepository.selectByCondition(condition));

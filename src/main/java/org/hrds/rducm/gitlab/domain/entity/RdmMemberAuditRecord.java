@@ -80,7 +80,8 @@ public class RdmMemberAuditRecord extends AuditDomain {
     private Integer glAccessLevel;
     @ApiModelProperty(value = "gitlab成员过期时间(Gitlab)")
     private Date glExpiresAt;
-
+    @ApiModelProperty(value = "同步标识")
+    private Boolean syncFlag;
     //
     // 非数据库字段
     // ------------------------------------------------------------------------------
@@ -203,6 +204,15 @@ public class RdmMemberAuditRecord extends AuditDomain {
 
     public RdmMemberAuditRecord setGlExpiresAt(Date glExpiresAt) {
         this.glExpiresAt = glExpiresAt;
+        return this;
+    }
+
+    public Boolean getSyncFlag() {
+        return syncFlag;
+    }
+
+    public RdmMemberAuditRecord setSyncFlag(Boolean syncFlag) {
+        this.syncFlag = syncFlag;
         return this;
     }
 }

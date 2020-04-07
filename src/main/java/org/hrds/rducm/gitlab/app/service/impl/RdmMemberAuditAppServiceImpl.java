@@ -5,6 +5,7 @@ import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
@@ -31,6 +32,8 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     private RdmMemberRepository rdmMemberRepository;
     @Autowired
     private IC7nDevOpsServiceService ic7nDevOpsServiceService;
+    @Autowired
+    private IC7nBaseServiceService ic7nBaseServiceService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -70,8 +73,8 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                 break;
         }
 
-        // <2> 同步结束, 删除审计记录
-        rdmMemberAuditRecordRepository.deleteByPrimaryKey(id);
+        // <2> 同步结束, 设置审计记录同步标识为true
+        rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
     }
 
     private void syncMemberToGitlabStrategy(Long organizationId,
@@ -87,6 +90,9 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
             // 移除Gitlab成员
             iRdmMemberService.tryRemoveMemberToGitlab(glProjectId, glUserId);
         } else {
+            // 若glUserId为null, 获取glUserId
+            glUserId = glUserId != null ? glUserId : ic7nBaseServiceService.userIdToGlUserId(userId);
+
             // 更新Gitlab成员
             iRdmMemberService.tryRemoveAndAddMemberToGitlab(glProjectId, glUserId, accessLevel, expiresAt);
         }

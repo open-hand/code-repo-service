@@ -9,5 +9,11 @@ import org.hzero.mybatis.base.BaseRepository;
  * @author ying.xie@hand-china.com 2020-03-30 14:09:52
  */
 public interface RdmMemberAuditRecordRepository extends BaseRepository<RdmMemberAuditRecord> {
-
+    /**
+     * 将同步标识设置为true
+     *
+     * @param record
+     * @return
+     */
+    int updateSyncTrueByPrimaryKeySelective(RdmMemberAuditRecord record);
 }

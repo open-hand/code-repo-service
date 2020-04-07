@@ -12,6 +12,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RdmMemberAuditRecordRepositoryImpl extends BaseRepositoryImpl<RdmMemberAuditRecord> implements RdmMemberAuditRecordRepository {
-
+    @Override
+    public int updateSyncTrueByPrimaryKeySelective(RdmMemberAuditRecord record) {
+        record.setSyncFlag(Boolean.TRUE);
+        return this.updateByPrimaryKeySelective(record);
+    }
 
 }

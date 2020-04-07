@@ -6,6 +6,7 @@ import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author ying.xie@hand-china.com
@@ -18,9 +19,11 @@ public interface IRdmMemberAuditRecordService {
      * @param organizationId
      * @param projectId
      * @param pageRequest
+     * @param repositoryIds
+     *
      * @return
      */
-    PageInfo<RdmMemberAuditRecordViewDTO> pageByOptions(Long organizationId, Long projectId, PageRequest pageRequest);
+    PageInfo<RdmMemberAuditRecordViewDTO> pageByOptions(Long organizationId, Long projectId, PageRequest pageRequest, Set<Long> repositoryIds);
 
     /**
      * 比对组织下的所有应用服务的成员权限
