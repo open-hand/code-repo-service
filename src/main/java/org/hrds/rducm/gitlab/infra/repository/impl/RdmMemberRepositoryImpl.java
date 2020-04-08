@@ -3,9 +3,12 @@ package org.hrds.rducm.gitlab.infra.repository.impl;
 import org.hrds.rducm.gitlab.domain.aggregate.MemberAuthDetailAgg;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
 import org.hzero.core.util.AssertUtils;
 import org.hzero.mybatis.base.impl.BaseRepositoryImpl;
+import org.hzero.mybatis.domian.Condition;
+import org.hzero.mybatis.util.Sqls;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -37,6 +40,20 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
         RdmMember rdmMember = new RdmMember();
         rdmMember.setRepositoryId(repositoryId);
         return this.selectCount(rdmMember);
+    }
+
+    @Override
+    public int selectManagerCountByRepositoryId(Long repositoryId) {
+        AssertUtils.notNull(repositoryId, "repositoryId not null");
+
+        RdmMember rdmMember = new RdmMember();
+        rdmMember.setRepositoryId(repositoryId);
+        Condition condition = Condition.builder(RdmMember.class)
+                .where(Sqls.custom()
+                        .andEqualTo(RdmMember.FIELD_REPOSITORY_ID, repositoryId)
+                        .andGreaterThanOrEqualTo(RdmMember.FIELD_GL_ACCESS_LEVEL, RdmAccessLevel.MAINTAINER.toValue()))
+                .build();
+        return this.selectCountByCondition(condition);
     }
 
     //

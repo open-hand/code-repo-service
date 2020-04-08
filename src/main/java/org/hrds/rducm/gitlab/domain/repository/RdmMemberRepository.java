@@ -27,6 +27,14 @@ public interface RdmMemberRepository extends BaseRepository<RdmMember> {
     int selectCountByRepositoryId(Long repositoryId);
 
     /**
+     * 查询某个代码库权限大于Maintainer的成员总数
+     *
+     * @param repositoryId 代码库id
+     * @return 成员数量
+     */
+    int selectManagerCountByRepositoryId(Long repositoryId);
+
+    /**
      * 查询成员已授权服务数
      *
      * @param organizationId
@@ -35,7 +43,5 @@ public interface RdmMemberRepository extends BaseRepository<RdmMember> {
      * @return
      */
     List<MemberAuthDetailAgg> selectMembersRepositoryAuthorized(Long organizationId, Long projectId, Set<Long> userIds);
-
-//    void checkIsSyncGitlab(RdmMember m);
 
 }

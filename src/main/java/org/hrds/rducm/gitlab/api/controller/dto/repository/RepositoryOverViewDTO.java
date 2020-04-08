@@ -16,6 +16,8 @@ public class RepositoryOverViewDTO {
     private String repositoryName;
     @ApiModelProperty(value = "开发成员数量")
     private Integer developerCount;
+    @ApiModelProperty(value = "管理者数量, 权限大于等于Maintainer")
+    private Integer managerCount;
     @ApiModelProperty(value = "默认分支")
     private String defaultBranch;
     @ApiModelProperty(value = "仓库可见性")
@@ -53,6 +55,15 @@ public class RepositoryOverViewDTO {
 
     public RepositoryOverViewDTO setDeveloperCount(Integer developerCount) {
         this.developerCount = developerCount;
+        return this;
+    }
+
+    public Integer getManagerCount() {
+        return managerCount;
+    }
+
+    public RepositoryOverViewDTO setManagerCount(Integer managerCount) {
+        this.managerCount = managerCount;
         return this;
     }
 

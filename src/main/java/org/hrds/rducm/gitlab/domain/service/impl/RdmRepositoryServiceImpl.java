@@ -59,6 +59,9 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
             // 查询成员数量
             int memberCount = rdmMemberRepository.selectCountByRepositoryId(repo.getRepositoryId());
 
+            // 查询权限大于Maintainer的成员数量
+            int managerMemberCount = rdmMemberRepository.selectManagerCountByRepositoryId(repo.getRepositoryId());
+
             // 查询合并分支
             int openedMergeRequestCount = gitlabMergeRequestApi.getMergeRequests(glProjectId, Constants.MergeRequestState.OPENED).size();
 
@@ -66,6 +69,7 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
             Commit latestCommit = gitlabCommitApi.getLatestCommit(glProjectId);
 
             repo.setDeveloperCount(memberCount)
+                    .setManagerCount(managerMemberCount)
                     .setDefaultBranch(glProject.getDefaultBranch())
                     .setVisibility(glProject.getVisibility().toValue())
                     .setLastCommittedDate(latestCommit.getCommittedDate())
