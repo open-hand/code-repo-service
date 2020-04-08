@@ -14,6 +14,7 @@ import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseUserQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
@@ -104,11 +105,13 @@ public class RdmMemberProjController extends BaseController {
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping("/audit/security-audit")
     @ApiImplicitParams({
-
+            @ApiImplicitParam(name = "realName", value = "用户名(模糊)", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "loginName", value = "登录名(模糊)", paramType = "query", dataType = "String"),
     })
     public ResponseEntity<PageInfo<MemberAuthDetailViewDTO>> pageSecurityAudit(@PathVariable Long organizationId,
                                                                                @PathVariable Long projectId,
-                                                                               PageRequest pageRequest) {
-        return Results.success(iRdmMemberService.pageMembersRepositoryAuthorized(organizationId, projectId, pageRequest));
+                                                                               PageRequest pageRequest,
+                                                                               BaseUserQueryDTO queryDTO) {
+        return Results.success(iRdmMemberService.pageMembersRepositoryAuthorized(organizationId, projectId, pageRequest, queryDTO));
     }
 }

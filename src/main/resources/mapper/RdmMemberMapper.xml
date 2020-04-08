@@ -7,6 +7,12 @@
         from rducm_gitlab_member rgm
         where rgm.organization_id = #{organizationId}
           and rgm.project_id = #{projectId}
+          <if test="userIds!=null and userIds.size > 0">
+              and rgm.user_id in
+              <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
+                  #{userId}
+              </foreach>
+          </if>
         group by rgm.user_id
     </select>
 </mapper>

@@ -5,6 +5,7 @@ import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hzero.mybatis.base.BaseRepository;
 
 import java.util.List;
+import java.util.Set;
 
 public interface RdmMemberRepository extends BaseRepository<RdmMember> {
     /**
@@ -30,9 +31,10 @@ public interface RdmMemberRepository extends BaseRepository<RdmMember> {
      *
      * @param organizationId
      * @param projectId
+     * @param userIds
      * @return
      */
-    List<MemberAuthDetailAgg> selectMembersRepositoryAuthorized(Long organizationId, Long projectId);
+    List<MemberAuthDetailAgg> selectMembersRepositoryAuthorized(Long organizationId, Long projectId, Set<Long> userIds);
 
 //    void checkIsSyncGitlab(RdmMember m);
 

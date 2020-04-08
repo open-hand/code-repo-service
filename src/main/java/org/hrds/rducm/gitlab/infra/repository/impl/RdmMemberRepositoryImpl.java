@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> implements RdmMemberRepository {
@@ -43,7 +44,7 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
     // ------------------------------------------------------------------------------
 
     @Override
-    public List<MemberAuthDetailAgg> selectMembersRepositoryAuthorized(Long organizationId, Long projectId) {
-        return rdmMemberMapper.selectMembersRepositoryAuthorized(organizationId, projectId);
+    public List<MemberAuthDetailAgg> selectMembersRepositoryAuthorized(Long organizationId, Long projectId, Set<Long> userIds) {
+        return rdmMemberMapper.selectMembersRepositoryAuthorized(organizationId, projectId, userIds);
     }
 }

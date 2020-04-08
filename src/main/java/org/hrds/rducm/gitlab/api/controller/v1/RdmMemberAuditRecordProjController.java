@@ -4,7 +4,11 @@ import com.github.pagehelper.PageInfo;
 import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.enums.ResourceType;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.hrds.rducm.gitlab.api.controller.dto.MemberAuditRecordQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
@@ -31,13 +35,17 @@ public class RdmMemberAuditRecordProjController extends BaseController {
     private RdmMemberAuditAppService rdmMemberAuditAppService;
 
     @ApiOperation(value = "查询权限审计结果")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "appServiceName", value = "应用服务名称(模糊)", paramType = "query", dataType = "String"),
+    })
     @Permission(type = ResourceType.PROJECT, permissionPublic = true)
     @GetMapping
     public ResponseEntity<PageInfo<RdmMemberAuditRecordViewDTO>> pageByOptions(@PathVariable Long organizationId,
                                                                                @PathVariable Long projectId,
                                                                                @RequestParam(required = false) Set<Long> repositoryIds,
-                                                                               PageRequest pageRequest) {
-        return Results.success(iRdmMemberAuditRecordService.pageByOptions(organizationId, Collections.singleton(projectId), repositoryIds, pageRequest));
+                                                                               PageRequest pageRequest,
+                                                                               MemberAuditRecordQueryDTO queryDTO) {
+        return Results.success(iRdmMemberAuditRecordService.pageByOptions(organizationId, Collections.singleton(projectId), repositoryIds, pageRequest, queryDTO, ResourceType.PROJECT));
     }
 
     @ApiOperation(value = "同步")

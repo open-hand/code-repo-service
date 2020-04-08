@@ -6,6 +6,7 @@ import org.hrds.rducm.gitlab.domain.aggregate.MemberAuthDetailAgg;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Mapper
@@ -16,8 +17,10 @@ public interface RdmMemberMapper extends BaseMapper<RdmMember> {
      *
      * @param organizationId
      * @param projectId
+     * @param userIds
      * @return
      */
     List<MemberAuthDetailAgg> selectMembersRepositoryAuthorized(@Param("organizationId") Long organizationId,
-                                                                @Param("projectId") Long projectId);
+                                                                @Param("projectId") Long projectId,
+                                                                @Param("userIds") Set<Long> userIds);
 }

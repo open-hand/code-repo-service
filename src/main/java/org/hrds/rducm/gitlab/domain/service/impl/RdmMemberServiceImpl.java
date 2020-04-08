@@ -10,7 +10,9 @@ import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseUserQueryDTO;
 import org.hrds.rducm.gitlab.domain.aggregate.MemberAuthDetailAgg;
+import org.hrds.rducm.gitlab.domain.component.QueryConditionHelper;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
@@ -29,6 +31,7 @@ import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -53,8 +56,18 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     private RdmUserRepository rdmUserRepository;
 
     @Override
-    public PageInfo<MemberAuthDetailViewDTO> pageMembersRepositoryAuthorized(Long organizationId, Long projectId, PageRequest pageRequest) {
-        Page<MemberAuthDetailAgg> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectMembersRepositoryAuthorized(organizationId, projectId));
+    public PageInfo<MemberAuthDetailViewDTO> pageMembersRepositoryAuthorized(Long organizationId, Long projectId, PageRequest pageRequest, BaseUserQueryDTO queryDTO) {
+        // 封装查询条件
+        String realName = queryDTO.getRealName();
+        String loginName = queryDTO.getLoginName();
+
+        // 调用外部接口模糊查询 用户名或登录名
+        Set<Long> userIdsSet = QueryConditionHelper.queryByNameConditionOnProj(projectId, realName, loginName);
+        if (userIdsSet != null && userIdsSet.isEmpty()) {
+            return PageInfo.of(Collections.emptyList());
+        }
+
+        Page<MemberAuthDetailAgg> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectMembersRepositoryAuthorized(organizationId, projectId, userIdsSet));
 
         // 查询应用服务总数
         int allRepositoryCount = ic7nDevOpsServiceService.listC7nAppServiceOnProjectLevel(projectId).size();
@@ -268,19 +281,6 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             }
         }
     }
-
-//    private boolean compareMember(RdmMember rdmMember, Member glMember) {
-//        Integer accessLevel = rdmMember.getGlAccessLevel();
-//        Date expiresAt = rdmMember.getGlExpiresAt();
-//        Integer glAccessLevel = glMember.getAccessLevel() == null ? null : glMember.getAccessLevel().toValue();
-//        Date glExpiresAt = glMember.getExpiresAt();
-//
-//        if (accessLevel.equals(glAccessLevel)) {
-//            return Objects.equals(expiresAt, glExpiresAt);
-//        }
-//
-//        return false;
-//    }
 
     @Override
     public void batchExpireMembers(List<RdmMember> expiredRdmMembers) {

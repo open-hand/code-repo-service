@@ -5,6 +5,7 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseUserQueryDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 
@@ -24,9 +25,10 @@ public interface IRdmMemberService {
      * @param organizationId
      * @param projectId
      * @param pageRequest
+     * @param queryDTO
      * @return
      */
-    PageInfo<MemberAuthDetailViewDTO> pageMembersRepositoryAuthorized(Long organizationId, Long projectId, PageRequest pageRequest);
+    PageInfo<MemberAuthDetailViewDTO> pageMembersRepositoryAuthorized(Long organizationId, Long projectId, PageRequest pageRequest, BaseUserQueryDTO queryDTO);
 
     /**
      * 查询某个成员的在所有代码库的权限情况
@@ -65,16 +67,6 @@ public interface IRdmMemberService {
      * @param param
      */
     void updateMemberBefore(RdmMember param);
-
-//    /**
-//     * 批量新增或更新成员至gitlab
-//     * 成功后:
-//     * 1. 回写数据库
-//     * 2. 发送操作审计事件
-//     *
-//     * @param rdmMembers
-//     */
-//    void batchAddOrUpdateMembersToGitlab(List<RdmMember> rdmMembers);
 
     /**
      * 新增或更新成员至gitlab
