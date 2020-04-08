@@ -11,7 +11,7 @@ public interface IMemberAuditService {
      * 获取最近一条审计日志
      *
      * @param organizationId
-     * @param projectId
+     * @param projectId projectId可为null
      * @return
      */
     MemberAuditLog detailLatestAuditLog(Long organizationId, Long projectId);
