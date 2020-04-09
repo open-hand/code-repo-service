@@ -10,7 +10,6 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
  * @author ying.xie@hand-china.com
  * @date 2020/3/17
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseC7nUserViewDTO {
     @ApiModelProperty(value = "用户id")
     private Long userId;
@@ -27,6 +26,7 @@ public class BaseC7nUserViewDTO {
     @ApiModelProperty(value = "邮箱")
     private String email;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @ApiModelProperty(value = "组织id")
     private Long organizationId;
 

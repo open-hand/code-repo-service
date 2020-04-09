@@ -1,17 +1,22 @@
 package org.hrds.rducm.gitlab.api.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 
 import java.util.Date;
 import java.util.List;
 
 
 public class RdmMemberViewDTO {
-    @ApiModelProperty("用户名")
-    private String realName;
+    @ApiModelProperty("用户")
+    private BaseC7nUserViewDTO user;
 
-    @ApiModelProperty("登录名")
-    private String loginName;
+//    @ApiModelProperty("用户名")
+//    private String realName;
+//
+//    @ApiModelProperty("登录名")
+//    private String loginName;
 
     @ApiModelProperty("应用服务名")
     private String appServiceName;
@@ -20,7 +25,10 @@ public class RdmMemberViewDTO {
     private List<String> roleNames;
 
     @ApiModelProperty("创建人")
-    private String createdByName;
+    private BaseC7nUserViewDTO createdUser;
+
+//    @ApiModelProperty("创建人")
+//    private String createdByName;
 
     /**
      * 成员id, 主键
@@ -33,6 +41,7 @@ public class RdmMemberViewDTO {
     @ApiModelProperty("代码库id")
     private Long repositoryId;
 
+    @JsonIgnore
     private Long userId;
 
     @ApiModelProperty("权限")
@@ -47,6 +56,7 @@ public class RdmMemberViewDTO {
     @ApiModelProperty("Gitlab同步时间")
     private Date syncDateGitlab;
 
+    @JsonIgnore
     private Long createdBy;
 
     private Date creationDate;
@@ -61,24 +71,6 @@ public class RdmMemberViewDTO {
 
     public RdmMemberViewDTO setId(Long id) {
         this.id = id;
-        return this;
-    }
-
-    public String getRealName() {
-        return realName;
-    }
-
-    public RdmMemberViewDTO setRealName(String realName) {
-        this.realName = realName;
-        return this;
-    }
-
-    public String getLoginName() {
-        return loginName;
-    }
-
-    public RdmMemberViewDTO setLoginName(String loginName) {
-        this.loginName = loginName;
         return this;
     }
 
@@ -115,24 +107,6 @@ public class RdmMemberViewDTO {
 
     public RdmMemberViewDTO setGlExpiresAt(Date glExpiresAt) {
         this.glExpiresAt = glExpiresAt;
-        return this;
-    }
-
-    public Long getCreatedBy() {
-        return createdBy;
-    }
-
-    public RdmMemberViewDTO setCreatedBy(Long createdBy) {
-        this.createdBy = createdBy;
-        return this;
-    }
-
-    public String getCreatedByName() {
-        return createdByName;
-    }
-
-    public RdmMemberViewDTO setCreatedByName(String createdByName) {
-        this.createdByName = createdByName;
         return this;
     }
 
@@ -205,6 +179,33 @@ public class RdmMemberViewDTO {
 
     public RdmMemberViewDTO setLastUpdateDate(Date lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
+        return this;
+    }
+
+    public Long getCreatedBy() {
+        return createdBy;
+    }
+
+    public RdmMemberViewDTO setCreatedBy(Long createdBy) {
+        this.createdBy = createdBy;
+        return this;
+    }
+
+    public BaseC7nUserViewDTO getUser() {
+        return user;
+    }
+
+    public RdmMemberViewDTO setUser(BaseC7nUserViewDTO user) {
+        this.user = user;
+        return this;
+    }
+
+    public BaseC7nUserViewDTO getCreatedUser() {
+        return createdUser;
+    }
+
+    public RdmMemberViewDTO setCreatedUser(BaseC7nUserViewDTO createdUser) {
+        this.createdUser = createdUser;
         return this;
     }
 }

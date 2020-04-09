@@ -111,27 +111,20 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
 
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.select(condition));
 
-        // 用户id
-        Set<Long> userIds = new HashSet<>();
         // 代码库id
         Set<Long> repositoryIds = new HashSet<>();
 
         page.getContent().forEach(v -> {
-            userIds.add(v.getUserId());
             repositoryIds.add(v.getRepositoryId());
         });
 
-        // 获取操作人用户信息
-        Map<Long, C7nUserVO> c7nUserVOMap = ic7nBaseServiceService.listC7nUserToMap(userIds);
+        // 获取应用服务信息
         Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(repositoryIds);
 
 
         Page<RdmMemberViewDTO> pageReturn = ConvertUtils.convertPage(page, (v) -> {
             RdmMemberViewDTO viewDTO = ConvertUtils.convertObject(v, RdmMemberViewDTO.class);
-            C7nUserVO c7nUserVO = c7nUserVOMap.get(v.getUserId());
 
-            viewDTO.setRealName(c7nUserVO.getRealName());
-            viewDTO.setLoginName(c7nUserVO.getLoginName());
             viewDTO.setAppServiceName(c7nAppServiceVOMap.get(v.getRepositoryId()).getName());
             return viewDTO;
         });

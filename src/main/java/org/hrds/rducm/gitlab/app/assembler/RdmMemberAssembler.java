@@ -6,6 +6,7 @@ import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberCreateDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
@@ -103,50 +104,6 @@ public class RdmMemberAssembler {
     }
 
     /**
-     * 成员查询dto转换
-     *
-     * @param page
-     * @return
-     */
-//    public PageInfo<RdmMemberViewDTO> pageToRdmMemberViewDTO(Long projectId, Page<RdmMember> page) {
-//        Page<RdmMemberViewDTO> rdmMemberViewDTOS = ConvertUtils.convertPage(page, RdmMemberViewDTO.class);
-//
-//        // 获取用户id集合
-//        Set<Long> userIds = Sets.newHashSet();
-//        // 获取代码库id集合
-//        Set<Long> repositoryIds = Sets.newHashSet();
-//        rdmMemberViewDTOS.getContent().forEach(dto -> {
-//            userIds.add(dto.getUserId());
-//            userIds.add(dto.getCreatedBy());
-//            repositoryIds.add(dto.getRepositoryId());
-//        });
-//
-//        // 查询用户信息
-//        Map<Long, C7nUserVO> userVOMap = ic7nBaseServiceService.listC7nUserToMap(projectId, userIds);
-//
-//        // 查询应用服务信息
-//        Map<Long, C7nAppServiceVO> appServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(repositoryIds);
-//
-//        // 填充数据
-//        for (RdmMemberViewDTO viewDTO : rdmMemberViewDTOS.getContent()) {
-//            C7nUserVO c7nUserVO = Optional.ofNullable(userVOMap.get(viewDTO.getUserId())).orElse(new C7nUserVO().setRoles(Collections.emptyList()));
-//            C7nUserVO c7nCreateUserVO = Optional.ofNullable(userVOMap.get(viewDTO.getCreatedBy())).orElse(new C7nUserVO());
-//
-//            C7nAppServiceVO c7nAppServiceVO = Optional.ofNullable(appServiceVOMap.get(viewDTO.getRepositoryId())).orElse(new C7nAppServiceVO());
-//
-//            viewDTO.setRealName(c7nUserVO.getRealName());
-//            viewDTO.setLoginName(c7nUserVO.getLoginName());
-//            viewDTO.setRoleNames(c7nUserVO.getRoles().stream().map(C7nRoleVO::getName).collect(Collectors.toList()));
-//
-//            viewDTO.setCreatedByName(c7nCreateUserVO.getRealName());
-//
-//            viewDTO.setAppServiceName(c7nAppServiceVO.getName());
-//        }
-//
-//        return PageConvertUtils.convert(rdmMemberViewDTOS);
-//    }
-
-    /**
      * 成员查询dto转换(可复用)
      *
      * @param page
@@ -183,11 +140,10 @@ public class RdmMemberAssembler {
 
             C7nAppServiceVO c7nAppServiceVO = Optional.ofNullable(appServiceVOMap.get(viewDTO.getRepositoryId())).orElse(new C7nAppServiceVO());
 
-            viewDTO.setRealName(c7nUserVO.getRealName());
-            viewDTO.setLoginName(c7nUserVO.getLoginName());
+            viewDTO.setUser(BaseC7nUserViewDTO.convert(c7nUserVO));
             viewDTO.setRoleNames(c7nUserVO.getRoles().stream().map(C7nRoleVO::getName).collect(Collectors.toList()));
 
-            viewDTO.setCreatedByName(c7nCreateUserVO.getRealName());
+            viewDTO.setCreatedUser(BaseC7nUserViewDTO.convert(c7nCreateUserVO));
 
             viewDTO.setAppServiceName(c7nAppServiceVO.getName());
         }
