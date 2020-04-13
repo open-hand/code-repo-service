@@ -5,6 +5,7 @@ import io.choerodon.mybatis.pagehelper.PageHelper;
 import org.hrds.rducm.gitlab.domain.entity.MemberAuditLog;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.repository.MemberAuditLogRepository;
+import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IMemberAuditService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hzero.mybatis.domian.Condition;
@@ -28,6 +29,8 @@ public class MemberAuditServiceImpl implements IMemberAuditService {
     private IRdmMemberAuditRecordService iRdmMemberAuditRecordService;
     @Autowired
     private MemberAuditLogRepository memberAuditLogRepository;
+    @Autowired
+    private IC7nBaseServiceService ic7nBaseServiceService;
 
     @Override
     public MemberAuditLog detailLatestAuditLog(Long organizationId, Long projectId) {
@@ -51,6 +54,9 @@ public class MemberAuditServiceImpl implements IMemberAuditService {
         Date endDate = new Date();
 
         // <2> 记录审计日志
+        // 获取组织下所有项目
+        Set<Long> projectIds = ic7nBaseServiceService.listProjectIds(organizationId);
+
         // 按项目分组
         Map<Long, List<RdmMemberAuditRecord>> group = records.stream().collect(Collectors.groupingBy(RdmMemberAuditRecord::getProjectId));
 
@@ -67,12 +73,14 @@ public class MemberAuditServiceImpl implements IMemberAuditService {
         memberAuditLogRepository.insertSelective(memberAuditLog);
 
         // 插入每个项目的审计日志
-        group.forEach((key, value) -> {
+        projectIds.forEach((projectId) -> {
+            List<RdmMemberAuditRecord> list = group.get(projectId);
+
             MemberAuditLog log = new MemberAuditLog();
             log.setOrganizationId(organizationId);
-            log.setProjectId(key);
+            log.setProjectId(projectId);
             log.setAuditNo(auditNo);
-            log.setAuditCount(value.size());
+            log.setAuditCount(list == null ? 0 : list.size());
             log.setAuditStartDate(startDate);
             log.setAuditEndDate(endDate);
             log.setAuditDuration(Math.toIntExact(Duration.between(startDate.toInstant(), endDate.toInstant()).toMillis()));
