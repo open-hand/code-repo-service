@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.domain.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.base.Stopwatch;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -98,7 +101,8 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
 
         // 查询项目的应用服务
         Set<Long> appServiceIds = new HashSet<>();
-        projectIds.forEach(projectId -> {
+        // 使用并行流优化
+        projectIds.parallelStream().forEach(projectId -> {
             Set<Long> asIds = listC7nAppServiceIdsByNameOnProjectLevel(projectId, appServiceName);
             appServiceIds.addAll(asIds);
         });

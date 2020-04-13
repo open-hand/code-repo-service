@@ -37,28 +37,6 @@ public interface DevOpsServiceFeignClient {
                                                                       @RequestParam(required = false) Integer size,
                                                                       @RequestBody(required = false) String params);
 
-
-    /**
-     * 批量查询应用服务
-     *
-     * @param projectId   项目Id
-     * @param ids         应用服务Ids
-     * @param doPage      是否分页
-     * @param withVersion 是否需要版本信息
-     * @param page        页数
-     * @param size        每页大小
-     * @param params      查询参数
-     * @return
-     */
-//    @PostMapping(value = "/v1/projects/{project_id}/app_service/list_app_service_ids")
-//    ResponseEntity<PageInfo<C7nAppServiceVO>> pageProjectAppServiceByIds(@PathVariable(value = "project_id") Long projectId,
-//                                                                         @RequestParam(value = "ids") Set<Long> ids,
-//                                                                         @RequestParam(value = "doPage", required = false) Boolean doPage,
-//                                                                         @RequestParam(value = "with_version", required = false, defaultValue = "true") Boolean withVersion,
-//                                                                         @RequestParam(required = false) Integer page,
-//                                                                         @RequestParam(required = false) Integer size,
-//                                                                         @RequestBody(required = false) String params);
-
     /**
      * 通过一组id分页查询或者不传id时进行分页查询
      *
