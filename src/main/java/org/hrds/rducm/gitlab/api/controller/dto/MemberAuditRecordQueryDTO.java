@@ -3,12 +3,10 @@ package org.hrds.rducm.gitlab.api.controller.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.util.Set;
-
 @ApiModel
 public class MemberAuditRecordQueryDTO {
     @ApiModelProperty(value = "应用服务名称")
-    private String appServiceName;
+    private String repositoryName;
     @ApiModelProperty(value = "用户名")
     private String realName;
     @ApiModelProperty(value = "登录名")
@@ -16,12 +14,12 @@ public class MemberAuditRecordQueryDTO {
     @ApiModelProperty(value = "通用参数")
     private String params;
 
-    public String getAppServiceName() {
-        return appServiceName;
+    public String getRepositoryName() {
+        return repositoryName;
     }
 
-    public MemberAuditRecordQueryDTO setAppServiceName(String appServiceName) {
-        this.appServiceName = appServiceName;
+    public MemberAuditRecordQueryDTO setRepositoryName(String repositoryName) {
+        this.repositoryName = repositoryName;
         return this;
     }
 

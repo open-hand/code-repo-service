@@ -10,7 +10,6 @@ import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuditRecordQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
 import org.hrds.rducm.gitlab.app.assembler.RdmMemberAuditRecordAssembler;
-import org.hrds.rducm.gitlab.domain.component.QueryConditionHelper;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
@@ -63,7 +62,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                                                                Set<Long> repositoryIds,
                                                                PageRequest pageRequest,
                                                                MemberAuditRecordQueryDTO queryDTO, ResourceType resourceType) {
-        String appServiceName = queryDTO.getAppServiceName();
+        String repositoryName = queryDTO.getRepositoryName();
 
         Condition condition = Condition.builder(RdmMemberAuditRecord.class)
                 .where(Sqls.custom()
@@ -77,8 +76,8 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         switch (resourceType) {
             case ORGANIZATION: {
                 // 调用外部接口模糊查询 应用服务
-                if (!StringUtils.isEmpty(appServiceName)) {
-                    Set<Long> repositoryIdSet = ic7nDevOpsServiceService.listC7nAppServiceIdsByNameOnOrgLevel(organizationId, appServiceName);
+                if (!StringUtils.isEmpty(repositoryName)) {
+                    Set<Long> repositoryIdSet = ic7nDevOpsServiceService.listC7nAppServiceIdsByNameOnOrgLevel(organizationId, repositoryName);
 
                     if (repositoryIdSet.isEmpty()) {
                         return PageInfo.of(Collections.emptyList());
@@ -90,8 +89,8 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
             }
             case PROJECT: {
                 // 调用外部接口模糊查询 应用服务
-                if (!StringUtils.isEmpty(appServiceName)) {
-                    Set<Long> repositoryIdSet = ic7nDevOpsServiceService.listC7nAppServiceIdsByNameOnProjectLevel(projectIds.iterator().next(), appServiceName);
+                if (!StringUtils.isEmpty(repositoryName)) {
+                    Set<Long> repositoryIdSet = ic7nDevOpsServiceService.listC7nAppServiceIdsByNameOnProjectLevel(projectIds.iterator().next(), repositoryName);
 
                     if (repositoryIdSet.isEmpty()) {
                         return PageInfo.of(Collections.emptyList());

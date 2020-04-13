@@ -34,7 +34,7 @@ public class RdmMemberAuditRecordOrgController extends BaseController {
 
     @ApiOperation(value = "查询权限审计结果")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "appServiceName", value = "应用服务名称(模糊)", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "repositoryName", value = "应用服务名称(模糊)", paramType = "query", dataType = "String"),
     })
     @Permission(type = ResourceType.ORGANIZATION, permissionPublic = true)
     @GetMapping

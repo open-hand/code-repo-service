@@ -145,7 +145,7 @@ public class RdmMemberAssembler {
 
             viewDTO.setCreatedUser(BaseC7nUserViewDTO.convert(c7nCreateUserVO));
 
-            viewDTO.setAppServiceName(c7nAppServiceVO.getName());
+            viewDTO.setRepositoryName(c7nAppServiceVO.getName());
         }
 
         return PageConvertUtils.convert(rdmMemberViewDTOS);

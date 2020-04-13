@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.api.controller.dto.export;
 
-import io.swagger.annotations.ApiModelProperty;
 import org.hzero.core.base.BaseConstants;
 import org.hzero.export.annotation.ExcelColumn;
 import org.hzero.export.annotation.ExcelSheet;
@@ -22,7 +21,7 @@ public class MemberExportDTO {
     private String loginName;
 
     @ExcelColumn(title = "应用服务名")
-    private String appServiceName;
+    private String repositoryName;
 
     @ExcelColumn(title = "项目角色")
     private List<String> roleNames;
@@ -71,12 +70,12 @@ public class MemberExportDTO {
         return this;
     }
 
-    public String getAppServiceName() {
-        return appServiceName;
+    public String getRepositoryName() {
+        return repositoryName;
     }
 
-    public MemberExportDTO setAppServiceName(String appServiceName) {
-        this.appServiceName = appServiceName;
+    public MemberExportDTO setRepositoryName(String repositoryName) {
+        this.repositoryName = repositoryName;
         return this;
     }
 

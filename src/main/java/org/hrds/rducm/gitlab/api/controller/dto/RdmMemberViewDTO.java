@@ -19,7 +19,7 @@ public class RdmMemberViewDTO {
 //    private String loginName;
 
     @ApiModelProperty("应用服务名")
-    private String appServiceName;
+    private String repositoryName;
 
     @ApiModelProperty("项目角色")
     private List<String> roleNames;
@@ -74,12 +74,12 @@ public class RdmMemberViewDTO {
         return this;
     }
 
-    public String getAppServiceName() {
-        return appServiceName;
+    public String getRepositoryName() {
+        return repositoryName;
     }
 
-    public RdmMemberViewDTO setAppServiceName(String appServiceName) {
-        this.appServiceName = appServiceName;
+    public RdmMemberViewDTO setRepositoryName(String repositoryName) {
+        this.repositoryName = repositoryName;
         return this;
     }
 

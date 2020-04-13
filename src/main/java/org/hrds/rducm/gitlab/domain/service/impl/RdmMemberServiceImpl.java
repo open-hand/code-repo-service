@@ -31,7 +31,6 @@ import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -125,7 +124,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         Page<RdmMemberViewDTO> pageReturn = ConvertUtils.convertPage(page, (v) -> {
             RdmMemberViewDTO viewDTO = ConvertUtils.convertObject(v, RdmMemberViewDTO.class);
 
-            viewDTO.setAppServiceName(c7nAppServiceVOMap.get(v.getRepositoryId()).getName());
+            viewDTO.setRepositoryName(c7nAppServiceVOMap.get(v.getRepositoryId()).getName());
             return viewDTO;
         });
 

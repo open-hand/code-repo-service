@@ -70,7 +70,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Override
     public PageInfo<RdmMemberViewDTO> pageByOptions(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query) {
         // <1> 封装查询条件
-        String appServiceName = query.getAppServiceName();
+        String repositoryName = query.getRepositoryName();
         String realName = query.getRealName();
         String loginName = query.getLoginName();
         Set<Long> repositoryIds = query.getRepositoryIds();
@@ -93,8 +93,8 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         }
 
         // 调用外部接口模糊查询 应用服务
-        if (!StringUtils.isEmpty(appServiceName)) {
-            Set<Long> repositoryIdSet = ic7nDevOpsServiceService.listC7nAppServiceIdsByNameOnProjectLevel(projectId, appServiceName);
+        if (!StringUtils.isEmpty(repositoryName)) {
+            Set<Long> repositoryIdSet = ic7nDevOpsServiceService.listC7nAppServiceIdsByNameOnProjectLevel(projectId, repositoryName);
 
             if (repositoryIdSet.isEmpty()) {
                 return PageInfo.of(Collections.emptyList());
@@ -111,7 +111,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Override
     public PageInfo<RdmMemberViewDTO> pageByOptionsOnOrg(Long organizationId, PageRequest pageRequest, RdmMemberQueryDTO query) {
         // <1> 封装查询条件
-        String appServiceName = query.getAppServiceName();
+        String repositoryName = query.getRepositoryName();
         String realName = query.getRealName();
         String loginName = query.getLoginName();
         Set<Long> projectIds = query.getProjectIds();
@@ -136,8 +136,8 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         }
 
         // 调用外部接口模糊查询 应用服务
-        if (!StringUtils.isEmpty(appServiceName)) {
-            Set<Long> repositoryIdSet = ic7nDevOpsServiceService.listC7nAppServiceIdsByNameOnOrgLevel(organizationId, appServiceName);
+        if (!StringUtils.isEmpty(repositoryName)) {
+            Set<Long> repositoryIdSet = ic7nDevOpsServiceService.listC7nAppServiceIdsByNameOnOrgLevel(organizationId, repositoryName);
 
             if (repositoryIdSet.isEmpty()) {
                 return PageInfo.of(Collections.emptyList());
