@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.hzero</groupId>
         <artifactId>hzero-parent</artifactId>
-        <version>1.2.0.RELEASE</version>
+        <version>1.3.1.RELEASE</version>
     </parent>
     <groupId>org.hrds.rducm</groupId>
     <artifactId>rducm</artifactId>
@@ -153,6 +153,12 @@
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-core</artifactId>
             <version>${choerodon.starters.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.alibaba</groupId>
+                    <artifactId>fastjson</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- hzero boot -->
         <dependency>
