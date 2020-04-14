@@ -60,6 +60,17 @@ public interface IC7nBaseServiceService {
 
     /**
      * 组织层
+     * 查询组织下的所有项目成员的用户id(非组织层的用户), 根据实际名称和登录名模糊查询
+     *
+     * @param organizationId
+     * @param realName
+     * @param loginName
+     * @return
+     */
+    Set<Long> listProjectsC7nUserIdsByNameOnOrgLevel(Long organizationId, String realName, String loginName);
+
+    /**
+     * 组织层
      * 查询用户ids, 根据实际名称和登录名模糊查询
      *
      * @param organizationId
@@ -69,15 +80,15 @@ public interface IC7nBaseServiceService {
      */
     Set<Long> listC7nUserIdsByNameOnOrgLevel(Long organizationId, String realName, String loginName);
 
-    /**
-     * 平台层
-     * 查询用户ids, 根据实际名称和登录名模糊查询
-     *
-     * @param realName
-     * @param loginName
-     * @return
-     */
-    Set<Long> listC7nUserIdsByNameOnSiteLevel(String realName, String loginName);
+//    /**
+//     * 平台层
+//     * 查询用户ids, 根据实际名称和登录名模糊查询
+//     *
+//     * @param realName
+//     * @param loginName
+//     * @return
+//     */
+//    Set<Long> listC7nUserIdsByNameOnSiteLevel(String realName, String loginName);
 
     /**
      * 查询项目开发成员, 并排除自己(项目层)

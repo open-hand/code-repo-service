@@ -96,6 +96,21 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
     }
 
     @Override
+    public Set<Long> listProjectsC7nUserIdsByNameOnOrgLevel(Long organizationId, String realName, String loginName) {
+        // 查询该组织所有项目
+        Set<Long> projectIds = this.listProjectIds(organizationId);
+
+        // 使用并行流优化
+        Set<Long> userIds = new HashSet<>();
+        projectIds.parallelStream().forEach(projectId -> {
+            Set<Long> asIds = listC7nUserIdsByNameOnProjectLevel(projectId, realName, loginName);
+            userIds.addAll(asIds);
+        });
+
+        return userIds;
+    }
+
+    @Override
     public Set<Long> listC7nUserIdsByNameOnOrgLevel(Long organizationId, String realName, String loginName) {
         // 0为不分页
         ResponseEntity<PageInfo<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnOrganizationLevel(organizationId, 0, 0, loginName, realName);
@@ -108,18 +123,18 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
         }
     }
 
-    @Override
-    public Set<Long> listC7nUserIdsByNameOnSiteLevel(String realName, String loginName) {
-        // 0为不分页
-        ResponseEntity<PageInfo<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnSiteLevel(0, 0, loginName, realName);
-
-        if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
-            List<C7nUserVO> c7nUserVOS = responseEntity.getBody().getList();
-            return c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
-        } else {
-            return Collections.emptySet();
-        }
-    }
+//    @Override
+//    public Set<Long> listC7nUserIdsByNameOnSiteLevel(String realName, String loginName) {
+//        // 0为不分页
+//        ResponseEntity<PageInfo<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnSiteLevel(0, 0, loginName, realName);
+//
+//        if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
+//            List<C7nUserVO> c7nUserVOS = responseEntity.getBody().getList();
+//            return c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
+//        } else {
+//            return Collections.emptySet();
+//        }
+//    }
 
     @Override
     public List<C7nUserVO> listDeveloperProjectMembers(Long projectId, String name) {

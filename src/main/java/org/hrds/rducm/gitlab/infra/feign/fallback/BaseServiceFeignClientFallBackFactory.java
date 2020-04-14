@@ -31,10 +31,10 @@ public class BaseServiceFeignClientFallBackFactory implements FallbackFactory<Ba
                 return null;
             }
 
-            @Override
-            public ResponseEntity<List<C7nUserVO>> listProjectUsersByName(Long projectId, String param) {
-                return null;
-            }
+//            @Override
+//            public ResponseEntity<List<C7nUserVO>> listProjectUsersByName(Long projectId, String param) {
+//                return null;
+//            }
 
             @Override
             public ResponseEntity<PageInfo<C7nUserVO>> pageUsersByOptionsOnProjectLevel(Long projectId, int page, int size, String loginName, String realName) {

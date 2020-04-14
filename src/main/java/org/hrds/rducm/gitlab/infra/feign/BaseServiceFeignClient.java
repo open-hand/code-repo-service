@@ -61,9 +61,9 @@ public interface BaseServiceFeignClient {
     /**
      * 查询项目下的用户列表(根据登录名或真实名称搜索)
      */
-    @GetMapping(value = "/v1/projects/{project_id}/users/search_by_name")
-    ResponseEntity<List<C7nUserVO>> listProjectUsersByName(@PathVariable(name = "project_id") Long projectId,
-                                                           @RequestParam(required = false) String param);
+//    @GetMapping(value = "/v1/projects/{project_id}/users/search_by_name")
+//    ResponseEntity<List<C7nUserVO>> listProjectUsersByName(@PathVariable(name = "project_id") Long projectId,
+//                                                           @RequestParam(required = false) String param);
 
 
     /**
