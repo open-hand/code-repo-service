@@ -7,6 +7,7 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author ying.xie@hand-china.com
@@ -16,6 +17,10 @@ public class MemberAuthDetailViewDTO {
     @JsonIgnore
     private Long userId;
     private BaseC7nUserViewDTO user;
+
+    @ApiModelProperty("项目角色")
+    private List<String> roleNames;
+
     @ApiModelProperty(value = "已授权服务数")
     private Integer authorizedRepositoryCount;
 
@@ -67,6 +72,15 @@ public class MemberAuthDetailViewDTO {
 
     public MemberAuthDetailViewDTO setAuthorizedRepositoryPercent(BigDecimal authorizedRepositoryPercent) {
         this.authorizedRepositoryPercent = authorizedRepositoryPercent;
+        return this;
+    }
+
+    public List<String> getRoleNames() {
+        return roleNames;
+    }
+
+    public MemberAuthDetailViewDTO setRoleNames(List<String> roleNames) {
+        this.roleNames = roleNames;
         return this;
     }
 }
