@@ -283,7 +283,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     }
 
     @Override
-    @ExcelExport(MemberExportDTO.class)
+    @ExcelExport(value = MemberExportDTO.class, groups = MemberExportDTO.GroupProject.class)
     public Page<MemberExportDTO> export(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query, ExportParam exportParam, HttpServletResponse response) {
         PageInfo<RdmMemberViewDTO> pageInfo = this.pageByOptions(projectId, pageRequest, query);
 

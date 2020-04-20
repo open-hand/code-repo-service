@@ -20,7 +20,7 @@ public class MemberExportDTO {
     @ExcelColumn(title = "登录名")
     private String loginName;
 
-    @ExcelColumn(title = "项目名", groups = GroupOrg.class)
+    @ExcelColumn(title = "项目名", groups = {GroupOrg.class})
     private String projectName;
 
     @ExcelColumn(title = "应用服务名")
@@ -53,6 +53,8 @@ public class MemberExportDTO {
             return (Boolean) value ? "已同步" : "未同步";
         }
     }
+
+    public interface GroupProject {}
 
     public interface GroupOrg {}
 
