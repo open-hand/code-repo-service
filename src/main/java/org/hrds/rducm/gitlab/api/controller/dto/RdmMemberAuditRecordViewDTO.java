@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.api.controller.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nProjectViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 
 import java.util.Date;
@@ -21,6 +22,9 @@ public class RdmMemberAuditRecordViewDTO {
 
     @ApiModelProperty(value = "项目层，项目id", required = true)
     private Long projectId;
+
+    @ApiModelProperty("项目信息")
+    private BaseC7nProjectViewDTO project;
 
     @ApiModelProperty(value = "代码仓库id", required = true)
     private Long repositoryId;
@@ -226,6 +230,15 @@ public class RdmMemberAuditRecordViewDTO {
 
     public RdmMemberAuditRecordViewDTO setSyncFlag(Boolean syncFlag) {
         this.syncFlag = syncFlag;
+        return this;
+    }
+
+    public BaseC7nProjectViewDTO getProject() {
+        return project;
+    }
+
+    public RdmMemberAuditRecordViewDTO setProject(BaseC7nProjectViewDTO project) {
+        this.project = project;
         return this;
     }
 }

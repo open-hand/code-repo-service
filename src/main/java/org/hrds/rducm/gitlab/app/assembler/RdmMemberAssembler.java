@@ -126,7 +126,6 @@ public class RdmMemberAssembler {
             projectIdAndUserIds.put(dto.getProjectId(), dto.getCreatedBy());
             repositoryIds.add(dto.getRepositoryId());
             projectIds.add(dto.getProjectId());
-
         });
 
         // 查询用户信息

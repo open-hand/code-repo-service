@@ -106,7 +106,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
 
         Page<RdmMemberAuditRecord> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberAuditRecordRepository.selectByCondition(condition));
 
-        return rdmMemberAuditRecordAssembler.pageToViewDTO(page);
+        return rdmMemberAuditRecordAssembler.pageToViewDTO(page, resourceType);
     }
 
     @Override

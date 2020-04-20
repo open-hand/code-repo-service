@@ -5,11 +5,14 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.enums.ResourceType;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nProjectViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
@@ -70,15 +73,17 @@ public class RdmOperationLogAssembler {
      * @param page
      * @return
      */
-    public PageInfo<OperationLogViewDTO> pageToOperationLogViewDTO(Page<RdmOperationLog> page) {
+    public PageInfo<OperationLogViewDTO> pageToOperationLogViewDTO(Page<RdmOperationLog> page, ResourceType resourceType) {
         // 操作人用户id
         Set<Long> opUserIds = new HashSet<>();
         // 代码库id
         Set<Long> repositoryIds = new HashSet<>();
-
+        // 获取项目id集合
+        Set<Long> projectIds = Sets.newHashSet();
         page.getContent().forEach(v -> {
             opUserIds.add(v.getOpUserId());
             repositoryIds.add(v.getRepositoryId());
+            projectIds.add(v.getProjectId());
         });
 
         // 获取操作人用户信息
@@ -86,6 +91,14 @@ public class RdmOperationLogAssembler {
 
         // 获取应用服务信息
         Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(repositoryIds);
+
+        // 查询项目信息(组织层需要)
+        Map<Long, C7nProjectVO> c7nProjectVOMap;
+        if (ResourceType.ORGANIZATION.equals(resourceType)) {
+            c7nProjectVOMap = ic7nBaseServiceService.listProjectsByIdsToMap(projectIds);
+        } else {
+            c7nProjectVOMap = Collections.emptyMap();
+        }
 
         return PageConvertUtils.convert(ConvertUtils.convertPage(page, val -> {
             C7nAppServiceVO c7nAppServiceVO = Optional.ofNullable(c7nAppServiceVOMap.get(val.getRepositoryId())).orElse(new C7nAppServiceVO());
@@ -96,6 +109,12 @@ public class RdmOperationLogAssembler {
             operationLogViewDTO.setRepositoryImageUrl(c7nAppServiceVO.getImgUrl());
             operationLogViewDTO.setOpUserName(c7nUserVO.getRealName());
             operationLogViewDTO.setOpUserImageUrl(c7nUserVO.getImageUrl());
+
+            // 组织层添加项目信息
+            if (ResourceType.ORGANIZATION.equals(resourceType)) {
+                C7nProjectVO c7nProjectVO = Optional.ofNullable(c7nProjectVOMap.get(operationLogViewDTO.getProjectId())).orElse(new C7nProjectVO());
+                operationLogViewDTO.setProject(BaseC7nProjectViewDTO.convert(c7nProjectVO));
+            }
             return operationLogViewDTO;
         }));
     }

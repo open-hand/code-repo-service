@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.api.controller.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nProjectViewDTO;
 
 import java.util.Date;
 
@@ -14,6 +15,9 @@ public class OperationLogViewDTO {
 
     @ApiModelProperty(value = "项目层，项目id", required = true)
     private Long projectId;
+
+    @ApiModelProperty("项目信息")
+    private BaseC7nProjectViewDTO project;
 
     @ApiModelProperty(value = "代码仓库id", required = true)
     private Long repositoryId;
@@ -163,6 +167,15 @@ public class OperationLogViewDTO {
 
     public OperationLogViewDTO setRepositoryImageUrl(String repositoryImageUrl) {
         this.repositoryImageUrl = repositoryImageUrl;
+        return this;
+    }
+
+    public BaseC7nProjectViewDTO getProject() {
+        return project;
+    }
+
+    public OperationLogViewDTO setProject(BaseC7nProjectViewDTO project) {
+        this.project = project;
         return this;
     }
 }
