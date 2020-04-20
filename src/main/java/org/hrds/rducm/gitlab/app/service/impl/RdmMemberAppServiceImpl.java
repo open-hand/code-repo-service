@@ -301,7 +301,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     }
 
     @Override
-    @ExcelExport(MemberExportDTO.class)
+    @ExcelExport(value = MemberExportDTO.class, groups = MemberExportDTO.GroupOrg.class)
     public Page<MemberExportDTO> exportOnOrg(Long organizationId, PageRequest pageRequest, RdmMemberQueryDTO query, ExportParam exportParam, HttpServletResponse response) {
         PageInfo<RdmMemberViewDTO> pageInfo = this.pageByOptionsOnOrg(organizationId, pageRequest, query);
 
@@ -311,6 +311,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             exportDTO.setRealName(dto.getUser().getRealName());
             exportDTO.setLoginName(dto.getUser().getLoginName());
             exportDTO.setCreatedByName(dto.getCreatedUser().getRealName());
+            exportDTO.setProjectName(dto.getProject().getProjectName());
             exportDTO.setGlAccessLevel(dto.getGlAccessLevel() == null ? null : RdmAccessLevel.forValue(dto.getGlAccessLevel()).toDesc());
             return exportDTO;
         });

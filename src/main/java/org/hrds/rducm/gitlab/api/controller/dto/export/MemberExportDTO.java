@@ -20,6 +20,9 @@ public class MemberExportDTO {
     @ExcelColumn(title = "登录名")
     private String loginName;
 
+    @ExcelColumn(title = "项目名", groups = GroupOrg.class)
+    private String projectName;
+
     @ExcelColumn(title = "应用服务名")
     private String repositoryName;
 
@@ -50,6 +53,8 @@ public class MemberExportDTO {
             return (Boolean) value ? "已同步" : "未同步";
         }
     }
+
+    public interface GroupOrg {}
 
 
     public String getRealName() {
@@ -139,6 +144,15 @@ public class MemberExportDTO {
 
     public MemberExportDTO setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
+        return this;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public MemberExportDTO setProjectName(String projectName) {
+        this.projectName = projectName;
         return this;
     }
 }
