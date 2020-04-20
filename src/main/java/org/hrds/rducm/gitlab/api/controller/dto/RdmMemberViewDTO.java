@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.api.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nProjectViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 
 import java.util.Date;
@@ -37,6 +38,9 @@ public class RdmMemberViewDTO {
 
     @ApiModelProperty("项目id")
     private Long projectId;
+
+    @ApiModelProperty("项目信息")
+    private BaseC7nProjectViewDTO project;
 
     @ApiModelProperty("代码库id")
     private Long repositoryId;
@@ -206,6 +210,15 @@ public class RdmMemberViewDTO {
 
     public RdmMemberViewDTO setCreatedUser(BaseC7nUserViewDTO createdUser) {
         this.createdUser = createdUser;
+        return this;
+    }
+
+    public BaseC7nProjectViewDTO getProject() {
+        return project;
+    }
+
+    public RdmMemberViewDTO setProject(BaseC7nProjectViewDTO project) {
+        this.project = project;
         return this;
     }
 }

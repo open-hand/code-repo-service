@@ -6,6 +6,7 @@ import io.choerodon.asgard.saga.annotation.Saga;
 import io.choerodon.asgard.saga.producer.StartSagaBuilder;
 import io.choerodon.asgard.saga.producer.TransactionalProducer;
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.domain.AuditDomain;
 import io.choerodon.mybatis.pagehelper.PageHelper;
@@ -105,7 +106,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectByCondition(condition));
 
-        return rdmMemberAssembler.pageToRdmMemberViewDTO(page);
+        return rdmMemberAssembler.pageToRdmMemberViewDTO(page, ResourceType.PROJECT);
     }
 
     @Override
@@ -148,7 +149,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectByCondition(condition));
 
-        return rdmMemberAssembler.pageToRdmMemberViewDTO(page);
+        return rdmMemberAssembler.pageToRdmMemberViewDTO(page, ResourceType.ORGANIZATION);
     }
 
     /**
@@ -289,6 +290,9 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         PageInfo<MemberExportDTO> exportDTOPageInfo = ConvertUtils.convertPageInfo(pageInfo, dto -> {
             MemberExportDTO exportDTO = new MemberExportDTO();
             BeanUtils.copyProperties(dto, exportDTO);
+            exportDTO.setRealName(dto.getUser().getRealName());
+            exportDTO.setLoginName(dto.getUser().getLoginName());
+            exportDTO.setCreatedByName(dto.getCreatedUser().getRealName());
             exportDTO.setGlAccessLevel(dto.getGlAccessLevel() == null ? null : RdmAccessLevel.forValue(dto.getGlAccessLevel()).toDesc());
             return exportDTO;
         });
@@ -304,6 +308,9 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         PageInfo<MemberExportDTO> exportDTOPageInfo = ConvertUtils.convertPageInfo(pageInfo, dto -> {
             MemberExportDTO exportDTO = new MemberExportDTO();
             BeanUtils.copyProperties(dto, exportDTO);
+            exportDTO.setRealName(dto.getUser().getRealName());
+            exportDTO.setLoginName(dto.getUser().getLoginName());
+            exportDTO.setCreatedByName(dto.getCreatedUser().getRealName());
             exportDTO.setGlAccessLevel(dto.getGlAccessLevel() == null ? null : RdmAccessLevel.forValue(dto.getGlAccessLevel()).toDesc());
             return exportDTO;
         });

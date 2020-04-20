@@ -165,4 +165,22 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
 
         return projectIds;
     }
+
+    @Override
+    public List<C7nProjectVO> listProjectsByIds(Set<Long> projectIds) {
+        ResponseEntity<List<C7nProjectVO>> responseEntity = baseServiceFeignClient.listProjectsByIds(projectIds);
+        return FeignUtils.handleResponseEntity(responseEntity);
+    }
+
+    @Override
+    public Map<Long, C7nProjectVO> listProjectsByIdsToMap(Set<Long> projectIds) {
+        ResponseEntity<List<C7nProjectVO>> responseEntity = baseServiceFeignClient.listProjectsByIds(projectIds);
+        List<C7nProjectVO> c7nProjectVOS = FeignUtils.handleResponseEntity(responseEntity);
+
+        if (!CollectionUtils.isEmpty(c7nProjectVOS)) {
+            return c7nProjectVOS.stream().collect(Collectors.toMap(C7nProjectVO::getId, v -> v));
+        } else {
+            return Collections.emptyMap();
+        }
+    }
 }

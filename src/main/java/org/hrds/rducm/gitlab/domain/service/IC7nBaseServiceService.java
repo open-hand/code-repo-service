@@ -117,4 +117,20 @@ public interface IC7nBaseServiceService {
      * @return
      */
     Set<Long> listProjectIds(Long organizationId);
+
+    /**
+     * 根据id获取项目信息
+     *
+     * @param projectIds
+     * @return
+     */
+    List<C7nProjectVO> listProjectsByIds(Set<Long> projectIds);
+
+    /**
+     * 根据id获取项目信息并转换为map
+     *
+     * @param projectIds
+     * @return
+     */
+    Map<Long, C7nProjectVO> listProjectsByIdsToMap(Set<Long> projectIds);
 }

@@ -164,6 +164,16 @@ public interface BaseServiceFeignClient {
     @GetMapping(value = "/v1/organizations/{organization_id}/projects/all")
     ResponseEntity<List<C7nProjectVO>> listProjectsByOrgId(@PathVariable(name = "organization_id") Long organizationId);
 
+
+    /**
+     * 根据id集合查询项目
+     *
+     * @param ids id集合，去重
+     * @return 项目集合
+     */
+    @PostMapping("/v1/projects/ids")
+    ResponseEntity<List<C7nProjectVO>> listProjectsByIds(@RequestBody Set<Long> ids);
+
 //    /**
 //     * 查询组织下所有项目
 //     *
