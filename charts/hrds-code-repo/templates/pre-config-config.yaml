@@ -42,7 +42,7 @@ spec:
           -Dspring.datasource.password={{ .Values.preJob.preConfig.datasource.password }}
           -Dregister.host={{ .Values.preJob.preConfig.registerHost | quote }}
           -Dservice.namespace={{ .Release.Namespace }}
-          -Dservice.name=hrds-code-repo
+          -Dservice.name={{ .Chart.Name }}
           -Dservice.version={{ default (.Chart.Version) .Values.image.tag }}
           -Dconfig.file={{ .Values.preJob.preConfig.configFile }}
           -Dconfig.jar=/choerodon/{{ .Chart.Name }}.jar
