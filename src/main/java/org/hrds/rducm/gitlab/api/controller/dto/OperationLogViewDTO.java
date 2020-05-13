@@ -51,8 +51,6 @@ public class OperationLogViewDTO {
     @ApiModelProperty(value = "操作日期", required = true)
     private Date opDate;
 
-//    private String extraParam;
-
     public Long getId() {
         return id;
     }
