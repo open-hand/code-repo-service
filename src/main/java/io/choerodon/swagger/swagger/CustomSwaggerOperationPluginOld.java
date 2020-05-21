@@ -21,9 +21,9 @@ import springfox.documentation.swagger.common.SwaggerPluginSupport;
  * @author xausky
  */
 @Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER + 1000)
-public class CustomSwaggerOperationPlugin implements OperationBuilderPlugin {
+public class CustomSwaggerOperationPluginOld implements OperationBuilderPlugin {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CustomSwaggerOperationPlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomSwaggerOperationPluginOld.class);
 
     private final ObjectMapper mapper = new ObjectMapper();
 

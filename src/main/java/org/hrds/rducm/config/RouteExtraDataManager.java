@@ -1,19 +1,20 @@
 package org.hrds.rducm.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import io.choerodon.core.swagger.ChoerodonRouteData;
 import io.choerodon.swagger.annotation.ChoerodonExtraData;
 import io.choerodon.swagger.swagger.extra.ExtraData;
 import io.choerodon.swagger.swagger.extra.ExtraDataManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 
 /**
  * 服务路由配置
  */
 @ChoerodonExtraData
 public class RouteExtraDataManager implements ExtraDataManager {
-	
-	@Autowired
-    private org.springframework.core.env.Environment environment;
+
+    @Autowired
+    private Environment environment;
 
     @Override
     public ExtraData getData() {

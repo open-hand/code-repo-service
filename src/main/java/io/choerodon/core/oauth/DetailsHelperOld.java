@@ -17,9 +17,9 @@ import org.hzero.core.base.BaseConstants;
  *
  * @author wuguokai
  */
-public class DetailsHelper {
+public class DetailsHelperOld {
 
-    private DetailsHelper() {
+    private DetailsHelperOld() {
     }
 
     private static final CustomUserDetails ANONYMOUS;

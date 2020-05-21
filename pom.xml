@@ -14,7 +14,7 @@
     <name>rducm</name>
 
     <properties>
-        <choerodon.starters.version>0.16.0.RELEASE</choerodon.starters.version>
+        <choerodon.starters.version>0.16.2-SNAPSHOT</choerodon.starters.version>
     </properties>
 
     <dependencies>
@@ -127,39 +127,23 @@
         </dependency>
 
         <!-- 添加猪齿鱼相关依赖 add by ying.xie -->
-<!--        <dependency>-->
-<!--            <groupId>io.choerodon</groupId>-->
-<!--            <artifactId>choerodon-starter-asgard</artifactId>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.hzero.boot</groupId>-->
-<!--            <artifactId>hzero-boot-scheduler</artifactId>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-asgard</artifactId>
             <version>${choerodon.starters.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.choerodon</groupId>
-            <artifactId>choerodon-starter-actuator</artifactId>
-            <version>${choerodon.starters.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.choerodon</groupId>
-            <artifactId>choerodon-starter-core</artifactId>
-            <version>${choerodon.starters.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.alibaba</groupId>
-                    <artifactId>fastjson</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.choerodon</groupId>-->
+<!--            <artifactId>choerodon-starter-core</artifactId>-->
+<!--            <version>${choerodon.starters.version}</version>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>com.alibaba</groupId>-->
+<!--                    <artifactId>fastjson</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
         <!-- hzero boot -->
         <dependency>
             <groupId>io.github.openfeign.form</groupId>
@@ -170,17 +154,6 @@
             <groupId>io.github.openfeign.form</groupId>
             <artifactId>feign-form-spring</artifactId>
             <version>3.0.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.choerodon</groupId>
-            <artifactId>choerodon-starter-swagger</artifactId>
-            <version>${choerodon.starters.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.choerodon</groupId>
-            <artifactId>choerodon-starter-feign-replay</artifactId>
-            <version>${choerodon.starters.version}</version>
         </dependency>
 
         <dependency>
@@ -218,22 +191,6 @@
         </repository> -->
     </repositories>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>io.choerodon</groupId>
-                <artifactId>choerodon-maven-plugin</artifactId>
-                <version>${choerodon.starters.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>convert</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>
 
 

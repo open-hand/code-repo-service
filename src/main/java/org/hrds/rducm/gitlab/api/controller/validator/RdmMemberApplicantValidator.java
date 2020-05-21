@@ -31,7 +31,8 @@ public class RdmMemberApplicantValidator {
     public void validateCreateDTO(Long projectId, MemberApplicantCreateDTO memberApplicantCreateDTO) {
         Long repositoryId = memberApplicantCreateDTO.getRepositoryId();
         // todo 暂时写死
-        Long applicantUserId = DetailsHelper.UXY.getUserId();
+        Long applicantUserId = DetailsHelper.getUserDetails().getUserId();
+//        Long applicantUserId = DetailsHelper.UXY.getUserId();
         String applicantType = memberApplicantCreateDTO.getApplicantType();
 
         Integer accessLevel = memberApplicantCreateDTO.getAccessLevel();

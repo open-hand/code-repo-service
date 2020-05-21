@@ -78,7 +78,8 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
     @Override
     public DetectApplicantTypeDTO detectApplicantType(Long projectId, Long repositoryId) {
         // todo 暂时写死
-        Long userId = DetailsHelper.UXY.getUserId();
+        Long userId = DetailsHelper.getUserDetails().getUserId();
+//        Long userId = DetailsHelper.UXY.getUserId();
 
         RdmMember dbMember = rdmMemberRepository.selectOneByUk(projectId, repositoryId, userId);
         if (dbMember == null) {
@@ -102,7 +103,8 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
 
         // <2> 创建成员权限申请
         // 申请人 todo 暂时写死
-        Long applicantUserId = DetailsHelper.UXY.getUserId();
+        Long applicantUserId = DetailsHelper.getUserDetails().getUserId();
+//        Long applicantUserId = DetailsHelper.UXY.getUserId();
 
         param.setApplicantUserId(applicantUserId);
         param.setOrganizationId(organizationId);

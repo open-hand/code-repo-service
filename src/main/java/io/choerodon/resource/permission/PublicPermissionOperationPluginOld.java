@@ -17,7 +17,7 @@ import java.util.Set;
  * 2018/4/16
  */
 @Order(SwaggerPluginSupport.SWAGGER_PLUGIN_ORDER + 1100)
-public class PublicPermissionOperationPlugin implements OperationBuilderPlugin {
+public class PublicPermissionOperationPluginOld implements OperationBuilderPlugin {
 
     private final Set<PublicPermission> publicPermissions = new HashSet<>();
 
