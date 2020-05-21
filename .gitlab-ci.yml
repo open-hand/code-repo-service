@@ -41,6 +41,7 @@ docker-build:
     - tags
     - master
     - develop
+    - develop-hzero
     - /^release-.*$/
     - /^hotfix-.*$/
 
