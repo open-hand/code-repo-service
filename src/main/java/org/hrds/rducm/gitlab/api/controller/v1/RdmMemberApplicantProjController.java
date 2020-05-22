@@ -1,11 +1,11 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import com.github.pagehelper.PageInfo;
-import io.choerodon.core.annotation.Permission;
-import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
+import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -52,21 +52,21 @@ public class RdmMemberApplicantProjController extends BaseController {
             @ApiImplicitParam(name = "applicantUserName", value = "申请人(模糊)", paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "approvalState", value = "审批状态", paramType = "query", dataType = "String"),
     })
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @GetMapping
-    public ResponseEntity<PageInfo<RdmMemberApplicantViewDTO>> pageByOptions(@PathVariable Long projectId,
-                                                                             @SortDefault(value = RdmMemberApplicant.FIELD_CREATION_DATE,
-                                                                                     direction = Sort.Direction.DESC)
-                                                                             @ApiIgnore PageRequest pageRequest,
-                                                                             @RequestParam(required = false) Set<Long> repositoryIds,
-                                                                             @RequestParam(required = false) String applicantUserName,
-                                                                             @RequestParam(required = false) String approvalState) {
+    public ResponseEntity<Page<RdmMemberApplicantViewDTO>> pageByOptions(@PathVariable Long projectId,
+                                                                         @SortDefault(value = RdmMemberApplicant.FIELD_CREATION_DATE,
+                                                                                 direction = Sort.Direction.DESC)
+                                                                         @ApiIgnore PageRequest pageRequest,
+                                                                         @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                         @RequestParam(required = false) String applicantUserName,
+                                                                         @RequestParam(required = false) String approvalState) {
 
         return Results.success(iRdmMemberApplicantService.pageByOptions(projectId, pageRequest, repositoryIds, applicantUserName, approvalState));
     }
 
     @ApiOperation(value = "检测当前用户申请类型")
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @PostMapping("/self/detect-applicant-type")
     public ResponseEntity<DetectApplicantTypeDTO> detectApplicantType(@PathVariable Long projectId,
                                                                       @RequestParam Long repositoryId) {
@@ -79,7 +79,7 @@ public class RdmMemberApplicantProjController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "memberApplicantCreateDTO", value = "参数", paramType = "body", dataType = "MemberApplicantCreateDTO", required = true)
     })
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @PostMapping
     public ResponseEntity<?> create(@PathVariable Long organizationId,
                                     @PathVariable Long projectId,
@@ -97,7 +97,7 @@ public class RdmMemberApplicantProjController extends BaseController {
             @ApiImplicitParam(name = "objectVersionNumber", value = "版本号", paramType = "query", required = true),
             @ApiImplicitParam(name = "expiresAt", value = "过期时间", paramType = "query")
     })
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @PostMapping("/{id}/pass")
     public ResponseEntity<?> passAndHandleMember(@PathVariable Long id,
                                                  @RequestParam Long objectVersionNumber,
@@ -109,7 +109,7 @@ public class RdmMemberApplicantProjController extends BaseController {
     }
 
     @ApiOperation(value = "成员权限申请-审批拒绝")
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @PostMapping("/{id}/refuse")
     public ResponseEntity<?> refuse(@PathVariable Long id,
                                     @RequestParam Long objectVersionNumber,

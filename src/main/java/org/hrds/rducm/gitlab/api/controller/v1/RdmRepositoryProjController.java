@@ -1,14 +1,12 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import com.github.pagehelper.PageInfo;
-import io.choerodon.core.annotation.Permission;
-import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import io.swagger.annotations.Api;
+import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.hrds.rducm.config.SwaggerTags;
 import org.hrds.rducm.gitlab.api.controller.dto.repository.RepositoryOverViewDTO;
 import org.hrds.rducm.gitlab.app.service.RdmRepositoryAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
@@ -32,7 +30,7 @@ public class RdmRepositoryProjController extends BaseController {
     private IRdmRepositoryService rdmRepositoryService;
 
     @ApiOperation(value = "查询所有已经启用的服务")
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @GetMapping("/list-by-active")
     public ResponseEntity<List<RdmRepository>> listByActive(@PathVariable(value = "projectId") Long projectId) {
         return ResponseEntity.ok(rdmRepositoryAppService.listByActive(projectId));
@@ -43,12 +41,12 @@ public class RdmRepositoryProjController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
             @ApiImplicitParam(name = "repositoryIds", value = "应用服务id", paramType = "query", dataType = "Long", allowMultiple = true),
     })
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @GetMapping("/overview")
-    public ResponseEntity<PageInfo<RepositoryOverViewDTO>> pageOverviewByOptions(@PathVariable Long projectId,
-                                                                                 PageRequest pageRequest,
-                                                                                 @RequestParam(required = false) Set<Long> repositoryIds) {
-        PageInfo<RepositoryOverViewDTO> repositoryOverViewDTOS = rdmRepositoryService.pageOverviewByOptions(projectId, pageRequest, repositoryIds);
+    public ResponseEntity<Page<RepositoryOverViewDTO>> pageOverviewByOptions(@PathVariable Long projectId,
+                                                                             PageRequest pageRequest,
+                                                                             @RequestParam(required = false) Set<Long> repositoryIds) {
+        Page<RepositoryOverViewDTO> repositoryOverViewDTOS = rdmRepositoryService.pageOverviewByOptions(projectId, pageRequest, repositoryIds);
         return Results.success(repositoryOverViewDTOS);
     }
 }

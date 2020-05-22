@@ -1,8 +1,7 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
-import com.github.pagehelper.PageInfo;
 import io.choerodon.core.domain.Page;
-import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogQueryDTO;
@@ -35,20 +34,20 @@ public class RdmOperationLogAppServiceImpl implements RdmOperationLogAppService 
     private RdmOperationLogAssembler rdmOperationLogAssembler;
 
     @Override
-    public PageInfo<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId,
+    public Page<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId,
                                                                 Set<Long> repositoryIds,
                                                                 PageRequest pageRequest,
                                                                 OperationLogQueryDTO queryDTO) {
-        return pageByOptionsMemberLogCommon(null, Collections.singleton(projectId), repositoryIds, pageRequest, queryDTO, ResourceType.PROJECT);
+        return pageByOptionsMemberLogCommon(null, Collections.singleton(projectId), repositoryIds, pageRequest, queryDTO, ResourceLevel.PROJECT);
     }
 
     @Override
-    public PageInfo<OperationLogViewDTO> pageByOptionsMemberLogOnOrg(Long organizationId,
+    public Page<OperationLogViewDTO> pageByOptionsMemberLogOnOrg(Long organizationId,
                                                                      Set<Long> projectIds,
                                                                      Set<Long> repositoryIds,
                                                                      PageRequest pageRequest,
                                                                      OperationLogQueryDTO queryDTO) {
-        return pageByOptionsMemberLogCommon(Collections.singleton(organizationId), projectIds, repositoryIds, pageRequest, queryDTO, ResourceType.ORGANIZATION);
+        return pageByOptionsMemberLogCommon(Collections.singleton(organizationId), projectIds, repositoryIds, pageRequest, queryDTO, ResourceLevel.ORGANIZATION);
     }
 
     /**
@@ -59,15 +58,15 @@ public class RdmOperationLogAppServiceImpl implements RdmOperationLogAppService 
      * @param repositoryIds
      * @param pageRequest
      * @param queryDTO
-     * @param resourceType
+     * @param resourceLevel
      * @return
      */
-    private PageInfo<OperationLogViewDTO> pageByOptionsMemberLogCommon(Set<Long> organizationIds,
-                                                                       Set<Long> projectIds,
-                                                                       Set<Long> repositoryIds,
-                                                                       PageRequest pageRequest,
-                                                                       OperationLogQueryDTO queryDTO,
-                                                                       ResourceType resourceType) {
+    private Page<OperationLogViewDTO> pageByOptionsMemberLogCommon(Set<Long> organizationIds,
+                                                                   Set<Long> projectIds,
+                                                                   Set<Long> repositoryIds,
+                                                                   PageRequest pageRequest,
+                                                                   OperationLogQueryDTO queryDTO,
+                                                                   ResourceLevel resourceLevel) {
         Long opUserId = queryDTO.getOpUserId();
         Date startDate = queryDTO.getStartDate();
         Date endDate = queryDTO.getEndDate();
@@ -98,6 +97,6 @@ public class RdmOperationLogAppServiceImpl implements RdmOperationLogAppService 
 
         Page<RdmOperationLog> page = PageHelper.doPageAndSort(pageRequest, () -> operationLogRepository.selectByCondition(condition));
 
-        return rdmOperationLogAssembler.pageToOperationLogViewDTO(page, resourceType);
+        return rdmOperationLogAssembler.pageToOperationLogViewDTO(page, resourceLevel);
     }
 }

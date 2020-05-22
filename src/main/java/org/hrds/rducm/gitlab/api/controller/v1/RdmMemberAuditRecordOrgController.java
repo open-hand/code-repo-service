@@ -1,9 +1,9 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import com.github.pagehelper.PageInfo;
-import io.choerodon.core.enums.ResourceType;
-import io.choerodon.core.annotation.Permission;
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -36,18 +36,18 @@ public class RdmMemberAuditRecordOrgController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "repositoryName", value = "应用服务名称(模糊)", paramType = "query", dataType = "String"),
     })
-    @Permission(type = ResourceType.ORGANIZATION, permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping
-    public ResponseEntity<PageInfo<RdmMemberAuditRecordViewDTO>> pageByOptions(@PathVariable Long organizationId,
-                                                                               @RequestParam(required = false) Set<Long> projectIds,
-                                                                               @RequestParam(required = false) Set<Long> repositoryIds,
-                                                                               PageRequest pageRequest,
-                                                                               MemberAuditRecordQueryDTO queryDTO) {
-        return Results.success(iRdmMemberAuditRecordService.pageByOptions(organizationId, projectIds, repositoryIds, pageRequest, queryDTO ,ResourceType.ORGANIZATION));
+    public ResponseEntity<Page<RdmMemberAuditRecordViewDTO>> pageByOptions(@PathVariable Long organizationId,
+                                                                           @RequestParam(required = false) Set<Long> projectIds,
+                                                                           @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                           PageRequest pageRequest,
+                                                                           MemberAuditRecordQueryDTO queryDTO) {
+        return Results.success(iRdmMemberAuditRecordService.pageByOptions(organizationId, projectIds, repositoryIds, pageRequest, queryDTO, ResourceLevel.ORGANIZATION));
     }
 
     @ApiOperation(value = "对组织下所有成员进行权限审计")
-    @Permission(type = ResourceType.ORGANIZATION, permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/batch-audit")
     public ResponseEntity<?> batchAudit(@PathVariable Long organizationId) {
         iMemberAuditService.auditMembersByOrganizationId(organizationId);

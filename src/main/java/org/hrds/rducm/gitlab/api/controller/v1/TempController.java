@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import io.choerodon.core.annotation.Permission;
-import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
+ * FIXME
  * 临时Controller, 里面的接口需删除
  * 用于存放定时任务等的测试接口
  *
@@ -30,14 +31,14 @@ public class TempController extends BaseController {
     private RdmMemberAppService rdmMemberAppService;
 
     @ApiOperation(value = "查询gitlab用户(平台层)")
-    @Permission(type = ResourceType.SITE, permissionPublic = true)
+    @Permission(level = ResourceLevel.SITE, permissionPublic = true)
     @GetMapping("/users")
     public ResponseEntity<Object> queryUser(@RequestParam String username) {
         return Results.success(rdmUserRepository.getUserFromGitlab(username));
     }
 
     @ApiOperation(value = "处理过期成员(定时任务测试)")
-    @Permission(type = ResourceType.SITE, permissionPublic = true)
+    @Permission(level = ResourceLevel.SITE, permissionPublic = true)
     @GetMapping("/handle-expired-members")
     public ResponseEntity<?> handleExpiredMembers() {
         rdmMemberAppService.handleExpiredMembers();
@@ -49,7 +50,7 @@ public class TempController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
             @ApiImplicitParam(name = "rdmMemberBatchDTO", value = "body参数", dataType = "RdmMemberBatchDTO", required = true),
     })
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT, permissionPublic = true)
     @PostMapping("/organizations/{organizationId}/projects/{projectId}/members/batch-add")
     public ResponseEntity<Object> batchAddMembersTemp(@PathVariable Long organizationId,
                                                       @PathVariable Long projectId,

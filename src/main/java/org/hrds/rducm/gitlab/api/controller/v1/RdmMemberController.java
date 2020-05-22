@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import io.choerodon.core.annotation.Permission;
-import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -38,7 +38,7 @@ public class RdmMemberController extends BaseController {
             @ApiImplicitParam(name = "memberId", value = "成员id", paramType = "path", required = true),
             @ApiImplicitParam(name = "rdmMemberUpdateDTO", value = "参数", dataType = "RdmMemberUpdateDTO", required = true),
     })
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @PutMapping("/{memberId}")
     public ResponseEntity<?> updateMember(@PathVariable Long organizationId,
                                           @PathVariable Long projectId,
@@ -56,7 +56,7 @@ public class RdmMemberController extends BaseController {
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "memberId", value = "成员id", paramType = "path", required = true)
     })
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @DeleteMapping("/{memberId}")
     public ResponseEntity<?> removeMember(@PathVariable Long organizationId,
                                           @PathVariable Long projectId,
@@ -72,7 +72,7 @@ public class RdmMemberController extends BaseController {
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "memberId", value = "成员id", paramType = "path", required = true),
     })
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @PostMapping("/{memberId}/sync")
     public ResponseEntity<?> syncMember(@PathVariable Long organizationId,
                                         @PathVariable Long projectId,
@@ -83,7 +83,7 @@ public class RdmMemberController extends BaseController {
     }
 
     @ApiOperation(value = "同步Gitlab代码库成员到本服务")
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @PostMapping("/sync-from-gitlab")
     public ResponseEntity<?> syncMembersFromGitlab(@PathVariable Long organizationId,
                                                    @PathVariable Long projectId,

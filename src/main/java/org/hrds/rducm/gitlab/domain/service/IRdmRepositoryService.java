@@ -1,6 +1,6 @@
 package org.hrds.rducm.gitlab.domain.service;
 
-import com.github.pagehelper.PageInfo;
+import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.repository.RepositoryOverViewDTO;
 
@@ -19,5 +19,5 @@ public interface IRdmRepositoryService {
      * @param repositoryIds
      * @return
      */
-    PageInfo<RepositoryOverViewDTO> pageOverviewByOptions(Long projectId, PageRequest pageRequest, Set<Long> repositoryIds);
+    Page<RepositoryOverViewDTO> pageOverviewByOptions(Long projectId, PageRequest pageRequest, Set<Long> repositoryIds);
 }

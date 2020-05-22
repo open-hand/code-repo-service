@@ -1,6 +1,6 @@
 package org.hrds.rducm.gitlab.infra.feign;
 
-import com.github.pagehelper.PageInfo;
+import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.infra.feign.fallback.DevOpsServiceFeignClientFallBackFactory;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nGlUserVO;
@@ -31,11 +31,11 @@ public interface DevOpsServiceFeignClient {
      * @param params
      */
     @PostMapping("/v1/projects/{project_id}/app_service/page_by_options")
-    ResponseEntity<PageInfo<C7nAppServiceVO>> pageAppServiceByOptions(@PathVariable(value = "project_id") Long projectId,
-                                                                      @RequestParam(value = "doPage", required = false) Boolean doPage,
-                                                                      @RequestParam(required = false) Integer page,
-                                                                      @RequestParam(required = false) Integer size,
-                                                                      @RequestBody(required = false) String params);
+    ResponseEntity<Page<C7nAppServiceVO>> pageAppServiceByOptions(@PathVariable(value = "project_id") Long projectId,
+                                                                  @RequestParam(value = "doPage", required = false) Boolean doPage,
+                                                                  @RequestParam(required = false) Integer page,
+                                                                  @RequestParam(required = false) Integer size,
+                                                                  @RequestBody(required = false) String params);
 
     /**
      * 通过一组id分页查询或者不传id时进行分页查询
@@ -48,7 +48,7 @@ public interface DevOpsServiceFeignClient {
      * @return
      */
     @PostMapping(value = "/v1/projects/{project_id}/app_service/list_by_ids_or_page")
-    ResponseEntity<PageInfo<C7nAppServiceVO>> listOrPageProjectAppServices(@PathVariable(value = "project_id") Long projectId,
+    ResponseEntity<Page<C7nAppServiceVO>> listOrPageProjectAppServices(@PathVariable(value = "project_id") Long projectId,
                                                                            @RequestBody(required = false) Set<Long> ids,
                                                                            @RequestParam(value = "doPage", required = false, defaultValue = "true") Boolean doPage,
                                                                            @RequestParam(required = false) Integer page,
@@ -62,7 +62,7 @@ public interface DevOpsServiceFeignClient {
      * @return
      */
     @PostMapping(value = "/v1/app_service/list_app_service_by_ids")
-    ResponseEntity<PageInfo<C7nAppServiceVO>> listAppServiceByIds(@RequestBody Set<Long> ids);
+    ResponseEntity<Page<C7nAppServiceVO>> listAppServiceByIds(@RequestBody Set<Long> ids);
 
     /**
      * 根据一组Gitlab用户id查询用户信息

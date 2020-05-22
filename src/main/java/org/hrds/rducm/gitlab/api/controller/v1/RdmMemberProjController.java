@@ -1,12 +1,11 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Sets;
-import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.domain.Page;
-import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.iam.InitRoleCode;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -52,12 +51,12 @@ public class RdmMemberProjController extends BaseController {
             @ApiImplicitParam(name = "realName", value = "用户名(模糊)", paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "loginName", value = "登录名(模糊)", paramType = "query", dataType = "String"),
     })
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @GetMapping
-    public ResponseEntity<PageInfo<RdmMemberViewDTO>> pageByOptions(@PathVariable Long organizationId,
-                                                                    @PathVariable Long projectId,
-                                                                    PageRequest pageRequest,
-                                                                    RdmMemberQueryDTO query) {
+    public ResponseEntity<Page<RdmMemberViewDTO>> pageByOptions(@PathVariable Long organizationId,
+                                                                @PathVariable Long projectId,
+                                                                PageRequest pageRequest,
+                                                                RdmMemberQueryDTO query) {
         return Results.success(rdmMemberAppService.pageByOptions(projectId, pageRequest, query));
     }
 
@@ -67,7 +66,7 @@ public class RdmMemberProjController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", dataType = "Long", required = true),
             @ApiImplicitParam(name = "rdmMemberBatchDTO", value = "body参数", dataType = "RdmMemberBatchDTO", required = true),
     })
-    @Permission(type = ResourceType.PROJECT, roles = {InitRoleCode.PROJECT_OWNER}, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_OWNER})
     @PostMapping("/batch-add")
     public ResponseEntity<?> batchAddMembers(@PathVariable Long organizationId,
                                              @PathVariable Long projectId,
@@ -78,7 +77,7 @@ public class RdmMemberProjController extends BaseController {
     }
 
     @ApiOperation(value = "权限导出")
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @GetMapping("/export")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", paramType = "query", dataType = "Int"),
@@ -102,16 +101,16 @@ public class RdmMemberProjController extends BaseController {
     }
 
     @ApiOperation(value = "查询成员授权情况")
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @GetMapping("/audit/security-audit")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "realName", value = "用户名(模糊)", paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "loginName", value = "登录名(模糊)", paramType = "query", dataType = "String"),
     })
-    public ResponseEntity<PageInfo<MemberAuthDetailViewDTO>> pageSecurityAudit(@PathVariable Long organizationId,
-                                                                               @PathVariable Long projectId,
-                                                                               PageRequest pageRequest,
-                                                                               BaseUserQueryDTO queryDTO) {
+    public ResponseEntity<Page<MemberAuthDetailViewDTO>> pageSecurityAudit(@PathVariable Long organizationId,
+                                                                           @PathVariable Long projectId,
+                                                                           PageRequest pageRequest,
+                                                                           BaseUserQueryDTO queryDTO) {
         return Results.success(iRdmMemberService.pageMembersRepositoryAuthorized(organizationId, projectId, pageRequest, queryDTO));
     }
 }

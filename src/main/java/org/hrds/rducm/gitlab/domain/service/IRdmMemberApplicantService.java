@@ -1,6 +1,6 @@
 package org.hrds.rducm.gitlab.domain.service;
 
-import com.github.pagehelper.PageInfo;
+import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.DetectApplicantTypeDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
@@ -23,11 +23,11 @@ public interface IRdmMemberApplicantService {
      * @param approvalState 审批状态
      * @return
      */
-    PageInfo<RdmMemberApplicantViewDTO> pageByOptions(Long projectId,
-                                                      PageRequest pageRequest,
-                                                      Set<Long> repositoryIds,
-                                                      String applicantUserName,
-                                                      String approvalState);
+    Page<RdmMemberApplicantViewDTO> pageByOptions(Long projectId,
+                                                  PageRequest pageRequest,
+                                                  Set<Long> repositoryIds,
+                                                  String applicantUserName,
+                                                  String approvalState);
 
     /**
      * 检测申请类型

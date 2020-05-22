@@ -1,6 +1,6 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import io.choerodon.core.annotation.Permission;
+import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;

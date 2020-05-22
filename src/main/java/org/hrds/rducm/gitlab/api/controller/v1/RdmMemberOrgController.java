@@ -1,11 +1,10 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Sets;
-import io.choerodon.core.annotation.Permission;
 import io.choerodon.core.domain.Page;
-import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -17,10 +16,12 @@ import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.hzero.export.vo.ExportParam;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Set;
 
 /**
  * @author ying.xie@hand-china.com
@@ -44,16 +45,16 @@ public class RdmMemberOrgController extends BaseController {
             @ApiImplicitParam(name = "realName", value = "用户名(模糊)", paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "loginName", value = "登录名(模糊)", paramType = "query", dataType = "String"),
     })
-    @Permission(type = ResourceType.ORGANIZATION, permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping
-    public ResponseEntity<PageInfo<RdmMemberViewDTO>> pageByOptions(@PathVariable Long organizationId,
-                                                                    PageRequest pageRequest,
-                                                                    RdmMemberQueryDTO query) {
+    public ResponseEntity<Page<RdmMemberViewDTO>> pageByOptions(@PathVariable Long organizationId,
+                                                                PageRequest pageRequest,
+                                                                RdmMemberQueryDTO query) {
         return Results.success(rdmMemberAppService.pageByOptionsOnOrg(organizationId, pageRequest, query));
     }
 
     @ApiOperation(value = "权限导出")
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @GetMapping("/export")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", paramType = "query", dataType = "Int"),

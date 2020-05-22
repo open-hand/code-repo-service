@@ -1,6 +1,6 @@
 package org.hrds.rducm.gitlab.infra.feign;
 
-import com.github.pagehelper.PageInfo;
+import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.infra.feign.fallback.BaseServiceFeignClientFallBackFactory;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
@@ -78,11 +78,11 @@ public interface BaseServiceFeignClient {
      * @return
      */
     @GetMapping("/v1/projects/{project_id}/users/search")
-    ResponseEntity<PageInfo<C7nUserVO>> pageUsersByOptionsOnProjectLevel(@PathVariable(name = "project_id") Long projectId,
-                                                                         @RequestParam(required = false) int page,
-                                                                         @RequestParam(required = false) int size,
-                                                                         @RequestParam(required = false) String loginName,
-                                                                         @RequestParam(required = false) String realName);
+    ResponseEntity<Page<C7nUserVO>> pageUsersByOptionsOnProjectLevel(@PathVariable(name = "project_id") Long projectId,
+                                                                     @RequestParam(required = false) int page,
+                                                                     @RequestParam(required = false) int size,
+                                                                     @RequestParam(required = false) String loginName,
+                                                                     @RequestParam(required = false) String realName);
 
     /**
      * 组织层
@@ -96,7 +96,7 @@ public interface BaseServiceFeignClient {
      * @return
      */
     @GetMapping(value = "/v1/organizations/{organization_id}/users/search")
-    ResponseEntity<PageInfo<C7nUserVO>> pageUsersByOptionsOnOrganizationLevel(@PathVariable(name = "organization_id") Long organizationId,
+    ResponseEntity<Page<C7nUserVO>> pageUsersByOptionsOnOrganizationLevel(@PathVariable(name = "organization_id") Long organizationId,
                                                                               @RequestParam(required = false) int page,
                                                                               @RequestParam(required = false) int size,
                                                                               @RequestParam(required = false) String loginName,
@@ -113,7 +113,7 @@ public interface BaseServiceFeignClient {
      * @return
      */
     @GetMapping(value = "/v1/users/search")
-    ResponseEntity<PageInfo<C7nUserVO>> pageUsersByOptionsOnSiteLevel(@RequestParam(required = false) int page,
+    ResponseEntity<Page<C7nUserVO>> pageUsersByOptionsOnSiteLevel(@RequestParam(required = false) int page,
                                                                       @RequestParam(required = false) int size,
                                                                       @RequestParam(required = false) String loginName,
                                                                       @RequestParam(required = false) String realName);

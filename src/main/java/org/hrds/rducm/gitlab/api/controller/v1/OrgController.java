@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import io.choerodon.core.annotation.Permission;
-import io.choerodon.core.enums.ResourceType;
+import io.choerodon.swagger.annotation.Permission;
+import io.choerodon.core.iam.ResourceLevel;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -30,7 +30,7 @@ public class OrgController extends BaseController {
             @ApiImplicitParam(name = "userId", value = "用户id", paramType = "path", required = true),
             @ApiImplicitParam(name = "name", value = "项目名称模糊搜索", paramType = "query"),
     })
-    @Permission(type = ResourceType.ORGANIZATION, permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/users/{userId}/projects")
     public ResponseEntity<List<C7nProjectVO>> listProjectsByUserId(@PathVariable Long organizationId,
                                                                    @PathVariable Long userId,

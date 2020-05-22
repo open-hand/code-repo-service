@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import io.choerodon.core.annotation.Permission;
-import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.domain.entity.MemberAuditLog;
 import org.hrds.rducm.gitlab.domain.service.IMemberAuditService;
@@ -25,7 +25,7 @@ public class MemberAuditLogOrgController extends BaseController {
     private IMemberAuditService iMemberAuditService;
 
     @ApiOperation(value = "获取最新一条审计日志(组织层)")
-    @Permission(type = ResourceType.ORGANIZATION, permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/detail/latest")
     public ResponseEntity<MemberAuditLog> detailLatest(@PathVariable Long organizationId,
                                                        @RequestParam(required = false) Long projectId) {

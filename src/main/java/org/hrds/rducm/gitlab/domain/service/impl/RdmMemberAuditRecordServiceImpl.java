@@ -1,9 +1,8 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
-import com.github.pagehelper.PageInfo;
 import com.google.common.base.Stopwatch;
 import io.choerodon.core.domain.Page;
-import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.gitlab4j.api.models.Member;
@@ -12,8 +11,8 @@ import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
 import org.hrds.rducm.gitlab.app.assembler.RdmMemberAuditRecordAssembler;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
-import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
+import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
@@ -57,11 +56,11 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
     private IRdmMemberService iRdmMemberService;
 
     @Override
-    public PageInfo<RdmMemberAuditRecordViewDTO> pageByOptions(Long organizationId,
-                                                               Set<Long> projectIds,
-                                                               Set<Long> repositoryIds,
-                                                               PageRequest pageRequest,
-                                                               MemberAuditRecordQueryDTO queryDTO, ResourceType resourceType) {
+    public Page<RdmMemberAuditRecordViewDTO> pageByOptions(Long organizationId,
+                                                           Set<Long> projectIds,
+                                                           Set<Long> repositoryIds,
+                                                           PageRequest pageRequest,
+                                                           MemberAuditRecordQueryDTO queryDTO, ResourceLevel resourceLevel) {
         String repositoryName = queryDTO.getRepositoryName();
 
         Condition condition = Condition.builder(RdmMemberAuditRecord.class)
@@ -73,14 +72,14 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                 .build();
 
 
-        switch (resourceType) {
+        switch (resourceLevel) {
             case ORGANIZATION: {
                 // 调用外部接口模糊查询 应用服务
                 if (!StringUtils.isEmpty(repositoryName)) {
                     Set<Long> repositoryIdSet = ic7nDevOpsServiceService.listC7nAppServiceIdsByNameOnOrgLevel(organizationId, repositoryName);
 
                     if (repositoryIdSet.isEmpty()) {
-                        return PageInfo.of(Collections.emptyList());
+                        return new Page<>();
                     }
 
                     condition.and().andIn(RdmMemberAuditRecord.FIELD_REPOSITORY_ID, repositoryIdSet);
@@ -93,7 +92,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                     Set<Long> repositoryIdSet = ic7nDevOpsServiceService.listC7nAppServiceIdsByNameOnProjectLevel(projectIds.iterator().next(), repositoryName);
 
                     if (repositoryIdSet.isEmpty()) {
-                        return PageInfo.of(Collections.emptyList());
+                        return new Page<>();
                     }
 
                     condition.and().andIn(RdmMemberAuditRecord.FIELD_REPOSITORY_ID, repositoryIdSet);
@@ -106,7 +105,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
 
         Page<RdmMemberAuditRecord> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberAuditRecordRepository.selectByCondition(condition));
 
-        return rdmMemberAuditRecordAssembler.pageToViewDTO(page, resourceType);
+        return rdmMemberAuditRecordAssembler.pageToViewDTO(page, resourceLevel);
     }
 
     @Override

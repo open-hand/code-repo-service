@@ -1,9 +1,9 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import com.github.pagehelper.PageInfo;
-import io.choerodon.core.annotation.Permission;
-import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
@@ -28,15 +28,15 @@ public class RdmProjectController extends BaseController {
     private IRdmMemberService iRdmMemberService;
 
     @ApiOperation(value = "查询成员所有应用服务的权限")
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @GetMapping("/members/{userId}/permissions")
     @ApiImplicitParams({
 
     })
-    public ResponseEntity<PageInfo<RdmMemberViewDTO>> pageMemberPermissions(@PathVariable Long organizationId,
-                                                                            @PathVariable Long projectId,
-                                                                            @PathVariable Long userId,
-                                                                            PageRequest pageRequest) {
+    public ResponseEntity<Page<RdmMemberViewDTO>> pageMemberPermissions(@PathVariable Long organizationId,
+                                                                        @PathVariable Long projectId,
+                                                                        @PathVariable Long userId,
+                                                                        PageRequest pageRequest) {
         return Results.success(iRdmMemberService.pageMemberPermissions(organizationId, projectId, userId, pageRequest));
     }
 }

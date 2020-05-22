@@ -1,6 +1,6 @@
 package org.hrds.rducm.gitlab.app.service;
 
-import com.github.pagehelper.PageInfo;
+import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
@@ -23,10 +23,10 @@ public interface RdmOperationLogAppService {
      * @param queryDTO
      * @return
      */
-    PageInfo<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId,
-                                                         Set<Long> repositoryIds,
-                                                         PageRequest pageRequest,
-                                                         OperationLogQueryDTO queryDTO);
+    Page<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId,
+                                                     Set<Long> repositoryIds,
+                                                     PageRequest pageRequest,
+                                                     OperationLogQueryDTO queryDTO);
 
     /**
      * 组织层
@@ -39,9 +39,9 @@ public interface RdmOperationLogAppService {
      * @param queryDTO
      * @return
      */
-    PageInfo<OperationLogViewDTO> pageByOptionsMemberLogOnOrg(Long organizationId,
-                                                              Set<Long> projectIds,
-                                                              Set<Long> repositoryIds,
-                                                              PageRequest pageRequest,
-                                                              OperationLogQueryDTO queryDTO);
+    Page<OperationLogViewDTO> pageByOptionsMemberLogOnOrg(Long organizationId,
+                                                          Set<Long> projectIds,
+                                                          Set<Long> repositoryIds,
+                                                          PageRequest pageRequest,
+                                                          OperationLogQueryDTO queryDTO);
 }

@@ -1,7 +1,6 @@
 package org.hrds.rducm.gitlab.infra.util;
 
 
-import com.github.pagehelper.PageInfo;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import org.springframework.beans.BeanUtils;
@@ -42,49 +41,6 @@ public class ConvertUtils {
         } catch (InstantiationException | IllegalAccessException e) {
             throw new CommonException("Can not instantiate the class type: {} with no-arg constructor.", destinationClass.getName());
         }
-    }
-
-    /**
-     * convert page with special converter
-     *
-     * @param source    source page
-     * @param converter converter for list content of page
-     * @param <S>       the source content type
-     * @param <D>       the destination content type
-     * @return destination page
-     */
-    public static <S, D> PageInfo<D> convertPageInfo(PageInfo<S> source, Function<S, D> converter) {
-        if (source == null) {
-            return null;
-        }
-        PageInfo<D> destination = new PageInfo<>();
-        BeanUtils.copyProperties(source, destination, "list");
-        if (source.getList() != null) {
-            destination.setList(source.getList().stream().map(converter).collect(Collectors.toList()));
-        } else {
-            destination.setList(new ArrayList<>());
-        }
-        return destination;
-    }
-
-    /**
-     * convert page with default beanUtils
-     *
-     * @param source source page
-     * @param <S>    the source content type
-     * @param <D>    the destination content type
-     * @return destination page
-     */
-    public static <S, D> PageInfo<D> convertPageInfo(PageInfo<S> source, Class<D> destinationClass) {
-        if (source == null) {
-            return null;
-        }
-        PageInfo<D> destination = new PageInfo<>();
-        BeanUtils.copyProperties(source, destination, "list");
-        if (source.getList() != null) {
-            destination.setList(source.getList().stream().map(s -> convertObject(s, destinationClass)).collect(Collectors.toList()));
-        }
-        return destination;
     }
 
     /**

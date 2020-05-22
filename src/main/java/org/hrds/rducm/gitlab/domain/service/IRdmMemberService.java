@@ -1,6 +1,6 @@
 package org.hrds.rducm.gitlab.domain.service;
 
-import com.github.pagehelper.PageInfo;
+import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
@@ -28,7 +28,7 @@ public interface IRdmMemberService {
      * @param queryDTO
      * @return
      */
-    PageInfo<MemberAuthDetailViewDTO> pageMembersRepositoryAuthorized(Long organizationId, Long projectId, PageRequest pageRequest, BaseUserQueryDTO queryDTO);
+    Page<MemberAuthDetailViewDTO> pageMembersRepositoryAuthorized(Long organizationId, Long projectId, PageRequest pageRequest, BaseUserQueryDTO queryDTO);
 
     /**
      * 查询某个成员的在所有代码库的权限情况
@@ -39,7 +39,7 @@ public interface IRdmMemberService {
      * @param pageRequest
      * @return
      */
-    PageInfo<RdmMemberViewDTO> pageMemberPermissions(Long organizationId,
+    Page<RdmMemberViewDTO> pageMemberPermissions(Long organizationId,
                                                      Long projectId,
                                                      Long userId,
                                                      PageRequest pageRequest);

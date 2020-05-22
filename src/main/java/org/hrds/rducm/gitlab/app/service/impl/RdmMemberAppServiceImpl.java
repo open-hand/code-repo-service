@@ -1,12 +1,10 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.pagehelper.PageInfo;
 import io.choerodon.asgard.saga.annotation.Saga;
 import io.choerodon.asgard.saga.producer.StartSagaBuilder;
 import io.choerodon.asgard.saga.producer.TransactionalProducer;
 import io.choerodon.core.domain.Page;
-import io.choerodon.core.enums.ResourceType;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.domain.AuditDomain;
 import io.choerodon.mybatis.pagehelper.PageHelper;
@@ -24,7 +22,6 @@ import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
-import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.hzero.core.base.AopProxy;
 import org.hzero.export.annotation.ExcelExport;
 import org.hzero.export.vo.ExportParam;
@@ -38,7 +35,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import static org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants.RDUCM_BATCH_ADD_MEMBERS;
 
@@ -69,7 +68,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     }
 
     @Override
-    public PageInfo<RdmMemberViewDTO> pageByOptions(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query) {
+    public Page<RdmMemberViewDTO> pageByOptions(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query) {
         // <1> 封装查询条件
         String repositoryName = query.getRepositoryName();
         String realName = query.getRealName();
@@ -83,11 +82,11 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                 .build();
 
         // 调用外部接口模糊查询 用户名或登录名
-        if (!StringUtils.isEmpty(realName)|| !StringUtils.isEmpty(loginName)) {
+        if (!StringUtils.isEmpty(realName) || !StringUtils.isEmpty(loginName)) {
             Set<Long> userIdsSet = ic7nBaseServiceService.listC7nUserIdsByNameOnProjectLevel(projectId, realName, loginName);
 
             if (userIdsSet.isEmpty()) {
-                return PageInfo.of(Collections.emptyList());
+                return new Page<>();
             }
 
             condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
@@ -98,7 +97,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             Set<Long> repositoryIdSet = ic7nDevOpsServiceService.listC7nAppServiceIdsByNameOnProjectLevel(projectId, repositoryName);
 
             if (repositoryIdSet.isEmpty()) {
-                return PageInfo.of(Collections.emptyList());
+                return new Page<>();
             }
 
             condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
@@ -106,11 +105,11 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectByCondition(condition));
 
-        return rdmMemberAssembler.pageToRdmMemberViewDTO(page, ResourceType.PROJECT);
+        return rdmMemberAssembler.pageToRdmMemberViewDTO(page, ResourceLevel.PROJECT);
     }
 
     @Override
-    public PageInfo<RdmMemberViewDTO> pageByOptionsOnOrg(Long organizationId, PageRequest pageRequest, RdmMemberQueryDTO query) {
+    public Page<RdmMemberViewDTO> pageByOptionsOnOrg(Long organizationId, PageRequest pageRequest, RdmMemberQueryDTO query) {
         // <1> 封装查询条件
         String repositoryName = query.getRepositoryName();
         String realName = query.getRealName();
@@ -126,11 +125,11 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                 .build();
 
         // 调用外部接口模糊查询 用户名或登录名
-        if (!StringUtils.isEmpty(realName)|| !StringUtils.isEmpty(loginName)) {
+        if (!StringUtils.isEmpty(realName) || !StringUtils.isEmpty(loginName)) {
             Set<Long> userIdsSet = ic7nBaseServiceService.listProjectsC7nUserIdsByNameOnOrgLevel(organizationId, realName, loginName);
 
             if (userIdsSet.isEmpty()) {
-                return PageInfo.of(Collections.emptyList());
+                return new Page<>();
             }
 
             condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
@@ -141,7 +140,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             Set<Long> repositoryIdSet = ic7nDevOpsServiceService.listC7nAppServiceIdsByNameOnOrgLevel(organizationId, repositoryName);
 
             if (repositoryIdSet.isEmpty()) {
-                return PageInfo.of(Collections.emptyList());
+                return new Page<>();
             }
 
             condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
@@ -149,7 +148,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectByCondition(condition));
 
-        return rdmMemberAssembler.pageToRdmMemberViewDTO(page, ResourceType.ORGANIZATION);
+        return rdmMemberAssembler.pageToRdmMemberViewDTO(page, ResourceLevel.ORGANIZATION);
     }
 
     /**
@@ -285,9 +284,9 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Override
     @ExcelExport(value = MemberExportDTO.class, groups = MemberExportDTO.GroupProject.class)
     public Page<MemberExportDTO> export(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query, ExportParam exportParam, HttpServletResponse response) {
-        PageInfo<RdmMemberViewDTO> pageInfo = this.pageByOptions(projectId, pageRequest, query);
+        Page<RdmMemberViewDTO> page = this.pageByOptions(projectId, pageRequest, query);
 
-        PageInfo<MemberExportDTO> exportDTOPageInfo = ConvertUtils.convertPageInfo(pageInfo, dto -> {
+        Page<MemberExportDTO> exportDTOPage = ConvertUtils.convertPage(page, dto -> {
             MemberExportDTO exportDTO = new MemberExportDTO();
             BeanUtils.copyProperties(dto, exportDTO);
             exportDTO.setRealName(dto.getUser().getRealName());
@@ -297,15 +296,15 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             return exportDTO;
         });
 
-        return PageConvertUtils.convert(exportDTOPageInfo);
+        return exportDTOPage;
     }
 
     @Override
     @ExcelExport(value = MemberExportDTO.class, groups = MemberExportDTO.GroupOrg.class)
     public Page<MemberExportDTO> exportOnOrg(Long organizationId, PageRequest pageRequest, RdmMemberQueryDTO query, ExportParam exportParam, HttpServletResponse response) {
-        PageInfo<RdmMemberViewDTO> pageInfo = this.pageByOptionsOnOrg(organizationId, pageRequest, query);
+        Page<RdmMemberViewDTO> page = this.pageByOptionsOnOrg(organizationId, pageRequest, query);
 
-        PageInfo<MemberExportDTO> exportDTOPageInfo = ConvertUtils.convertPageInfo(pageInfo, dto -> {
+        Page<MemberExportDTO> exportDTOPage = ConvertUtils.convertPage(page, dto -> {
             MemberExportDTO exportDTO = new MemberExportDTO();
             BeanUtils.copyProperties(dto, exportDTO);
             exportDTO.setRealName(dto.getUser().getRealName());
@@ -316,7 +315,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             return exportDTO;
         });
 
-        return PageConvertUtils.convert(exportDTOPageInfo);
+        return exportDTOPage;
     }
 
     @Override

@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.infra.feign.fallback;
 
-import com.github.pagehelper.PageInfo;
 import feign.hystrix.FallbackFactory;
+import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
@@ -37,17 +37,17 @@ public class BaseServiceFeignClientFallBackFactory implements FallbackFactory<Ba
 //            }
 
             @Override
-            public ResponseEntity<PageInfo<C7nUserVO>> pageUsersByOptionsOnProjectLevel(Long projectId, int page, int size, String loginName, String realName) {
+            public ResponseEntity<Page<C7nUserVO>> pageUsersByOptionsOnProjectLevel(Long projectId, int page, int size, String loginName, String realName) {
                 return null;
             }
 
             @Override
-            public ResponseEntity<PageInfo<C7nUserVO>> pageUsersByOptionsOnOrganizationLevel(Long organizationId, int page, int size, String loginName, String realName) {
+            public ResponseEntity<Page<C7nUserVO>> pageUsersByOptionsOnOrganizationLevel(Long organizationId, int page, int size, String loginName, String realName) {
                 return null;
             }
 
             @Override
-            public ResponseEntity<PageInfo<C7nUserVO>> pageUsersByOptionsOnSiteLevel(int page, int size, String loginName, String realName) {
+            public ResponseEntity<Page<C7nUserVO>> pageUsersByOptionsOnSiteLevel(int page, int size, String loginName, String realName) {
                 return null;
             }
 

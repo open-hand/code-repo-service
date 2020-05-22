@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.app.service;
 
-import com.github.pagehelper.PageInfo;
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.*;
@@ -21,7 +20,7 @@ public interface RdmMemberAppService {
      * @param query       查询参数
      * @return
      */
-    PageInfo<RdmMemberViewDTO> pageByOptions(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query);
+    Page<RdmMemberViewDTO> pageByOptions(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query);
 
     /**
      * 组织层
@@ -32,7 +31,7 @@ public interface RdmMemberAppService {
      * @param query
      * @return
      */
-    PageInfo<RdmMemberViewDTO> pageByOptionsOnOrg(Long organizationId, PageRequest pageRequest, RdmMemberQueryDTO query);
+    Page<RdmMemberViewDTO> pageByOptionsOnOrg(Long organizationId, PageRequest pageRequest, RdmMemberQueryDTO query);
 
     /**
      * 批量新增或修改成员

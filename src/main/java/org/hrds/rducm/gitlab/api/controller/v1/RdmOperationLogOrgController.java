@@ -1,11 +1,11 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import com.github.pagehelper.PageInfo;
-import io.choerodon.core.annotation.Permission;
-import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
+import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -47,17 +47,17 @@ public class RdmOperationLogOrgController extends BaseController {
             @ApiImplicitParam(name = "endDate", value = "结束日期", paramType = "query", dataType = "Date"),
             @ApiImplicitParam(name = "opEventTypes", value = "操作事件类型", paramType = "query", dataType = "String", allowMultiple = true),
     })
-    @Permission(type = ResourceType.ORGANIZATION, permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping
-    public ResponseEntity<PageInfo<OperationLogViewDTO>> pageByOptionsMemberLog(@PathVariable Long organizationId,
-                                                                                @SortDefault(value = RdmOperationLog.FIELD_CREATION_DATE,
-                                                                                        direction = Sort.Direction.DESC)
-                                                                                @ApiIgnore PageRequest pageRequest,
-                                                                                @RequestParam(required = false) Set<Long> projectIds,
-                                                                                @RequestParam(required = false) Set<Long> repositoryIds,
-                                                                                OperationLogQueryDTO queryDTO) {
+    public ResponseEntity<Page<OperationLogViewDTO>> pageByOptionsMemberLog(@PathVariable Long organizationId,
+                                                                            @SortDefault(value = RdmOperationLog.FIELD_CREATION_DATE,
+                                                                                    direction = Sort.Direction.DESC)
+                                                                            @ApiIgnore PageRequest pageRequest,
+                                                                            @RequestParam(required = false) Set<Long> projectIds,
+                                                                            @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                            OperationLogQueryDTO queryDTO) {
 
-        PageInfo<OperationLogViewDTO> list = operationLogService.pageByOptionsMemberLogOnOrg(organizationId, projectIds, repositoryIds, pageRequest, queryDTO);
+        Page<OperationLogViewDTO> list = operationLogService.pageByOptionsMemberLogOnOrg(organizationId, projectIds, repositoryIds, pageRequest, queryDTO);
         return Results.success(list);
     }
 

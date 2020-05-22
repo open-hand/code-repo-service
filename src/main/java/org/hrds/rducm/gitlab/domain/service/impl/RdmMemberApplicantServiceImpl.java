@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
-import com.github.pagehelper.PageInfo;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.mybatis.pagehelper.PageHelper;
@@ -46,7 +45,7 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
     private IC7nBaseServiceService ic7nBaseServiceService;
 
     @Override
-    public PageInfo<RdmMemberApplicantViewDTO> pageByOptions(Long projectId,
+    public Page<RdmMemberApplicantViewDTO> pageByOptions(Long projectId,
                                                              PageRequest pageRequest,
                                                              Set<Long> repositoryIds,
                                                              String applicantUserName,
@@ -63,7 +62,7 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
             Set<Long> userIdsSet = ic7nBaseServiceService.listC7nUserIdsByNameOnProjectLevel(projectId, applicantUserName, null);
 
             if (userIdsSet.isEmpty()) {
-                return PageInfo.of(Collections.emptyList());
+                return new Page<>();
             }
 
             condition.and().andIn(RdmMemberApplicant.FIELD_APPLICANT_USER_ID, userIdsSet);

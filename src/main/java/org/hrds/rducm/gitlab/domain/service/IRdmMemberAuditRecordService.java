@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.domain.service;
 
-import com.github.pagehelper.PageInfo;
-import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuditRecordQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
@@ -23,10 +23,10 @@ public interface IRdmMemberAuditRecordService {
      * @param repositoryIds
      * @param pageRequest
      * @param queryDTO
-     * @param resourceType
+     * @param resourceLevel
      * @return
      */
-    PageInfo<RdmMemberAuditRecordViewDTO> pageByOptions(Long organizationId, Set<Long> projectIds, Set<Long> repositoryIds, PageRequest pageRequest, MemberAuditRecordQueryDTO queryDTO, ResourceType resourceType);
+    Page<RdmMemberAuditRecordViewDTO> pageByOptions(Long organizationId, Set<Long> projectIds, Set<Long> repositoryIds, PageRequest pageRequest, MemberAuditRecordQueryDTO queryDTO, ResourceLevel resourceLevel);
 
     /**
      * 比对组织下的所有应用服务的成员权限

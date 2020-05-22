@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.pagehelper.PageInfo;
+import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
@@ -38,10 +38,10 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     @Override
     public Integer repositoryIdToGlProjectId(Long repositoryId) {
         // 查询应用服务信息
-        ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.listAppServiceByIds(Collections.singleton(repositoryId));
+        ResponseEntity<Page<C7nAppServiceVO>> entity = devOpsServiceFeignClient.listAppServiceByIds(Collections.singleton(repositoryId));
 
-        if (!CollectionUtils.isEmpty(Objects.requireNonNull(entity.getBody()).getList())) {
-            return Math.toIntExact(entity.getBody().getList().get(0).getGitlabProjectId());
+        if (!CollectionUtils.isEmpty(Objects.requireNonNull(entity.getBody()).getContent())) {
+            return Math.toIntExact(entity.getBody().getContent().get(0).getGitlabProjectId());
         } else {
             return null;
         }
@@ -50,10 +50,10 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     @Override
     public C7nAppServiceVO detailC7nAppService(Long repositoryId) {
         // 查询应用服务信息
-        ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.listAppServiceByIds(Collections.singleton(repositoryId));
+        ResponseEntity<Page<C7nAppServiceVO>> entity = devOpsServiceFeignClient.listAppServiceByIds(Collections.singleton(repositoryId));
 
-        if (!CollectionUtils.isEmpty(Objects.requireNonNull(entity.getBody()).getList())) {
-            return entity.getBody().getList().get(0);
+        if (!CollectionUtils.isEmpty(Objects.requireNonNull(entity.getBody()).getContent())) {
+            return entity.getBody().getContent().get(0);
         } else {
             return null;
         }
@@ -66,10 +66,10 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
         }
 
         // 查询应用服务信息
-        ResponseEntity<PageInfo<C7nAppServiceVO>> entity = devOpsServiceFeignClient.listAppServiceByIds(repositoryIds);
+        ResponseEntity<Page<C7nAppServiceVO>> entity = devOpsServiceFeignClient.listAppServiceByIds(repositoryIds);
 
-        if (!CollectionUtils.isEmpty(Objects.requireNonNull(entity.getBody()).getList())) {
-            return entity.getBody().getList().stream().collect(Collectors.toMap(C7nAppServiceVO::getId, v -> v));
+        if (!CollectionUtils.isEmpty(Objects.requireNonNull(entity.getBody()).getContent())) {
+            return entity.getBody().getContent().stream().collect(Collectors.toMap(C7nAppServiceVO::getId, v -> v));
         } else {
             return Collections.emptyMap();
         }
@@ -80,10 +80,10 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
         // 将参数转换为json格式
         String params = TypeUtil.castToSearchParam("name", appServiceName);
 
-        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, 0, 0, params);
+        ResponseEntity<Page<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, 0, 0, params);
 
-        if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
-            List<C7nAppServiceVO> c7nAppServiceVOS = responseEntity.getBody().getList();
+        if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getContent())) {
+            List<C7nAppServiceVO> c7nAppServiceVOS = responseEntity.getBody().getContent();
             return c7nAppServiceVOS.stream().map(C7nAppServiceVO::getId).collect(Collectors.toSet());
 
         } else {
@@ -108,22 +108,22 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
     }
 
     @Override
-    public PageInfo<C7nAppServiceVO> pageC7nAppServices(Long projectId, PageRequest pageRequest, Set<Long> repositoryIds) {
+    public Page<C7nAppServiceVO> pageC7nAppServices(Long projectId, PageRequest pageRequest, Set<Long> repositoryIds) {
         // 这里加1是因为在controller被-1
         int page = pageRequest.getPage() + 1;
         int size = pageRequest.getSize();
 
-        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.listOrPageProjectAppServices(projectId, Optional.ofNullable(repositoryIds).orElse(Collections.emptySet()), true, page, size);
+        ResponseEntity<Page<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.listOrPageProjectAppServices(projectId, Optional.ofNullable(repositoryIds).orElse(Collections.emptySet()), true, page, size);
         return FeignUtils.handleResponseEntity(responseEntity);
     }
 
     @Override
     public List<C7nAppServiceVO> listC7nAppServiceOnProjectLevel(Long projectId) {
         // 将参数转换为json格式
-        ResponseEntity<PageInfo<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, 0, 0, "");
+        ResponseEntity<Page<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, 0, 0, "");
 
-        if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getList())) {
-            List<C7nAppServiceVO> c7nAppServiceVOS = responseEntity.getBody().getList();
+        if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getContent())) {
+            List<C7nAppServiceVO> c7nAppServiceVOS = responseEntity.getBody().getContent();
             return c7nAppServiceVOS;
         } else {
             return Collections.emptyList();

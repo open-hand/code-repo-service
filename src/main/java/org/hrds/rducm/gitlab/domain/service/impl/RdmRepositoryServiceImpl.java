@@ -1,6 +1,6 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
-import com.github.pagehelper.PageInfo;
+import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.gitlab4j.api.Constants;
 import org.gitlab4j.api.models.Commit;
@@ -40,18 +40,18 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
     private IC7nDevOpsServiceService ic7nDevOpsServiceService;
 
     @Override
-    public PageInfo<RepositoryOverViewDTO> pageOverviewByOptions(Long projectId, PageRequest pageRequest, Set<Long> repositoryIds) {
+    public Page<RepositoryOverViewDTO> pageOverviewByOptions(Long projectId, PageRequest pageRequest, Set<Long> repositoryIds) {
         // <1> 查询
         // 调用devops服务查询
-        PageInfo<C7nAppServiceVO> c7nRepositories = ic7nDevOpsServiceService.pageC7nAppServices(projectId, pageRequest, repositoryIds);
+        Page<C7nAppServiceVO> c7nRepositories = ic7nDevOpsServiceService.pageC7nAppServices(projectId, pageRequest, repositoryIds);
 
-        PageInfo<RepositoryOverViewDTO> repositoryOverViewDTOPageInfo = ConvertUtils.convertPageInfo(c7nRepositories, s -> new RepositoryOverViewDTO()
+        Page<RepositoryOverViewDTO> repositoryOverViewDTOPageInfo = ConvertUtils.convertPage(c7nRepositories, s -> new RepositoryOverViewDTO()
                 .setRepositoryId(s.getId())
                 .setRepositoryName(s.getName())
                 .setGlProjectId(Math.toIntExact(s.getGitlabProjectId())));
 
         // <2> 封装展示参数
-        repositoryOverViewDTOPageInfo.getList().forEach(repo -> {
+        repositoryOverViewDTOPageInfo.getContent().forEach(repo -> {
             Integer glProjectId = repo.getGlProjectId();
 
             // 查询Gitlab项目

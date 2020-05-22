@@ -22,7 +22,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  * 2018/1/30
  **/
 @Component
-public class PageRequestHandlerMethodArgumentResolver implements PageRequestArgumentResolver {
+public class PageRequestHandlerMethodArgumentResolverOld implements PageRequestArgumentResolver {
 
     private static final String INVALID_DEFAULT_PAGE_SIZE =
             "Invalid default page size configured for method %s! Must not be less than one!";
@@ -44,7 +44,7 @@ public class PageRequestHandlerMethodArgumentResolver implements PageRequestArgu
     // update by ying.xie 修改为true, 兼容猪齿鱼默认分页从1开始
     private boolean oneIndexedParameters = true;
 
-    public PageRequestHandlerMethodArgumentResolver(SortArgumentResolver sortResolver) {
+    public PageRequestHandlerMethodArgumentResolverOld(SortArgumentResolver sortResolver) {
         this.sortResolver = sortResolver;
     }
 

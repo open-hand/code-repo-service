@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.infra.feign.fallback;
 
-import com.github.pagehelper.PageInfo;
 import feign.hystrix.FallbackFactory;
+import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nGlUserVO;
@@ -27,17 +27,17 @@ public class DevOpsServiceFeignClientFallBackFactory implements FallbackFactory<
             }
 
             @Override
-            public ResponseEntity<PageInfo<C7nAppServiceVO>> pageAppServiceByOptions(Long projectId, Boolean doPage, Integer page, Integer size, String params) {
+            public ResponseEntity<Page<C7nAppServiceVO>> pageAppServiceByOptions(Long projectId, Boolean doPage, Integer page, Integer size, String params) {
                 return null;
             }
 
             @Override
-            public ResponseEntity<PageInfo<C7nAppServiceVO>> listOrPageProjectAppServices(Long projectId, Set<Long> ids, Boolean doPage, Integer page, Integer size) {
+            public ResponseEntity<Page<C7nAppServiceVO>> listOrPageProjectAppServices(Long projectId, Set<Long> ids, Boolean doPage, Integer page, Integer size) {
                 return null;
             }
 
             @Override
-            public ResponseEntity<PageInfo<C7nAppServiceVO>> listAppServiceByIds(Set<Long> ids) {
+            public ResponseEntity<Page<C7nAppServiceVO>> listAppServiceByIds(Set<Long> ids) {
                 return null;
             }
 

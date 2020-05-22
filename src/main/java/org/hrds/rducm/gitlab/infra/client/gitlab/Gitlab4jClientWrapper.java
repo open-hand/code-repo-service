@@ -1,13 +1,10 @@
 package org.hrds.rducm.gitlab.infra.client.gitlab;
 
-import io.choerodon.core.helper.ApplicationContextHelper;
 import io.choerodon.core.oauth.DetailsHelper;
 import org.gitlab4j.api.GitLabApi;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
-import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;

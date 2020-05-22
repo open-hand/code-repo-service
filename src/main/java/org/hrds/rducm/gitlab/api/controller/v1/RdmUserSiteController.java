@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import io.choerodon.core.annotation.Permission;
-import io.choerodon.core.enums.ResourceType;
+import io.choerodon.swagger.annotation.Permission;
+import io.choerodon.core.iam.ResourceLevel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.config.SwaggerTags;
@@ -25,14 +25,14 @@ public class RdmUserSiteController extends BaseController {
     private RdmUserAppService rdmUserAppService;
 
     @ApiOperation(value = "查询个人信息")
-    @Permission(type = ResourceType.SITE, permissionPublic = true)
+    @Permission(level = ResourceLevel.SITE)
     @GetMapping("/self")
     public ResponseEntity<RdmUserViewDTO> queryUser() {
         return Results.success(rdmUserAppService.queryUserSelf());
     }
 
     @ApiOperation(value = "新建用户")
-    @Permission(type = ResourceType.SITE, permissionLogin = true)
+    @Permission(level = ResourceLevel.SITE, permissionLogin = true)
     @PostMapping("/{userId}")
     public ResponseEntity<Object> createUser(@PathVariable Long userId,
                                              @RequestParam String glEmail,

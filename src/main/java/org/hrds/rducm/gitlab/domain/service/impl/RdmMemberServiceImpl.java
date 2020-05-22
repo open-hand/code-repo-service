@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
-import com.github.pagehelper.PageInfo;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.domain.AuditDomain;
@@ -28,7 +27,6 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
-import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +55,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     private RdmUserRepository rdmUserRepository;
 
     @Override
-    public PageInfo<MemberAuthDetailViewDTO> pageMembersRepositoryAuthorized(Long organizationId, Long projectId, PageRequest pageRequest, BaseUserQueryDTO queryDTO) {
+    public Page<MemberAuthDetailViewDTO> pageMembersRepositoryAuthorized(Long organizationId, Long projectId, PageRequest pageRequest, BaseUserQueryDTO queryDTO) {
         // 封装查询条件
         String realName = queryDTO.getRealName();
         String loginName = queryDTO.getLoginName();
@@ -65,7 +63,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         // 调用外部接口模糊查询 用户名或登录名
         Set<Long> userIdsSet = QueryConditionHelper.queryByNameConditionOnProj(projectId, realName, loginName);
         if (userIdsSet != null && userIdsSet.isEmpty()) {
-            return PageInfo.of(Collections.emptyList());
+            return new Page<>();
         }
 
         Page<MemberAuthDetailAgg> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectMembersRepositoryAuthorized(organizationId, projectId, userIdsSet));
@@ -99,14 +97,14 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             return viewDTO;
         });
 
-        return PageConvertUtils.convert(pageReturn);
+        return pageReturn;
     }
 
     @Override
-    public PageInfo<RdmMemberViewDTO> pageMemberPermissions(Long organizationId,
-                                                            Long projectId,
-                                                            Long userId,
-                                                            PageRequest pageRequest) {
+    public Page<RdmMemberViewDTO> pageMemberPermissions(Long organizationId,
+                                                        Long projectId,
+                                                        Long userId,
+                                                        PageRequest pageRequest) {
         RdmMember condition = new RdmMember();
         condition.setOrganizationId(organizationId);
         condition.setProjectId(projectId);
@@ -132,7 +130,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             return viewDTO;
         });
 
-        return PageConvertUtils.convert(pageReturn);
+        return pageReturn;
     }
 
     @Override

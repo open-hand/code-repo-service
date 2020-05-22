@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.app.assembler;
 
-import com.github.pagehelper.PageInfo;
 import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
@@ -10,7 +9,6 @@ import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
-import org.hrds.rducm.gitlab.infra.util.PageConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +34,7 @@ public class RdmMemberApplicantAssembler {
      * @param page
      * @return
      */
-    public PageInfo<RdmMemberApplicantViewDTO> pageToRdmMemberApplicantViewDTO(Page<RdmMemberApplicant> page) {
+    public Page<RdmMemberApplicantViewDTO> pageToRdmMemberApplicantViewDTO(Page<RdmMemberApplicant> page) {
         // 用户id
         Set<Long> opUserIds = new HashSet<>();
         // 代码库id
@@ -52,7 +50,7 @@ public class RdmMemberApplicantAssembler {
         Map<Long, C7nUserVO> c7nUserVOMap = ic7nBaseServiceService.listC7nUserToMap(opUserIds);
         Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(repositoryIds);
 
-        return PageConvertUtils.convert(ConvertUtils.convertPage(page, val -> {
+        return ConvertUtils.convertPage(page, val -> {
             C7nAppServiceVO c7nAppServiceVO = Optional.ofNullable(c7nAppServiceVOMap.get(val.getRepositoryId())).orElse(new C7nAppServiceVO());
             C7nUserVO c7nApplicantUserVO = Optional.ofNullable(c7nUserVOMap.get(val.getApplicantUserId())).orElse(new C7nUserVO());
             C7nUserVO c7nApprovalUserVO = Optional.ofNullable(c7nUserVOMap.get(val.getApprovalUserId())).orElse(new C7nUserVO());
@@ -72,6 +70,6 @@ public class RdmMemberApplicantAssembler {
                     .setLoginName(c7nApprovalUserVO.getLoginName())
                     .setImageUrl(c7nApprovalUserVO.getImageUrl()));
             return viewDTO;
-        }));
+        });
     }
 }

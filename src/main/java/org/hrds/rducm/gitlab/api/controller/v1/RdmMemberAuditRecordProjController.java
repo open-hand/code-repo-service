@@ -1,13 +1,12 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
-import com.github.pagehelper.PageInfo;
-import io.choerodon.core.annotation.Permission;
-import io.choerodon.core.enums.ResourceType;
+import io.choerodon.core.domain.Page;
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuditRecordQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
@@ -38,18 +37,18 @@ public class RdmMemberAuditRecordProjController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "repositoryName", value = "应用服务名称(模糊)", paramType = "query", dataType = "String"),
     })
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @GetMapping
-    public ResponseEntity<PageInfo<RdmMemberAuditRecordViewDTO>> pageByOptions(@PathVariable Long organizationId,
-                                                                               @PathVariable Long projectId,
-                                                                               @RequestParam(required = false) Set<Long> repositoryIds,
-                                                                               PageRequest pageRequest,
-                                                                               MemberAuditRecordQueryDTO queryDTO) {
-        return Results.success(iRdmMemberAuditRecordService.pageByOptions(organizationId, Collections.singleton(projectId), repositoryIds, pageRequest, queryDTO, ResourceType.PROJECT));
+    public ResponseEntity<Page<RdmMemberAuditRecordViewDTO>> pageByOptions(@PathVariable Long organizationId,
+                                                                           @PathVariable Long projectId,
+                                                                           @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                           PageRequest pageRequest,
+                                                                           MemberAuditRecordQueryDTO queryDTO) {
+        return Results.success(iRdmMemberAuditRecordService.pageByOptions(organizationId, Collections.singleton(projectId), repositoryIds, pageRequest, queryDTO, ResourceLevel.PROJECT));
     }
 
     @ApiOperation(value = "同步")
-    @Permission(type = ResourceType.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.PROJECT)
     @PostMapping("/{id}/sync")
     public ResponseEntity<?> sync(@PathVariable Long id, @RequestParam int syncStrategy) {
         rdmMemberAuditAppService.syncByStrategy(id, syncStrategy);
