@@ -15,7 +15,7 @@ import java.util.Set;
  * @author ying.xie@hand-china.com
  * @date 2020/3/17
  */
-@FeignClient(value = "devops-service", path = "/choerodon", fallbackFactory = DevOpsServiceFeignClientFallBackFactory.class)
+@FeignClient(value = "devops-service", fallbackFactory = DevOpsServiceFeignClientFallBackFactory.class)
 public interface DevOpsServiceFeignClient {
     /**
      * 获取所有已经启用的服务
