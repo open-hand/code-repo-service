@@ -46,6 +46,7 @@ public class RdmMemberAuditRecordOrgController extends BaseController {
         return Results.success(iRdmMemberAuditRecordService.pageByOptions(organizationId, projectIds, repositoryIds, pageRequest, queryDTO, ResourceLevel.ORGANIZATION));
     }
 
+    // TODO 测试用,需删除,改为定时任务调用
     @ApiOperation(value = "对组织下所有成员进行权限审计")
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/batch-audit")

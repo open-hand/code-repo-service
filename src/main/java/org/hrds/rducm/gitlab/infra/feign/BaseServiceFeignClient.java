@@ -15,7 +15,7 @@ import java.util.Set;
  * @author ying.xie@hand-china.com
  * @date 2020/3/16
  */
-@FeignClient(value = "base-service", fallbackFactory = BaseServiceFeignClientFallBackFactory.class)
+@FeignClient(value = "hzero-iam", path = "/choerodon", fallbackFactory = BaseServiceFeignClientFallBackFactory.class)
 public interface BaseServiceFeignClient {
     /**
      * 查询当前组织下用户的项目列表
