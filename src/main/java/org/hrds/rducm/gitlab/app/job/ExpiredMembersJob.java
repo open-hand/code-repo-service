@@ -25,13 +25,13 @@ public class ExpiredMembersJob {
     private RdmMemberAppService rdmMemberAppService;
 
     @JobTask(maxRetryCount = 3, code = "handleExpiredMembers", description = "代码库移除过期成员")
-//    @TimedTask(name = "代码库移除过期成员",
-//            description = "代码库移除过期成员",
-//            oneExecution = true,
-//            repeatCount = 0,
-//            repeatInterval = 100,
-//            repeatIntervalUnit = QuartzDefinition.SimpleRepeatIntervalUnit.HOURS,
-//            params = {})
+    @TimedTask(name = "代码库移除过期成员",
+            description = "代码库移除过期成员",
+            oneExecution = true,
+            repeatCount = 3,
+            repeatInterval = 5,
+            repeatIntervalUnit = QuartzDefinition.SimpleRepeatIntervalUnit.MINUTES,
+            params = {})
     public void handleExpiredMembers(Map<String, Object> map) {
         // 执行方法
         logger.info("移除过期成员定时任务开始执行");
