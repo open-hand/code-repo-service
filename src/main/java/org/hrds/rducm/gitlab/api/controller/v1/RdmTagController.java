@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -34,7 +35,7 @@ public class RdmTagController extends BaseController {
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "excludeProtectedFlag", value = "是否排除保护标记", paramType = "query", dataType = "boolean"),
     })
-    @Permission(permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping
     public ResponseEntity<List<TagDTO>> getTags(@PathVariable Long projectId,
                                                 @PathVariable Long repositoryId,
@@ -47,7 +48,7 @@ public class RdmTagController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
     })
-    @Permission(permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/protected-tags")
     public ResponseEntity<List<ProtectedTagDTO>> getProtectedTags(@PathVariable Long projectId,
                                                                   @PathVariable Long repositoryId) {
@@ -61,7 +62,7 @@ public class RdmTagController extends BaseController {
             @ApiImplicitParam(name = "tagName", value = API_INFO_TAG_NAME, paramType = "query", required = true),
             @ApiImplicitParam(name = "createAccessLevel", value = API_INFO_CREATE_ACCESS_LEVEL, paramType = "query", required = true),
     })
-    @Permission(permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/protected-tags")
     public ResponseEntity<ProtectedTagDTO> createProtectedTag(@PathVariable Long projectId,
                                                               @PathVariable Long repositoryId,
@@ -77,7 +78,7 @@ public class RdmTagController extends BaseController {
             @ApiImplicitParam(name = "tagName", value = "标签名", paramType = "query", required = true),
             @ApiImplicitParam(name = "createAccessLevel", value = API_INFO_CREATE_ACCESS_LEVEL, paramType = "query", required = true),
     })
-    @Permission(permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @PutMapping("/protected-tags")
     public ResponseEntity<ProtectedTagDTO> updateProtectedTag(@PathVariable Long projectId,
                                                               @PathVariable Long repositoryId,
@@ -92,7 +93,7 @@ public class RdmTagController extends BaseController {
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "tagName", value = "标签名", paramType = "query", required = true),
     })
-    @Permission(permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @DeleteMapping("/protected-tags")
     public ResponseEntity<ProtectedTag> deleteProtectedTag(@PathVariable Long projectId,
                                                            @PathVariable Long repositoryId,

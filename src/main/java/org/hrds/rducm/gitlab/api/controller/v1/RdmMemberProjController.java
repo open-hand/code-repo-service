@@ -51,7 +51,7 @@ public class RdmMemberProjController extends BaseController {
             @ApiImplicitParam(name = "realName", value = "用户名(模糊)", paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "loginName", value = "登录名(模糊)", paramType = "query", dataType = "String"),
     })
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping
     public ResponseEntity<Page<RdmMemberViewDTO>> pageByOptions(@PathVariable Long organizationId,
                                                                 @PathVariable Long projectId,
@@ -66,7 +66,7 @@ public class RdmMemberProjController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", dataType = "Long", required = true),
             @ApiImplicitParam(name = "rdmMemberBatchDTO", value = "body参数", dataType = "RdmMemberBatchDTO", required = true),
     })
-    @Permission(level = ResourceLevel.PROJECT, roles = {InitRoleCode.PROJECT_OWNER})
+    @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.PROJECT_OWNER})
     @PostMapping("/batch-add")
     public ResponseEntity<?> batchAddMembers(@PathVariable Long organizationId,
                                              @PathVariable Long projectId,
@@ -77,7 +77,7 @@ public class RdmMemberProjController extends BaseController {
     }
 
     @ApiOperation(value = "权限导出")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/export")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", paramType = "query", dataType = "Int"),
@@ -101,7 +101,7 @@ public class RdmMemberProjController extends BaseController {
     }
 
     @ApiOperation(value = "查询成员授权情况")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/audit/security-audit")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "realName", value = "用户名(模糊)", paramType = "query", dataType = "String"),

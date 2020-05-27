@@ -29,7 +29,7 @@ public class ProjectController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
             @ApiImplicitParam(name = "name", value = "真实名称或登录名模糊搜索", paramType = "query"),
     })
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/c7n/members/developers")
     public ResponseEntity<List<BaseC7nUserViewDTO>> listDeveloperProjectMembers(@PathVariable Long projectId,
                                                                                 @RequestParam(required = false) String name) {

@@ -48,7 +48,7 @@ public class TestController extends BaseController {
     }
 
     @ApiOperation(value = "查询")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/test")
     public ResponseEntity<Long> test() {
         System.out.println("test");

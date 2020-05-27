@@ -47,7 +47,7 @@ public class RdmOperationLogProjController extends BaseController {
             @ApiImplicitParam(name = "endDate", value = "结束日期", paramType = "query", dataType = "Date"),
             @ApiImplicitParam(name = "opEventTypes", value = "操作事件类型", paramType = "query", dataType = "String", allowMultiple = true),
     })
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping
     public ResponseEntity<Page<OperationLogViewDTO>> pageByOptionsMemberLog(@PathVariable Long projectId,
                                                                             @SortDefault(value = RdmOperationLog.FIELD_CREATION_DATE,

@@ -28,7 +28,7 @@ public class RdmProjectController extends BaseController {
     private IRdmMemberService iRdmMemberService;
 
     @ApiOperation(value = "查询成员所有应用服务的权限")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/members/{userId}/permissions")
     @ApiImplicitParams({
 

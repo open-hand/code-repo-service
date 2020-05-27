@@ -54,7 +54,7 @@ public class TempController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
             @ApiImplicitParam(name = "rdmMemberBatchDTO", value = "body参数", dataType = "RdmMemberBatchDTO", required = true),
     })
-    @Permission(level = ResourceLevel.PROJECT, permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION, permissionPublic = true)
     @PostMapping("/organizations/{organizationId}/projects/{projectId}/members/batch-add")
     public ResponseEntity<Object> batchAddMembersTemp(@PathVariable Long organizationId,
                                                       @PathVariable Long projectId,

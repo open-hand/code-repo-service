@@ -54,7 +54,7 @@ public class RdmMemberOrgController extends BaseController {
     }
 
     @ApiOperation(value = "权限导出")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/export")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", paramType = "query", dataType = "Int"),

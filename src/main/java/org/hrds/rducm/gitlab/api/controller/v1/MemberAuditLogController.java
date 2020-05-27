@@ -26,7 +26,7 @@ public class MemberAuditLogController extends BaseController {
     private IMemberAuditService iMemberAuditService;
 
     @ApiOperation(value = "获取最新一条审计日志")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/detail/latest")
     public ResponseEntity<MemberAuditLog> detailLatest(@PathVariable Long organizationId,
                                                        @PathVariable Long projectId) {

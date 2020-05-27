@@ -52,7 +52,7 @@ public class RdmMemberApplicantProjController extends BaseController {
             @ApiImplicitParam(name = "applicantUserName", value = "申请人(模糊)", paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "approvalState", value = "审批状态", paramType = "query", dataType = "String"),
     })
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping
     public ResponseEntity<Page<RdmMemberApplicantViewDTO>> pageByOptions(@PathVariable Long projectId,
                                                                          @SortDefault(value = RdmMemberApplicant.FIELD_CREATION_DATE,
@@ -66,7 +66,7 @@ public class RdmMemberApplicantProjController extends BaseController {
     }
 
     @ApiOperation(value = "检测当前用户申请类型")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/self/detect-applicant-type")
     public ResponseEntity<DetectApplicantTypeDTO> detectApplicantType(@PathVariable Long projectId,
                                                                       @RequestParam Long repositoryId) {
@@ -79,7 +79,7 @@ public class RdmMemberApplicantProjController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "memberApplicantCreateDTO", value = "参数", paramType = "body", dataType = "MemberApplicantCreateDTO", required = true)
     })
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping
     public ResponseEntity<?> create(@PathVariable Long organizationId,
                                     @PathVariable Long projectId,
@@ -97,7 +97,7 @@ public class RdmMemberApplicantProjController extends BaseController {
             @ApiImplicitParam(name = "objectVersionNumber", value = "版本号", paramType = "query", required = true),
             @ApiImplicitParam(name = "expiresAt", value = "过期时间", paramType = "query")
     })
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/{id}/pass")
     public ResponseEntity<?> passAndHandleMember(@PathVariable Long id,
                                                  @RequestParam Long objectVersionNumber,
@@ -109,7 +109,7 @@ public class RdmMemberApplicantProjController extends BaseController {
     }
 
     @ApiOperation(value = "成员权限申请-审批拒绝")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/{id}/refuse")
     public ResponseEntity<?> refuse(@PathVariable Long id,
                                     @RequestParam Long objectVersionNumber,

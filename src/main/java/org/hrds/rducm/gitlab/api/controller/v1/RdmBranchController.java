@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.api.controller.v1;
 
+import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -33,7 +34,7 @@ public class RdmBranchController extends BaseController {
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "excludeProtectedFlag", value = "是否排除保护分支", paramType = "query", dataType = "boolean"),
     })
-    @Permission(permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping
     public ResponseEntity<List<BranchDTO>> getBranches(@PathVariable Long projectId,
                                                        @PathVariable Long repositoryId,
@@ -46,7 +47,7 @@ public class RdmBranchController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
     })
-    @Permission(permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/protected-branches")
     public ResponseEntity<List<ProtectedBranchDTO>> getProtectedBranches(@PathVariable Long projectId,
                                                                          @PathVariable Long repositoryId) {
@@ -61,7 +62,7 @@ public class RdmBranchController extends BaseController {
             @ApiImplicitParam(name = "pushAccessLevel", value = API_INFO_PUSH_ACCESS_LEVEL, paramType = "query", required = true),
             @ApiImplicitParam(name = "mergeAccessLevel", value = API_INFO_MERGE_ACCESS_LEVEL, paramType = "query", required = true),
     })
-    @Permission(permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/protected-branches")
     public ResponseEntity<ProtectedBranchDTO> createProtectedBranch(@PathVariable Long projectId,
                                                                     @PathVariable Long repositoryId,
@@ -79,7 +80,7 @@ public class RdmBranchController extends BaseController {
             @ApiImplicitParam(name = "pushAccessLevel", value = API_INFO_PUSH_ACCESS_LEVEL, paramType = "query", required = true),
             @ApiImplicitParam(name = "mergeAccessLevel", value = API_INFO_MERGE_ACCESS_LEVEL, paramType = "query", required = true),
     })
-    @Permission(permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @PutMapping("/protected-branches")
     public ResponseEntity<ProtectedBranchDTO> updateProtectedBranch(@PathVariable Long projectId,
                                                                     @PathVariable Long repositoryId,
@@ -95,7 +96,7 @@ public class RdmBranchController extends BaseController {
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
             @ApiImplicitParam(name = "branchName", value = "分支名", paramType = "query", required = true),
     })
-    @Permission(permissionPublic = true)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @DeleteMapping("/protected-branches")
     public ResponseEntity<?> removeProtectedBranch(@PathVariable Long projectId,
                                                    @PathVariable Long repositoryId,

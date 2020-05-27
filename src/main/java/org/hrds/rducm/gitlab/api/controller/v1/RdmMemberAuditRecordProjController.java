@@ -37,18 +37,18 @@ public class RdmMemberAuditRecordProjController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "repositoryName", value = "应用服务名称(模糊)", paramType = "query", dataType = "String"),
     })
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping
     public ResponseEntity<Page<RdmMemberAuditRecordViewDTO>> pageByOptions(@PathVariable Long organizationId,
                                                                            @PathVariable Long projectId,
                                                                            @RequestParam(required = false) Set<Long> repositoryIds,
                                                                            PageRequest pageRequest,
                                                                            MemberAuditRecordQueryDTO queryDTO) {
-        return Results.success(iRdmMemberAuditRecordService.pageByOptions(organizationId, Collections.singleton(projectId), repositoryIds, pageRequest, queryDTO, ResourceLevel.PROJECT));
+        return Results.success(iRdmMemberAuditRecordService.pageByOptions(organizationId, Collections.singleton(projectId), repositoryIds, pageRequest, queryDTO, ResourceLevel.ORGANIZATION));
     }
 
     @ApiOperation(value = "同步")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/{id}/sync")
     public ResponseEntity<?> sync(@PathVariable Long id, @RequestParam int syncStrategy) {
         rdmMemberAuditAppService.syncByStrategy(id, syncStrategy);

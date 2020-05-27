@@ -30,7 +30,7 @@ public class RdmRepositoryProjController extends BaseController {
     private IRdmRepositoryService rdmRepositoryService;
 
     @ApiOperation(value = "查询所有已经启用的服务")
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/list-by-active")
     public ResponseEntity<List<RdmRepository>> listByActive(@PathVariable(value = "projectId") Long projectId) {
         return ResponseEntity.ok(rdmRepositoryAppService.listByActive(projectId));
@@ -41,7 +41,7 @@ public class RdmRepositoryProjController extends BaseController {
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
             @ApiImplicitParam(name = "repositoryIds", value = "应用服务id", paramType = "query", dataType = "Long", allowMultiple = true),
     })
-    @Permission(level = ResourceLevel.PROJECT)
+    @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/overview")
     public ResponseEntity<Page<RepositoryOverViewDTO>> pageOverviewByOptions(@PathVariable Long projectId,
                                                                              PageRequest pageRequest,
