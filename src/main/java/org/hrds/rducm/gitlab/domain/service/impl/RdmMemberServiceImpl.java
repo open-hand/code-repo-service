@@ -27,12 +27,15 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +46,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class RdmMemberServiceImpl implements IRdmMemberService {
+    private static final Logger logger = LoggerFactory.getLogger(RdmMemberServiceImpl.class);
     @Autowired
     private RdmMemberRepository rdmMemberRepository;
     @Autowired
@@ -302,26 +306,33 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         deleteMember.setProjectId(projectId);
         deleteMember.setRepositoryId(repositoryId);
         rdmMemberRepository.delete(deleteMember);
+
+        AtomicInteger count = new AtomicInteger();
         glMembers.forEach(glMember -> {
             // 查询Gitlab用户对应的userId
             Long userId = ic7nDevOpsServiceService.glUserIdToUserId(glMember.getId());
 
-            RdmMember rdmMember = new RdmMember();
-            rdmMember.setOrganizationId(organizationId)
-                    .setProjectId(projectId)
-                    .setRepositoryId(repositoryId)
-                    .setUserId(userId)
-                    .setGlProjectId(glProjectId)
-                    .setGlUserId(glMember.getId())
-                    .setGlAccessLevel(glMember.getAccessLevel().toValue())
-                    .setGlExpiresAt(glMember.getExpiresAt())
-                    .setSyncGitlabFlag(Boolean.TRUE)
-                    .setSyncDateGitlab(new Date());
+            if (userId == null) {
+                logger.info("该Gitlab用户{}无对应的猪齿鱼用户", glMember.getUsername());
+            } else {
+                RdmMember rdmMember = new RdmMember();
+                rdmMember.setOrganizationId(organizationId)
+                        .setProjectId(projectId)
+                        .setRepositoryId(repositoryId)
+                        .setUserId(userId)
+                        .setGlProjectId(glProjectId)
+                        .setGlUserId(glMember.getId())
+                        .setGlAccessLevel(glMember.getAccessLevel().toValue())
+                        .setGlExpiresAt(glMember.getExpiresAt())
+                        .setSyncGitlabFlag(Boolean.TRUE)
+                        .setSyncDateGitlab(new Date());
 
-            // 重新插入
-            rdmMemberRepository.insertSelective(rdmMember);
+                // 重新插入
+                rdmMemberRepository.insertSelective(rdmMember);
+                count.getAndIncrement();
+            }
         });
-        return glMembers.size();
+        return count.get();
     }
 
     @Override

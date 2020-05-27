@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
+import org.hrds.rducm.gitlab.app.job.MemberInitJob;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
 import org.hzero.core.base.BaseController;
@@ -13,6 +14,9 @@ import org.hzero.core.util.Results;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * FIXME
@@ -58,5 +62,17 @@ public class TempController extends BaseController {
 //        validObject(rdmMemberBatchDTO);
         rdmMemberAppService.batchAddMemberSagaDemo(organizationId, projectId, rdmMemberBatchDTO);
         return Results.created(null);
+    }
+
+    @Autowired
+    private MemberInitJob memberInitJob;
+
+    @ApiOperation(value = "上线初始化成员测试")
+    @Permission(type = ResourceType.SITE, permissionPublic = true)
+    @PostMapping("/organizations/{organizationId}/init-members")
+    public void initMembers(@PathVariable Long organizationId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("organizationId", organizationId);
+        memberInitJob.initRdmMembers(map);
     }
 }
