@@ -68,7 +68,7 @@ public class TempController extends BaseController {
     private MemberInitJob memberInitJob;
 
     @ApiOperation(value = "上线初始化成员测试")
-    @Permission(type = ResourceType.SITE, permissionPublic = true)
+    @Permission(level = ResourceLevel.SITE, permissionPublic = true)
     @PostMapping("/organizations/{organizationId}/init-members")
     public void initMembers(@PathVariable Long organizationId) {
         Map<String, Object> map = new HashMap<>();
