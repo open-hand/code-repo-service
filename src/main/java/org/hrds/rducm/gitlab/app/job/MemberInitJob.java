@@ -38,9 +38,9 @@ public class MemberInitJob {
      *
      * @param map
      */
-    @JobTask(maxRetryCount = 3,
-            code = "initRdmMembers",
-            description = "代码库移除过期成员")
+//    @JobTask(maxRetryCount = 3,
+//            code = "initRdmMembers",
+//            description = "代码库移除过期成员")
     @Transactional(rollbackFor = Exception.class)
     public void initRdmMembers(Map<String, Object> map) {
 //        Long organizationId = (Long) map.get("organizationId");
