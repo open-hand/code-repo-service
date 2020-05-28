@@ -109,8 +109,7 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
 
     @Override
     public Page<C7nAppServiceVO> pageC7nAppServices(Long projectId, PageRequest pageRequest, Set<Long> repositoryIds) {
-        // 这里加1是因为在controller被-1
-        int page = pageRequest.getPage() + 1;
+        int page = pageRequest.getPage();
         int size = pageRequest.getSize();
 
         ResponseEntity<Page<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.listOrPageProjectAppServices(projectId, Optional.ofNullable(repositoryIds).orElse(Collections.emptySet()), true, page, size);
