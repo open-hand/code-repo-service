@@ -6,6 +6,7 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.gitlab4j.api.models.Member;
+import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuditRecordQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
 import org.hrds.rducm.gitlab.app.assembler.RdmMemberAuditRecordAssembler;
@@ -176,6 +177,13 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                                                                     Long repositoryId,
                                                                     Integer glProjectId) {
         // 查询gitlab所有成员
+
+        // 判断一下gitlab是否存在该仓库, 避免报错
+        Project project = gitlabAdminApi.getProject(glProjectId);
+        if (project == null) {
+            return Collections.emptyList();
+        }
+
         List<Member> members = gitlabAdminApi.getAllMembers(glProjectId);
         LOGGER.info("{}项目查询到成员数量为:{}", glProjectId, members.size());
 

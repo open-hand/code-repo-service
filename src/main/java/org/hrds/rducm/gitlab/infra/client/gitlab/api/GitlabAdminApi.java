@@ -1,12 +1,14 @@
 package org.hrds.rducm.gitlab.infra.client.gitlab.api;
 
 import org.gitlab4j.api.GitLabApiException;
-import org.gitlab4j.api.Pager;
 import org.gitlab4j.api.models.Member;
 import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.constant.GitlabClientConstants;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,6 +21,8 @@ import java.util.List;
  */
 @Repository
 public class GitlabAdminApi {
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitlabAdminApi.class);
+
     private final Gitlab4jClientWrapper gitlab4jClient;
 
     public GitlabAdminApi(Gitlab4jClientWrapper gitlab4jClient) {
@@ -26,17 +30,24 @@ public class GitlabAdminApi {
     }
 
     /**
-     * 分页获取项目列表
+     * 获取Gitlab项目
      *
-     * @return
+     * @param projectId Gitlab项目id
+     * @return 如果未找到, 返回null
      */
-    public Pager<Project> getProjectsPageable() {
+    public Project getProject(Integer projectId) {
         try {
             return gitlab4jClient.getAdminGitLabApi()
                     .getProjectApi()
-                    .getProjects(GitlabClientConstants.DEFAULT_PER_PAGE);
+                    .getProject(projectId);
         } catch (GitLabApiException e) {
-            throw new GitlabClientException(e, e.getMessage());
+            // Gitlab查询到不存在的资源会返回404
+            if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                LOGGER.warn(e.getMessage(), e);
+                return null;
+            } else {
+                throw new GitlabClientException(e, e.getMessage());
+            }
         }
     }
 

@@ -135,7 +135,8 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
 
         if (!CollectionUtils.isEmpty(list)) {
             return list.stream()
-                    .collect(Collectors.toMap(C7nAppServiceVO::getId, C7nAppServiceVO::getGitlabProjectId));
+                    .collect(HashMap::new, (m, v)->
+                            m.put(v.getId(), v.getGitlabProjectId()), HashMap::putAll);
         } else {
             return Collections.emptyMap();
         }

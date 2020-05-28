@@ -89,7 +89,8 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
 
         Page<MemberAuthDetailViewDTO> pageReturn = ConvertUtils.convertPage(page, (v) -> {
             MemberAuthDetailViewDTO viewDTO = ConvertUtils.convertObject(v, MemberAuthDetailViewDTO.class);
-            C7nUserVO c7nUserVO = c7nUserVOMap.get(v.getUserId());
+            C7nUserVO c7nUserVO = Optional.ofNullable(c7nUserVOMap.get(v.getUserId()))
+                    .orElse(new C7nUserVO().setRoles(Collections.emptyList()));
 
             viewDTO.setAllRepositoryCount(allRepositoryCount);
             viewDTO.setUser(BaseC7nUserViewDTO.convert(c7nUserVO));
