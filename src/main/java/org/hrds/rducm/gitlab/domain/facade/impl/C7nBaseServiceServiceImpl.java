@@ -1,4 +1,4 @@
-package org.hrds.rducm.gitlab.domain.service.impl;
+package org.hrds.rducm.gitlab.domain.facade.impl;
 
 import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
@@ -6,6 +6,8 @@ import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
+    private static final Logger logger = LoggerFactory.getLogger(C7nBaseServiceServiceImpl.class);
+
     @Autowired
     private BaseServiceFeignClient baseServiceFeignClient;
 
@@ -32,7 +36,9 @@ public class C7nBaseServiceServiceImpl implements IC7nBaseServiceService {
         ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listUsersByIds(false, Collections.singleton(userId));
 
         if (!CollectionUtils.isEmpty(entity.getBody())) {
-            return Math.toIntExact(entity.getBody().get(0).getGitlabUserId());
+            Long gitlabUserId = entity.getBody().get(0).getGitlabUserId();
+            logger.info("{}用户获取到的GitlabUserId为{}", userId, gitlabUserId);
+            return gitlabUserId == null ? null : Math.toIntExact(gitlabUserId);
         } else {
             return null;
         }

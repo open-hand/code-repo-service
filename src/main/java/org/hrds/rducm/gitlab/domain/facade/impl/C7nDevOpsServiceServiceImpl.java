@@ -1,4 +1,4 @@
-package org.hrds.rducm.gitlab.domain.service.impl;
+package org.hrds.rducm.gitlab.domain.facade.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.core.domain.Page;
