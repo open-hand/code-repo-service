@@ -32,7 +32,7 @@ public class RdmMemberAuditRecordOrgController extends BaseController {
     @Autowired
     private IMemberAuditService iMemberAuditService;
 
-    @ApiOperation(value = "查询权限审计结果")
+    @ApiOperation(value = "查询权限审计结果(组织层)")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "repositoryName", value = "应用服务名称(模糊)", paramType = "query", dataType = "String"),
     })
@@ -47,7 +47,7 @@ public class RdmMemberAuditRecordOrgController extends BaseController {
     }
 
     // TODO 测试用,需删除,改为定时任务调用
-    @ApiOperation(value = "对组织下所有成员进行权限审计")
+    @ApiOperation(value = "对组织下所有成员进行权限审计(组织层) 测试用,需删除,改为定时任务调用")
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/batch-audit")
     public ResponseEntity<?> batchAudit(@PathVariable Long organizationId) {

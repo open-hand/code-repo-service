@@ -24,14 +24,14 @@ public class RdmUserSiteController extends BaseController {
     @Autowired
     private RdmUserAppService rdmUserAppService;
 
-    @ApiOperation(value = "查询个人信息")
+    @ApiOperation(value = "查询个人信息(平台层)")
     @Permission(level = ResourceLevel.SITE)
     @GetMapping("/self")
     public ResponseEntity<RdmUserViewDTO> queryUser() {
         return Results.success(rdmUserAppService.queryUserSelf());
     }
 
-    @ApiOperation(value = "新建用户")
+    @ApiOperation(value = "新建用户(平台层)")
     @Permission(level = ResourceLevel.SITE, permissionLogin = true)
     @PostMapping("/{userId}")
     public ResponseEntity<Object> createUser(@PathVariable Long userId,

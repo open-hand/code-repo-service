@@ -53,7 +53,7 @@ public class RdmMemberOrgController extends BaseController {
         return Results.success(rdmMemberAppService.pageByOptionsOnOrg(organizationId, pageRequest, query));
     }
 
-    @ApiOperation(value = "权限导出")
+    @ApiOperation(value = "权限导出(组织层)")
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/export")
     @ApiImplicitParams({
