@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
  * API接口
  */
 //@Api(tags = SwaggerTags.RDM_USER)
-@RestController("rdmUserSiteController.v1")
+@RestController("rdmUserUserController.v1")
 @RequestMapping("/v1/gitlab/users")
 public class RdmUserUserController extends BaseController {
     @Autowired
