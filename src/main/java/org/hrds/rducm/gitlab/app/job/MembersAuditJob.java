@@ -33,10 +33,10 @@ public class MembersAuditJob {
     @JobTask(maxRetryCount = 3,
             code = "membersAuditJob",
             description = "成员审计定时任务",
-            params = {@JobParam(name = "organizationId", type = Long.class, description = "组织id")})
+            params = {@JobParam(name = "auditOrganizationId", type = Long.class, description = "待审计组织id")})
     public void membersAuditJob(Map<String, Object> param) {
-        Object organizationId1 = param.get("organizationId");
-        logger.debug("参数组织id为[{}]", organizationId1.toString());
+        Object auditOrganizationId = param.get("auditOrganizationId");
+        logger.debug("参数组织id为[{}]", auditOrganizationId.toString());
 
         List<Long> organizationIds = new ArrayList<>();
 
