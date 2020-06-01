@@ -30,12 +30,11 @@ public class MembersAuditJob {
     /**
      * 成员审计定时任务
      */
-    @Transactional(rollbackFor = Exception.class)
     @JobTask(maxRetryCount = 3,
             code = "membersAuditJob",
             description = "成员审计定时任务",
             params = {@JobParam(name = "organizationId", type = Long.class, description = "组织id")})
-    public Map<String, Object> membersAuditJob(Map<String, Object> param) {
+    public void membersAuditJob(Map<String, Object> param) {
         Object organizationId1 = param.get("organizationId");
         logger.debug("参数组织id为[{}]", organizationId1.toString());
 
@@ -58,8 +57,6 @@ public class MembersAuditJob {
             logger.info("审计组织[{}]的数据结束, 耗时[{}]ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
         }
         logger.info("结束审计, 耗时[{}]s, \n{}", stopWatch.getTotalTimeSeconds(), stopWatch.prettyPrint());
-
-        return param;
     }
 
 }
