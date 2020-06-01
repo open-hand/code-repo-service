@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
  */
 //@Api(tags = SwaggerTags.RDM_USER)
 @RestController("rdmUserUserController.v1")
-@RequestMapping("/v1/gitlab/users")
+@RequestMapping("/v1/{organizationId}/gitlab/users")
 public class RdmUserUserController extends BaseController {
     @Autowired
     private RdmUserAppService rdmUserAppService;
@@ -25,7 +25,8 @@ public class RdmUserUserController extends BaseController {
     @ApiOperation(value = "查询个人Gitlab信息(用户层)")
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/self")
-    public ResponseEntity<RdmUserViewDTO> queryUser() {
+    public ResponseEntity<RdmUserViewDTO> queryUser(@PathVariable Long organizationId) {
+        // 用户层接口不需要组织id, 但是不加会报错
         return Results.success(rdmUserAppService.queryUserSelf());
     }
 }
