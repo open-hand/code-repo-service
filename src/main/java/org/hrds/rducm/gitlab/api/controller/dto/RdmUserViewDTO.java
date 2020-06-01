@@ -3,11 +3,10 @@ package org.hrds.rducm.gitlab.api.controller.dto;
 import java.util.Date;
 
 public class RdmUserViewDTO {
-    private Long id;
     private Long userId;
-    private String initPassword;
-    private Boolean syncGitlabFlag;
-    private Date syncDateGitlab;
+//    private String initPassword;
+//    private Boolean syncGitlabFlag;
+//    private Date syncDateGitlab;
 //    private User glUser;
 
     /* gitlab用户信息 */
@@ -22,48 +21,12 @@ public class RdmUserViewDTO {
     private String glWebsiteUrl;
     private String glWebUrl;
 
-    public Long getId() {
-        return id;
-    }
-
-    public RdmUserViewDTO setId(Long id) {
-        this.id = id;
-        return this;
-    }
-
     public Long getUserId() {
         return userId;
     }
 
     public RdmUserViewDTO setUserId(Long userId) {
         this.userId = userId;
-        return this;
-    }
-
-    public String getInitPassword() {
-        return initPassword;
-    }
-
-    public RdmUserViewDTO setInitPassword(String initPassword) {
-        this.initPassword = initPassword;
-        return this;
-    }
-
-    public Boolean getSyncGitlab() {
-        return syncGitlabFlag;
-    }
-
-    public RdmUserViewDTO setSyncGitlab(Boolean syncGitlab) {
-        syncGitlabFlag = syncGitlab;
-        return this;
-    }
-
-    public Date getSyncDateGitlab() {
-        return syncDateGitlab;
-    }
-
-    public RdmUserViewDTO setSyncDateGitlab(Date syncDateGitlab) {
-        this.syncDateGitlab = syncDateGitlab;
         return this;
     }
 
