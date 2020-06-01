@@ -109,6 +109,7 @@ choerodon:
       retry-interval: 3
       skip-services: config**, **register-server, **gateway**, zipkin**, hystrix**, oauth**
   saga:
+    service: hzero-asgard
     consumer:
       enabled: true # 启动消费端
       thread-num: 2 # saga消息消费线程池大小
