@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.PageHelper;
@@ -26,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -112,19 +114,28 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<RdmMemberAuditRecord> batchCompare(Long organizationId) {
-        Stopwatch started = Stopwatch.createStarted();
+        StopWatch stopWatch = new StopWatch();
 
         // <0> 删除原有数据
         rdmMemberAuditRecordRepository.delete(new RdmMemberAuditRecord().setOrganizationId(organizationId));
 
         // <1> 对比组织所有成员
+        stopWatch.start("任务1");
         List<RdmMemberAuditRecord> list = compareMembersByOrganizationId(organizationId);
+        stopWatch.stop();
 
-        // <2> 批量插入数据库 todo 可优化为批量插入
-        rdmMemberAuditRecordRepository.batchInsertSelective(list);
+        // <2> 批量插入数据库
+        // 优化, 每次最多一次性插入10000条
+        stopWatch.start("任务2");
+        int maxInsert = 10000;
+        int curIndex = 0;
+        while (curIndex < list.size()) {
+            rdmMemberAuditRecordRepository.batchInsertCustom(list.subList(curIndex, Math.min(curIndex + maxInsert, list.size())));
+            curIndex += maxInsert;
+        }
+        stopWatch.stop();
 
-        long elapsed = started.elapsed(TimeUnit.SECONDS);
-        LOGGER.info("执行时长:{}", elapsed);
+        LOGGER.info("执行时长:{}, 执行详情\n{}", stopWatch.getTotalTimeMillis(), stopWatch.prettyPrint());
 
         return list;
     }

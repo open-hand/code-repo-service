@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.hrds.rducm.gitlab.infra.mapper.RdmMemberAuditRecordMapper">
+
+    <insert id="batchInsertCustom" parameterType="org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord">
+        insert into rducm_gitlab_member_audit_record
+            (organization_id,
+             project_id,
+             repository_id,
+             user_id,
+             access_level,
+             expires_at,
+             gl_project_id,
+             gl_user_id,
+             gl_access_level,
+             gl_expires_at)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.organizationId},
+            #{item.projectId},
+            #{item.repositoryId},
+            #{item.userId},
+            #{item.accessLevel},
+            #{item.expiresAt},
+            #{item.glProjectId},
+            #{item.glUserId},
+            #{item.glAccessLevel},
+            #{item.glExpiresAt})
+        </foreach>
+    </insert>
+</mapper>

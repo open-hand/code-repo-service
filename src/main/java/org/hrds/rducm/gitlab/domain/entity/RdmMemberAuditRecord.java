@@ -64,8 +64,6 @@ public class RdmMemberAuditRecord extends AuditDomain {
     private Long repositoryId;
     @ApiModelProperty(value = "用户id")
     private Long userId;
-    @ApiModelProperty(value = "gitlab成员状态(本系统)")
-    private String state;
     @ApiModelProperty(value = "gitlab成员权限级别(本系统)")
     private Integer accessLevel;
     @ApiModelProperty(value = "gitlab成员过期时间(本系统)")
@@ -75,8 +73,6 @@ public class RdmMemberAuditRecord extends AuditDomain {
     private Integer glProjectId;
     @ApiModelProperty(value = "gitlab用户id")
     private Integer glUserId;
-    @ApiModelProperty(value = "gitlab成员状态(Gitlab)")
-    private String glState;
     @ApiModelProperty(value = "gitlab成员权限级别(Gitlab)")
     private Integer glAccessLevel;
     @ApiModelProperty(value = "gitlab成员过期时间(Gitlab)")
@@ -136,15 +132,6 @@ public class RdmMemberAuditRecord extends AuditDomain {
         return this;
     }
 
-    public String getState() {
-        return state;
-    }
-
-    public RdmMemberAuditRecord setState(String state) {
-        this.state = state;
-        return this;
-    }
-
     public Integer getAccessLevel() {
         return accessLevel;
     }
@@ -178,15 +165,6 @@ public class RdmMemberAuditRecord extends AuditDomain {
 
     public RdmMemberAuditRecord setGlUserId(Integer glUserId) {
         this.glUserId = glUserId;
-        return this;
-    }
-
-    public String getGlState() {
-        return glState;
-    }
-
-    public RdmMemberAuditRecord setGlState(String glState) {
-        this.glState = glState;
         return this;
     }
 
