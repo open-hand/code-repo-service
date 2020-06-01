@@ -35,8 +35,8 @@ public class MembersAuditJob {
             code = "membersAuditJob",
             description = "成员审计定时任务",
             params = {@JobParam(name = "organizationId", type = Long.class, description = "组织id")})
-    public void membersAuditJob(Map<String, Object> map) {
-        Object organizationId1 = map.get("organizationId");
+    public Map<String, Object> membersAuditJob(Map<String, Object> param) {
+        Object organizationId1 = param.get("organizationId");
         logger.debug("参数组织id为[{}]", organizationId1.toString());
 
         List<Long> organizationIds = new ArrayList<>();
@@ -59,6 +59,7 @@ public class MembersAuditJob {
         }
         logger.info("结束审计, 耗时[{}]s, \n{}", stopWatch.getTotalTimeSeconds(), stopWatch.prettyPrint());
 
+        return param;
     }
 
 }
