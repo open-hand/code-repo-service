@@ -74,6 +74,6 @@ public class TestController extends BaseController {
     public void initMembers(@PathVariable Long organizationId) {
         Map<String, Object> map = new HashMap<>();
         map.put("organizationId", organizationId);
-        membersAuditJob.audit();
+        membersAuditJob.membersAuditJob(map);
     }
 }

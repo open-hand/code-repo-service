@@ -37,7 +37,7 @@ public class MembersAuditJob {
             params = {@JobParam(name = "organizationId", type = Long.class, description = "组织id")})
     public void membersAuditJob(Map<String, Object> map) {
         Object organizationId1 = map.get("organizationId");
-        logger.debug(organizationId1.toString());
+        logger.debug("参数组织id为[{}]", organizationId1.toString());
 
         List<Long> organizationIds = new ArrayList<>();
 
