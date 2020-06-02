@@ -36,16 +36,16 @@ public class MembersAuditJob {
         long auditOrganizationId = Long.parseLong((String) param.get("auditOrganizationId"));
         logger.debug("参数组织id为[{}]", auditOrganizationId);
 
-        StopWatch stopWatch = new StopWatch();
         logger.info("开始审计");
+        StopWatch stopWatch = new StopWatch();
 
         stopWatch.start("组织" + auditOrganizationId);
         logger.info("开始审计组织[{}]的数据", auditOrganizationId);
 
         iMemberAuditService.auditMembersByOrganizationId(auditOrganizationId);
 
-        logger.info("审计组织[{}]的数据结束, 耗时[{}]ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
         stopWatch.stop();
+        logger.info("审计组织[{}]的数据结束, 耗时[{}]ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
 
         logger.info("结束审计, 耗时[{}]s, \n{}", stopWatch.getTotalTimeSeconds(), stopWatch.prettyPrint());
     }
