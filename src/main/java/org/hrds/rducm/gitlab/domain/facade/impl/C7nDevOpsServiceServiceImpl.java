@@ -11,6 +11,8 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nGlUserVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
 import org.hrds.rducm.gitlab.infra.util.TypeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
+    private static final Logger logger = LoggerFactory.getLogger(C7nDevOpsServiceServiceImpl.class);
     @Autowired
     private DevOpsServiceFeignClient devOpsServiceFeignClient;
     @Autowired
@@ -41,7 +44,9 @@ public class C7nDevOpsServiceServiceImpl implements IC7nDevOpsServiceService {
         ResponseEntity<Page<C7nAppServiceVO>> entity = devOpsServiceFeignClient.listAppServiceByIds(Collections.singleton(repositoryId));
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(entity.getBody()).getContent())) {
-            return Math.toIntExact(entity.getBody().getContent().get(0).getGitlabProjectId());
+            Long gitlabProjectId = entity.getBody().get(0).getGitlabProjectId();
+            logger.info("{}应用服务获取到的GitlabProjectId为{}", repositoryId, gitlabProjectId);
+            return gitlabProjectId == null ? null : Math.toIntExact(gitlabProjectId);
         } else {
             return null;
         }

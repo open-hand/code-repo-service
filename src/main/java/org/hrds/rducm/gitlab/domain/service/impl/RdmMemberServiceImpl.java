@@ -5,7 +5,9 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.domain.AuditDomain;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import org.gitlab4j.api.models.AccessLevel;
 import org.gitlab4j.api.models.Member;
+import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
@@ -20,9 +22,11 @@ import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabAdminApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
+import org.hrds.rducm.gitlab.infra.enums.RdmMemberStateEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
@@ -35,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -51,6 +56,8 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     private RdmMemberRepository rdmMemberRepository;
     @Autowired
     private GitlabProjectApi gitlabProjectApi;
+    @Autowired
+    private GitlabAdminApi gitlabAdminApi;
     @Autowired
     private IC7nDevOpsServiceService ic7nDevOpsServiceService;
     @Autowired
@@ -298,41 +305,69 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         // <1> 获取Gitlab项目id
         Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(repositoryId);
 
+        if (glProjectId == null) {
+            return 0;
+        }
+
         // <2> 查询Gitlab成员
-        List<Member> glMembers = gitlabProjectApi.getAllMembers(glProjectId);
+        // 判断一下gitlab是否存在该代码库, 避免404报错
+        Project project = gitlabAdminApi.getProject(glProjectId);
+        if (project == null) {
+            return 0;
+        }
+        List<Member> glMembers = gitlabAdminApi.getAllMembers(glProjectId);
 
         // <3> 同步到数据库
         // 删除原成员
         RdmMember deleteMember = new RdmMember();
+        deleteMember.setOrganizationId(organizationId);
         deleteMember.setProjectId(projectId);
         deleteMember.setRepositoryId(repositoryId);
         rdmMemberRepository.delete(deleteMember);
 
         AtomicInteger count = new AtomicInteger();
-        glMembers.forEach(glMember -> {
-            // 查询Gitlab用户对应的userId
-            Long userId = ic7nDevOpsServiceService.glUserIdToUserId(glMember.getId());
+        // Gitlab成员权限分为group权限和project权限
+        // group和project成员有可能重复, 并且权限不一样. 导致通过getAllMembers获取到的重复成员有2个,需要特殊处理
+        // 当成员重复, 取权限较大的插入数据库
+        glMembers.stream()
+                // 过滤blocked的成员
+                .filter(glMember -> !RdmMemberStateEnum.BLOCKED.getCode().equals(glMember.getState()))
+                // 按id分组
+                .collect(Collectors.groupingBy(Member::getId))
+                .forEach((key, value) -> {
+                    Member glMember;
+                    if (value.size() > 1) {
+                        // 如果有2个相同成员, 需要特殊处理; 表示该成员在gitlab的group和project都有权限, 这种情况取accessLevel中较大的那个权限
+                        glMember = value.stream()
+                                .max((o1, o2) -> o1.getAccessLevel().toValue() >= o2.getAccessLevel().toValue() ? 1 : -1)
+                                .get();
+                    } else {
+                        glMember = value.get(0);
+                    }
 
-            if (userId == null) {
-                logger.info("该Gitlab用户{}无对应的猪齿鱼用户", glMember.getUsername());
-            } else {
-                RdmMember rdmMember = new RdmMember();
-                rdmMember.setOrganizationId(organizationId)
-                        .setProjectId(projectId)
-                        .setRepositoryId(repositoryId)
-                        .setUserId(userId)
-                        .setGlProjectId(glProjectId)
-                        .setGlUserId(glMember.getId())
-                        .setGlAccessLevel(glMember.getAccessLevel().toValue())
-                        .setGlExpiresAt(glMember.getExpiresAt())
-                        .setSyncGitlabFlag(Boolean.TRUE)
-                        .setSyncDateGitlab(new Date());
+                    // 查询Gitlab用户对应的userId
+                    Long userId = ic7nDevOpsServiceService.glUserIdToUserId(glMember.getId());
 
-                // 重新插入
-                rdmMemberRepository.insertSelective(rdmMember);
-                count.getAndIncrement();
-            }
-        });
+                    if (userId == null) {
+                        logger.info("该Gitlab用户{}无对应的猪齿鱼用户", glMember.getUsername());
+                    } else {
+                        RdmMember rdmMember = new RdmMember();
+                        rdmMember.setOrganizationId(organizationId)
+                                .setProjectId(projectId)
+                                .setRepositoryId(repositoryId)
+                                .setUserId(userId)
+                                .setGlProjectId(glProjectId)
+                                .setGlUserId(glMember.getId())
+                                .setGlAccessLevel(glMember.getAccessLevel().toValue())
+                                .setGlExpiresAt(glMember.getExpiresAt())
+                                .setSyncGitlabFlag(Boolean.TRUE)
+                                .setSyncDateGitlab(new Date());
+
+                        // 重新插入
+                        rdmMemberRepository.insertSelective(rdmMember);
+                        count.getAndIncrement();
+                    }
+                });
         return count.get();
     }
 
