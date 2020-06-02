@@ -7,11 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,28 +32,21 @@ public class MembersAuditJob {
             description = "成员审计定时任务",
             params = {@JobParam(name = "auditOrganizationId", description = "待审计组织id")})
     public void membersAuditJob(Map<String, Object> param) {
-        Object auditOrganizationId = param.get("auditOrganizationId");
-        logger.debug("参数组织id为[{}]", auditOrganizationId.toString());
+        // <> 获取组织
+        long auditOrganizationId = Long.parseLong((String) param.get("auditOrganizationId"));
+        logger.debug("参数组织id为[{}]", auditOrganizationId);
 
-        List<Long> organizationIds = new ArrayList<>();
-
-        // <0> 获取所有组织
         StopWatch stopWatch = new StopWatch();
-
         logger.info("开始审计");
-        for (long i = 7; i < 8; i++) {
-            stopWatch.start("组织" + i);
 
-            Long organizationId = i;
+        stopWatch.start("组织" + auditOrganizationId);
+        logger.info("开始审计组织[{}]的数据", auditOrganizationId);
 
-            logger.info("开始审计组织[{}]的数据", organizationId);
+        iMemberAuditService.auditMembersByOrganizationId(auditOrganizationId);
 
-            iMemberAuditService.auditMembersByOrganizationId(organizationId);
+        logger.info("审计组织[{}]的数据结束, 耗时[{}]ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
+        stopWatch.stop();
 
-            stopWatch.stop();
-            logger.info("审计组织[{}]的数据结束, 耗时[{}]ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
-        }
         logger.info("结束审计, 耗时[{}]s, \n{}", stopWatch.getTotalTimeSeconds(), stopWatch.prettyPrint());
     }
-
 }
