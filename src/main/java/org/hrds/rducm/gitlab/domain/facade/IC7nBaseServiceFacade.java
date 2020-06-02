@@ -1,4 +1,4 @@
-package org.hrds.rducm.gitlab.domain.service;
+package org.hrds.rducm.gitlab.domain.facade;
 
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
@@ -11,7 +11,7 @@ import java.util.Set;
  * @author ying.xie@hand-china.com
  * @date 2020/3/18
  */
-public interface IC7nBaseServiceService {
+public interface IC7nBaseServiceFacade {
     /**
      * 根据用户id获取Gitlab用户id
      * todo 高频调用, 是否使用缓存

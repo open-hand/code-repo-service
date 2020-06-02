@@ -5,8 +5,8 @@ import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
-import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
-import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
+import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.util.AssertExtensionUtils;
@@ -31,9 +31,9 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     @Autowired
     private RdmMemberRepository rdmMemberRepository;
     @Autowired
-    private IC7nDevOpsServiceService ic7nDevOpsServiceService;
+    private IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
     @Autowired
-    private IC7nBaseServiceService ic7nBaseServiceService;
+    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -91,7 +91,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
             iRdmMemberService.tryRemoveMemberToGitlab(glProjectId, glUserId);
         } else {
             // 若glUserId为null, 获取glUserId
-            glUserId = glUserId != null ? glUserId : ic7nBaseServiceService.userIdToGlUserId(userId);
+            glUserId = glUserId != null ? glUserId : ic7NBaseServiceFacade.userIdToGlUserId(userId);
 
             // 更新Gitlab成员
             iRdmMemberService.tryRemoveAndAddMemberToGitlab(glProjectId, glUserId, accessLevel, expiresAt);
@@ -111,7 +111,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
         if (userId == null) {
             // 同步并新增
             // 查询Gitlab用户对应的userId
-            userId = ic7nDevOpsServiceService.glUserIdToUserId(glUserId);
+            userId = ic7NDevOpsServiceFacade.glUserIdToUserId(glUserId);
 
             dbMember.setOrganizationId(organizationId)
                     .setProjectId(projectId)

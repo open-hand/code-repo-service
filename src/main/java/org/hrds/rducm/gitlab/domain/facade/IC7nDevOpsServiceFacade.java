@@ -1,4 +1,4 @@
-package org.hrds.rducm.gitlab.domain.service;
+package org.hrds.rducm.gitlab.domain.facade;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
@@ -12,7 +12,7 @@ import java.util.Set;
  * @author ying.xie@hand-china.com
  * @date 2020/3/18
  */
-public interface IC7nDevOpsServiceService {
+public interface IC7nDevOpsServiceFacade {
     /**
      * 根据应用服务id获取Gitlab代码库id
      * todo 高频调用, 是否使用缓存

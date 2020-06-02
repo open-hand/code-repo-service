@@ -11,8 +11,8 @@ import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nProjectViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
-import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
-import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
+import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
@@ -31,9 +31,9 @@ import java.util.stream.Collectors;
 @Component
 public class RdmMemberAssembler {
     @Autowired
-    private IC7nDevOpsServiceService ic7nDevOpsServiceService;
+    private IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
     @Autowired
-    private IC7nBaseServiceService ic7nBaseServiceService;
+    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
 
     /**
      * 将GitlabMemberBatchDTO转换为List<RdmMember>
@@ -48,14 +48,14 @@ public class RdmMemberAssembler {
         Map<Long, Integer> repositoryIdToGlProjectIdMap = new HashMap<>();
         rdmMemberBatchDTO.getRepositoryIds().forEach(repositoryId -> {
             // 获取gitlab项目id
-            Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(repositoryId);
+            Integer glProjectId = ic7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
             repositoryIdToGlProjectIdMap.put(repositoryId, glProjectId);
         });
 
         // 查询gitlab用户id
         Map<Long, Integer> userIdToGlUserIdMap = new HashMap<>();
         rdmMemberBatchDTO.getMembers().forEach(m -> {
-            Integer glUserId = ic7nBaseServiceService.userIdToGlUserId(m.getUserId());
+            Integer glUserId = ic7NBaseServiceFacade.userIdToGlUserId(m.getUserId());
             userIdToGlUserIdMap.put(m.getUserId(), glUserId);
         });
 
@@ -92,8 +92,8 @@ public class RdmMemberAssembler {
         final RdmMember param = ConvertUtils.convertObject(rdmMemberCreateDTO, RdmMember.class);
 
         // 获取gitlab项目id和用户id
-        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(repositoryId);
-        Integer glUserId = ic7nBaseServiceService.userIdToGlUserId(param.getUserId());
+        Integer glProjectId = ic7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
+        Integer glUserId = ic7NBaseServiceFacade.userIdToGlUserId(param.getUserId());
 
         param.setGlProjectId(glProjectId);
         param.setGlUserId(glUserId);
@@ -131,17 +131,17 @@ public class RdmMemberAssembler {
         Map<Long, C7nUserVO> userVOMap = new HashMap<>();
 
         projectIdAndUserIds.asMap().forEach((projectId, userIds) -> {
-            Map<Long, C7nUserVO> tempMap = ic7nBaseServiceService.listC7nUserToMapOnProjectLevel(projectId, Sets.newHashSet(userIds));
+            Map<Long, C7nUserVO> tempMap = ic7NBaseServiceFacade.listC7nUserToMapOnProjectLevel(projectId, Sets.newHashSet(userIds));
             userVOMap.putAll(tempMap);
         });
 
         // 查询应用服务信息
-        Map<Long, C7nAppServiceVO> appServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(repositoryIds);
+        Map<Long, C7nAppServiceVO> appServiceVOMap = ic7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
 
         // 查询项目信息(组织层需要)
         Map<Long, C7nProjectVO> c7nProjectVOMap = Collections.emptyMap();
         if (ResourceLevel.ORGANIZATION.equals(resourceLevel)) {
-            c7nProjectVOMap = ic7nBaseServiceService.listProjectsByIdsToMap(projectIds);
+            c7nProjectVOMap = ic7NBaseServiceFacade.listProjectsByIdsToMap(projectIds);
         }
 
         // 填充数据

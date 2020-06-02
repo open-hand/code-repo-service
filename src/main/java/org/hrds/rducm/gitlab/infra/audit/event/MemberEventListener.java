@@ -6,9 +6,9 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.oauth.DetailsHelper;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
+import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmOperationLogRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
-import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.PlaceholderUtils;
@@ -35,7 +35,7 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
     @Autowired
     private RdmUserRepository userRepository;
     @Autowired
-    private IC7nBaseServiceService ic7nBaseServiceService;
+    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
 
     @Override
     public void onApplicationEvent(MemberEvent event) {
@@ -108,8 +108,8 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
         String expiresAtStr;
         String opDateStr;
 
-        C7nUserVO c7nUserS = ic7nBaseServiceService.detailC7nUser(userId);
-        C7nUserVO c7nUserT = ic7nBaseServiceService.detailC7nUser(targetUserId);
+        C7nUserVO c7nUserS = ic7NBaseServiceFacade.detailC7nUser(userId);
+        C7nUserVO c7nUserT = ic7NBaseServiceFacade.detailC7nUser(targetUserId);
 
         sourceUserIdStr = c7nUserS.getRealName() + "(" + c7nUserS.getLoginName() + ")";
         targetUserIdStr = c7nUserT.getRealName() + "(" + c7nUserT.getLoginName() + ")";

@@ -13,7 +13,7 @@ import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberApplicantRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
-import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
+import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberApplicantService;
 import org.hrds.rducm.gitlab.infra.enums.ApplicantTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.ApprovalStateEnum;
@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
@@ -42,7 +41,7 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
     @Autowired
     private RdmMemberApplicantAssembler rdmMemberApplicantAssembler;
     @Autowired
-    private IC7nBaseServiceService ic7nBaseServiceService;
+    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
 
     @Override
     public Page<RdmMemberApplicantViewDTO> pageByOptions(Long projectId,
@@ -59,7 +58,7 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
 
         // 调用外部接口模糊查询
         if (!StringUtils.isEmpty(applicantUserName)) {
-            Set<Long> userIdsSet = ic7nBaseServiceService.listC7nUserIdsByNameOnProjectLevel(projectId, applicantUserName, null);
+            Set<Long> userIdsSet = ic7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, applicantUserName, null);
 
             if (userIdsSet.isEmpty()) {
                 return new Page<>();

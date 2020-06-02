@@ -4,8 +4,8 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import org.hrds.rducm.gitlab.domain.entity.MemberAuditLog;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
+import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.MemberAuditLogRepository;
-import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
 import org.hrds.rducm.gitlab.domain.service.IMemberAuditService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hzero.mybatis.domian.Condition;
@@ -30,7 +30,7 @@ public class MemberAuditServiceImpl implements IMemberAuditService {
     @Autowired
     private MemberAuditLogRepository memberAuditLogRepository;
     @Autowired
-    private IC7nBaseServiceService ic7nBaseServiceService;
+    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
 
     @Override
     public MemberAuditLog detailLatestAuditLog(Long organizationId, Long projectId) {
@@ -55,7 +55,7 @@ public class MemberAuditServiceImpl implements IMemberAuditService {
 
         // <2> 记录审计日志
         // 获取组织下所有项目
-        Set<Long> projectIds = ic7nBaseServiceService.listProjectIds(organizationId);
+        Set<Long> projectIds = ic7NBaseServiceFacade.listProjectIds(organizationId);
 
         // 按项目分组
         Map<Long, List<RdmMemberAuditRecord>> group = records.stream().collect(Collectors.groupingBy(RdmMemberAuditRecord::getProjectId));

@@ -6,8 +6,8 @@ import io.choerodon.core.iam.ResourceLevel;
 import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nProjectViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
-import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
-import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
+import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
@@ -24,9 +24,9 @@ import java.util.*;
 @Component
 public class RdmOperationLogAssembler {
     @Autowired
-    private IC7nBaseServiceService ic7nBaseServiceService;
+    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
     @Autowired
-    private IC7nDevOpsServiceService ic7nDevOpsServiceService;
+    private IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
 
     /**
      * 操作日志查询结果转换
@@ -47,8 +47,8 @@ public class RdmOperationLogAssembler {
 //        });
 //
 //        // 获取操作人用户信息
-//        Map<Long, C7nUserVO> c7nUserVOMap = ic7nBaseServiceService.listC7nUserToMap(projectId, opUserIds);
-//        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(repositoryIds);
+//        Map<Long, C7nUserVO> c7nUserVOMap = ic7NBaseServiceFacade.listC7nUserToMap(projectId, opUserIds);
+//        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
 //
 //        return PageConvertUtils.convert(ConvertUtils.convertPage(page, val -> {
 //            C7nAppServiceVO c7nAppServiceVO = Optional.ofNullable(c7nAppServiceVOMap.get(val.getRepositoryId())).orElse(new C7nAppServiceVO());
@@ -84,15 +84,15 @@ public class RdmOperationLogAssembler {
         });
 
         // 获取操作人用户信息
-        Map<Long, C7nUserVO> c7nUserVOMap = ic7nBaseServiceService.listC7nUserToMap(opUserIds);
+        Map<Long, C7nUserVO> c7nUserVOMap = ic7NBaseServiceFacade.listC7nUserToMap(opUserIds);
 
         // 获取应用服务信息
-        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(repositoryIds);
+        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
 
         // 查询项目信息(组织层需要)
         Map<Long, C7nProjectVO> c7nProjectVOMap;
         if (ResourceLevel.ORGANIZATION.equals(resourceLevel)) {
-            c7nProjectVOMap = ic7nBaseServiceService.listProjectsByIdsToMap(projectIds);
+            c7nProjectVOMap = ic7NBaseServiceFacade.listProjectsByIdsToMap(projectIds);
         } else {
             c7nProjectVOMap = Collections.emptyMap();
         }

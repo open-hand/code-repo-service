@@ -5,7 +5,7 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
+import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hzero.core.base.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequestMapping("/v1/organizations/{organizationId}")
 public class OrgController extends BaseController {
     @Autowired
-    private IC7nBaseServiceService ic7nBaseServiceService;
+    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
 
     @ApiOperation(value = "查询组织下用户的项目列表(组织层)")
     @ApiImplicitParams({
@@ -35,7 +35,7 @@ public class OrgController extends BaseController {
     public ResponseEntity<List<C7nProjectVO>> listProjectsByUserId(@PathVariable Long organizationId,
                                                                    @PathVariable Long userId,
                                                                    @RequestParam(required = false) String name) {
-        List<C7nProjectVO> c7nProjectVOS = ic7nBaseServiceService.listProjectsByUserIdOnOrgLevel(organizationId, userId, name);
+        List<C7nProjectVO> c7nProjectVOS = ic7NBaseServiceFacade.listProjectsByUserIdOnOrgLevel(organizationId, userId, name);
         return ResponseEntity.ok(c7nProjectVOS);
     }
 }

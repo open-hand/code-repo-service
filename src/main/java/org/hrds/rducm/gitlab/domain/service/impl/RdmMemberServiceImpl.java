@@ -5,7 +5,6 @@ import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.domain.AuditDomain;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import org.gitlab4j.api.models.AccessLevel;
 import org.gitlab4j.api.models.Member;
 import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
@@ -15,10 +14,10 @@ import org.hrds.rducm.gitlab.api.controller.dto.base.BaseUserQueryDTO;
 import org.hrds.rducm.gitlab.domain.aggregate.MemberAuthDetailAgg;
 import org.hrds.rducm.gitlab.domain.component.QueryConditionHelper;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
-import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
-import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
+import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
@@ -39,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -59,9 +57,9 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     @Autowired
     private GitlabAdminApi gitlabAdminApi;
     @Autowired
-    private IC7nDevOpsServiceService ic7nDevOpsServiceService;
+    private IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
     @Autowired
-    private IC7nBaseServiceService ic7nBaseServiceService;
+    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
     @Autowired
     private RdmUserRepository rdmUserRepository;
 
@@ -80,7 +78,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         Page<MemberAuthDetailAgg> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectMembersRepositoryAuthorized(organizationId, projectId, userIdsSet));
 
         // 查询应用服务总数
-        int allRepositoryCount = ic7nDevOpsServiceService.listC7nAppServiceOnProjectLevel(projectId).size();
+        int allRepositoryCount = ic7NDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId).size();
         BigDecimal allRepositoryCountBigD = new BigDecimal(allRepositoryCount);
 
         // 用户id
@@ -91,7 +89,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         });
 
         // 获取操作人用户信息
-        Map<Long, C7nUserVO> c7nUserVOMap = ic7nBaseServiceService.listC7nUserToMapOnProjectLevel(projectId, userIds);
+        Map<Long, C7nUserVO> c7nUserVOMap = ic7NBaseServiceFacade.listC7nUserToMapOnProjectLevel(projectId, userIds);
 
 
         Page<MemberAuthDetailViewDTO> pageReturn = ConvertUtils.convertPage(page, (v) -> {
@@ -132,7 +130,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         });
 
         // 获取应用服务信息
-        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7nDevOpsServiceService.listC7nAppServiceToMap(repositoryIds);
+        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
 
 
         Page<RdmMemberViewDTO> pageReturn = ConvertUtils.convertPage(page, (v) -> {
@@ -303,7 +301,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     @Transactional(rollbackFor = Exception.class)
     public int syncAllMembersFromGitlab(Long organizationId, Long projectId, Long repositoryId) {
         // <1> 获取Gitlab项目id
-        Integer glProjectId = ic7nDevOpsServiceService.repositoryIdToGlProjectId(repositoryId);
+        Integer glProjectId = ic7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
 
         if (glProjectId == null) {
             return 0;
@@ -346,7 +344,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
                     }
 
                     // 查询Gitlab用户对应的userId
-                    Long userId = ic7nDevOpsServiceService.glUserIdToUserId(glMember.getId());
+                    Long userId = ic7NDevOpsServiceFacade.glUserIdToUserId(glMember.getId());
 
                     if (userId == null) {
                         logger.info("该Gitlab用户{}无对应的猪齿鱼用户", glMember.getUsername());

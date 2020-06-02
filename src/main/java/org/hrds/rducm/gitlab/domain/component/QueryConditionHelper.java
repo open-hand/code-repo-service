@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.domain.component;
 
-import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
-import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
+import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -17,8 +17,8 @@ import java.util.Set;
  */
 @Component
 public class QueryConditionHelper {
-    private static IC7nBaseServiceService ic7nBaseServiceService;
-    private static IC7nDevOpsServiceService ic7nDevOpsServiceService;
+    private static IC7nBaseServiceFacade ic7NBaseServiceFacade;
+    private static IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
 
     /**
      * 项目层
@@ -36,7 +36,7 @@ public class QueryConditionHelper {
     public static Set<Long> queryByNameConditionOnProj(Long projectId, String realName, String loginName) {
         // 调用外部接口模糊查询 用户名或登录名
         if (!StringUtils.isEmpty(realName) || !StringUtils.isEmpty(loginName)) {
-            Set<Long> userIdsSet = ic7nBaseServiceService.listC7nUserIdsByNameOnProjectLevel(projectId, realName, loginName);
+            Set<Long> userIdsSet = ic7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, realName, loginName);
 
             return userIdsSet.isEmpty() ? Collections.emptySet() : userIdsSet;
         }
@@ -45,12 +45,12 @@ public class QueryConditionHelper {
     }
 
     @Autowired
-    public void setIc7nBaseServiceService(IC7nBaseServiceService ic7nBaseServiceService) {
-        QueryConditionHelper.ic7nBaseServiceService = ic7nBaseServiceService;
+    public void setIc7nBaseServiceService(IC7nBaseServiceFacade ic7NBaseServiceFacade) {
+        QueryConditionHelper.ic7NBaseServiceFacade = ic7NBaseServiceFacade;
     }
 
     @Autowired
-    public static void setIc7nDevOpsServiceService(IC7nDevOpsServiceService ic7nDevOpsServiceService) {
-        QueryConditionHelper.ic7nDevOpsServiceService = ic7nDevOpsServiceService;
+    public static void setIc7NDevOpsServiceFacade(IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade) {
+        QueryConditionHelper.ic7NDevOpsServiceFacade = ic7NDevOpsServiceFacade;
     }
 }
