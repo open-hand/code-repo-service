@@ -1,20 +1,17 @@
 package org.hrds.rducm.gitlab.app.job;
 
-import com.google.common.base.Stopwatch;
-import io.choerodon.asgard.schedule.annotation.JobParam;
-import io.choerodon.asgard.schedule.annotation.JobTask;
-import org.hrds.rducm.gitlab.domain.service.IC7nBaseServiceService;
-import org.hrds.rducm.gitlab.domain.service.IC7nDevOpsServiceService;
+import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 初始化Gitlab权限到代码库的任务
@@ -29,9 +26,9 @@ public class MemberInitJob {
     @Autowired
     private IRdmMemberService iRdmMemberService;
     @Autowired
-    private IC7nBaseServiceService ic7nBaseServiceService;
+    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
     @Autowired
-    private IC7nDevOpsServiceService ic7nDevOpsServiceService;
+    private IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
 
     /**
      * 上线时初始化Gitlab成员到代码库
@@ -45,29 +42,33 @@ public class MemberInitJob {
     public void initRdmMembers(Map<String, Object> map) {
 //        Long organizationId = (Long) map.get("organizationId");
 
+        StopWatch stopWatch = new StopWatch();
+
         // <0> 获取所有组织
-        for (long i = 0; i < 730; i++) {
+        for (long i = 0; i < 10; i++) {
+            stopWatch.start("组织" + i);
+
             Long organizationId = i;
 
             // <1> 获取组织下所有项目
-            Set<Long> projectIds = ic7nBaseServiceService.listProjectIds(organizationId);
+            Set<Long> projectIds = ic7NBaseServiceFacade.listProjectIds(organizationId);
 
             logger.info("该组织{} 下的所有项目为{}", organizationId, projectIds);
 
             // <2> 获取项目下所有代码库id和Gitlab项目id
             projectIds.forEach(projectId -> {
-                Map<Long, Long> appServiceIdMap = ic7nDevOpsServiceService.listC7nAppServiceIdsMapOnProjectLevel(projectId);
+                Map<Long, Long> appServiceIdMap = ic7NDevOpsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
 
                 appServiceIdMap.forEach((repositoryId, glProjectId) -> {
                     logger.info("组织id为{}, 项目id为{}, 代码库id为{}", organizationId, projectId, repositoryId);
-                    Stopwatch stopwatch = Stopwatch.createStarted();
                     int count = iRdmMemberService.syncAllMembersFromGitlab(organizationId, projectId, repositoryId);
                     logger.info("此次导入了{}个成员", count);
-
-                    long elapsed = stopwatch.elapsed(TimeUnit.MICROSECONDS);
-                    logger.info("耗时 {} ms", elapsed);
                 });
             });
+
+            stopWatch.stop();
         }
+
+        logger.info("Gitlab成员初始化完成, \n{}", stopWatch.prettyPrint());
     }
 }
