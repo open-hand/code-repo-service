@@ -122,7 +122,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                     .setGlAccessLevel(accessLevel)
                     .setGlExpiresAt(expiresAt)
                     .setSyncGitlabFlag(Boolean.TRUE)
-                    .setSyncDateGitlab(new Date());
+                    .setSyncGitlabDate(new Date());
 
             // 重新插入
             rdmMemberRepository.insertSelective(dbMember);
@@ -136,7 +136,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                 dbMember.setGlAccessLevel(accessLevel)
                         .setGlExpiresAt(expiresAt)
                         .setSyncGitlabFlag(Boolean.TRUE)
-                        .setSyncDateGitlab(new Date());
+                        .setSyncGitlabDate(new Date());
                 rdmMemberRepository.updateByPrimaryKey(dbMember);
             }
         }

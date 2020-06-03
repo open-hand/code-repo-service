@@ -335,12 +335,16 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Transactional(rollbackFor = Exception.class)
     public void batchAddMemberSagaDemo(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
         // <0> 校验入参 + 转换
-//        List<RdmMember> rdmMembers = rdmMemberAssembler.rdmMemberBatchDTOToRdmMembers(organizationId, projectId, rdmMemberBatchDTO);
-//
-//        // <1> 预更新, 数据库添加成员, 已存在需要更新
-//        iRdmMemberService.batchAddOrUpdateMembersBefore(rdmMembers);
+        List<RdmMember> rdmMembers = rdmMemberAssembler.rdmMemberBatchDTOToRdmMembers(organizationId, projectId, rdmMemberBatchDTO);
 
-        System.out.println("-------------- saga 001");
+        // <1> 数据库添加成员, 已存在需要更新, 发起一个新事务
+        // 开启新事务的目的是使这一步操作独立执行, 保证预操作成功
+        self().batchAddOrUpdateMembersBeforeRequestsNew(rdmMembers);
+
+        // 检测Gitlab是否无法修改权限
+        // 当该成员
+
+
 
         // 创建saga
         producer.apply(

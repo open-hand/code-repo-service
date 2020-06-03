@@ -251,12 +251,12 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
                 RdmMember.FIELD_GL_ACCESS_LEVEL,
                 RdmMember.FIELD_GL_EXPIRES_AT,
                 RdmMember.FIELD_SYNC_GITLAB_FLAG,
-                RdmMember.FIELD_SYNC_DATE_GITLAB
+                RdmMember.FIELD_SYNC_GITLAB_DATE
         };
         m.setGlAccessLevel(member.getAccessLevel().toValue());
         m.setGlExpiresAt(member.getExpiresAt());
         m.setSyncGitlabFlag(true);
-        m.setSyncDateGitlab(new Date());
+        m.setSyncGitlabDate(new Date());
         rdmMemberRepository.updateOptional(m, fields);
     }
 
@@ -281,7 +281,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             try {
                 this.removeMemberToGitlab(glProjectId, glUserId);
             } catch (GitlabClientException e) {
-                throw new CommonException("error.member.not.allow.change", glMember.getName());
+                throw new CommonException("error.member.not.allow.change", e, glMember.getName());
             }
         }
     }
@@ -359,7 +359,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
                                 .setGlAccessLevel(glMember.getAccessLevel().toValue())
                                 .setGlExpiresAt(glMember.getExpiresAt())
                                 .setSyncGitlabFlag(Boolean.TRUE)
-                                .setSyncDateGitlab(new Date());
+                                .setSyncGitlabDate(new Date());
 
                         // 重新插入
                         rdmMemberRepository.insertSelective(rdmMember);

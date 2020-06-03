@@ -38,7 +38,7 @@ public class RdmMember extends AuditDomain {
     public static final String FIELD_GL_ACCESS_LEVEL = "glAccessLevel";
     public static final String FIELD_GL_EXPIRES_AT = "glExpiresAt";
     public static final String FIELD_SYNC_GITLAB_FLAG = "syncGitlabFlag";
-    public static final String FIELD_SYNC_DATE_GITLAB = "syncDateGitlab";
+    public static final String FIELD_SYNC_GITLAB_DATE = "syncGitlabDate";
 
     //
     // 业务方法(按public protected private顺序排列)
@@ -91,8 +91,6 @@ public class RdmMember extends AuditDomain {
     @ApiModelProperty(value = "用户id", required = true)
     @NotNull
     private Long userId;
-    @ApiModelProperty(value = "成员状态")
-    private String state;
     @ApiModelProperty(value = "gitlab项目id")
     private Integer glProjectId;
     @ApiModelProperty(value = "gitlab用户id")
@@ -105,7 +103,7 @@ public class RdmMember extends AuditDomain {
     @NotNull
     private Boolean syncGitlabFlag;
     @ApiModelProperty(value = "gitlab同步时间")
-    private Date syncDateGitlab;
+    private Date syncGitlabDate;
 
     //
     // 非数据库字段
@@ -166,15 +164,6 @@ public class RdmMember extends AuditDomain {
         return this;
     }
 
-    public String getState() {
-        return state;
-    }
-
-    public RdmMember setState(String state) {
-        this.state = state;
-        return this;
-    }
-
     public Integer getGlProjectId() {
         return glProjectId;
     }
@@ -220,12 +209,12 @@ public class RdmMember extends AuditDomain {
         return this;
     }
 
-    public Date getSyncDateGitlab() {
-        return syncDateGitlab;
+    public Date getSyncGitlabDate() {
+        return syncGitlabDate;
     }
 
-    public RdmMember setSyncDateGitlab(Date syncDateGitlab) {
-        this.syncDateGitlab = syncDateGitlab;
+    public RdmMember setSyncGitlabDate(Date syncGitlabDate) {
+        this.syncGitlabDate = syncGitlabDate;
         return this;
     }
 
