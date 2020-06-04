@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
+import com.google.common.collect.Sets;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.domain.AuditDomain;
@@ -88,18 +89,22 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             userIds.add(v.getUserId());
         });
 
-        // 获取操作人用户信息
-        Map<Long, C7nUserVO> c7nUserVOMap = ic7NBaseServiceFacade.listC7nUserToMapOnProjectLevel(projectId, userIds);
+        // 获取操作人用户信息, 带有项目角色信息
+        Map<Long, C7nUserVO> userWithRolesVOMap = ic7NBaseServiceFacade.listC7nUserToMapOnProjectLevel(projectId, userIds);
+        // 查询用户信息
+        Map<Long, C7nUserVO> userVOMap = ic7NBaseServiceFacade.listC7nUserToMap(Sets.newHashSet(userIds));
 
 
         Page<MemberAuthDetailViewDTO> pageReturn = ConvertUtils.convertPage(page, (v) -> {
             MemberAuthDetailViewDTO viewDTO = ConvertUtils.convertObject(v, MemberAuthDetailViewDTO.class);
-            C7nUserVO c7nUserVO = Optional.ofNullable(c7nUserVOMap.get(v.getUserId()))
+            C7nUserVO c7nUserVO = Optional.ofNullable(userVOMap.get(v.getUserId()))
+                    .orElse(new C7nUserVO());
+            C7nUserVO c7nUserWithRolesVO = Optional.ofNullable(userWithRolesVOMap.get(v.getUserId()))
                     .orElse(new C7nUserVO().setRoles(Collections.emptyList()));
 
             viewDTO.setAllRepositoryCount(allRepositoryCount);
             viewDTO.setUser(BaseC7nUserViewDTO.convert(c7nUserVO));
-            viewDTO.setRoleNames(c7nUserVO.getRoles().stream().map(C7nRoleVO::getName).collect(Collectors.toList()));
+            viewDTO.setRoleNames(c7nUserWithRolesVO.getRoles().stream().map(C7nRoleVO::getName).collect(Collectors.toList()));
 
             BigDecimal authorizedRepositoryCountBigD = Optional.ofNullable(viewDTO.getAuthorizedRepositoryCount()).map(BigDecimal::new).orElse(BigDecimal.ZERO);
             viewDTO.setAuthorizedRepositoryPercent(authorizedRepositoryCountBigD.divide(allRepositoryCountBigD, 4, BigDecimal.ROUND_HALF_UP));
