@@ -114,26 +114,32 @@ public class RdmMemberAssembler {
     public Page<RdmMemberViewDTO> pageToRdmMemberViewDTO(Page<RdmMember> page, ResourceLevel resourceLevel) {
         Page<RdmMemberViewDTO> rdmMemberViewDTOS = ConvertUtils.convertPage(page, RdmMemberViewDTO.class);
 
-        // 获取用户id集合, 格式如: {projectId: [userId1, userId2]}
+        // 获取用户id集合, 格式如: {projectId: [userId1, userId2]}, 用于查询项目角色
         Multimap<Long, Long> projectIdAndUserIds = HashMultimap.create();
+        // 获取用户id集合
+        Set<Long> userIds = Sets.newHashSet();
         // 获取代码库id集合
         Set<Long> repositoryIds = Sets.newHashSet();
         // 获取项目id集合
         Set<Long> projectIds = Sets.newHashSet();
         rdmMemberViewDTOS.getContent().forEach(dto -> {
             projectIdAndUserIds.put(dto.getProjectId(), dto.getUserId());
-            projectIdAndUserIds.put(dto.getProjectId(), dto.getCreatedBy());
+            userIds.add(dto.getUserId());
+            userIds.add(dto.getCreatedBy());
             repositoryIds.add(dto.getRepositoryId());
             projectIds.add(dto.getProjectId());
         });
 
-        // 查询用户信息
-        Map<Long, C7nUserVO> userVOMap = new HashMap<>();
+        // 查询用户信息, 带角色信息
+        Map<Long, C7nUserVO> userWithRolesVOMap = new HashMap<>();
 
-        projectIdAndUserIds.asMap().forEach((projectId, userIds) -> {
-            Map<Long, C7nUserVO> tempMap = ic7NBaseServiceFacade.listC7nUserToMapOnProjectLevel(projectId, Sets.newHashSet(userIds));
-            userVOMap.putAll(tempMap);
+        projectIdAndUserIds.asMap().forEach((projectId, uIds) -> {
+            Map<Long, C7nUserVO> tempMap = ic7NBaseServiceFacade.listC7nUserToMapOnProjectLevel(projectId, Sets.newHashSet(uIds));
+            userWithRolesVOMap.putAll(tempMap);
         });
+
+        // 查询用户信息
+        Map<Long, C7nUserVO> userVOMap = ic7NBaseServiceFacade.listC7nUserToMap(Sets.newHashSet(userIds));
 
         // 查询应用服务信息
         Map<Long, C7nAppServiceVO> appServiceVOMap = ic7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
@@ -146,8 +152,11 @@ public class RdmMemberAssembler {
 
         // 填充数据
         for (RdmMemberViewDTO viewDTO : rdmMemberViewDTOS.getContent()) {
-            C7nUserVO c7nUserVO = Optional.ofNullable(userVOMap.get(viewDTO.getUserId())).orElse(new C7nUserVO().setRoles(Collections.emptyList()));
+            C7nUserVO c7nUserVO = Optional.ofNullable(userVOMap.get(viewDTO.getUserId())).orElse(new C7nUserVO());
             C7nUserVO c7nCreateUserVO = Optional.ofNullable(userVOMap.get(viewDTO.getCreatedBy())).orElse(new C7nUserVO());
+
+            C7nUserVO c7nUserWithRolesVO = Optional.ofNullable(userWithRolesVOMap.get(viewDTO.getUserId())).orElse(new C7nUserVO().setRoles(Collections.emptyList()));
+
 
             C7nAppServiceVO c7nAppServiceVO = Optional.ofNullable(appServiceVOMap.get(viewDTO.getRepositoryId())).orElse(new C7nAppServiceVO());
 
@@ -158,7 +167,7 @@ public class RdmMemberAssembler {
             }
 
             viewDTO.setUser(BaseC7nUserViewDTO.convert(c7nUserVO));
-            viewDTO.setRoleNames(c7nUserVO.getRoles().stream().map(C7nRoleVO::getName).collect(Collectors.toList()));
+            viewDTO.setRoleNames(c7nUserWithRolesVO.getRoles().stream().map(C7nRoleVO::getName).collect(Collectors.toList()));
 
             viewDTO.setCreatedUser(BaseC7nUserViewDTO.convert(c7nCreateUserVO));
 
