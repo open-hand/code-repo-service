@@ -27,6 +27,8 @@ import org.hzero.export.annotation.ExcelExport;
 import org.hzero.export.vo.ExportParam;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -43,6 +46,8 @@ import static org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeCons
 
 @Service
 public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<RdmMemberAppServiceImpl> {
+    private static final Logger logger = LoggerFactory.getLogger(RdmMemberAppServiceImpl.class);
+
     private final RdmMemberRepository rdmMemberRepository;
 
     @Autowired
@@ -180,19 +185,25 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             }
 
             // <2.2> 新增或更新成员至gitlab
-            Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
+            try {
+                Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
 
-            // <2.3> 回写数据库
-            iRdmMemberService.updateMemberAfter(m, glMember);
+                // <2.3> 回写数据库
+                iRdmMemberService.updateMemberAfter(m, glMember);
 
-            // <2.4> 发送事件
-            if (isExists) {
-                iRdmMemberService.publishMemberEvent(m, MemberEvent.EventType.UPDATE_MEMBER);
-            } else {
-                iRdmMemberService.publishMemberEvent(m, MemberEvent.EventType.ADD_MEMBER);
+                // <2.4> 发送事件
+                if (isExists) {
+                    iRdmMemberService.publishMemberEvent(m, MemberEvent.EventType.UPDATE_MEMBER);
+                } else {
+                    iRdmMemberService.publishMemberEvent(m, MemberEvent.EventType.ADD_MEMBER);
+                }
+            } catch (Exception e) {
+                // 回写数据库错误消息
+                logger.error(e.getMessage(), e);
+                m.setSyncGitlabErrorMsg(e.getMessage());
+                rdmMemberRepository.updateOptional(m, RdmMember.FIELD_SYNC_GITLAB_ERROR_MSG);
             }
         });
-//        iRdmMemberService.batchAddOrUpdateMembersToGitlab(rdmMembers);
     }
 
     @Override

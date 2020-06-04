@@ -39,6 +39,7 @@ public class RdmMember extends AuditDomain {
     public static final String FIELD_GL_EXPIRES_AT = "glExpiresAt";
     public static final String FIELD_SYNC_GITLAB_FLAG = "syncGitlabFlag";
     public static final String FIELD_SYNC_GITLAB_DATE = "syncGitlabDate";
+    public static final String FIELD_SYNC_GITLAB_ERROR_MSG = "syncGitlabErrorMsg";
 
     //
     // 业务方法(按public protected private顺序排列)
@@ -104,6 +105,8 @@ public class RdmMember extends AuditDomain {
     private Boolean syncGitlabFlag;
     @ApiModelProperty(value = "gitlab同步时间")
     private Date syncGitlabDate;
+    @ApiModelProperty(value = "同步gitlab失败的错误信息")
+    private String syncGitlabErrorMsg;
 
     //
     // 非数据库字段
@@ -224,6 +227,15 @@ public class RdmMember extends AuditDomain {
 
     public RdmMember setExpiredFlag(Boolean expiredFlag) {
         this.expiredFlag = expiredFlag;
+        return this;
+    }
+
+    public String getSyncGitlabErrorMsg() {
+        return syncGitlabErrorMsg;
+    }
+
+    public RdmMember setSyncGitlabErrorMsg(String syncGitlabErrorMsg) {
+        this.syncGitlabErrorMsg = syncGitlabErrorMsg;
         return this;
     }
 }
