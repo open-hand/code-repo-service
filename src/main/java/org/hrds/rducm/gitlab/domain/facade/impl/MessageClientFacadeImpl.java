@@ -7,6 +7,8 @@ import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hzero.boot.message.MessageClient;
 import org.hzero.boot.message.entity.Receiver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
 public class MessageClientFacadeImpl implements MessageClientFacade {
     public static final String APPLICANT_TEMPLATE_CODE = "RDUCM.MEMBER_APPLICANT";
 
+    private static final Logger logger = LoggerFactory.getLogger(MessageClientFacadeImpl.class);
+
     @Autowired
     private MessageClient messageClient;
     @Autowired
@@ -32,8 +36,9 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
      */
     @Override
     public void sendApprovalMessage(Long projectId) {
+        // 查询该项目下所有用户
         List<C7nUserVO> c7nUserVOS = ic7nBaseServiceFacade.listC7nUsersOnProjectLevel(projectId);
-        // 获取所有"项目管理员"角色的用户
+        // 过滤并获取所有"项目管理员"角色的用户
         c7nUserVOS = c7nUserVOS.stream()
                 .filter(u -> u.getRoles().stream()
                         .anyMatch(r -> IamRoleCodeEnum.PROJECT_OWNER.getCode().equals(r.getCode())))
@@ -53,6 +58,9 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
 
         args.put("processName", "测试消息");
         args.put("processDescription", "测试消息");
+
+        logger.info("tenantId:[{}], receivers:[{}]", tenantId, receivers);
+
         // 同步发送站内消息
         messageClient.sendWebMessage(tenantId, APPLICANT_TEMPLATE_CODE, lang, receivers, args);
         // 异步发送站内消息
