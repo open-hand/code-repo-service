@@ -251,12 +251,14 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
                 RdmMember.FIELD_GL_ACCESS_LEVEL,
                 RdmMember.FIELD_GL_EXPIRES_AT,
                 RdmMember.FIELD_SYNC_GITLAB_FLAG,
-                RdmMember.FIELD_SYNC_GITLAB_DATE
+                RdmMember.FIELD_SYNC_GITLAB_DATE,
+                RdmMember.FIELD_SYNC_GITLAB_ERROR_MSG
         };
         m.setGlAccessLevel(member.getAccessLevel().toValue());
         m.setGlExpiresAt(member.getExpiresAt());
         m.setSyncGitlabFlag(true);
         m.setSyncGitlabDate(new Date());
+        m.setSyncGitlabErrorMsg(null);
         rdmMemberRepository.updateOptional(m, fields);
     }
 
