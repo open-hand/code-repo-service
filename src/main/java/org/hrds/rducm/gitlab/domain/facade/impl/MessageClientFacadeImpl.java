@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class MessageClientFacadeImpl implements MessageClientFacade {
-    public static final String APPLICANT_TEMPLATE_CODE = "RDUCM.MEMBER_APPLICANT";
+    public static final String APPLICANT_TEMPLATE_CODE = "RDUCM_MEMBER_APPLICANT.WEB";
 
     private static final Logger logger = LoggerFactory.getLogger(MessageClientFacadeImpl.class);
 
