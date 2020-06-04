@@ -69,11 +69,11 @@ public class RdmMemberSagaHandler {
     /**
      * 回写数据库
      */
-    @SagaTask(code = SagaTaskCodeConstants.RDUCM_BATCH_ADD_MEMBERS_TO_GITLAB,
-            description = "回写数据库",
-            sagaCode = SagaTopicCodeConstants.RDUCM_BATCH_ADD_MEMBERS,
-            maxRetryCount = 3,
-            seq = 1)
+//    @SagaTask(code = SagaTaskCodeConstants.RDUCM_BATCH_ADD_MEMBERS_TO_GITLAB,
+//            description = "回写数据库",
+//            sagaCode = SagaTopicCodeConstants.RDUCM_BATCH_ADD_MEMBERS,
+//            maxRetryCount = 3,
+//            seq = 1)
     public void updateAfter(String data) {
 //        List<RdmMember> rdmMembers = new ArrayList<>();
 //
