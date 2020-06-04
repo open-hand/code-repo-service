@@ -11,6 +11,7 @@ import org.hrds.rducm.gitlab.api.controller.validator.RdmMemberApplicantValidato
 import org.hrds.rducm.gitlab.app.assembler.RdmMemberApplicantAssembler;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
+import org.hrds.rducm.gitlab.domain.facade.MessageClientFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberApplicantRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
@@ -20,6 +21,8 @@ import org.hrds.rducm.gitlab.infra.enums.ApprovalStateEnum;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +37,8 @@ import java.util.Set;
  */
 @Service
 public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService {
+    private static final Logger logger = LoggerFactory.getLogger(RdmMemberApplicantServiceImpl.class);
+
     @Autowired
     private RdmMemberApplicantRepository rdmMemberApplicantRepository;
     @Autowired
@@ -42,6 +47,8 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
     private RdmMemberApplicantAssembler rdmMemberApplicantAssembler;
     @Autowired
     private IC7nBaseServiceFacade ic7NBaseServiceFacade;
+    @Autowired
+    private MessageClientFacade messageClientFacade;
 
     @Override
     public Page<RdmMemberApplicantViewDTO> pageByOptions(Long projectId,
@@ -107,6 +114,10 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
         param.setApplicantDate(new Date());
         param.setApprovalState(ApprovalStateEnum.PENDING.getCode());
         rdmMemberApplicantRepository.insertSelective(param);
+
+        // <3> 发送站内信, 通知审批人
+        logger.info("发送站内信, 通知审批人");
+        messageClientFacade.sendApprovalMessage(projectId);
     }
 
     @Override

@@ -102,6 +102,19 @@ public class C7NBaseServiceFacadeImpl implements IC7nBaseServiceFacade {
     }
 
     @Override
+    public List<C7nUserVO> listC7nUsersOnProjectLevel(Long projectId) {
+        // 0为不分页
+        ResponseEntity<Page<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnProjectLevel(projectId, 0, 0, null, null);
+
+        if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getContent())) {
+            List<C7nUserVO> c7nUserVOS = responseEntity.getBody().getContent();
+            return c7nUserVOS;
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
     public Set<Long> listProjectsC7nUserIdsByNameOnOrgLevel(Long organizationId, String realName, String loginName) {
         // 查询该组织所有项目
         Set<Long> projectIds = this.listProjectIds(organizationId);

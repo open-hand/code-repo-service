@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.hzero</groupId>
         <artifactId>hzero-parent</artifactId>
-        <version>1.3.1.RELEASE</version>
+        <version>1.3.2.RELEASE</version>
     </parent>
 
     <groupId>org.hrds.rducm</groupId>
@@ -41,6 +41,12 @@
 <!--            <groupId>org.hzero.starter</groupId>-->
 <!--            <artifactId>hzero-starter-dynamic-route</artifactId>-->
 <!--        </dependency>-->
+        <!-- 消息服务客户端 -->
+        <dependency>
+            <groupId>org.hzero.boot</groupId>
+            <artifactId>hzero-boot-message</artifactId>
+        </dependency>
+
         <!-- 导出组件 -->
         <dependency>
             <groupId>org.hzero.starter</groupId>

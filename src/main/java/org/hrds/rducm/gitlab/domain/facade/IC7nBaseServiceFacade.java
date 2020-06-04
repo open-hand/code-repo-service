@@ -59,6 +59,15 @@ public interface IC7nBaseServiceFacade {
     Set<Long> listC7nUserIdsByNameOnProjectLevel(Long projectId, String realName, String loginName);
 
     /**
+     * 项目层
+     * 查询项目的所有用户信息
+     *
+     * @param projectId
+     * @return
+     */
+    List<C7nUserVO> listC7nUsersOnProjectLevel(Long projectId);
+
+    /**
      * 组织层
      * 查询组织下的所有项目成员的用户id(非组织层的用户), 根据实际名称和登录名模糊查询
      *
