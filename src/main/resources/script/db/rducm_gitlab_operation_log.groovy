@@ -1,7 +1,7 @@
 package script.db
 
 databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_operation_log.groovy') {
-    changeSet(author: "ying.xie@hand-china.com", id: "2020-03-03-rducm_gitlab_operation_log") {
+    changeSet(author: "ying.xie@hand-china.com", id: "2020-06-05-rducm_gitlab_operation_log") {
         def weight = 1
         if (helper.isSqlServer()) {
             weight = 2
