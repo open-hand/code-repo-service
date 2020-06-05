@@ -11,10 +11,10 @@ import org.hrds.rducm.gitlab.api.controller.validator.RdmMemberApplicantValidato
 import org.hrds.rducm.gitlab.app.assembler.RdmMemberApplicantAssembler;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.MessageClientFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberApplicantRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
-import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberApplicantService;
 import org.hrds.rducm.gitlab.infra.enums.ApplicantTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.ApprovalStateEnum;
@@ -52,10 +52,10 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
 
     @Override
     public Page<RdmMemberApplicantViewDTO> pageByOptions(Long projectId,
-                                                             PageRequest pageRequest,
-                                                             Set<Long> repositoryIds,
-                                                             String applicantUserName,
-                                                             String approvalState) {
+                                                         PageRequest pageRequest,
+                                                         Set<Long> repositoryIds,
+                                                         String applicantUserName,
+                                                         String approvalState) {
         Condition condition = Condition.builder(RdmMemberApplicant.class)
                 .where(Sqls.custom()
                         .andEqualTo(RdmMemberApplicant.FIELD_PROJECT_ID, projectId)

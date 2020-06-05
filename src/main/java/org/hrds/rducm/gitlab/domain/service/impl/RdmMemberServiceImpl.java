@@ -15,14 +15,13 @@ import org.hrds.rducm.gitlab.api.controller.dto.base.BaseUserQueryDTO;
 import org.hrds.rducm.gitlab.domain.aggregate.MemberAuthDetailAgg;
 import org.hrds.rducm.gitlab.domain.component.QueryConditionHelper;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
-import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
-import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
-import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabAdminApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.admin.GitlabAdminApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
@@ -61,8 +60,6 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
-    @Autowired
-    private RdmUserRepository rdmUserRepository;
 
     @Override
     public Page<MemberAuthDetailViewDTO> pageMembersRepositoryAuthorized(Long organizationId, Long projectId, PageRequest pageRequest, BaseUserQueryDTO queryDTO) {

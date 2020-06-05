@@ -25,15 +25,6 @@ public class RdmMemberApplicantViewDTO {
     @ApiModelProperty(value = "申请人")
     private BaseC7nUserViewDTO applicantUser;
 
-//    @ApiModelProperty(value = "申请人，用户id")
-//    private Long applicantUserId;
-//
-//    @ApiModelProperty(value = "申请人，用户名")
-//    private String applicantUserName;
-//
-//    @ApiModelProperty(value = "申请人，头像地址")
-//    private String applicantImageUrl;
-
     @ApiModelProperty(value = "申请类型（新成员|权限变更）")
     private String applicantType;
 
@@ -42,15 +33,6 @@ public class RdmMemberApplicantViewDTO {
 
     @ApiModelProperty(value = "审批人")
     private BaseC7nUserViewDTO approvalUser;
-
-//    @ApiModelProperty(value = "审批人，用户id")
-//    private Long approvalUserId;
-//
-//    @ApiModelProperty(value = "审批人，用户名")
-//    private String approvalUserName;
-//
-//    @ApiModelProperty(value = "审批人，头像地址")
-//    private String approvalImageUrl;
 
     @ApiModelProperty(value = "审批状态（待审批|通过|不通过）")
     private String approvalState;

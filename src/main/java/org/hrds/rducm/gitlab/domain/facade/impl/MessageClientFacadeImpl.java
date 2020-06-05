@@ -12,7 +12,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -32,7 +35,7 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
 
     /**
      * 申请权限发送站内消息
-     * 发送给所有项目管理员
+     * 发送给所有[项目管理员]
      */
     @Override
     public void sendApprovalMessage(Long projectId) {
@@ -46,7 +49,7 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
 
         Long tenantId = DetailsHelper.getUserDetails().getTenantId();
         String lang = "zh_CN";
-        List<Receiver> receivers = new ArrayList<>();;
+        List<Receiver> receivers = new ArrayList<>();
         Map<String, String> args = new HashMap<>(16);
 
         c7nUserVOS.forEach(u -> {
@@ -56,14 +59,9 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
             receivers.add(receiver);
         });
 
-        args.put("processName", "测试消息");
-        args.put("processDescription", "测试消息");
-
         logger.info("tenantId:[{}], receivers:[{}]", tenantId, receivers);
 
-        // 同步发送站内消息
-        messageClient.sendWebMessage(tenantId, APPLICANT_TEMPLATE_CODE, lang, receivers, args);
         // 异步发送站内消息
-//        messageClient.async().sendWebMessage(tenantId, messageTemplateCode, lang, Collections.singletonList(receiver), args);
+        messageClient.async().sendWebMessage(tenantId, APPLICANT_TEMPLATE_CODE, lang, receivers, args);
     }
 }

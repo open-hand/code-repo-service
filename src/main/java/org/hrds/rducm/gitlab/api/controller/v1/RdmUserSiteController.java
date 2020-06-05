@@ -34,16 +34,4 @@ public class RdmUserSiteController extends BaseController {
         rdmUserAppService.createUserWithRandomPassword(userId, glEmail, glUsername, glName);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-
-//    @ApiOperation(value = "修改个人密码")
-//    @Permission(level = ResourceLevel.SITE, permissionLogin = true)
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "id", value = "ID", paramType = "path")
-//    })
-//    @PutMapping("/personal/password")
-//    public ResponseEntity<Object> updateUserPassword(@RequestParam String password,
-//                                                     @RequestParam String confirmPassword) {
-//        rdmUserService.updatePasswordForUser(password, confirmPassword);
-//        return Results.created(null);
-//    }
 }

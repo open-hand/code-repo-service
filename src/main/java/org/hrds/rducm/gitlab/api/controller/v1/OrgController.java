@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
+ * C7N相关的组织层接口
+ *
  * @author ying.xie@hand-china.com
  * @date 2020/3/19
  */

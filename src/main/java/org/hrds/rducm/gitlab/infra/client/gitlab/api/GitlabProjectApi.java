@@ -54,7 +54,7 @@ public class GitlabProjectApi {
      * 由于当前Gitlab版本不支持
      *
      * @param projectId
-     * @param userId Gitlab用户id
+     * @param userId    Gitlab用户id
      * @return
      */
     public Member getAllMember(Integer projectId, Integer userId) {
@@ -139,12 +139,13 @@ public class GitlabProjectApi {
     }
 
     /* private方法 */
+
     /**
      * 获取项目单个成员, 包括继承的成员
      * 由于当前Gitlab版本不支持
      *
      * @param projectId
-     * @param userName 用户名
+     * @param userName  用户名
      * @return
      */
     private Member getAllMember(Integer projectId, String userName) {

@@ -28,5 +28,5 @@ public class RdmMemberApplicantRepositoryImpl extends BaseRepositoryImpl<RdmMemb
         rdmMemberApplicant.setApplicantUserId(applicantUserId);
         return this.selectOne(rdmMemberApplicant);
     }
-  
+
 }

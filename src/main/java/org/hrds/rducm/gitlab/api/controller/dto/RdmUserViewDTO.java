@@ -4,10 +4,6 @@ import java.util.Date;
 
 public class RdmUserViewDTO {
     private Long userId;
-//    private String initPassword;
-//    private Boolean syncGitlabFlag;
-//    private Date syncDateGitlab;
-//    private User glUser;
 
     /* gitlab用户信息 */
 

@@ -34,39 +34,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 @ApiModel("分支")
 public class BranchDTO {
-
-    //    private Commit commit;
-//    private Boolean developersCanMerge;
-//    private Boolean developersCanPush;
     private Boolean merged;
     @ApiModelProperty(value = "分支名称")
     private String name;
     @ApiModelProperty(value = "是否是保护分支")
     private Boolean isProtected;
-
-//    public Commit getCommit() {
-//        return commit;
-//    }
-//
-//    public void setCommit(Commit commit) {
-//        this.commit = commit;
-//    }
-//
-//    public Boolean getDevelopersCanMerge() {
-//        return developersCanMerge;
-//    }
-//
-//    public void setDevelopersCanMerge(Boolean developersCanMerge) {
-//        this.developersCanMerge = developersCanMerge;
-//    }
-//
-//    public Boolean getDevelopersCanPush() {
-//        return developersCanPush;
-//    }
-//
-//    public void setDevelopersCanPush(Boolean developersCanPush) {
-//        this.developersCanPush = developersCanPush;
-//    }
 
     public Boolean getMerged() {
         return merged;

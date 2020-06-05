@@ -31,9 +31,6 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
     private RdmOperationLogRepository operationLogRepository;
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private RdmUserRepository userRepository;
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
 

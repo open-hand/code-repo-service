@@ -59,7 +59,6 @@ public class RdmMember extends AuditDomain {
 
     /**
      * 检查当前记录是否处于"预更新"状态
-     *
      */
     public void checkIsSyncGitlab() {
         if (!this.getSyncGitlabFlag()) {

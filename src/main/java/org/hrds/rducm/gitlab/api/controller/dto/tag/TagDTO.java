@@ -32,20 +32,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TagDTO {
-
-    //    private Commit commit;
     private String message;
     @ApiModelProperty("标签名")
     private String name;
-//    private Release release;
-
-//    public Commit getCommit() {
-//        return this.commit;
-//    }
-//
-//    public void setCommit(Commit commit) {
-//        this.commit = commit;
-//    }
 
     public String getMessage() {
         return message;
@@ -62,12 +51,4 @@ public class TagDTO {
     public void setName(String name) {
         this.name = name;
     }
-
-//    public Release getRelease() {
-//        return release;
-//    }
-//
-//    public void setRelease(Release release) {
-//        this.release = release;
-//    }
 }

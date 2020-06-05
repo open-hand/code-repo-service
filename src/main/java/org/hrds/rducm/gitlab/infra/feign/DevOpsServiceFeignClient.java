@@ -49,10 +49,10 @@ public interface DevOpsServiceFeignClient {
      */
     @PostMapping(value = "/v1/projects/{project_id}/app_service/list_by_ids_or_page")
     ResponseEntity<Page<C7nAppServiceVO>> listOrPageProjectAppServices(@PathVariable(value = "project_id") Long projectId,
-                                                                           @RequestBody(required = false) Set<Long> ids,
-                                                                           @RequestParam(value = "doPage", required = false, defaultValue = "true") Boolean doPage,
-                                                                           @RequestParam(required = false) Integer page,
-                                                                           @RequestParam(required = false) Integer size);
+                                                                       @RequestBody(required = false) Set<Long> ids,
+                                                                       @RequestParam(value = "doPage", required = false, defaultValue = "true") Boolean doPage,
+                                                                       @RequestParam(required = false) Integer page,
+                                                                       @RequestParam(required = false) Integer size);
 
 
     /**

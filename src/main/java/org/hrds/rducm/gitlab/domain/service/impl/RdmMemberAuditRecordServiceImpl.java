@@ -11,13 +11,12 @@ import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
 import org.hrds.rducm.gitlab.app.assembler.RdmMemberAuditRecordAssembler;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
-import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
-import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
-import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabAdminApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.admin.GitlabAdminApi;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
 import org.slf4j.Logger;
@@ -52,8 +51,6 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
     private C7nBaseServiceFacade c7NBaseServiceFacade;
     @Autowired
     private RdmMemberAuditRecordAssembler rdmMemberAuditRecordAssembler;
-    @Autowired
-    private IRdmMemberService iRdmMemberService;
 
     @Override
     public Page<RdmMemberAuditRecordViewDTO> pageByOptions(Long organizationId,

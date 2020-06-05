@@ -1,7 +1,5 @@
 package org.hrds.rducm.gitlab.domain.aggregate;
 
-import java.math.BigDecimal;
-
 /**
  * @author ying.xie@hand-china.com
  * @date 2020/4/7

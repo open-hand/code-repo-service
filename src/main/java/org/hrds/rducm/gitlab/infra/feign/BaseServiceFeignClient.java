@@ -17,6 +17,9 @@ import java.util.Set;
  */
 @FeignClient(value = "hzero-iam", path = "/choerodon", fallbackFactory = BaseServiceFeignClientFallBackFactory.class)
 public interface BaseServiceFeignClient {
+    /* 项目相关 */
+    // -------------------------------
+
     /**
      * 查询当前组织下用户的项目列表
      *
@@ -39,6 +42,28 @@ public interface BaseServiceFeignClient {
                                                                       @RequestParam(required = false) Boolean enabled,
                                                                       @RequestParam(required = false) Long createdBy,
                                                                       @RequestParam(required = false) String params);
+
+    /**
+     * 查询组织下所有项目
+     *
+     * @param organizationId
+     * @return
+     */
+    @GetMapping(value = "/v1/organizations/{organization_id}/projects/all")
+    ResponseEntity<List<C7nProjectVO>> listProjectsByOrgId(@PathVariable(name = "organization_id") Long organizationId);
+
+
+    /**
+     * 根据id集合查询项目
+     *
+     * @param ids id集合，去重
+     * @return 项目集合
+     */
+    @PostMapping("/v1/projects/ids")
+    ResponseEntity<List<C7nProjectVO>> listProjectsByIds(@RequestBody Set<Long> ids);
+
+    /* 用户相关 */
+    // -------------------------------
 
     /**
      * 获取开发者角色的用户
@@ -97,10 +122,10 @@ public interface BaseServiceFeignClient {
      */
     @GetMapping(value = "/v1/organizations/{organization_id}/users/search")
     ResponseEntity<Page<C7nUserVO>> pageUsersByOptionsOnOrganizationLevel(@PathVariable(name = "organization_id") Long organizationId,
-                                                                              @RequestParam(required = false) int page,
-                                                                              @RequestParam(required = false) int size,
-                                                                              @RequestParam(required = false) String loginName,
-                                                                              @RequestParam(required = false) String realName);
+                                                                          @RequestParam(required = false) int page,
+                                                                          @RequestParam(required = false) int size,
+                                                                          @RequestParam(required = false) String loginName,
+                                                                          @RequestParam(required = false) String realName);
 
     /**
      * 全局层
@@ -114,9 +139,9 @@ public interface BaseServiceFeignClient {
      */
     @GetMapping(value = "/v1/users/search")
     ResponseEntity<Page<C7nUserVO>> pageUsersByOptionsOnSiteLevel(@RequestParam(required = false) int page,
-                                                                      @RequestParam(required = false) int size,
-                                                                      @RequestParam(required = false) String loginName,
-                                                                      @RequestParam(required = false) String realName);
+                                                                  @RequestParam(required = false) int size,
+                                                                  @RequestParam(required = false) String loginName,
+                                                                  @RequestParam(required = false) String realName);
 
     /**
      * 项目层
@@ -155,44 +180,6 @@ public interface BaseServiceFeignClient {
     ResponseEntity<List<C7nUserVO>> listUsersByIds(@RequestParam(value = "only_enabled", defaultValue = "true", required = false) Boolean onlyEnabled,
                                                    @RequestBody Set<Long> ids);
 
-    /**
-     * 查询组织下所有项目
-     *
-     * @param organizationId
-     * @return
-     */
-    @GetMapping(value = "/v1/organizations/{organization_id}/projects/all")
-    ResponseEntity<List<C7nProjectVO>> listProjectsByOrgId(@PathVariable(name = "organization_id") Long organizationId);
-
-
-    /**
-     * 根据id集合查询项目
-     *
-     * @param ids id集合，去重
-     * @return 项目集合
-     */
-    @PostMapping("/v1/projects/ids")
-    ResponseEntity<List<C7nProjectVO>> listProjectsByIds(@RequestBody Set<Long> ids);
-
-//    /**
-//     * 查询组织下所有项目
-//     *
-//     * @param organizationId
-//     * @return
-//     */
-//    @GetMapping(value = "/all")
-//    public ResponseEntity<List<ProjectDTO>> listProjectsByOrgId(@PathVariable(name = "organization_id") Long organizationId) {
-//        return new ResponseEntity<>(organizationProjectService.listProjectsByOrgId(organizationId), HttpStatus.OK);
-//    }
-
-//    /**
-//     * 根据id批量查询用户信息列表
-//     *
-//     * @param ids
-//     * @param onlyEnabled
-//     * @return
-//     */
-//    @PostMapping(value = "/v1/users/ids")
-//    ResponseEntity<List<C7nUserVO>> listUsersByIds(@RequestBody Long[] ids,
-//                                                   @RequestParam(value = "only_enabled", defaultValue = "true", required = false) Boolean onlyEnabled);
+    /* 其他 */
+    // -------------------------------
 }

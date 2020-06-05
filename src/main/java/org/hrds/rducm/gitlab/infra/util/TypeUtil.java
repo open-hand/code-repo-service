@@ -24,7 +24,6 @@ public class TypeUtil {
     }
 
 
-
     /**
      * 对象转换
      *

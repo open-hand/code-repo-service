@@ -20,7 +20,7 @@ public interface IRdmMemberApplicantService {
      * @param pageRequest
      * @param repositoryIds
      * @param applicantUserName 申请人名称(模糊)
-     * @param approvalState 审批状态
+     * @param approvalState     审批状态
      * @return
      */
     Page<RdmMemberApplicantViewDTO> pageByOptions(Long projectId,
@@ -62,7 +62,7 @@ public interface IRdmMemberApplicantService {
      *
      * @param id
      * @param objectVersionNumber
-     * @param approvalMessage 审批信息
+     * @param approvalMessage     审批信息
      */
     void refuse(Long id, Long objectVersionNumber, String approvalMessage);
 }

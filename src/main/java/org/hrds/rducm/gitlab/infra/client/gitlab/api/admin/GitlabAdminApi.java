@@ -1,4 +1,4 @@
-package org.hrds.rducm.gitlab.infra.client.gitlab.api;
+package org.hrds.rducm.gitlab.infra.client.gitlab.api.admin;
 
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.models.Member;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * 供管理员调用的api
+ * 使用管理员权限调用的api
  *
  * @author ying.xie@hand-china.com
  * @date 2020/3/30

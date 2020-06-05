@@ -18,6 +18,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * C7N相关的项目层接口
+ *
+ * @author ying.xie
+ * @date 2020/6/5
+ */
 //@Api(tags = SwaggerTags.GITLAB_MEMBER)
 @RestController("projectController.v1")
 @RequestMapping("/v1/projects/{projectId}")

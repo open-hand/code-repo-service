@@ -13,12 +13,6 @@ public class RdmMemberViewDTO {
     @ApiModelProperty("用户")
     private BaseC7nUserViewDTO user;
 
-//    @ApiModelProperty("用户名")
-//    private String realName;
-//
-//    @ApiModelProperty("登录名")
-//    private String loginName;
-
     @ApiModelProperty("应用服务名")
     private String repositoryName;
 
@@ -27,9 +21,6 @@ public class RdmMemberViewDTO {
 
     @ApiModelProperty("创建人")
     private BaseC7nUserViewDTO createdUser;
-
-//    @ApiModelProperty("创建人")
-//    private String createdByName;
 
     /**
      * 成员id, 主键

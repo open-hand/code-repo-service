@@ -74,33 +74,4 @@ public class RdmUserAppServiceImpl implements RdmUserAppService {
                 .setGlIsAdmin(user.getIsAdmin());
         rdmUserRepository.updateByPrimaryKey(rdmUser);
     }
-
-
-//    /**
-//     *
-//     */
-//    @Override
-//    public void updatePasswordForUser(String password, String confirmPassword) {
-//        // 校验密码是否一致
-//        if (!Objects.equals(password, confirmPassword)) {
-//            throw new CommonException("error.todo");
-//        }
-//
-//        // 校验用户是否同步
-//        CustomUserDetails userDetails = DetailsHelper.getUserDetails();
-//        AssertUtils.notNull(userDetails.getUserId(), "error.");
-//        RdmUser gitlabUser = new RdmUser();
-//        gitlabUser.setIamUserId(userDetails.getUserId());
-//        gitlabUser = rdmUserRepository.selectOne(gitlabUser);
-//        this.checkUserSync(gitlabUser, userDetails.getUserId());
-//
-//        // 更新密码
-//        gitlabUserApiRepository.updateUserPassword(gitlabUser.getUserId(), password);
-//    }
-
-    private void checkUserSync(RdmUser rdmUser, Long iamUserId) {
-        if (rdmUser == null || rdmUser.getUserId() == null) {
-            throw new CommonException("error.iam.user.sync.to.gitlab", iamUserId);
-        }
-    }
 }

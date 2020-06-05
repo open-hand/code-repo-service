@@ -37,7 +37,4 @@ public class GitlabMergeRequestApi {
             throw new GitlabClientException(e, e.getMessage());
         }
     }
-    /**
-     * GET /projects/:id/merge_requests?state=opened
-     */
 }

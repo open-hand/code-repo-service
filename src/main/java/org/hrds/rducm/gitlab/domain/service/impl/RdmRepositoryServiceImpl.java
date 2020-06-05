@@ -27,8 +27,6 @@ import java.util.Set;
 @Service
 public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
     @Autowired
-    private RdmRepositoryRepository rdmRepositoryRepository;
-    @Autowired
     private RdmMemberRepository rdmMemberRepository;
     @Autowired
     private GitlabProjectApi gitlabProjectApi;

@@ -137,7 +137,7 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
 
         if (!CollectionUtils.isEmpty(list)) {
             return list.stream()
-                    .collect(HashMap::new, (m, v)->
+                    .collect(HashMap::new, (m, v) ->
                             m.put(v.getId(), v.getGitlabProjectId()), HashMap::putAll);
         } else {
             return Collections.emptyMap();

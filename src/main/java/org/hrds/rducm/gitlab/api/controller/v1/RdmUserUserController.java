@@ -26,7 +26,6 @@ public class RdmUserUserController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION, permissionLogin = true)
     @GetMapping("/self")
     public ResponseEntity<RdmUserViewDTO> queryUser() {
-        // 用户层接口不需要组织id, 但是不加会报错
         return Results.success(rdmUserAppService.queryUserSelf());
     }
 }

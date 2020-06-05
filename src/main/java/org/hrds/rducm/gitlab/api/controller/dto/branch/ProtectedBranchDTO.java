@@ -14,8 +14,6 @@ public class ProtectedBranchDTO {
     private List<BranchAccessLevelDTO> pushAccessLevels;
     @ApiModelProperty("是否允许合并-权限级别")
     private List<BranchAccessLevelDTO> mergeAccessLevels;
-//    private List<BranchAccessLevelDTO> unprotectAccessLevels;
-//    private Boolean codeOwnerApprovalRequired;
 
     public String getName() {
         return this.name;

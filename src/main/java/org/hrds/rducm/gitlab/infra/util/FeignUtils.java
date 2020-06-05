@@ -4,6 +4,8 @@ import io.choerodon.core.exception.CommonException;
 import org.springframework.http.ResponseEntity;
 
 /**
+ * 判断ResponseEntity调用结果
+ *
  * @author ying.xie@hand-china.com
  * @date 2020/3/19
  */

@@ -35,18 +35,18 @@ public class RdmOperationLogAppServiceImpl implements RdmOperationLogAppService 
 
     @Override
     public Page<OperationLogViewDTO> pageByOptionsMemberLog(Long projectId,
-                                                                Set<Long> repositoryIds,
-                                                                PageRequest pageRequest,
-                                                                OperationLogQueryDTO queryDTO) {
+                                                            Set<Long> repositoryIds,
+                                                            PageRequest pageRequest,
+                                                            OperationLogQueryDTO queryDTO) {
         return pageByOptionsMemberLogCommon(null, Collections.singleton(projectId), repositoryIds, pageRequest, queryDTO, ResourceLevel.PROJECT);
     }
 
     @Override
     public Page<OperationLogViewDTO> pageByOptionsMemberLogOnOrg(Long organizationId,
-                                                                     Set<Long> projectIds,
-                                                                     Set<Long> repositoryIds,
-                                                                     PageRequest pageRequest,
-                                                                     OperationLogQueryDTO queryDTO) {
+                                                                 Set<Long> projectIds,
+                                                                 Set<Long> repositoryIds,
+                                                                 PageRequest pageRequest,
+                                                                 OperationLogQueryDTO queryDTO) {
         return pageByOptionsMemberLogCommon(Collections.singleton(organizationId), projectIds, repositoryIds, pageRequest, queryDTO, ResourceLevel.ORGANIZATION);
     }
 

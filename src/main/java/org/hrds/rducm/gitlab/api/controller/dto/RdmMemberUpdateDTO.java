@@ -8,12 +8,6 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 public class RdmMemberUpdateDTO {
-    //    @NotNull
-//    @ApiModelProperty(ApiInfoConstants.GL_PROJECT_ID)
-//    private Integer glProjectId;
-//    @NotNull
-//    @ApiModelProperty(ApiInfoConstants.GL_USER_ID)
-//    private Integer glUserId;
     @NotNull
     @ApiModelProperty(ApiInfoConstants.GL_ACCESS_LEVEL)
     private Integer glAccessLevel;
@@ -23,24 +17,6 @@ public class RdmMemberUpdateDTO {
     @NotNull
     @ApiModelProperty(ApiInfoConstants.OBJECT_VERSION_NUMBER)
     private Long objectVersionNumber;
-
-//    public Integer getGlProjectId() {
-//        return glProjectId;
-//    }
-//
-//    public RdmMemberUpdateDTO setGlProjectId(Integer glProjectId) {
-//        this.glProjectId = glProjectId;
-//        return this;
-//    }
-//
-//    public Integer getGlUserId() {
-//        return glUserId;
-//    }
-//
-//    public RdmMemberUpdateDTO setGlUserId(Integer glUserId) {
-//        this.glUserId = glUserId;
-//        return this;
-//    }
 
     public Integer getGlAccessLevel() {
         return glAccessLevel;

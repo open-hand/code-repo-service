@@ -16,22 +16,6 @@ public class RdmUserRepositoryImpl extends BaseRepositoryImpl<RdmUser> implement
     private GitlabUserApi gitlabUserApi;
 
     @Override
-    public RdmUser selectByUk(Long userId) {
-        RdmUser rdmUser = new RdmUser();
-        rdmUser.setUserId(userId);
-        rdmUser = this.selectOne(rdmUser);
-        return rdmUser;
-    }
-
-    @Override
-    public RdmUser selectByUk(Integer glUserId) {
-        RdmUser rdmUser = new RdmUser();
-        rdmUser.setGlUserId(glUserId);
-        rdmUser = this.selectOne(rdmUser);
-        return rdmUser;
-    }
-
-    @Override
     public User getUserFromGitlab(Integer userId) {
         return gitlabUserApi.getUser(userId);
     }

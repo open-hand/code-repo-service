@@ -12,7 +12,6 @@ public interface IRdmTagService {
     /**
      * 获取分支列表(排除保护分支)
      *
-     *
      * @param projectId
      * @param repositoryId
      * @return

@@ -40,9 +40,9 @@ public interface IRdmMemberService {
      * @return
      */
     Page<RdmMemberViewDTO> pageMemberPermissions(Long organizationId,
-                                                     Long projectId,
-                                                     Long userId,
-                                                     PageRequest pageRequest);
+                                                 Long projectId,
+                                                 Long userId,
+                                                 PageRequest pageRequest);
 
     /**
      * 批量新增或更新成员, 预更新(同步标识设为false, gitlab字段置空)
