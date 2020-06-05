@@ -1,4 +1,4 @@
-package script.db
+package script.db.groovy.hrds_code_repo
 
 databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member.groovy') {
     changeSet(author: "ying.xie@hand-china.com", id: "2020-06-05-rducm_gitlab_member") {

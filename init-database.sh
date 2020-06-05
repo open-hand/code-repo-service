@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
-mkdir -p target
-if [ ! -f target/choerodon-tool-liquibase.jar ]
-then
-    curl https://nexus.choerodon.com.cn/repository/choerodon-release/io/choerodon/choerodon-tool-liquibase/0.9.2.RELEASE/choerodon-tool-liquibase-0.9.2.RELEASE.jar -o target/choerodon-tool-liquibase.jar
-fi
+MAVEN_LOCAL_REPO=$(cd / && mvn help:evaluate -Dexpression=settings.localRepository -q -DforceStdout)
+TOOL_GROUP_ID=io.choerodon
+TOOL_ARTIFACT_ID=choerodon-tool-liquibase
+TOOL_VERSION=0.16.2-SNAPSHOT
+TOOL_JAR_PATH=${MAVEN_LOCAL_REPO}/${TOOL_GROUP_ID/\./\/}/${TOOL_ARTIFACT_ID}/${TOOL_VERSION}/${TOOL_ARTIFACT_ID}-${TOOL_VERSION}.jar
+mvn org.apache.maven.plugins:maven-dependency-plugin:get \
+ -Dartifact=${TOOL_GROUP_ID}:${TOOL_ARTIFACT_ID}:${TOOL_VERSION} \
+ -Dtransitive=false
 
-java -Dspring.datasource.url="jdbc:mysql://db.hzero.org:3306/hzero_platform?useUnicode=true&characterEncoding=utf-8&useSSL=false" \
-	 -Dspring.datasource.username=hzero \
-	 -Dspring.datasource.password=hzero \
-	 -Ddata.drop=false -Ddata.init=init \
-	 -Ddata.dir=src/main/resources \
-	 -jar target/choerodon-tool-liquibase.jar
-
-
-
+java -Dspring.datasource.url="jdbc:mysql://localhost/?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true" \
+ -Dspring.datasource.username=root \
+ -Dspring.datasource.password=root \
+ -Dspring.datasource.driver-class-name=com.mysql.jdbc.Driver \
+ -Ddata.init=true \
+ -Dlogging.level.root=info \
+ -Ddata.version=1.4.0.RELEASE \
+ -Dinstaller.jarPath=target/app.jar \
+ -jar ${TOOL_JAR_PATH}
