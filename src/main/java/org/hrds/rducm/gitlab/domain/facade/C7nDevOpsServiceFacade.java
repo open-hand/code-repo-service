@@ -49,7 +49,7 @@ public interface C7nDevOpsServiceFacade {
     Set<Long> listC7nAppServiceIdsByNameOnProjectLevel(Long projectId, String appServiceName);
 
     /**
-     * 组织层 todo,待优化,可取消循环,直接返回该组织所有应用服务
+     * 组织层
      * 查询应用服务ids, 根据应用服务名模糊查询
      *
      * @param organizationId

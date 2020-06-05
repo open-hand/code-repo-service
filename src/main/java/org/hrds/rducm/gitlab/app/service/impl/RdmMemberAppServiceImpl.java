@@ -171,7 +171,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         // 开启新事务的目的是使这一步操作独立执行, 保证预操作成功
         self().batchAddOrUpdateMembersBeforeRequestsNew(rdmMembers);
 
-        // <2> 调用gitlab api添加成员 todo 事务一致性问题
+        // <2> 调用gitlab api添加成员
         rdmMembers.forEach((m) -> {
             // <2.1> 判断新增或更新
             boolean isExists;
@@ -214,7 +214,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         // <1> 数据库预更新成员, 发起新事务
         self().addMemberBeforeRequestsNew(param);
 
-        // <2> 调用gitlab api更新成员 todo 事务一致性问题
+        // <2> 调用gitlab api更新成员
         Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
 
         // <3> 回写数据库
@@ -250,7 +250,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         // <1> 数据库预更新成员, 发起新事务
         self().updateMemberBeforeRequestsNew(param);
 
-        // <2> 调用gitlab api更新成员 todo 事务一致性问题
+        // <2> 调用gitlab api更新成员
         Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(param.getGlProjectId(), param.getGlUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
 
         // <3> 回写数据库
@@ -268,7 +268,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         // <1> 数据库更新成员, 预删除, 发起新事务
         self().updateMemberBeforeRequestsNew(dbMember);
 
-        // <2> 调用gitlab api删除成员 todo 事务一致性问题
+        // <2> 调用gitlab api删除成员
         iRdmMemberService.tryRemoveMemberToGitlab(dbMember.getGlProjectId(), dbMember.getGlUserId());
 
         // <3> 数据库删除成员
