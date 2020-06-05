@@ -9,6 +9,7 @@ import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.app.job.MemberInitJob;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
+import org.hrds.rducm.gitlab.domain.service.IMemberAuditService;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,8 @@ public class TempController extends BaseController {
     private RdmUserRepository rdmUserRepository;
     @Autowired
     private RdmMemberAppService rdmMemberAppService;
+    @Autowired
+    private IMemberAuditService iMemberAuditService;
 
     @ApiOperation(value = "查询gitlab用户(平台层)")
     @Permission(level = ResourceLevel.SITE, permissionPublic = true)
@@ -74,5 +77,14 @@ public class TempController extends BaseController {
         Map<String, Object> map = new HashMap<>();
         map.put("organizationId", organizationId);
         memberInitJob.initRdmMembers(map);
+    }
+
+    // TODO 测试用,需删除,改为定时任务调用
+    @ApiOperation(value = "对组织下所有成员进行权限审计(组织层) 测试用,需删除,改为定时任务调用")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @PostMapping("/batch-audit")
+    public ResponseEntity<?> batchAudit(@PathVariable Long organizationId) {
+        iMemberAuditService.auditMembersByOrganizationId(organizationId);
+        return Results.success();
     }
 }

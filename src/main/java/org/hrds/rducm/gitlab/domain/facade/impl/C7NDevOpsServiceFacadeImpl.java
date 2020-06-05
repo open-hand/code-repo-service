@@ -5,7 +5,6 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
-import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nGlUserVO;
@@ -31,8 +30,6 @@ public class C7NDevOpsServiceFacadeImpl implements IC7nDevOpsServiceFacade {
     private static final Logger logger = LoggerFactory.getLogger(C7NDevOpsServiceFacadeImpl.class);
     @Autowired
     private DevOpsServiceFeignClient devOpsServiceFeignClient;
-    @Autowired
-    private BaseServiceFeignClient baseServiceFeignClient;
     @Autowired
     private IC7nBaseServiceFacade ic7NBaseServiceFacade;
     @Autowired
@@ -170,5 +167,13 @@ public class C7NDevOpsServiceFacadeImpl implements IC7nDevOpsServiceFacade {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public List<C7nAppServiceVO> listAppServiceByActive(Long projectId) {
+        // 获取所有已经启用的服务
+        ResponseEntity<List<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.listAppServiceByActive(projectId);
+
+        return FeignUtils.handleResponseEntity(responseEntity);
     }
 }

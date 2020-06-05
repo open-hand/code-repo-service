@@ -1,16 +1,14 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nAppServiceViewDTO;
 import org.hrds.rducm.gitlab.app.service.RdmRepositoryAppService;
-import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
-import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
-import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
+import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 应用服务默认实现
@@ -20,9 +18,7 @@ import java.util.stream.Collectors;
 @Service
 public class RdmRepositoryAppServiceImpl implements RdmRepositoryAppService {
     @Autowired
-    private RdmRepositoryRepository rdmRepositoryRepository;
-    @Autowired
-    private DevOpsServiceFeignClient devOpsServiceFeignClient;
+    private IC7nDevOpsServiceFacade ic7nDevOpsServiceFacade;
 
     /**
      * 查询所有[已启用]的服务
@@ -30,19 +26,9 @@ public class RdmRepositoryAppServiceImpl implements RdmRepositoryAppService {
      * @return
      */
     @Override
-    public List<RdmRepository> listByActive(Long projectId) {
-        ResponseEntity<List<C7nAppServiceVO>> feignVO = devOpsServiceFeignClient.listRepositoriesByActive(projectId);
+    public List<BaseC7nAppServiceViewDTO> listByActive(Long projectId) {
+        List<C7nAppServiceVO> appServiceVOS = ic7nDevOpsServiceFacade.listAppServiceByActive(projectId);
 
-        List<RdmRepository> rdmRepositories = feignVO.getBody().stream().map(vo -> {
-            RdmRepository rdmRepository = new RdmRepository();
-            rdmRepository.setRepositoryId(vo.getId())
-                    .setRepositoryName(vo.getName())
-                    .setProjectId(vo.getProjectId())
-                    .setGlProjectId(Math.toIntExact(vo.getGitlabProjectId()));
-            return rdmRepository;
-        }).collect(Collectors.toList());
-
-//        List<RdmRepository> gitlabRepositories = rdmRepositoryRepository.selectAll();
-        return rdmRepositories;
+        return ConvertUtils.convertList(appServiceVOS, BaseC7nAppServiceViewDTO::convert);
     }
 }

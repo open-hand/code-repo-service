@@ -31,7 +31,7 @@ public class MemberInitJob {
     private IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
 
     /**
-     * 上线时初始化Gitlab成员到代码库
+     * 上线时初始化Gitlab成员到代码库 TODO
      *
      * @param map
      */

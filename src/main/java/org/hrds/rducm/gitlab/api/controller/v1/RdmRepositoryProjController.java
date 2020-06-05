@@ -7,9 +7,9 @@ import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nAppServiceViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.repository.RepositoryOverViewDTO;
 import org.hrds.rducm.gitlab.app.service.RdmRepositoryAppService;
-import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmRepositoryService;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
@@ -32,7 +32,7 @@ public class RdmRepositoryProjController extends BaseController {
     @ApiOperation(value = "查询所有已经启用的服务")
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/list-by-active")
-    public ResponseEntity<List<RdmRepository>> listByActive(@PathVariable(value = "projectId") Long projectId) {
+    public ResponseEntity<List<BaseC7nAppServiceViewDTO>> listByActive(@PathVariable(value = "projectId") Long projectId) {
         return ResponseEntity.ok(rdmRepositoryAppService.listByActive(projectId));
     }
 

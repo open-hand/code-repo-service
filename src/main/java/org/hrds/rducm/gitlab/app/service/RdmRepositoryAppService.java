@@ -1,6 +1,6 @@
 package org.hrds.rducm.gitlab.app.service;
 
-import org.hrds.rducm.gitlab.domain.entity.RdmRepository;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nAppServiceViewDTO;
 
 import java.util.List;
 
@@ -16,5 +16,5 @@ public interface RdmRepositoryAppService {
      * @param projectId
      * @return
      */
-    List<RdmRepository> listByActive(Long projectId);
+    List<BaseC7nAppServiceViewDTO> listByActive(Long projectId);
 }

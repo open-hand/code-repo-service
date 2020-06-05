@@ -21,7 +21,7 @@ public interface DevOpsServiceFeignClient {
      * 获取所有已经启用的服务
      */
     @GetMapping("/v1/projects/{projectId}/app_service/list_by_active")
-    ResponseEntity<List<C7nAppServiceVO>> listRepositoriesByActive(@PathVariable Long projectId);
+    ResponseEntity<List<C7nAppServiceVO>> listAppServiceByActive(@PathVariable Long projectId);
 
     /**
      * 项目下分页查询应用服务

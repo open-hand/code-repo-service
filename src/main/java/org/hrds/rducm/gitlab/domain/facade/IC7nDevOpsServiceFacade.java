@@ -103,4 +103,12 @@ public interface IC7nDevOpsServiceFacade {
      * @return
      */
     Long glUserIdToUserId(Integer glUserId);
+
+    /**
+     * 获取项目已经启用的应用服务
+     *
+     * @param projectId
+     * @return
+     */
+    List<C7nAppServiceVO> listAppServiceByActive(Long projectId);
 }

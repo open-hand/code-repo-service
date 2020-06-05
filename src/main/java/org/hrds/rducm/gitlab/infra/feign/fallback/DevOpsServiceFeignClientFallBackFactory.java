@@ -22,7 +22,7 @@ public class DevOpsServiceFeignClientFallBackFactory implements FallbackFactory<
         cause.printStackTrace();
         return new DevOpsServiceFeignClient() {
             @Override
-            public ResponseEntity<List<C7nAppServiceVO>> listRepositoriesByActive(Long projectId) {
+            public ResponseEntity<List<C7nAppServiceVO>> listAppServiceByActive(Long projectId) {
                 return null;
             }
 

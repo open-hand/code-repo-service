@@ -46,14 +46,8 @@ public class RdmUserAppServiceImpl implements RdmUserAppService {
         return rdmUserViewDTO;
     }
 
-    @Override
-    public RdmUserViewDTO queryUser(Long userId) {
-        RdmUser rdmUser = rdmUserRepository.selectByUk(userId);
-        return ConvertUtils.convertObject(rdmUser, RdmUserViewDTO.class);
-    }
-
     /**
-     * todo 需要分布式事务
+     * todo 未完成
      *
      * @param userId
      * @param glEmail
