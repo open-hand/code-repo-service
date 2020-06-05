@@ -4,7 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.choerodon.core.oauth.DetailsHelper;
 import org.gitlab4j.api.GitLabApi;
-import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class Gitlab4jClientWrapper {
     @Autowired
     private Gitlab4jClient gitlab4jClient;
     @Autowired
-    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
+    private C7nBaseServiceFacade c7NBaseServiceFacade;
 
     /**
      * 获取当前用户权限的GitlabApi
@@ -50,7 +50,7 @@ public class Gitlab4jClientWrapper {
             glUserId = USER_CACHE.getIfPresent(userId);
             LOGGER.debug("使用缓存中的用户 {}对应的Gitlab用户ID {}", userId, glUserId);
         } else {
-            glUserId = Objects.requireNonNull(ic7NBaseServiceFacade.userIdToGlUserId(userId));
+            glUserId = Objects.requireNonNull(c7NBaseServiceFacade.userIdToGlUserId(userId));
             USER_CACHE.put(userId, glUserId);
         }
 

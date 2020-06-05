@@ -3,7 +3,7 @@ package org.hrds.rducm.gitlab.domain.service.impl;
 import org.gitlab4j.api.models.ProtectedTag;
 import org.gitlab4j.api.models.Tag;
 import org.hrds.rducm.gitlab.api.controller.dto.tag.TagDTO;
-import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmTagRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmTagService;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
@@ -23,12 +23,12 @@ public class RdmTagServiceImpl implements IRdmTagService {
     @Autowired
     private RdmTagRepository rdmTagRepository;
     @Autowired
-    private IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
+    private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
 
     @Override
     public List<TagDTO> getTagsWithExcludeProtected(Long projectId, Long repositoryId) {
         // 获取对应Gitlab项目id
-        Integer glProjectId = ic7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
+        Integer glProjectId = c7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
 
         // 获取标记
         List<Tag> tags = rdmTagRepository.getTagsFromGitlab(glProjectId);

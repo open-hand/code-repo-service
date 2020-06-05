@@ -7,8 +7,8 @@ import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nProjectViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
-import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
-import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
@@ -25,9 +25,9 @@ import java.util.*;
 @Component
 public class RdmMemberAuditRecordAssembler {
     @Autowired
-    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
+    private C7nBaseServiceFacade c7NBaseServiceFacade;
     @Autowired
-    private IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
+    private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
 
     /**
      * 查询结果转换
@@ -56,21 +56,21 @@ public class RdmMemberAuditRecordAssembler {
         });
 
         // 获取Gitlab用户id对应的用户id
-        Map<Integer, Long> glToUserIds = ic7NDevOpsServiceFacade.mapGlUserIdsToUserIds(glUserIds);
+        Map<Integer, Long> glToUserIds = c7NDevOpsServiceFacade.mapGlUserIdsToUserIds(glUserIds);
 
         // Gitlab用户查询的userId添加到集合里
         userIds.addAll(glToUserIds.values());
 
         // 获取用户信息
-        Map<Long, C7nUserVO> c7nUserVOMap = ic7NBaseServiceFacade.listC7nUserToMap(userIds);
+        Map<Long, C7nUserVO> c7nUserVOMap = c7NBaseServiceFacade.listC7nUserToMap(userIds);
 
         // 获取应用服务信息
-        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
+        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = c7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
 
         // 查询项目信息(组织层需要)
         Map<Long, C7nProjectVO> c7nProjectVOMap;
         if (ResourceLevel.ORGANIZATION.equals(resourceLevel)) {
-            c7nProjectVOMap = ic7NBaseServiceFacade.listProjectsByIdsToMap(projectIds);
+            c7nProjectVOMap = c7NBaseServiceFacade.listProjectsByIdsToMap(projectIds);
         } else {
             c7nProjectVOMap = Collections.emptyMap();
         }

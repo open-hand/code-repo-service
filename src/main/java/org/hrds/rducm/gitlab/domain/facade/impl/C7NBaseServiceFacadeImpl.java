@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.domain.facade.impl;
 
 import io.choerodon.core.domain.Page;
-import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 
 @Service
-public class C7NBaseServiceFacadeImpl implements IC7nBaseServiceFacade {
+public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
     private static final Logger logger = LoggerFactory.getLogger(C7NBaseServiceFacadeImpl.class);
 
     @Autowired

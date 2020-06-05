@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.domain.facade.impl;
 
 import io.choerodon.core.oauth.DetailsHelper;
-import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.MessageClientFacade;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
@@ -28,7 +28,7 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
     @Autowired
     private MessageClient messageClient;
     @Autowired
-    private IC7nBaseServiceFacade ic7nBaseServiceFacade;
+    private C7nBaseServiceFacade c7NBaseServiceFacade;
 
     /**
      * 申请权限发送站内消息
@@ -37,7 +37,7 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
     @Override
     public void sendApprovalMessage(Long projectId) {
         // 查询该项目下所有用户
-        List<C7nUserVO> c7nUserVOS = ic7nBaseServiceFacade.listC7nUsersOnProjectLevel(projectId);
+        List<C7nUserVO> c7nUserVOS = c7NBaseServiceFacade.listC7nUsersOnProjectLevel(projectId);
         // 过滤并获取所有"项目管理员"角色的用户
         c7nUserVOS = c7nUserVOS.stream()
                 .filter(u -> u.getRoles().stream()

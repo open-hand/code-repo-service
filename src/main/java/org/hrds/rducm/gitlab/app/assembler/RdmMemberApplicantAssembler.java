@@ -4,8 +4,8 @@ import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
-import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
-import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
@@ -24,9 +24,9 @@ import java.util.Set;
 @Component
 public class RdmMemberApplicantAssembler {
     @Autowired
-    private IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
+    private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
     @Autowired
-    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
+    private C7nBaseServiceFacade c7NBaseServiceFacade;
 
     /**
      * 查询结果转换
@@ -47,8 +47,8 @@ public class RdmMemberApplicantAssembler {
         });
 
         // 获取操作人用户信息
-        Map<Long, C7nUserVO> c7nUserVOMap = ic7NBaseServiceFacade.listC7nUserToMap(opUserIds);
-        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
+        Map<Long, C7nUserVO> c7nUserVOMap = c7NBaseServiceFacade.listC7nUserToMap(opUserIds);
+        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = c7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
 
         return ConvertUtils.convertPage(page, val -> {
             C7nAppServiceVO c7nAppServiceVO = Optional.ofNullable(c7nAppServiceVOMap.get(val.getRepositoryId())).orElse(new C7nAppServiceVO());

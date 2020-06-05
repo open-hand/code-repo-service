@@ -11,8 +11,8 @@ import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nProjectViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
-import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
-import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
@@ -31,9 +31,9 @@ import java.util.stream.Collectors;
 @Component
 public class RdmMemberAssembler {
     @Autowired
-    private IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
+    private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
     @Autowired
-    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
+    private C7nBaseServiceFacade c7NBaseServiceFacade;
 
     /**
      * 将GitlabMemberBatchDTO转换为List<RdmMember>
@@ -48,14 +48,14 @@ public class RdmMemberAssembler {
         Map<Long, Integer> repositoryIdToGlProjectIdMap = new HashMap<>();
         rdmMemberBatchDTO.getRepositoryIds().forEach(repositoryId -> {
             // 获取gitlab项目id
-            Integer glProjectId = ic7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
+            Integer glProjectId = c7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
             repositoryIdToGlProjectIdMap.put(repositoryId, glProjectId);
         });
 
         // 查询gitlab用户id
         Map<Long, Integer> userIdToGlUserIdMap = new HashMap<>();
         rdmMemberBatchDTO.getMembers().forEach(m -> {
-            Integer glUserId = ic7NBaseServiceFacade.userIdToGlUserId(m.getUserId());
+            Integer glUserId = c7NBaseServiceFacade.userIdToGlUserId(m.getUserId());
             userIdToGlUserIdMap.put(m.getUserId(), glUserId);
         });
 
@@ -92,8 +92,8 @@ public class RdmMemberAssembler {
         final RdmMember param = ConvertUtils.convertObject(rdmMemberCreateDTO, RdmMember.class);
 
         // 获取gitlab项目id和用户id
-        Integer glProjectId = ic7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
-        Integer glUserId = ic7NBaseServiceFacade.userIdToGlUserId(param.getUserId());
+        Integer glProjectId = c7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
+        Integer glUserId = c7NBaseServiceFacade.userIdToGlUserId(param.getUserId());
 
         param.setGlProjectId(glProjectId);
         param.setGlUserId(glUserId);
@@ -134,20 +134,20 @@ public class RdmMemberAssembler {
         Map<Long, C7nUserVO> userWithRolesVOMap = new HashMap<>();
 
         projectIdAndUserIds.asMap().forEach((projectId, uIds) -> {
-            Map<Long, C7nUserVO> tempMap = ic7NBaseServiceFacade.listC7nUserToMapOnProjectLevel(projectId, Sets.newHashSet(uIds));
+            Map<Long, C7nUserVO> tempMap = c7NBaseServiceFacade.listC7nUserToMapOnProjectLevel(projectId, Sets.newHashSet(uIds));
             userWithRolesVOMap.putAll(tempMap);
         });
 
         // 查询用户信息
-        Map<Long, C7nUserVO> userVOMap = ic7NBaseServiceFacade.listC7nUserToMap(Sets.newHashSet(userIds));
+        Map<Long, C7nUserVO> userVOMap = c7NBaseServiceFacade.listC7nUserToMap(Sets.newHashSet(userIds));
 
         // 查询应用服务信息
-        Map<Long, C7nAppServiceVO> appServiceVOMap = ic7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
+        Map<Long, C7nAppServiceVO> appServiceVOMap = c7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
 
         // 查询项目信息(组织层需要)
         Map<Long, C7nProjectVO> c7nProjectVOMap = Collections.emptyMap();
         if (ResourceLevel.ORGANIZATION.equals(resourceLevel)) {
-            c7nProjectVOMap = ic7NBaseServiceFacade.listProjectsByIdsToMap(projectIds);
+            c7nProjectVOMap = c7NBaseServiceFacade.listProjectsByIdsToMap(projectIds);
         }
 
         // 填充数据

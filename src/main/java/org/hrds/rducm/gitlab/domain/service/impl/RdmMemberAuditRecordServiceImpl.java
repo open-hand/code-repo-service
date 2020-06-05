@@ -11,10 +11,10 @@ import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
 import org.hrds.rducm.gitlab.app.assembler.RdmMemberAuditRecordAssembler;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
-import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
-import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabAdminApi;
@@ -47,9 +47,9 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
     @Autowired
     private GitlabAdminApi gitlabAdminApi;
     @Autowired
-    private IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
+    private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
     @Autowired
-    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
+    private C7nBaseServiceFacade c7NBaseServiceFacade;
     @Autowired
     private RdmMemberAuditRecordAssembler rdmMemberAuditRecordAssembler;
     @Autowired
@@ -76,7 +76,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
             case ORGANIZATION: {
                 // 调用外部接口模糊查询 应用服务
                 if (!StringUtils.isEmpty(repositoryName)) {
-                    Set<Long> repositoryIdSet = ic7NDevOpsServiceFacade.listC7nAppServiceIdsByNameOnOrgLevel(organizationId, repositoryName);
+                    Set<Long> repositoryIdSet = c7NDevOpsServiceFacade.listC7nAppServiceIdsByNameOnOrgLevel(organizationId, repositoryName);
 
                     if (repositoryIdSet.isEmpty()) {
                         return new Page<>();
@@ -89,7 +89,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
             case PROJECT: {
                 // 调用外部接口模糊查询 应用服务
                 if (!StringUtils.isEmpty(repositoryName)) {
-                    Set<Long> repositoryIdSet = ic7NDevOpsServiceFacade.listC7nAppServiceIdsByNameOnProjectLevel(projectIds.iterator().next(), repositoryName);
+                    Set<Long> repositoryIdSet = c7NDevOpsServiceFacade.listC7nAppServiceIdsByNameOnProjectLevel(projectIds.iterator().next(), repositoryName);
 
                     if (repositoryIdSet.isEmpty()) {
                         return new Page<>();
@@ -139,7 +139,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
 
     private List<RdmMemberAuditRecord> compareMembersByOrganizationId(Long organizationId) {
         // <1> 获取组织下所有项目
-        Set<Long> projectIds = ic7NBaseServiceFacade.listProjectIds(organizationId);
+        Set<Long> projectIds = c7NBaseServiceFacade.listProjectIds(organizationId);
 
         List<RdmMemberAuditRecord> list = projectIds.stream()
                 .map(projectId -> {
@@ -154,7 +154,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
     private List<RdmMemberAuditRecord> compareMembersByProjectId(Long organizationId,
                                                                  Long projectId) {
         // 获取项目下所有代码库id和Gitlab项目id
-        Map<Long, Long> appServiceIdMap = ic7NDevOpsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
+        Map<Long, Long> appServiceIdMap = c7NDevOpsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
 
 
         List<RdmMemberAuditRecord> list = appServiceIdMap.entrySet()

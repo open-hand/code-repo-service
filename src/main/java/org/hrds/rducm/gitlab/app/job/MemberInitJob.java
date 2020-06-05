@@ -1,7 +1,7 @@
 package org.hrds.rducm.gitlab.app.job;
 
-import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
-import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +26,9 @@ public class MemberInitJob {
     @Autowired
     private IRdmMemberService iRdmMemberService;
     @Autowired
-    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
+    private C7nBaseServiceFacade c7NBaseServiceFacade;
     @Autowired
-    private IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
+    private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
 
     /**
      * 上线时初始化Gitlab成员到代码库 TODO
@@ -51,13 +51,13 @@ public class MemberInitJob {
             Long organizationId = i;
 
             // <1> 获取组织下所有项目
-            Set<Long> projectIds = ic7NBaseServiceFacade.listProjectIds(organizationId);
+            Set<Long> projectIds = c7NBaseServiceFacade.listProjectIds(organizationId);
 
             logger.info("该组织{} 下的所有项目为{}", organizationId, projectIds);
 
             // <2> 获取项目下所有代码库id和Gitlab项目id
             projectIds.forEach(projectId -> {
-                Map<Long, Long> appServiceIdMap = ic7NDevOpsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
+                Map<Long, Long> appServiceIdMap = c7NDevOpsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
 
                 appServiceIdMap.forEach((repositoryId, glProjectId) -> {
                     logger.info("组织id为{}, 项目id为{}, 代码库id为{}", organizationId, projectId, repositoryId);

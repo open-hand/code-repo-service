@@ -3,8 +3,8 @@ package org.hrds.rducm.gitlab.domain.facade.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
-import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
-import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nGlUserVO;
@@ -26,12 +26,12 @@ import java.util.stream.Collectors;
  */
 
 @Service
-public class C7NDevOpsServiceFacadeImpl implements IC7nDevOpsServiceFacade {
+public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
     private static final Logger logger = LoggerFactory.getLogger(C7NDevOpsServiceFacadeImpl.class);
     @Autowired
     private DevOpsServiceFeignClient devOpsServiceFeignClient;
     @Autowired
-    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
+    private C7nBaseServiceFacade c7NBaseServiceFacade;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -96,7 +96,7 @@ public class C7NDevOpsServiceFacadeImpl implements IC7nDevOpsServiceFacade {
     @Override
     public Set<Long> listC7nAppServiceIdsByNameOnOrgLevel(Long organizationId, String appServiceName) {
         // 查询该组织所有项目
-        Set<Long> projectIds = ic7NBaseServiceFacade.listProjectIds(organizationId);
+        Set<Long> projectIds = c7NBaseServiceFacade.listProjectIds(organizationId);
 
         // 查询项目的应用服务
         Set<Long> appServiceIds = new HashSet<>();

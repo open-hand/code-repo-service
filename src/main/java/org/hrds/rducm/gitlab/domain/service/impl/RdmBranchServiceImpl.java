@@ -2,7 +2,7 @@ package org.hrds.rducm.gitlab.domain.service.impl;
 
 import org.gitlab4j.api.models.Branch;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchDTO;
-import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmBranchRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmBranchService;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
@@ -20,12 +20,12 @@ public class RdmBranchServiceImpl implements IRdmBranchService {
     @Autowired
     private RdmBranchRepository rdmBranchRepository;
     @Autowired
-    private IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
+    private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
 
     @Override
     public List<BranchDTO> getBranchesWithExcludeProtected(Long projectId, Long repositoryId) {
         // 获取对应Gitlab项目id
-        Integer glProjectId = ic7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
+        Integer glProjectId = c7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
 
 
         // 获取分支

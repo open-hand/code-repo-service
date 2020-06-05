@@ -11,7 +11,7 @@ import java.util.Set;
  * @author ying.xie@hand-china.com
  * @date 2020/3/18
  */
-public interface IC7nBaseServiceFacade {
+public interface C7nBaseServiceFacade {
     /**
      * 根据用户id获取Gitlab用户id
      * todo 高频调用, 是否使用缓存

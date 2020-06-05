@@ -2,7 +2,7 @@ package org.hrds.rducm.gitlab.app.service.impl;
 
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nAppServiceViewDTO;
 import org.hrds.rducm.gitlab.app.service.RdmRepositoryAppService;
-import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 public class RdmRepositoryAppServiceImpl implements RdmRepositoryAppService {
     @Autowired
-    private IC7nDevOpsServiceFacade ic7nDevOpsServiceFacade;
+    private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
 
     /**
      * 查询所有[已启用]的服务
@@ -27,7 +27,7 @@ public class RdmRepositoryAppServiceImpl implements RdmRepositoryAppService {
      */
     @Override
     public List<BaseC7nAppServiceViewDTO> listByActive(Long projectId) {
-        List<C7nAppServiceVO> appServiceVOS = ic7nDevOpsServiceFacade.listAppServiceByActive(projectId);
+        List<C7nAppServiceVO> appServiceVOS = c7NDevOpsServiceFacade.listAppServiceByActive(projectId);
 
         return ConvertUtils.convertList(appServiceVOS, BaseC7nAppServiceViewDTO::convert);
     }

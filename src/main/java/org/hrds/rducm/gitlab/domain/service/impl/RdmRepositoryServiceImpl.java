@@ -6,7 +6,7 @@ import org.gitlab4j.api.Constants;
 import org.gitlab4j.api.models.Commit;
 import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.api.controller.dto.repository.RepositoryOverViewDTO;
-import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmRepositoryService;
@@ -37,13 +37,13 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
     @Autowired
     private GitlabMergeRequestApi gitlabMergeRequestApi;
     @Autowired
-    private IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
+    private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
 
     @Override
     public Page<RepositoryOverViewDTO> pageOverviewByOptions(Long projectId, PageRequest pageRequest, Set<Long> repositoryIds) {
         // <1> 查询
         // 调用devops服务查询
-        Page<C7nAppServiceVO> c7nRepositories = ic7NDevOpsServiceFacade.pageC7nAppServices(projectId, pageRequest, repositoryIds);
+        Page<C7nAppServiceVO> c7nRepositories = c7NDevOpsServiceFacade.pageC7nAppServices(projectId, pageRequest, repositoryIds);
 
         Page<RepositoryOverViewDTO> repositoryOverViewDTOPageInfo = ConvertUtils.convertPage(c7nRepositories, s -> new RepositoryOverViewDTO()
                 .setRepositoryId(s.getId())

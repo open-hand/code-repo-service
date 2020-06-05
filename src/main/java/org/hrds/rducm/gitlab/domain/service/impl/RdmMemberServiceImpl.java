@@ -15,10 +15,10 @@ import org.hrds.rducm.gitlab.api.controller.dto.base.BaseUserQueryDTO;
 import org.hrds.rducm.gitlab.domain.aggregate.MemberAuthDetailAgg;
 import org.hrds.rducm.gitlab.domain.component.QueryConditionHelper;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
-import org.hrds.rducm.gitlab.domain.facade.IC7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
-import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
@@ -58,9 +58,9 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     @Autowired
     private GitlabAdminApi gitlabAdminApi;
     @Autowired
-    private IC7nDevOpsServiceFacade ic7NDevOpsServiceFacade;
+    private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
     @Autowired
-    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
+    private C7nBaseServiceFacade c7NBaseServiceFacade;
     @Autowired
     private RdmUserRepository rdmUserRepository;
 
@@ -79,7 +79,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         Page<MemberAuthDetailAgg> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectMembersRepositoryAuthorized(organizationId, projectId, userIdsSet));
 
         // 查询应用服务总数
-        int allRepositoryCount = ic7NDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId).size();
+        int allRepositoryCount = c7NDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId).size();
         BigDecimal allRepositoryCountBigD = new BigDecimal(allRepositoryCount);
 
         // 用户id
@@ -90,9 +90,9 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         });
 
         // 获取操作人用户信息, 带有项目角色信息
-        Map<Long, C7nUserVO> userWithRolesVOMap = ic7NBaseServiceFacade.listC7nUserToMapOnProjectLevel(projectId, userIds);
+        Map<Long, C7nUserVO> userWithRolesVOMap = c7NBaseServiceFacade.listC7nUserToMapOnProjectLevel(projectId, userIds);
         // 查询用户信息
-        Map<Long, C7nUserVO> userVOMap = ic7NBaseServiceFacade.listC7nUserToMap(Sets.newHashSet(userIds));
+        Map<Long, C7nUserVO> userVOMap = c7NBaseServiceFacade.listC7nUserToMap(Sets.newHashSet(userIds));
 
 
         Page<MemberAuthDetailViewDTO> pageReturn = ConvertUtils.convertPage(page, (v) -> {
@@ -135,7 +135,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         });
 
         // 获取应用服务信息
-        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = ic7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
+        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = c7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
 
 
         Page<RdmMemberViewDTO> pageReturn = ConvertUtils.convertPage(page, (v) -> {
@@ -308,7 +308,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     @Transactional(rollbackFor = Exception.class)
     public int syncAllMembersFromGitlab(Long organizationId, Long projectId, Long repositoryId) {
         // <1> 获取Gitlab项目id
-        Integer glProjectId = ic7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
+        Integer glProjectId = c7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
 
         if (glProjectId == null) {
             return 0;
@@ -351,7 +351,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
                     }
 
                     // 查询Gitlab用户对应的userId
-                    Long userId = ic7NDevOpsServiceFacade.glUserIdToUserId(glMember.getId());
+                    Long userId = c7NDevOpsServiceFacade.glUserIdToUserId(glMember.getId());
 
                     if (userId == null) {
                         logger.info("该Gitlab用户{}无对应的猪齿鱼用户", glMember.getUsername());

@@ -7,9 +7,8 @@ import org.gitlab4j.api.models.User;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmUserViewDTO;
 import org.hrds.rducm.gitlab.app.service.RdmUserAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmUser;
-import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
-import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,13 +21,13 @@ public class RdmUserAppServiceImpl implements RdmUserAppService {
     @Autowired
     private RdmUserRepository rdmUserRepository;
     @Autowired
-    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
+    private C7nBaseServiceFacade c7NBaseServiceFacade;
 
     @Override
     public RdmUserViewDTO queryUserSelf() {
         Long userId = DetailsHelper.getUserDetails().getUserId();
 
-        Integer glUserId = ic7NBaseServiceFacade.userIdToGlUserId(userId);
+        Integer glUserId = c7NBaseServiceFacade.userIdToGlUserId(userId);
 
         User glUser = rdmUserRepository.getUserFromGitlab(glUserId);
 

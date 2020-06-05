@@ -14,7 +14,7 @@ import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
 import org.hrds.rducm.gitlab.domain.facade.MessageClientFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberApplicantRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
-import org.hrds.rducm.gitlab.domain.facade.IC7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberApplicantService;
 import org.hrds.rducm.gitlab.infra.enums.ApplicantTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.ApprovalStateEnum;
@@ -46,7 +46,7 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
     @Autowired
     private RdmMemberApplicantAssembler rdmMemberApplicantAssembler;
     @Autowired
-    private IC7nBaseServiceFacade ic7NBaseServiceFacade;
+    private C7nBaseServiceFacade c7NBaseServiceFacade;
     @Autowired
     private MessageClientFacade messageClientFacade;
 
@@ -65,7 +65,7 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
 
         // 调用外部接口模糊查询
         if (!StringUtils.isEmpty(applicantUserName)) {
-            Set<Long> userIdsSet = ic7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, applicantUserName, null);
+            Set<Long> userIdsSet = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, applicantUserName, null);
 
             if (userIdsSet.isEmpty()) {
                 return new Page<>();
