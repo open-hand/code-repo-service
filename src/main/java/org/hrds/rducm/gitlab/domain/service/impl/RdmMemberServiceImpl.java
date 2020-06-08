@@ -3,12 +3,14 @@ package org.hrds.rducm.gitlab.domain.service.impl;
 import com.google.common.collect.Sets;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
+import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.mybatis.domain.AuditDomain;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.gitlab4j.api.models.Member;
 import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.MemberPrivilegeViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseUserQueryDTO;
@@ -21,8 +23,8 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
-import org.hrds.rducm.gitlab.infra.client.gitlab.api.admin.GitlabAdminApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.admin.GitlabAdminApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.enums.RdmMemberStateEnum;
@@ -387,6 +389,21 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             // 更新数据库成员
             updateMemberAfter(param, glMember);
         }
+    }
+
+    @Override
+    public List<MemberPrivilegeViewDTO> selfPrivilege(Long organizationId,
+                                                      Long projectId,
+                                                      Set<Long> repositoryIds) {
+        Long userId = DetailsHelper.getUserDetails().getUserId();
+        return repositoryIds.stream().map(repositoryId -> {
+            RdmMember dbMember = Optional.ofNullable(rdmMemberRepository.selectOneByUk(projectId, repositoryId, userId))
+                    .orElse(new RdmMember());
+            MemberPrivilegeViewDTO viewDTO = new MemberPrivilegeViewDTO();
+            viewDTO.setRepositoryId(repositoryId)
+                    .setAccessLevel(dbMember.getGlAccessLevel());
+            return viewDTO;
+        }).collect(Collectors.toList());
     }
 
     @Override

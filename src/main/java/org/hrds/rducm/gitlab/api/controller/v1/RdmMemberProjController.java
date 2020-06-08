@@ -9,10 +9,7 @@ import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.*;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseUserQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
@@ -25,6 +22,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author ying.xie@hand-china.com
@@ -112,5 +111,23 @@ public class RdmMemberProjController extends BaseController {
                                                                            PageRequest pageRequest,
                                                                            BaseUserQueryDTO queryDTO) {
         return Results.success(iRdmMemberService.pageMembersRepositoryAuthorized(organizationId, projectId, pageRequest, queryDTO));
+    }
+
+    /**
+     * 获取当前用户指定应用服务的代码库权限
+     *
+     * @param organizationId
+     * @param projectId
+     * @param repositoryIds
+     * @return
+     */
+    @ApiOperation(value = "获取当前用户指定应用服务的代码库权限")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @PostMapping("/self/privilege")
+    public ResponseEntity<List<MemberPrivilegeViewDTO>> selfPrivilege(@PathVariable Long organizationId,
+                                                                      @PathVariable Long projectId,
+                                                                      @RequestBody Set<Long> repositoryIds) {
+        return Results.success(iRdmMemberService.selfPrivilege(organizationId, projectId, repositoryIds));
+
     }
 }

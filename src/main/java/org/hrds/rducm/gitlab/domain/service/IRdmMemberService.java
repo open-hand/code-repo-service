@@ -4,6 +4,7 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.MemberPrivilegeViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseUserQueryDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
@@ -11,6 +12,7 @@ import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 成员管理领域服务类
@@ -104,6 +106,17 @@ public interface IRdmMemberService {
      * @param param
      */
     void syncMemberFromGitlab(RdmMember param);
+
+    /**
+     * 查询当前用户指定应用服务的代码库权限
+     * @param organizationId
+     * @param projectId
+     * @param repositoryIds
+     * @return
+     */
+    List<MemberPrivilegeViewDTO> selfPrivilege(Long organizationId,
+                                               Long projectId,
+                                               Set<Long> repositoryIds);
 
     /**
      * 发送成员操作审计事件
