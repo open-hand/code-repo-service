@@ -30,6 +30,20 @@ public interface IRdmMemberApplicantService {
                                                   String approvalState);
 
     /**
+     * 查询我的权限申请记录
+     *
+     * @param projectId
+     * @param pageRequest
+     * @param repositoryIds
+     * @param approvalState
+     * @return
+     */
+    Page<RdmMemberApplicantViewDTO> pageByOptionsSelf(Long projectId,
+                                                      PageRequest pageRequest,
+                                                      Set<Long> repositoryIds,
+                                                      String approvalState);
+
+    /**
      * 检测申请类型
      * 1. 如果当前用户没有权限, 返回"新成员"
      * 2. 如果当前用户已有权限, 返回"权限变更"

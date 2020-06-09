@@ -81,6 +81,27 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
     }
 
     @Override
+    public Page<RdmMemberApplicantViewDTO> pageByOptionsSelf(Long projectId,
+                                                             PageRequest pageRequest,
+                                                             Set<Long> repositoryIds,
+                                                             String approvalState) {
+        Long userId = DetailsHelper.getUserDetails().getUserId();
+
+        Condition condition = Condition.builder(RdmMemberApplicant.class)
+                .where(Sqls.custom()
+                        .andEqualTo(RdmMemberApplicant.FIELD_PROJECT_ID, projectId)
+                        .andIn(RdmMemberApplicant.FIELD_REPOSITORY_ID, repositoryIds, true)
+                        .andEqualTo(RdmMemberApplicant.FIELD_APPROVAL_STATE, approvalState, true)
+                        .andEqualTo(RdmMemberApplicant.FIELD_APPLICANT_USER_ID, userId))
+                .build();
+
+        Page<RdmMemberApplicant> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberApplicantRepository.selectByCondition(condition));
+
+        // 转换查询结果
+        return rdmMemberApplicantAssembler.pageToRdmMemberApplicantViewDTO(page);
+    }
+
+    @Override
     public DetectApplicantTypeDTO detectApplicantType(Long projectId, Long repositoryId) {
         Long userId = DetailsHelper.getUserDetails().getUserId();
 

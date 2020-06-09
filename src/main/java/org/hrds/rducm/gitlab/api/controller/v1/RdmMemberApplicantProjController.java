@@ -65,6 +65,26 @@ public class RdmMemberApplicantProjController extends BaseController {
         return Results.success(iRdmMemberApplicantService.pageByOptions(projectId, pageRequest, repositoryIds, applicantUserName, approvalState));
     }
 
+    @ApiOperation(value = "我的权限申请列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "page", paramType = "query", dataType = "Int"),
+            @ApiImplicitParam(name = "size", paramType = "query", dataType = "Int"),
+            @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
+            @ApiImplicitParam(name = "repositoryIds", value = "代码库id", paramType = "query", dataType = "Long", allowMultiple = true),
+            @ApiImplicitParam(name = "approvalState", value = "审批状态", paramType = "query", dataType = "String"),
+    })
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @GetMapping("/self")
+    public ResponseEntity<Page<RdmMemberApplicantViewDTO>> pageByOptionsSelf(@PathVariable Long projectId,
+                                                                             @SortDefault(value = RdmMemberApplicant.FIELD_CREATION_DATE,
+                                                                                     direction = Sort.Direction.DESC)
+                                                                             @ApiIgnore PageRequest pageRequest,
+                                                                             @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                             @RequestParam(required = false) String approvalState) {
+
+        return Results.success(iRdmMemberApplicantService.pageByOptionsSelf(projectId, pageRequest, repositoryIds, approvalState));
+    }
+
     @ApiOperation(value = "检测当前用户申请类型")
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/self/detect-applicant-type")
