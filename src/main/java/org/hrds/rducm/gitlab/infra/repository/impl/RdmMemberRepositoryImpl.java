@@ -12,6 +12,7 @@ import org.hzero.mybatis.util.Sqls;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -31,6 +32,33 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
         rdmMember.setRepositoryId(repositoryId);
         rdmMember.setUserId(userId);
         return this.selectOne(rdmMember);
+    }
+
+    @Override
+    public int deleteByProjectIdAndUserId(Long projectId, Long userId) {
+        AssertUtils.notNull(projectId, "projectId not null");
+        AssertUtils.notNull(userId, "userId not null");
+
+        RdmMember param = new RdmMember();
+        param.setProjectId(projectId);
+        param.setUserId(userId);
+        return this.delete(param);
+    }
+
+    @Override
+    public int insertWithOwner(Long organizationId, Long projectId, Long repositoryId, Long userId, Integer glProjectId, Integer glUserId) {
+        RdmMember param = new RdmMember();
+        param.setOrganizationId(organizationId);
+        param.setProjectId(projectId);
+        param.setRepositoryId(repositoryId);
+        param.setUserId(userId);
+        param.setGlProjectId(glProjectId);
+        param.setGlUserId(glUserId);
+        param.setSyncGitlabFlag(Boolean.TRUE);
+        param.setGlAccessLevel(RdmAccessLevel.OWNER.toValue());
+        param.setSyncGitlabDate(new Date());
+
+        return this.insertSelective(param);
     }
 
     @Override

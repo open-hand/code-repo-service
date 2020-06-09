@@ -19,6 +19,28 @@ public interface RdmMemberRepository extends BaseRepository<RdmMember> {
     RdmMember selectOneByUk(Long projectId, Long repositoryId, Long userId);
 
     /**
+     * 删除指定项目下指定用户的代码库权限
+     *
+     * @param projectId
+     * @param userId
+     * @return
+     */
+    int deleteByProjectIdAndUserId(Long projectId, Long userId);
+
+    /**
+     * 插入Owner权限的成员
+     *
+     * @param organizationId
+     * @param projectId
+     * @param repositoryId
+     * @param userId
+     * @param glProjectId
+     * @param glUserId
+     * @return
+     */
+    int insertWithOwner(Long organizationId, Long projectId, Long repositoryId, Long userId, Integer glProjectId, Integer glUserId);
+
+    /**
      * 查询某个代码库成员总数
      *
      * @param repositoryId 代码库id
