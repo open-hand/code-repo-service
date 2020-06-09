@@ -15,7 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -40,7 +42,8 @@ public class ProjectController extends BaseController {
     @GetMapping("/c7n/members/developers")
     public ResponseEntity<List<BaseC7nUserViewDTO>> listDeveloperProjectMembers(@PathVariable Long projectId,
                                                                                 @RequestParam(required = false) String name) {
-        List<C7nUserVO> c7nUserVOS = c7NBaseServiceFacade.listDeveloperProjectMembers(projectId, name);
+        List<C7nUserVO> c7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listDeveloperProjectMembers(projectId, name))
+                .orElse(Collections.emptyList());
 
         List<BaseC7nUserViewDTO> baseC7NUserViewDTOS = c7nUserVOS.stream()
                 // 过滤掉"项目所有者"角色
