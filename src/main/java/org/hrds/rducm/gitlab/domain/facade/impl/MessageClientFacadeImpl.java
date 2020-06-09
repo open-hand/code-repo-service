@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +52,11 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
         String lang = "zh_CN";
         List<Receiver> receivers = new ArrayList<>();
         Map<String, String> args = new HashMap<>(16);
+
+        if (CollectionUtils.isEmpty(c7nUserVOS)) {
+            // 未找到项目管理员, 不发送站内信
+            return;
+        }
 
         c7nUserVOS.forEach(u -> {
             Receiver receiver = new Receiver()
