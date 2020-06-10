@@ -95,70 +95,71 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                         .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
                         .andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIds, true))
                 .build();
+        // TODO 使用多线程优化
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        try {
-            ListenableFuture<Integer> future1 = rdmMemberQueryHelper.userCondition(projectId, realName, loginName, condition);
-            ListenableFuture<Integer> future2 = rdmMemberQueryHelper.repositoryCondition(projectId, repositoryName, condition);
-            ListenableFuture<Integer> future3 = rdmMemberQueryHelper.paramsCondition(projectId, params, condition);
+//        try {
+//            ListenableFuture<Integer> future1 = rdmMemberQueryHelper.userCondition(projectId, realName, loginName, condition);
+//            ListenableFuture<Integer> future2 = rdmMemberQueryHelper.repositoryCondition(projectId, repositoryName, condition);
+//            ListenableFuture<Integer> future3 = rdmMemberQueryHelper.paramsCondition(projectId, params, condition);
+//
+//            if (future1.get() == 0 || future2.get() == 0 || future3.get() == 0) {
+//                return new Page<>();
+//            }
+//        } catch (InterruptedException | ExecutionException e) {
+//            throw new RuntimeException(e);
+//        }
 
-            if (future1.get() == 0 || future2.get() == 0 || future3.get() == 0) {
+        // 调用外部接口模糊查询 用户名或登录名
+        if (!StringUtils.isEmpty(realName) || !StringUtils.isEmpty(loginName)) {
+            Set<Long> userIdsSet = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, realName, loginName);
+
+            if (userIdsSet.isEmpty()) {
                 return new Page<>();
             }
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+
+            condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
         }
 
-//        // 调用外部接口模糊查询 用户名或登录名
-//        if (!StringUtils.isEmpty(realName) || !StringUtils.isEmpty(loginName)) {
-//            Set<Long> userIdsSet = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, realName, loginName);
-//
-//            if (userIdsSet.isEmpty()) {
-//                return new Page<>();
-//            }
-//
-//            condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
-//        }
-//
-//        // 调用外部接口模糊查询 应用服务
-//        if (!StringUtils.isEmpty(repositoryName)) {
-//            Set<Long> repositoryIdSet = c7NDevOpsServiceFacade.listC7nAppServiceIdsByNameOnProjectLevel(projectId, repositoryName);
-//
-//            if (repositoryIdSet.isEmpty()) {
-//                return new Page<>();
-//            }
-//
-//            condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
-//        }
-//
-//        // 根据params多条件查询
-//        if (!StringUtils.isEmpty(params)) {
-//            Set<Long> userIdsSet1 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, params, null);
-//            Set<Long> userIdsSet2 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, null, params);
-//            Set<Long> userIdsSet = new HashSet<>();
-//            userIdsSet.addAll(userIdsSet1);
-//            userIdsSet.addAll(userIdsSet2);
-//
-//            Set<Long> repositoryIdSet = c7NDevOpsServiceFacade.listC7nAppServiceIdsByNameOnProjectLevel(projectId, params);
-//
-//            boolean userIsEmpty = userIdsSet.isEmpty();
-//            boolean repositoryIsEmpty = repositoryIdSet.isEmpty();
-//
-//            if (userIsEmpty && repositoryIsEmpty) {
-//                // 都为空, 查询结果为空
-//                return new Page<>();
-//            } else if (!userIsEmpty && !repositoryIsEmpty) {
-//                // 都不为空, or条件查询
-//                condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet)
-//                        .orIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
-//            } else if (!userIsEmpty) {
-//                // 用户查询不为空
-//                condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
-//            } else {
-//                // 应用服务查询不为空
-//                condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
-//            }
-//        }
+        // 调用外部接口模糊查询 应用服务
+        if (!StringUtils.isEmpty(repositoryName)) {
+            Set<Long> repositoryIdSet = c7NDevOpsServiceFacade.listC7nAppServiceIdsByNameOnProjectLevel(projectId, repositoryName);
+
+            if (repositoryIdSet.isEmpty()) {
+                return new Page<>();
+            }
+
+            condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
+        }
+
+        // 根据params多条件查询
+        if (!StringUtils.isEmpty(params)) {
+            Set<Long> userIdsSet1 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, params, null);
+            Set<Long> userIdsSet2 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, null, params);
+            Set<Long> userIdsSet = new HashSet<>();
+            userIdsSet.addAll(userIdsSet1);
+            userIdsSet.addAll(userIdsSet2);
+
+            Set<Long> repositoryIdSet = c7NDevOpsServiceFacade.listC7nAppServiceIdsByNameOnProjectLevel(projectId, params);
+
+            boolean userIsEmpty = userIdsSet.isEmpty();
+            boolean repositoryIsEmpty = repositoryIdSet.isEmpty();
+
+            if (userIsEmpty && repositoryIsEmpty) {
+                // 都为空, 查询结果为空
+                return new Page<>();
+            } else if (!userIsEmpty && !repositoryIsEmpty) {
+                // 都不为空, or条件查询
+                condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet)
+                        .orIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
+            } else if (!userIsEmpty) {
+                // 用户查询不为空
+                condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
+            } else {
+                // 应用服务查询不为空
+                condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
+            }
+        }
 
         stopWatch.stop();
         logger.info(stopWatch.prettyPrint());
