@@ -8,6 +8,7 @@ import io.choerodon.core.iam.ResourceLevel;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberCreateDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nAppServiceViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nProjectViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
@@ -187,26 +188,33 @@ public class RdmMemberAssembler {
     public void conversionForExpireMembersJob(List<RdmMember> rdmMembers) {
         // 获取用户id集合
         Set<Long> userIds = Sets.newHashSet();
+        // 获取代码库id集合
+        Set<Long> repositoryIds = Sets.newHashSet();
         // 获取项目id集合
         Set<Long> projectIds = Sets.newHashSet();
 
         rdmMembers.forEach(dto -> {
             userIds.add(dto.getUserId());
+            repositoryIds.add(dto.getRepositoryId());
             projectIds.add(dto.getProjectId());
         });
 
         // 查询用户信息
         Map<Long, C7nUserVO> userVOMap = c7NBaseServiceFacade.listC7nUserToMap(Sets.newHashSet(userIds));
+        // 查询应用服务信息
+        Map<Long, C7nAppServiceVO> appServiceVOMap = c7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
         // 查询项目信息
         Map<Long, C7nProjectVO> c7nProjectVOMap = c7NBaseServiceFacade.listProjectsByIdsToMap(projectIds);
 
         // 填充数据
         for (RdmMember rdmMember : rdmMembers) {
             C7nUserVO c7nUserVO = Optional.ofNullable(userVOMap.get(rdmMember.getUserId())).orElse(new C7nUserVO());
+            C7nAppServiceVO c7nAppServiceVO = Optional.ofNullable(appServiceVOMap.get(rdmMember.getRepositoryId())).orElse(new C7nAppServiceVO());
             C7nProjectVO c7nProjectVO = Optional.ofNullable(c7nProjectVOMap.get(rdmMember.getProjectId())).orElse(new C7nProjectVO());
 
             rdmMember.setProject(BaseC7nProjectViewDTO.convert(c7nProjectVO));
             rdmMember.setUser(BaseC7nUserViewDTO.convert(c7nUserVO));
+            rdmMember.setRepository(BaseC7nAppServiceViewDTO.convert(c7nAppServiceVO));
         }
     }
 }

@@ -7,6 +7,7 @@ import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nAppServiceViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nProjectViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 
@@ -123,6 +124,12 @@ public class RdmMember extends AuditDomain {
      */
     @Transient
     private BaseC7nUserViewDTO user;
+
+    /**
+     * 应用服务
+     */
+    @Transient
+    private BaseC7nAppServiceViewDTO repository;
 
     /**
      * 项目
@@ -267,6 +274,15 @@ public class RdmMember extends AuditDomain {
 
     public RdmMember setProject(BaseC7nProjectViewDTO project) {
         this.project = project;
+        return this;
+    }
+
+    public BaseC7nAppServiceViewDTO getRepository() {
+        return repository;
+    }
+
+    public RdmMember setRepository(BaseC7nAppServiceViewDTO repository) {
+        this.repository = repository;
         return this;
     }
 }

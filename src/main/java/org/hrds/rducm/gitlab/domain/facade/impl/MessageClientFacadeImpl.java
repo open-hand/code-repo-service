@@ -102,12 +102,13 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
         StringBuilder sb = new StringBuilder();
         members.forEach(m -> {
             String projectName = m.getProject().getProjectName();
+            String repositoryName = m.getRepository().getRepositoryName();
             String realName = m.getUser().getRealName();
             String expiresAtStr = Optional.ofNullable(m.getGlExpiresAt())
                     .map(val -> DateFormatUtils.format(val, "yyyy-MM-dd"))
                     .orElse("");
             int days = Period.between(LocalDate.now(), m.getGlExpiresAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()).getDays();
-            sb.append("[").append(projectName).append("]项目[")
+            sb.append("[").append(projectName).append("]项目[").append(repositoryName).append("]应用服务").append("[")
                     .append(realName).append("]的权限即将于")
                     .append(expiresAtStr).append("(").append(days).append("天后)")
                     .append("到期<br/>");
