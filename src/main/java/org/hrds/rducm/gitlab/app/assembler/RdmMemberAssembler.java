@@ -176,4 +176,37 @@ public class RdmMemberAssembler {
 
         return rdmMemberViewDTOS;
     }
+
+    /**
+     * ExpiredMembersJob定时任务站内信模板使用
+     * 将RdmMember里的id字段查询对应的name
+     *
+     * @param rdmMembers
+     * @return
+     */
+    public void conversionForExpireMembersJob(List<RdmMember> rdmMembers) {
+        // 获取用户id集合
+        Set<Long> userIds = Sets.newHashSet();
+        // 获取项目id集合
+        Set<Long> projectIds = Sets.newHashSet();
+
+        rdmMembers.forEach(dto -> {
+            userIds.add(dto.getUserId());
+            projectIds.add(dto.getProjectId());
+        });
+
+        // 查询用户信息
+        Map<Long, C7nUserVO> userVOMap = c7NBaseServiceFacade.listC7nUserToMap(Sets.newHashSet(userIds));
+        // 查询项目信息
+        Map<Long, C7nProjectVO> c7nProjectVOMap = c7NBaseServiceFacade.listProjectsByIdsToMap(projectIds);
+
+        // 填充数据
+        for (RdmMember rdmMember : rdmMembers) {
+            C7nUserVO c7nUserVO = Optional.ofNullable(userVOMap.get(rdmMember.getUserId())).orElse(new C7nUserVO());
+            C7nProjectVO c7nProjectVO = Optional.ofNullable(c7nProjectVOMap.get(rdmMember.getProjectId())).orElse(new C7nProjectVO());
+
+            rdmMember.setProject(BaseC7nProjectViewDTO.convert(c7nProjectVO));
+            rdmMember.setUser(BaseC7nUserViewDTO.convert(c7nUserVO));
+        }
+    }
 }

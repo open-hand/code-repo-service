@@ -7,6 +7,8 @@ import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nProjectViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -115,6 +117,18 @@ public class RdmMember extends AuditDomain {
      */
     @Transient
     private Boolean expiredFlag;
+
+    /**
+     * 用户
+     */
+    @Transient
+    private BaseC7nUserViewDTO user;
+
+    /**
+     * 项目
+     */
+    @Transient
+    private BaseC7nProjectViewDTO project;
 
     //
     // getter/setter
@@ -235,6 +249,24 @@ public class RdmMember extends AuditDomain {
 
     public RdmMember setSyncGitlabErrorMsg(String syncGitlabErrorMsg) {
         this.syncGitlabErrorMsg = syncGitlabErrorMsg;
+        return this;
+    }
+
+    public BaseC7nUserViewDTO getUser() {
+        return user;
+    }
+
+    public RdmMember setUser(BaseC7nUserViewDTO user) {
+        this.user = user;
+        return this;
+    }
+
+    public BaseC7nProjectViewDTO getProject() {
+        return project;
+    }
+
+    public RdmMember setProject(BaseC7nProjectViewDTO project) {
+        this.project = project;
         return this;
     }
 }
