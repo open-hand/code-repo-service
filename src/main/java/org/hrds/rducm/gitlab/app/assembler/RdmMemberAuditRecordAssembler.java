@@ -41,25 +41,13 @@ public class RdmMemberAuditRecordAssembler {
         Set<Long> userIds = new HashSet<>();
         // 代码库id
         Set<Long> repositoryIds = new HashSet<>();
-        // Gitlab用户id
-        Set<Integer> glUserIds = new HashSet<>();
         // 获取项目id集合
         Set<Long> projectIds = Sets.newHashSet();
         page.getContent().forEach(v -> {
             userIds.add(v.getUserId());
             repositoryIds.add(v.getRepositoryId());
             projectIds.add(v.getProjectId());
-
-            if (v.getUserId() == null) {
-                glUserIds.add(v.getGlUserId());
-            }
         });
-
-        // 获取Gitlab用户id对应的用户id
-        Map<Integer, Long> glToUserIds = c7NDevOpsServiceFacade.mapGlUserIdsToUserIds(glUserIds);
-
-        // Gitlab用户查询的userId添加到集合里
-        userIds.addAll(glToUserIds.values());
 
         // 获取用户信息
         Map<Long, C7nUserVO> c7nUserVOMap = c7NBaseServiceFacade.listC7nUserToMap(userIds);
@@ -76,11 +64,6 @@ public class RdmMemberAuditRecordAssembler {
         }
 
         return ConvertUtils.convertPage(page, val -> {
-            // 若无userId, 先根据glUserId获取userId
-            if (val.getUserId() == null) {
-                val.setUserId(glToUserIds.get(val.getGlUserId()));
-            }
-
             C7nAppServiceVO c7nAppServiceVO = Optional.ofNullable(c7nAppServiceVOMap.get(val.getRepositoryId())).orElse(new C7nAppServiceVO());
             C7nUserVO c7nUserVO = Optional.ofNullable(c7nUserVOMap.get(val.getUserId())).orElse(new C7nUserVO());
 

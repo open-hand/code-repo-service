@@ -3,6 +3,7 @@ package org.hrds.rducm.gitlab.infra.feign.fallback;
 import feign.hystrix.FallbackFactory;
 import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nOrgAdministratorVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.springframework.http.ResponseEntity;
@@ -63,6 +64,11 @@ public class BaseServiceFeignClientFallBackFactory implements FallbackFactory<Ba
 
             @Override
             public ResponseEntity<List<C7nUserVO>> listUsersByIds(Boolean onlyEnabled, Set<Long> ids) {
+                return null;
+            }
+
+            @Override
+            public ResponseEntity<Page<C7nOrgAdministratorVO>> pagingQueryOrgAdministrator(Long organizationId, int page, int size, String realName, String loginName, String params) {
                 return null;
             }
 

@@ -3,6 +3,7 @@ package org.hrds.rducm.gitlab.domain.facade.impl;
 import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nOrgAdministratorVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
@@ -162,6 +163,20 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
         List<C7nUserVO> c7nUserVOS = FeignUtils.handleResponseEntity(responseEntity);
         return c7nUserVOS;
     }
+
+    @Override
+    public List<C7nUserVO> listOrgAdministrator(Long organizationId) {
+        ResponseEntity<Page<C7nOrgAdministratorVO>> responseEntity = baseServiceFeignClient.pagingQueryOrgAdministrator(organizationId, 0, 0, null, null, null);
+        Page<C7nOrgAdministratorVO> result = FeignUtils.handleResponseEntity(responseEntity);
+        return result.getContent().stream().map(r -> {
+            C7nUserVO vo = new C7nUserVO();
+            vo.setId(r.getId());
+            vo.setRealName(r.getUserName());
+            vo.setLoginName(r.getLoginName());
+            return vo;
+        }).collect(Collectors.toList());
+    }
+
 
     /* 猪齿鱼项目相关方法 */
 

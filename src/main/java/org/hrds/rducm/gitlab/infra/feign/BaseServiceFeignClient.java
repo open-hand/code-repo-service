@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.infra.feign;
 
 import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.infra.feign.fallback.BaseServiceFeignClientFallBackFactory;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nOrgAdministratorVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -179,6 +180,26 @@ public interface BaseServiceFeignClient {
     @PostMapping(value = "/v1/users/list_by_ids")
     ResponseEntity<List<C7nUserVO>> listUsersByIds(@RequestParam(value = "only_enabled", defaultValue = "true", required = false) Boolean onlyEnabled,
                                                    @RequestBody Set<Long> ids);
+
+
+    /**
+     * 查询本组织下的所有组织管理者
+     *
+     * @param organizationId
+     * @param page
+     * @param size           size=0表示不分页
+     * @param realName
+     * @param loginName
+     * @param params
+     * @return
+     */
+    @GetMapping(value = "/v1/organizations/{organization_id}/org_administrator")
+    ResponseEntity<Page<C7nOrgAdministratorVO>> pagingQueryOrgAdministrator(@PathVariable(name = "organization_id") Long organizationId,
+                                                                            @RequestParam(required = false) int page,
+                                                                            @RequestParam(required = false) int size,
+                                                                            @RequestParam(required = false) String realName,
+                                                                            @RequestParam(required = false) String loginName,
+                                                                            @RequestParam(required = false) String params);
 
     /* 其他 */
     // -------------------------------

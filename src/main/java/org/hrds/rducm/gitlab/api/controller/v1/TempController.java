@@ -82,7 +82,7 @@ public class TempController extends BaseController {
     // TODO 测试用,需删除,改为定时任务调用
     @ApiOperation(value = "对组织下所有成员进行权限审计(组织层) 测试用,需删除,改为定时任务调用")
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @PostMapping("/batch-audit")
+    @PostMapping("/{organizationId}/batch-audit")
     public ResponseEntity<?> batchAudit(@PathVariable Long organizationId) {
         iMemberAuditService.auditMembersByOrganizationId(organizationId);
         return Results.success();

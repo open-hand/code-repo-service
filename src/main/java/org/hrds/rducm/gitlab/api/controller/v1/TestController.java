@@ -5,6 +5,7 @@ import io.choerodon.swagger.annotation.Permission;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.core.oauth.DetailsHelper;
 import io.swagger.annotations.ApiOperation;
+import org.hrds.rducm.gitlab.app.eventhandler.RdmMemberChangeSagaHandler;
 import org.hrds.rducm.gitlab.app.job.MemberInitJob;
 import org.hrds.rducm.gitlab.app.job.MembersAuditJob;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
@@ -14,10 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -75,5 +73,16 @@ public class TestController extends BaseController {
         Map<String, Object> map = new HashMap<>();
         map.put("organizationId", organizationId);
         membersAuditJob.membersAuditJob(map);
+    }
+
+    @Autowired
+    private RdmMemberChangeSagaHandler rdmMemberChangeSagaHandler;
+
+    @ApiOperation(value = "rdmMemberChangeSagaHandler")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @PostMapping("/organizations/{organizationId}/rdmMemberChangeSagaHandler")
+    public void rdmMemberChangeSagaHandler(@PathVariable Long organizationId,
+                                           @RequestBody String payload) {
+        rdmMemberChangeSagaHandler.handleGitlabGroupMemberEvent(payload);
     }
 }

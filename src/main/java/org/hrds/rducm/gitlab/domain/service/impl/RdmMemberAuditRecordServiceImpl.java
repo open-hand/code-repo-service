@@ -17,6 +17,7 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.admin.GitlabAdminApi;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
 import org.slf4j.Logger;
@@ -39,6 +40,11 @@ import java.util.stream.Collectors;
 @Service
 public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordService {
     public static final Logger LOGGER = LoggerFactory.getLogger(RdmMemberAuditRecordServiceImpl.class);
+
+    /**
+     * 用于存储组织的组织管理员数据, 便于后续逻辑处理
+     */
+    private final ThreadLocal<List<C7nUserVO>> threadLocal = new ThreadLocal<>();
     @Autowired
     private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
     @Autowired
@@ -135,6 +141,10 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
     }
 
     private List<RdmMemberAuditRecord> compareMembersByOrganizationId(Long organizationId) {
+        // 获取组织管理员, 存入ThreadLocal备用
+        List<C7nUserVO> orgAdministrators = c7NBaseServiceFacade.listOrgAdministrator(organizationId);
+        threadLocal.set(orgAdministrators);
+
         // <1> 获取组织下所有项目
         Set<Long> projectIds = c7NBaseServiceFacade.listProjectIds(organizationId);
 
@@ -144,6 +154,8 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                 })
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
+
+        threadLocal.remove();
 
         return list;
     }
@@ -181,16 +193,15 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                                                                     Long projectId,
                                                                     Long repositoryId,
                                                                     Integer glProjectId) {
-        // 查询gitlab所有成员
-
         // 判断一下gitlab是否存在该仓库, 避免报错
         Project project = gitlabAdminApi.getProject(glProjectId);
         if (project == null) {
             return Collections.emptyList();
         }
 
+        // 查询gitlab所有成员
         List<Member> members = gitlabAdminApi.getAllMembers(glProjectId);
-        LOGGER.info("{}项目查询到成员数量为:{}", glProjectId, members.size());
+        LOGGER.info("{}项目查询到Gitlab成员数量为:{}", glProjectId, members.size());
 
         // 查询数据库所有成员
         List<RdmMember> dbMembers = memberRepository.select(new RdmMember().setGlProjectId(glProjectId));
@@ -254,7 +265,48 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
             });
         }
 
+        // 填补userId
+        List<RdmMemberAuditRecord> memberAuditsWrapper = fill(memberAudits);
+
+        // 排除组织管理员用户(组织管理员不进行审计)
+        List<RdmMemberAuditRecord> result = excludeOrgAdmin(memberAuditsWrapper);
+
+        return result;
+    }
+
+    /**
+     * 查询并填补为空的userId
+     * 举例:
+     * 补全前: userId -> null  glUserId -> 10001
+     * 补全后: userId -> 20000 glUserId -> 10001
+     * @param memberAudits
+     */
+    private List<RdmMemberAuditRecord> fill(List<RdmMemberAuditRecord> memberAudits) {
+        // Gitlab用户id
+        Set<Integer> glUserIds;
+        glUserIds = memberAudits.stream().filter(m -> m.getUserId() == null)
+                .map(RdmMemberAuditRecord::getGlUserId)
+                .collect(Collectors.toSet());
+        // 获取Gitlab用户id对应的用户id
+        Map<Integer, Long> glToUserIds = c7NDevOpsServiceFacade.mapGlUserIdsToUserIds(glUserIds);
+
+        memberAudits.stream()
+                .filter(m -> m.getUserId() == null)
+                .forEach(m -> {
+                    m.setUserId(glToUserIds.get(m.getGlUserId()));
+                });
+
         return memberAudits;
+    }
+
+    private List<RdmMemberAuditRecord> excludeOrgAdmin(List<RdmMemberAuditRecord> memberAudits) {
+        // 获取组织管理员
+        List<C7nUserVO> orgAdministrators = threadLocal.get();
+        Set<Long> orgAdminUserIds = orgAdministrators.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
+
+        return memberAudits.stream()
+                .filter(m -> !orgAdminUserIds.contains(m.getUserId()))
+                .collect(Collectors.toList());
     }
 
     private RdmMemberAuditRecord buildMemberAudit(Long organizationId,

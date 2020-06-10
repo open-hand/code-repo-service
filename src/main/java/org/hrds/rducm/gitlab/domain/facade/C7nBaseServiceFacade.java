@@ -109,6 +109,14 @@ public interface C7nBaseServiceFacade {
     List<C7nUserVO> listDeveloperProjectMembers(Long projectId, String name);
 
     /**
+     * 获取一个组织的所有组织管理员
+     *
+     * @param organizationId
+     * @return
+     */
+    List<C7nUserVO> listOrgAdministrator(Long organizationId);
+
+    /**
      * 组织层
      * 查询组织下用户的项目列表
      *
