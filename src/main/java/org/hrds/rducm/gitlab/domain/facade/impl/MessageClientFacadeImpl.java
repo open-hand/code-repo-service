@@ -107,10 +107,10 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
                     .map(val -> DateFormatUtils.format(val, "yyyy-MM-dd"))
                     .orElse("");
             int days = Period.between(LocalDate.now(), m.getGlExpiresAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()).getDays();
-            sb.append("[").append(projectName).append("]项目的[")
-                    .append(realName).append("]的权限即将于[")
+            sb.append("[").append(projectName).append("]项目[")
+                    .append(realName).append("]的权限即将于")
                     .append(expiresAtStr).append("(").append(days).append("天后)")
-                    .append("]到期\n");
+                    .append("到期<br/>");
         });
         args.put("membersInfo", sb.toString());
 
