@@ -34,7 +34,7 @@ public class ProjectController extends BaseController {
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
 
-    @ApiOperation(value = "查询项目开发成员, 仅包含'项目成员'角色,并排除自己(项目层)")
+    @ApiOperation(value = "查询项目成员, 排除'项目管理员'和'组织管理员'角色,并排除自己(项目层)")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
             @ApiImplicitParam(name = "name", value = "真实名称或登录名模糊搜索", paramType = "query"),
