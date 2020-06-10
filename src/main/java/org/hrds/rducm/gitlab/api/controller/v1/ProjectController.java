@@ -50,7 +50,7 @@ public class ProjectController extends BaseController {
         // 获取组织管理员
         List<C7nUserVO> orgAdministrators = Optional.ofNullable(c7NBaseServiceFacade.listOrgAdministrator(organizationId))
                 .orElse(Collections.emptyList());
-        Set<Long> orgAdmins = orgAdministrators.stream().map(v -> v.getId()).collect(Collectors.toSet());
+        Set<Long> orgAdmins = orgAdministrators.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
 
         List<BaseC7nUserViewDTO> baseC7NUserViewDTOS = c7nUserVOS.stream()
                 // 过滤掉"项目所有者"角色的用户
