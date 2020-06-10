@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
  */
 //@Api(tags = SwaggerTags.GITLAB_MEMBER)
 @RestController("projectController.v1")
-@RequestMapping("/v1/projects/{projectId}")
+@RequestMapping("/v1/{organizationId}/projects/{projectId}")
 public class ProjectController extends BaseController {
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
@@ -40,14 +41,22 @@ public class ProjectController extends BaseController {
     })
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/c7n/members/developers")
-    public ResponseEntity<List<BaseC7nUserViewDTO>> listDeveloperProjectMembers(@PathVariable Long projectId,
+    public ResponseEntity<List<BaseC7nUserViewDTO>> listDeveloperProjectMembers(@PathVariable Long organizationId,
+                                                                                @PathVariable Long projectId,
                                                                                 @RequestParam(required = false) String name) {
         List<C7nUserVO> c7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listDeveloperProjectMembers(projectId, name))
                 .orElse(Collections.emptyList());
 
+        // 获取组织管理员
+        List<C7nUserVO> orgAdministrators = Optional.ofNullable(c7NBaseServiceFacade.listOrgAdministrator(organizationId))
+                .orElse(Collections.emptyList());
+        Set<Long> orgAdmins = orgAdministrators.stream().map(v -> v.getId()).collect(Collectors.toSet());
+
         List<BaseC7nUserViewDTO> baseC7NUserViewDTOS = c7nUserVOS.stream()
-                // 过滤掉"项目所有者"角色
+                // 过滤掉"项目所有者"角色的用户
                 .filter(u -> u.getRoles().stream().noneMatch(r -> r.getCode().equals(IamRoleCodeEnum.PROJECT_OWNER.getCode())))
+                // 过滤掉"组织管理员"角色的用户
+                .filter(u -> !orgAdmins.contains(u.getId()))
                 .map(u -> {
                     BaseC7nUserViewDTO baseC7NUserViewDTO = new BaseC7nUserViewDTO();
                     baseC7NUserViewDTO.setUserId(u.getId())
