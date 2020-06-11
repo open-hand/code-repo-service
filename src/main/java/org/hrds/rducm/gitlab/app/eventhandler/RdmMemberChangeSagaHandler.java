@@ -54,6 +54,7 @@ public class RdmMemberChangeSagaHandler {
         logger.info("payload:\n{}", gson.toJson(gitlabGroupMemberVOList));
 
         handleProjectLevel(gitlabGroupMemberVOList);
+        handleOrgLevel(gitlabGroupMemberVOList);
 
         logger.info("update user role end");
         return gitlabGroupMemberVOList;
