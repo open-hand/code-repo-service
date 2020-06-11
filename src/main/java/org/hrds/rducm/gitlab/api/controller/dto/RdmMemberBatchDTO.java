@@ -2,6 +2,8 @@ package org.hrds.rducm.gitlab.api.controller.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Future;
@@ -14,6 +16,7 @@ import java.util.List;
 public class RdmMemberBatchDTO {
     @NotEmpty
     @ApiModelProperty(value = ApiInfoConstants.REPOSITORY_ID, dataType = "Long", required = true)
+    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON)
     private List<Long> repositoryIds;
 
     @NotEmpty
