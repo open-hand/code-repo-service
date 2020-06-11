@@ -14,7 +14,6 @@ import org.hzero.starter.keyencrypt.core.Encrypt;
  */
 public class BaseC7nUserViewDTO {
     @ApiModelProperty(value = "用户id")
-    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON)
     private Long userId;
 
     @ApiModelProperty(value = "用户名")
