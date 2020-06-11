@@ -8,8 +8,10 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +37,7 @@ public class RdmProjectController extends BaseController {
     })
     public ResponseEntity<Page<RdmMemberViewDTO>> pageMemberPermissions(@PathVariable Long organizationId,
                                                                         @PathVariable Long projectId,
-                                                                        @PathVariable Long userId,
+                                                                        @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @PathVariable Long userId,
                                                                         PageRequest pageRequest) {
         return Results.success(iRdmMemberService.pageMemberPermissions(organizationId, projectId, userId, pageRequest));
     }

@@ -11,8 +11,10 @@ import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nAppServiceViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.repository.RepositoryOverViewDTO;
 import org.hrds.rducm.gitlab.app.service.RdmRepositoryAppService;
 import org.hrds.rducm.gitlab.domain.service.IRdmRepositoryService;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +47,7 @@ public class RdmRepositoryProjController extends BaseController {
     @GetMapping("/overview")
     public ResponseEntity<Page<RepositoryOverViewDTO>> pageOverviewByOptions(@PathVariable Long projectId,
                                                                              PageRequest pageRequest,
-                                                                             @RequestParam(required = false) Set<Long> repositoryIds) {
+                                                                             @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @RequestParam(required = false) Set<Long> repositoryIds) {
         Page<RepositoryOverViewDTO> repositoryOverViewDTOS = rdmRepositoryService.pageOverviewByOptions(projectId, pageRequest, repositoryIds);
         return Results.success(repositoryOverViewDTOS);
     }

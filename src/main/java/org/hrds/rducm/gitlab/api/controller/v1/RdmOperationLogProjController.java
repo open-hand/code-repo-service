@@ -14,8 +14,10 @@ import org.hrds.rducm.gitlab.api.controller.dto.OperationLogViewDTO;
 import org.hrds.rducm.gitlab.app.service.RdmOperationLogAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,7 +55,7 @@ public class RdmOperationLogProjController extends BaseController {
                                                                             @SortDefault(value = RdmOperationLog.FIELD_CREATION_DATE,
                                                                                     direction = Sort.Direction.DESC)
                                                                             @ApiIgnore PageRequest pageRequest,
-                                                                            @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                            @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @RequestParam(required = false) Set<Long> repositoryIds,
                                                                             OperationLogQueryDTO queryDTO) {
 
         Page<OperationLogViewDTO> list = operationLogService.pageByOptionsMemberLog(projectId, repositoryIds, pageRequest, queryDTO);

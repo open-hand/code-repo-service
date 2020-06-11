@@ -2,7 +2,9 @@ package org.hrds.rducm.gitlab.api.controller.dto.base;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 /**
  * 通用的展示用户信息的DTO
@@ -12,6 +14,7 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
  */
 public class BaseC7nUserViewDTO {
     @ApiModelProperty(value = "用户id")
+    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON)
     private Long userId;
 
     @ApiModelProperty(value = "用户名")
