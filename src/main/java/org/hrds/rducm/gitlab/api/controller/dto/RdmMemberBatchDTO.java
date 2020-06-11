@@ -27,6 +27,7 @@ public class RdmMemberBatchDTO {
     public static class GitlabMemberCreateDTO {
         @NotNull
         @ApiModelProperty(value = ApiInfoConstants.USER_ID, required = true)
+        @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON)
         private Long userId;
         @NotNull
         @ApiModelProperty(value = ApiInfoConstants.GL_ACCESS_LEVEL, required = true)
