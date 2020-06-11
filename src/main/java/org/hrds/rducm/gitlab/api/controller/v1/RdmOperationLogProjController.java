@@ -55,7 +55,7 @@ public class RdmOperationLogProjController extends BaseController {
                                                                             @SortDefault(value = RdmOperationLog.FIELD_CREATION_DATE,
                                                                                     direction = Sort.Direction.DESC)
                                                                             @ApiIgnore PageRequest pageRequest,
-                                                                            @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                            @RequestParam(required = false) Set<Long> repositoryIds,
                                                                             OperationLogQueryDTO queryDTO) {
 
         Page<OperationLogViewDTO> list = operationLogService.pageByOptionsMemberLog(projectId, repositoryIds, pageRequest, queryDTO);

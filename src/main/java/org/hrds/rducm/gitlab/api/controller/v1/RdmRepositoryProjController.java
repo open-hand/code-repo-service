@@ -47,7 +47,7 @@ public class RdmRepositoryProjController extends BaseController {
     @GetMapping("/overview")
     public ResponseEntity<Page<RepositoryOverViewDTO>> pageOverviewByOptions(@PathVariable Long projectId,
                                                                              PageRequest pageRequest,
-                                                                             @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @RequestParam(required = false) Set<Long> repositoryIds) {
+                                                                             @RequestParam(required = false) Set<Long> repositoryIds) {
         Page<RepositoryOverViewDTO> repositoryOverViewDTOS = rdmRepositoryService.pageOverviewByOptions(projectId, pageRequest, repositoryIds);
         return Results.success(repositoryOverViewDTOS);
     }
