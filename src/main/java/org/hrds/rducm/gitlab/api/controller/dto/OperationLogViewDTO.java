@@ -2,6 +2,8 @@ package org.hrds.rducm.gitlab.api.controller.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nProjectViewDTO;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import java.util.Date;
 
@@ -11,6 +13,7 @@ import java.util.Date;
  */
 public class OperationLogViewDTO {
     @ApiModelProperty("主键")
+    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGMAL)
     private Long id;
 
     @ApiModelProperty(value = "项目层，项目id", required = true)

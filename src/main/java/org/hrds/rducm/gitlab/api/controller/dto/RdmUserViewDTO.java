@@ -1,8 +1,12 @@
 package org.hrds.rducm.gitlab.api.controller.dto;
 
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
+import org.hzero.starter.keyencrypt.core.Encrypt;
+
 import java.util.Date;
 
 public class RdmUserViewDTO {
+    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON)
     private Long userId;
 
     /* gitlab用户信息 */

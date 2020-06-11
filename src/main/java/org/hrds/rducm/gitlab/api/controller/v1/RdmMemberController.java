@@ -9,8 +9,10 @@ import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +45,7 @@ public class RdmMemberController extends BaseController {
     public ResponseEntity<?> updateMember(@PathVariable Long organizationId,
                                           @PathVariable Long projectId,
                                           @PathVariable Long repositoryId,
-                                          @PathVariable Long memberId,
+                                          @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGM) @PathVariable Long memberId,
                                           @RequestBody RdmMemberUpdateDTO rdmMemberUpdateDTO) {
         validObject(rdmMemberUpdateDTO);
         rdmMemberAppService.updateMember(memberId, rdmMemberUpdateDTO);
@@ -61,7 +63,7 @@ public class RdmMemberController extends BaseController {
     public ResponseEntity<?> removeMember(@PathVariable Long organizationId,
                                           @PathVariable Long projectId,
                                           @PathVariable Long repositoryId,
-                                          @PathVariable Long memberId) {
+                                          @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGM) @PathVariable Long memberId) {
         rdmMemberAppService.removeMember(memberId);
         return Results.success();
     }
@@ -77,18 +79,19 @@ public class RdmMemberController extends BaseController {
     public ResponseEntity<?> syncMember(@PathVariable Long organizationId,
                                         @PathVariable Long projectId,
                                         @PathVariable Long repositoryId,
-                                        @PathVariable Long memberId) {
+                                        @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGM) @PathVariable Long memberId) {
         rdmMemberAppService.syncMember(memberId);
         return Results.success();
     }
 
-    @ApiOperation(value = "同步Gitlab代码库成员到本服务")
-    @Permission(level = ResourceLevel.ORGANIZATION)
-    @PostMapping("/sync-from-gitlab")
-    public ResponseEntity<?> syncMembersFromGitlab(@PathVariable Long organizationId,
-                                                   @PathVariable Long projectId,
-                                                   @PathVariable Long repositoryId) {
-        rdmMemberService.syncAllMembersFromGitlab(organizationId, projectId, repositoryId);
-        return Results.success();
-    }
+    // TODO delete
+//    @ApiOperation(value = "同步Gitlab代码库成员到本服务")
+//    @Permission(level = ResourceLevel.ORGANIZATION)
+//    @PostMapping("/sync-from-gitlab")
+//    public ResponseEntity<?> syncMembersFromGitlab(@PathVariable Long organizationId,
+//                                                   @PathVariable Long projectId,
+//                                                   @PathVariable Long repositoryId) {
+//        rdmMemberService.syncAllMembersFromGitlab(organizationId, projectId, repositoryId);
+//        return Results.success();
+//    }
 }

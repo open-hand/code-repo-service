@@ -6,6 +6,8 @@ import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -48,6 +50,7 @@ public class MemberAuditLog extends AuditDomain {
     @ApiModelProperty("主键")
     @Id
     @GeneratedValue
+    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGMAL)
     private Long id;
     @ApiModelProperty(value = "组织id")
     private Long organizationId;

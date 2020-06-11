@@ -2,8 +2,10 @@ package org.hrds.rducm.gitlab.api.controller.dto.base;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import java.util.Optional;
 
@@ -15,6 +17,7 @@ import java.util.Optional;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseC7nAppServiceViewDTO {
+    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON)
     private Long repositoryId;
     private String repositoryName;
     private String repositoryCode;

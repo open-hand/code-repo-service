@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nProjectViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import java.util.Date;
 import java.util.List;
@@ -25,6 +27,7 @@ public class RdmMemberViewDTO {
     /**
      * 成员id, 主键
      */
+    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGM)
     private Long id;
 
     @ApiModelProperty("项目id")

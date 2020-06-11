@@ -11,8 +11,10 @@ import org.hrds.rducm.gitlab.api.controller.dto.MemberAuditRecordQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +52,7 @@ public class RdmMemberAuditRecordProjController extends BaseController {
     @ApiOperation(value = "同步")
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/{id}/sync")
-    public ResponseEntity<?> sync(@PathVariable Long id, @RequestParam int syncStrategy) {
+    public ResponseEntity<?> sync(@Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGMAR) @PathVariable Long id, @RequestParam int syncStrategy) {
         rdmMemberAuditAppService.syncByStrategy(id, syncStrategy);
         return Results.success();
     }

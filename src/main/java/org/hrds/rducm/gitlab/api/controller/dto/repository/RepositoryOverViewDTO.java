@@ -2,6 +2,8 @@ package org.hrds.rducm.gitlab.api.controller.dto.repository;
 
 import io.swagger.annotations.ApiModelProperty;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import java.util.Date;
 
@@ -11,6 +13,7 @@ import java.util.Date;
  */
 public class RepositoryOverViewDTO {
     @ApiModelProperty(value = ApiInfoConstants.REPOSITORY_ID)
+    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON)
     private Long repositoryId;
     @ApiModelProperty(value = "代码库名称")
     private String repositoryName;

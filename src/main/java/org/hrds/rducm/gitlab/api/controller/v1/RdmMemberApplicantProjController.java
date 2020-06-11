@@ -18,8 +18,10 @@ import org.hrds.rducm.gitlab.app.service.RdmMemberApplicantAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberApplicantService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -119,7 +121,7 @@ public class RdmMemberApplicantProjController extends BaseController {
     })
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/{id}/pass")
-    public ResponseEntity<?> passAndHandleMember(@PathVariable Long id,
+    public ResponseEntity<?> passAndHandleMember(@Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGMA) @PathVariable Long id,
                                                  @RequestParam Long objectVersionNumber,
                                                  RdmMemberApplicantPassDTO passDTO) {
         validObject(passDTO);
@@ -131,7 +133,7 @@ public class RdmMemberApplicantProjController extends BaseController {
     @ApiOperation(value = "成员权限申请-审批拒绝")
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/{id}/refuse")
-    public ResponseEntity<?> refuse(@PathVariable Long id,
+    public ResponseEntity<?> refuse(@Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGMA) @PathVariable Long id,
                                     @RequestParam Long objectVersionNumber,
                                     @RequestBody String approvalMessage) {
         rdmMemberApplicantAppService.refuse(id, objectVersionNumber, approvalMessage);
