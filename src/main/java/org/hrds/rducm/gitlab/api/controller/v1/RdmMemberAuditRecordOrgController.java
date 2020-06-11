@@ -11,8 +11,10 @@ import org.hrds.rducm.gitlab.api.controller.dto.MemberAuditRecordQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
 import org.hrds.rducm.gitlab.domain.service.IMemberAuditService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +42,7 @@ public class RdmMemberAuditRecordOrgController extends BaseController {
     @GetMapping
     public ResponseEntity<Page<RdmMemberAuditRecordViewDTO>> pageByOptions(@PathVariable Long organizationId,
                                                                            @RequestParam(required = false) Set<Long> projectIds,
-                                                                           @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                           @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @RequestParam(required = false) Set<Long> repositoryIds,
                                                                            PageRequest pageRequest,
                                                                            MemberAuditRecordQueryDTO queryDTO) {
         return Results.success(iRdmMemberAuditRecordService.pageByOptions(organizationId, projectIds, repositoryIds, pageRequest, queryDTO, ResourceLevel.ORGANIZATION));

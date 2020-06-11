@@ -60,7 +60,7 @@ public class RdmMemberApplicantProjController extends BaseController {
                                                                          @SortDefault(value = RdmMemberApplicant.FIELD_CREATION_DATE,
                                                                                  direction = Sort.Direction.DESC)
                                                                          @ApiIgnore PageRequest pageRequest,
-                                                                         @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                         @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @RequestParam(required = false) Set<Long> repositoryIds,
                                                                          @RequestParam(required = false) String applicantUserName,
                                                                          @RequestParam(required = false) String approvalState) {
 
@@ -81,7 +81,7 @@ public class RdmMemberApplicantProjController extends BaseController {
                                                                              @SortDefault(value = RdmMemberApplicant.FIELD_CREATION_DATE,
                                                                                      direction = Sort.Direction.DESC)
                                                                              @ApiIgnore PageRequest pageRequest,
-                                                                             @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                             @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @RequestParam(required = false) Set<Long> repositoryIds,
                                                                              @RequestParam(required = false) String approvalState) {
 
         return Results.success(iRdmMemberApplicantService.pageByOptionsSelf(projectId, pageRequest, repositoryIds, approvalState));

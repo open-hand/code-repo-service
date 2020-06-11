@@ -43,7 +43,7 @@ public class RdmMemberAuditRecordProjController extends BaseController {
     @GetMapping
     public ResponseEntity<Page<RdmMemberAuditRecordViewDTO>> pageByOptions(@PathVariable Long organizationId,
                                                                            @PathVariable Long projectId,
-                                                                           @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                           @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @RequestParam(required = false) Set<Long> repositoryIds,
                                                                            PageRequest pageRequest,
                                                                            MemberAuditRecordQueryDTO queryDTO) {
         return Results.success(iRdmMemberAuditRecordService.pageByOptions(organizationId, Collections.singleton(projectId), repositoryIds, pageRequest, queryDTO, ResourceLevel.ORGANIZATION));
