@@ -110,6 +110,8 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
             return new DetectApplicantTypeDTO()
                     .setApplicantType(ApplicantTypeEnum.MEMBER_JOIN.getCode());
         } else {
+            dbMember.checkIsSyncGitlab();
+
             // 旧权限为Owner以上无法申请
             RdmMemberApplicantValidator.validateOldAccessLevelIsOwner(dbMember.getGlAccessLevel());
 

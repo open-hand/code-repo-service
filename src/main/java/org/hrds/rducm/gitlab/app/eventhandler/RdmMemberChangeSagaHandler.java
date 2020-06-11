@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author ying.xie@hand-china.com
@@ -72,17 +73,19 @@ public class RdmMemberChangeSagaHandler {
                     List<String> userMemberRoleList = gitlabGroupMemberVO.getRoleLabels();
                     if (CollectionUtils.isEmpty(userMemberRoleList)) {
                         logger.info("用户角色为空, 表示删除");
-                        // 删除成员
+                        // 无项目角色, 删除权限
                         handleRemoveMemberOnProjectLevel(projectId, userId);
                     } else {
                         String roleType = fetchRoleLabel(userMemberRoleList);
-                        RoleLabelEnum roleLabelEnum = EnumUtils.getEnum(RoleLabelEnum.class, roleType);
+                        RoleLabelEnum roleLabelEnum = Optional.ofNullable(EnumUtils.getEnum(RoleLabelEnum.class, roleType)).orElseThrow(IllegalArgumentException::new);
 
                         switch (roleLabelEnum) {
                             case PROJECT_MEMBER:
+                                // 设置角色为项目成员, 删除权限
                                 handleProjectMemberOnProjectLevel(projectId, userId);
                                 break;
                             case PROJECT_ADMIN:
+                                // 设置角色为项目管理员, 设置默认Owner权限
                                 handleProjectAdminOnProjectLevel(projectId, userId);
                                 break;
                             default:
@@ -93,7 +96,7 @@ public class RdmMemberChangeSagaHandler {
     }
 
     /**
-     * 处理组织层的成员角色变更 TODO
+     * 处理组织层的成员角色变更
      */
     private void handleOrgLevel(List<GitlabGroupMemberVO> gitlabGroupMemberVOList) {
         gitlabGroupMemberVOList.stream()
@@ -104,22 +107,17 @@ public class RdmMemberChangeSagaHandler {
 
                     List<String> userMemberRoleList = gitlabGroupMemberVO.getRoleLabels();
                     if (CollectionUtils.isEmpty(userMemberRoleList)) {
-                        logger.info("用户角色为空, 表示删除");
                         // do nothing
-                    } else if (userMemberRoleList.contains(RoleLabelEnum.TENANT_ROLE.value())) {
+                    } else {
                         String roleType = fetchRoleLabel(userMemberRoleList);
-                        if (userMemberRoleList.contains(RoleLabelEnum.TENANT_ADMIN.value())) {
-                            roleType = RoleLabelEnum.TENANT_ADMIN.value();
-                        } else if (userMemberRoleList.contains(RoleLabelEnum.TENANT_MEMBER.value())) {
-                            roleType = RoleLabelEnum.TENANT_MEMBER.value();
-                        }
-                        RoleLabelEnum roleLabelEnum = EnumUtils.getEnum(RoleLabelEnum.class, roleType);
+                        RoleLabelEnum roleLabelEnum = Optional.ofNullable(EnumUtils.getEnum(RoleLabelEnum.class, roleType)).orElseThrow(IllegalArgumentException::new);
 
                         switch (roleLabelEnum) {
                             case TENANT_MEMBER:
                                 // do nothing
                                 break;
                             case TENANT_ADMIN:
+                                // 添加组织管理员角色需删除该组织下的权限
                                 handleRemoveMemberOnOrgLevel(organizationId, userId);
                                 break;
                             default:
@@ -131,18 +129,32 @@ public class RdmMemberChangeSagaHandler {
 
     /**
      * 获取角色变更后的角色
-     * 如果是项目管理员, 返回项目管理员角色
-     * 如果是项目成员, 返回项目成员角色
-     * 如果既是项目成员又是项目管理员, 返回项目管理员角色
+     * 项目层:
+     * - 如果是项目管理员, 返回项目管理员角色
+     * - 如果是项目成员, 返回项目成员角色
+     * - 如果既是项目成员又是项目管理员, 返回项目管理员角色
+     * 组织层:
+     * - 同理
      *
      * @param userMemberRoleList
      * @return
      */
     private String fetchRoleLabel(List<String> userMemberRoleList) {
-        if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_ADMIN.value())) {
-            return RoleLabelEnum.PROJECT_ADMIN.value();
-        } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value())) {
-            return RoleLabelEnum.PROJECT_MEMBER.value();
+        // 项目层
+        if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_ROLE.value())) {
+            if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_ADMIN.value())) {
+                return RoleLabelEnum.PROJECT_ADMIN.value();
+            } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value())) {
+                return RoleLabelEnum.PROJECT_MEMBER.value();
+            }
+        }
+        // 组织层
+        else if (userMemberRoleList.contains(RoleLabelEnum.TENANT_ROLE.value())) {
+            if (userMemberRoleList.contains(RoleLabelEnum.TENANT_ADMIN.value())) {
+                return RoleLabelEnum.TENANT_ADMIN.value();
+            } else if (userMemberRoleList.contains(RoleLabelEnum.TENANT_MEMBER.value())) {
+                return RoleLabelEnum.TENANT_MEMBER.value();
+            }
         }
 
         return null;
@@ -155,11 +167,10 @@ public class RdmMemberChangeSagaHandler {
 
     private void handleProjectMemberOnProjectLevel(Long projectId, Long userId) {
         // 3种情况; 无->项目成员 项目成员->项目成员 项目管理员->项目成员
+        // 项目成员->项目成员 这种情况无法识别
 
         // 删除该成员权限
-        // TODO 有个bug, 项目成员->项目成员 这种情况无法识别
         rdmMemberRepository.deleteByProjectIdAndUserId(projectId, userId);
-
     }
 
     private void handleProjectAdminOnProjectLevel(Long projectId, Long userId) {
