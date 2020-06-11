@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,7 +46,7 @@ public class RdmMemberChangeSagaHandler {
             sagaCode = SagaTopicCodeConstants.IAM_UPDATE_MEMBER_ROLE,
             maxRetryCount = 3, seq = 1)
     public List<GitlabGroupMemberVO> handleGitlabGroupMemberEvent(String payload) {
-        List<GitlabGroupMemberVO> gitlabGroupMemberVOList = gson.fromJson(payload,
+        final List<GitlabGroupMemberVO> gitlabGroupMemberVOList = gson.fromJson(payload,
                 new TypeToken<List<GitlabGroupMemberVO>>() {
                 }.getType());
         logger.info("update user role start");
@@ -74,17 +73,17 @@ public class RdmMemberChangeSagaHandler {
                     if (CollectionUtils.isEmpty(userMemberRoleList)) {
                         logger.info("用户角色为空, 表示删除");
                         // 删除成员
-                        handleRemoveMember(projectId, userId);
+                        handleRemoveMemberOnProjectLevel(projectId, userId);
                     } else {
                         String roleType = fetchRoleLabel(userMemberRoleList);
                         RoleLabelEnum roleLabelEnum = EnumUtils.getEnum(RoleLabelEnum.class, roleType);
 
                         switch (roleLabelEnum) {
                             case PROJECT_MEMBER:
-                                handleProjectMember(projectId, userId);
+                                handleProjectMemberOnProjectLevel(projectId, userId);
                                 break;
                             case PROJECT_ADMIN:
-                                handleProjectAdmin(projectId, userId);
+                                handleProjectAdminOnProjectLevel(projectId, userId);
                                 break;
                             default:
                                 break;
@@ -100,7 +99,7 @@ public class RdmMemberChangeSagaHandler {
         gitlabGroupMemberVOList.stream()
                 .filter(gitlabGroupMemberVO -> gitlabGroupMemberVO.getResourceType().equals(ResourceLevel.ORGANIZATION.value()))
                 .forEach(gitlabGroupMemberVO -> {
-                    Long projectId = gitlabGroupMemberVO.getResourceId();
+                    Long organizationId = gitlabGroupMemberVO.getResourceId();
                     Long userId = gitlabGroupMemberVO.getUserId();
 
                     List<String> userMemberRoleList = gitlabGroupMemberVO.getRoleLabels();
@@ -121,7 +120,7 @@ public class RdmMemberChangeSagaHandler {
                                 // do nothing
                                 break;
                             case TENANT_ADMIN:
-                                handleRemoveMember(projectId, userId);
+                                handleRemoveMemberOnOrgLevel(organizationId, userId);
                                 break;
                             default:
                                 break;
@@ -149,12 +148,12 @@ public class RdmMemberChangeSagaHandler {
         return null;
     }
 
-    private void handleRemoveMember(Long projectId, Long userId) {
+    private void handleRemoveMemberOnProjectLevel(Long projectId, Long userId) {
         // 删除该成员权限
         rdmMemberRepository.deleteByProjectIdAndUserId(projectId, userId);
     }
 
-    private void handleProjectMember(Long projectId, Long userId) {
+    private void handleProjectMemberOnProjectLevel(Long projectId, Long userId) {
         // 3种情况; 无->项目成员 项目成员->项目成员 项目管理员->项目成员
 
         // 删除该成员权限
@@ -163,7 +162,7 @@ public class RdmMemberChangeSagaHandler {
 
     }
 
-    private void handleProjectAdmin(Long projectId, Long userId) {
+    private void handleProjectAdminOnProjectLevel(Long projectId, Long userId) {
         Long organizationId = 712L; //TODO
 
         // <> 删除该成员权限
@@ -177,5 +176,10 @@ public class RdmMemberChangeSagaHandler {
             Integer glProjectId = Math.toIntExact(appServiceVO.getGitlabProjectId());
             rdmMemberRepository.insertWithOwner(organizationId, projectId, repositoryId, userId, glProjectId, glUserId);
         });
+    }
+
+    private void handleRemoveMemberOnOrgLevel(Long organizationId, Long userId) {
+        // 删除该成员在整个组织的权限
+        rdmMemberRepository.deleteByOrganizationIdAndUserId(organizationId, userId);
     }
 }

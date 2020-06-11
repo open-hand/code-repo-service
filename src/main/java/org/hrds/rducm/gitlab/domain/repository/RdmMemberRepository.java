@@ -28,6 +28,15 @@ public interface RdmMemberRepository extends BaseRepository<RdmMember> {
     int deleteByProjectIdAndUserId(Long projectId, Long userId);
 
     /**
+     * 删除指定组织下所有项目指定用户的代码库权限
+     *
+     * @param projectId
+     * @param userId
+     * @return
+     */
+    int deleteByOrganizationIdAndUserId(Long projectId, Long userId);
+
+    /**
      * 插入Owner权限的成员
      *
      * @param organizationId
