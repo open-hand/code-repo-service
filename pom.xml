@@ -52,6 +52,12 @@
             <groupId>org.hzero.starter</groupId>
             <artifactId>hzero-starter-export</artifactId>
         </dependency>
+
+        <!-- 主键加密组件 -->
+        <dependency>
+            <groupId>org.hzero.starter</groupId>
+            <artifactId>hzero-starter-keyencrypt</artifactId>
+        </dependency>
         <!-- hzero boot -->
 
         <dependency>
