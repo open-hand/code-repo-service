@@ -10,8 +10,10 @@ import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.ProtectedBranchDTO;
 import org.hrds.rducm.gitlab.app.service.RdmBranchAppService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +39,7 @@ public class RdmBranchController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping
     public ResponseEntity<List<BranchDTO>> getBranches(@PathVariable Long projectId,
-                                                       @PathVariable Long repositoryId,
+                                                       @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @PathVariable Long repositoryId,
                                                        BranchQueryDTO branchQueryDTO) {
         return Results.success(rdmBranchAppService.getBranches(projectId, repositoryId, branchQueryDTO));
     }
@@ -50,7 +52,7 @@ public class RdmBranchController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/protected-branches")
     public ResponseEntity<List<ProtectedBranchDTO>> getProtectedBranches(@PathVariable Long projectId,
-                                                                         @PathVariable Long repositoryId) {
+                                                                         @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @PathVariable Long repositoryId) {
         return Results.success(rdmBranchAppService.getProtectedBranches(projectId, repositoryId));
     }
 
@@ -65,7 +67,7 @@ public class RdmBranchController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/protected-branches")
     public ResponseEntity<ProtectedBranchDTO> createProtectedBranch(@PathVariable Long projectId,
-                                                                    @PathVariable Long repositoryId,
+                                                                    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @PathVariable Long repositoryId,
                                                                     @RequestParam String branchName,
                                                                     @RequestParam Integer pushAccessLevel,
                                                                     @RequestParam Integer mergeAccessLevel) {
@@ -83,7 +85,7 @@ public class RdmBranchController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PutMapping("/protected-branches")
     public ResponseEntity<ProtectedBranchDTO> updateProtectedBranch(@PathVariable Long projectId,
-                                                                    @PathVariable Long repositoryId,
+                                                                    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @PathVariable Long repositoryId,
                                                                     @RequestParam String branchName,
                                                                     @RequestParam Integer pushAccessLevel,
                                                                     @RequestParam Integer mergeAccessLevel) {
@@ -99,7 +101,7 @@ public class RdmBranchController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @DeleteMapping("/protected-branches")
     public ResponseEntity<?> removeProtectedBranch(@PathVariable Long projectId,
-                                                   @PathVariable Long repositoryId,
+                                                   @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @PathVariable Long repositoryId,
                                                    @RequestParam String branchName) {
         rdmBranchAppService.unprotectBranch(projectId, repositoryId, branchName);
         return Results.success();

@@ -11,8 +11,10 @@ import org.hrds.rducm.gitlab.api.controller.dto.tag.TagDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.tag.TagQueryDTO;
 import org.hrds.rducm.gitlab.app.service.RdmTagAppService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
+import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +40,7 @@ public class RdmTagController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping
     public ResponseEntity<List<TagDTO>> getTags(@PathVariable Long projectId,
-                                                @PathVariable Long repositoryId,
+                                                @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @PathVariable Long repositoryId,
                                                 TagQueryDTO tagQueryDTO) {
         return Results.success(rdmTagAppService.getTags(projectId, repositoryId, tagQueryDTO));
     }
@@ -51,7 +53,7 @@ public class RdmTagController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/protected-tags")
     public ResponseEntity<List<ProtectedTagDTO>> getProtectedTags(@PathVariable Long projectId,
-                                                                  @PathVariable Long repositoryId) {
+                                                                  @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @PathVariable Long repositoryId) {
         return Results.success(rdmTagAppService.getProtectedTags(projectId, repositoryId));
     }
 
@@ -65,7 +67,7 @@ public class RdmTagController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/protected-tags")
     public ResponseEntity<ProtectedTagDTO> createProtectedTag(@PathVariable Long projectId,
-                                                              @PathVariable Long repositoryId,
+                                                              @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @PathVariable Long repositoryId,
                                                               @RequestParam String tagName,
                                                               @RequestParam Integer createAccessLevel) {
         return Results.created(rdmTagAppService.protectTag(projectId, repositoryId, tagName, createAccessLevel));
@@ -81,7 +83,7 @@ public class RdmTagController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PutMapping("/protected-tags")
     public ResponseEntity<ProtectedTagDTO> updateProtectedTag(@PathVariable Long projectId,
-                                                              @PathVariable Long repositoryId,
+                                                              @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @PathVariable Long repositoryId,
                                                               @RequestParam String tagName,
                                                               @RequestParam Integer createAccessLevel) {
         return Results.created(rdmTagAppService.updateProtectedTag(projectId, repositoryId, tagName, createAccessLevel));
@@ -96,7 +98,7 @@ public class RdmTagController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @DeleteMapping("/protected-tags")
     public ResponseEntity<ProtectedTag> deleteProtectedTag(@PathVariable Long projectId,
-                                                           @PathVariable Long repositoryId,
+                                                           @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @PathVariable Long repositoryId,
                                                            @RequestParam String tagName) {
         rdmTagAppService.unprotectTag(projectId, repositoryId, tagName);
         return Results.success();
