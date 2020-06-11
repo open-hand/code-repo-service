@@ -59,6 +59,16 @@ public interface C7nBaseServiceFacade {
     Set<Long> listC7nUserIdsByNameOnProjectLevel(Long projectId, String realName, String loginName);
 
     /**
+     * 平台层
+     * 查询用户信息, 根据实际名称和登录名模糊查询
+     *
+     * @param realName
+     * @param loginName
+     * @return
+     */
+    Set<Long> listC7nUserIdsByNameOnSiteLevel(String realName, String loginName);
+
+    /**
      * 项目层
      * 查询项目的所有用户信息
      *

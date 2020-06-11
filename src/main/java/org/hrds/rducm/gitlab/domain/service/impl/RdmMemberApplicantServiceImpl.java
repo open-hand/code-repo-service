@@ -65,7 +65,7 @@ public class RdmMemberApplicantServiceImpl implements IRdmMemberApplicantService
 
         // 调用外部接口模糊查询
         if (!StringUtils.isEmpty(applicantUserName)) {
-            Set<Long> userIdsSet = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, applicantUserName, null);
+            Set<Long> userIdsSet = c7NBaseServiceFacade.listC7nUserIdsByNameOnSiteLevel(applicantUserName, null);
 
             if (userIdsSet.isEmpty()) {
                 return new Page<>();

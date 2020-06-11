@@ -93,6 +93,43 @@ public class RdmMemberChangeSagaHandler {
     }
 
     /**
+     * 处理组织层的成员角色变更 TODO
+     */
+    private void handleOrgLevel(List<GitlabGroupMemberVO> gitlabGroupMemberVOList) {
+        gitlabGroupMemberVOList.stream()
+                .filter(gitlabGroupMemberVO -> gitlabGroupMemberVO.getResourceType().equals(ResourceLevel.ORGANIZATION.value()))
+                .forEach(gitlabGroupMemberVO -> {
+                    Long projectId = gitlabGroupMemberVO.getResourceId();
+                    Long userId = gitlabGroupMemberVO.getUserId();
+
+                    List<String> userMemberRoleList = gitlabGroupMemberVO.getRoleLabels();
+                    if (CollectionUtils.isEmpty(userMemberRoleList)) {
+                        logger.info("用户角色为空, 表示删除");
+                        // do nothing
+                    } else if (userMemberRoleList.contains(RoleLabelEnum.TENANT_ROLE.value())) {
+                        String roleType = fetchRoleLabel(userMemberRoleList);
+                        if (userMemberRoleList.contains(RoleLabelEnum.TENANT_ADMIN.value())) {
+                            roleType = RoleLabelEnum.TENANT_ADMIN.value();
+                        } else if (userMemberRoleList.contains(RoleLabelEnum.TENANT_MEMBER.value())) {
+                            roleType = RoleLabelEnum.TENANT_MEMBER.value();
+                        }
+                        RoleLabelEnum roleLabelEnum = EnumUtils.getEnum(RoleLabelEnum.class, roleType);
+
+                        switch (roleLabelEnum) {
+                            case TENANT_MEMBER:
+                                // do nothing
+                                break;
+                            case TENANT_ADMIN:
+                                handleRemoveMember(projectId, userId);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                });
+    }
+
+    /**
      * 获取角色变更后的角色
      * 如果是项目管理员, 返回项目管理员角色
      * 如果是项目成员, 返回项目成员角色
