@@ -73,6 +73,11 @@ public class BaseServiceFeignClientFallBackFactory implements FallbackFactory<Ba
             }
 
             @Override
+            public ResponseEntity<Boolean> checkIsOrgRoot(Long organizationId, Long userId) {
+                return null;
+            }
+
+            @Override
             public ResponseEntity<List<C7nProjectVO>> listProjectsByOrgId(Long organizationId) {
                 return null;
             }
