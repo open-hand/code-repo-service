@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.app.eventhandler;
 
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.choerodon.asgard.saga.annotation.SagaTask;
@@ -14,6 +15,7 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.infra.enums.RoleLabelEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hzero.core.util.AssertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +24,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * @author ying.xie@hand-china.com
@@ -148,8 +152,20 @@ public class RdmMemberChangeSagaHandler {
                                 // do nothing
                                 break;
                             case TENANT_ADMIN:
-                                // 添加组织管理员角色需删除该组织下的权限
+                                // 添加组织管理员角色
+                                // 1. 删除该组织下的权限
                                 handleRemoveMemberOnOrgLevel(organizationId, userId);
+
+                                // 2. 组织的所有项目中, 如果是项目成员, 需添加Owner权限
+                                Set<Long> projectIds = c7nBaseServiceFacade.listProjectIds(organizationId);
+                                projectIds.forEach(projectId -> {
+                                    Map<Long, C7nUserVO> voMap = c7nBaseServiceFacade.listC7nUserToMapOnProjectLevel(projectId, Sets.newHashSet(userId));
+                                    boolean isProjectMember = !voMap.isEmpty();
+                                    if (isProjectMember) {
+                                        // <> 插入该成员Owner权限
+                                        insertProjectOwner(organizationId, projectId, userId);
+                                    }
+                                });
                                 break;
                             default:
                                 break;
