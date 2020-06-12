@@ -15,7 +15,7 @@ public class SagaTaskCodeConstants {
     /**
      * 删除角色同步事件
      */
-    public static final String CODE_REPO_DELETE_MEMBER_ROLE = "devopsDeleteMemberRole";
+    public static final String CODE_REPO_DELETE_MEMBER_ROLE = "codeRepoDeleteMemberRole";
 
     private SagaTaskCodeConstants() {
     }
