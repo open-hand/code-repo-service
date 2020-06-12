@@ -146,6 +146,14 @@ public interface C7nBaseServiceFacade {
     Set<Long> listProjectIds(Long organizationId);
 
     /**
+     * 获取项目详情
+     *
+     * @param projectId
+     * @return
+     */
+    C7nProjectVO detailC7nProject(Long projectId);
+
+    /**
      * 根据id获取项目信息
      *
      * @param projectIds

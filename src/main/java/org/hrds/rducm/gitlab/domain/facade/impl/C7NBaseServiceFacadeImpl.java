@@ -214,6 +214,18 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
     }
 
     @Override
+    public C7nProjectVO detailC7nProject(Long projectId) {
+        // 查询项目信息
+        List<C7nProjectVO> c7nProjectVOS = this.listProjectsByIds(Collections.singleton(projectId));
+
+        if (!CollectionUtils.isEmpty(c7nProjectVOS)) {
+            return c7nProjectVOS.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public List<C7nProjectVO> listProjectsByIds(Set<Long> projectIds) {
         ResponseEntity<List<C7nProjectVO>> responseEntity = baseServiceFeignClient.listProjectsByIds(projectIds);
         return FeignUtils.handleResponseEntity(responseEntity);

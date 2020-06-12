@@ -35,11 +35,13 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
     }
 
     @Override
-    public int deleteByProjectIdAndUserId(Long projectId, Long userId) {
+    public int deleteByProjectIdAndUserId(Long organizationId, Long projectId, Long userId) {
+        AssertUtils.notNull(organizationId, "organizationId not null");
         AssertUtils.notNull(projectId, "projectId not null");
         AssertUtils.notNull(userId, "userId not null");
 
         RdmMember param = new RdmMember();
+        param.setOrganizationId(organizationId);
         param.setProjectId(projectId);
         param.setUserId(userId);
         return this.delete(param);

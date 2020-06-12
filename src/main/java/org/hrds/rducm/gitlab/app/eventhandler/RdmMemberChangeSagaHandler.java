@@ -13,6 +13,8 @@ import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.infra.enums.RoleLabelEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
+import org.hzero.core.util.AssertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,12 +71,13 @@ public class RdmMemberChangeSagaHandler {
                 .forEach(gitlabGroupMemberVO -> {
                     Long projectId = gitlabGroupMemberVO.getResourceId();
                     Long userId = gitlabGroupMemberVO.getUserId();
+                    Long organizationId = getOrganizationId(projectId);
 
                     List<String> userMemberRoleList = gitlabGroupMemberVO.getRoleLabels();
                     if (CollectionUtils.isEmpty(userMemberRoleList)) {
                         logger.info("用户角色为空, 表示删除");
                         // 无项目角色, 删除权限
-                        handleRemoveMemberOnProjectLevel(projectId, userId);
+                        handleRemoveMemberOnProjectLevel(organizationId, projectId, userId);
                     } else {
                         String roleType = fetchRoleLabel(userMemberRoleList);
                         RoleLabelEnum roleLabelEnum = Optional.ofNullable(EnumUtils.getEnum(RoleLabelEnum.class, roleType)).orElseThrow(IllegalArgumentException::new);
@@ -82,11 +85,11 @@ public class RdmMemberChangeSagaHandler {
                         switch (roleLabelEnum) {
                             case PROJECT_MEMBER:
                                 // 设置角色为项目成员, 删除权限
-                                handleProjectMemberOnProjectLevel(projectId, userId);
+                                handleProjectMemberOnProjectLevel(organizationId, projectId, userId);
                                 break;
                             case PROJECT_ADMIN:
                                 // 设置角色为项目管理员, 设置默认Owner权限
-                                handleProjectAdminOnProjectLevel(projectId, userId);
+                                handleProjectAdminOnProjectLevel(organizationId, projectId, userId);
                                 break;
                             default:
                                 break;
@@ -160,24 +163,22 @@ public class RdmMemberChangeSagaHandler {
         return null;
     }
 
-    private void handleRemoveMemberOnProjectLevel(Long projectId, Long userId) {
+    private void handleRemoveMemberOnProjectLevel(Long organizationId, Long projectId, Long userId) {
         // 删除该成员权限
-        rdmMemberRepository.deleteByProjectIdAndUserId(projectId, userId);
+        rdmMemberRepository.deleteByProjectIdAndUserId(organizationId, projectId, userId);
     }
 
-    private void handleProjectMemberOnProjectLevel(Long projectId, Long userId) {
+    private void handleProjectMemberOnProjectLevel(Long organizationId, Long projectId, Long userId) {
         // 3种情况; 无->项目成员 项目成员->项目成员 项目管理员->项目成员
         // 项目成员->项目成员 这种情况无法识别
 
         // 删除该成员权限
-        rdmMemberRepository.deleteByProjectIdAndUserId(projectId, userId);
+        rdmMemberRepository.deleteByProjectIdAndUserId(organizationId, projectId, userId);
     }
 
-    private void handleProjectAdminOnProjectLevel(Long projectId, Long userId) {
-        Long organizationId = 712L; //TODO
-
+    private void handleProjectAdminOnProjectLevel(Long organizationId, Long projectId, Long userId) {
         // <> 删除该成员权限
-        rdmMemberRepository.deleteByProjectIdAndUserId(projectId, userId);
+        rdmMemberRepository.deleteByProjectIdAndUserId(organizationId, projectId, userId);
 
         // <> 插入该成员Owner权限
         Integer glUserId = c7nBaseServiceFacade.userIdToGlUserId(userId);
@@ -192,5 +193,12 @@ public class RdmMemberChangeSagaHandler {
     private void handleRemoveMemberOnOrgLevel(Long organizationId, Long userId) {
         // 删除该成员在整个组织的权限
         rdmMemberRepository.deleteByOrganizationIdAndUserId(organizationId, userId);
+    }
+
+    private Long getOrganizationId(Long projectId) {
+        C7nProjectVO c7nProjectVO = c7nBaseServiceFacade.detailC7nProject(projectId);
+        Long organizationId = Optional.ofNullable(c7nProjectVO).map(C7nProjectVO::getOrganizationId).orElse(null);
+        AssertUtils.notNull(organizationId, "organizationId cannot null");
+        return organizationId;
     }
 }
