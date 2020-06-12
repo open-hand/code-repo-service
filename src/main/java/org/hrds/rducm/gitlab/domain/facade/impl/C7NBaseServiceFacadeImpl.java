@@ -190,6 +190,12 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
         }).collect(Collectors.toList());
     }
 
+    @Override
+    public Boolean checkIsOrgAdmin(Long organizationId, Long userId) {
+        ResponseEntity<Boolean> responseEntity = baseServiceFeignClient.checkIsOrgRoot(organizationId, userId);
+        return FeignUtils.handleResponseEntity(responseEntity);
+    }
+
 
     /* 猪齿鱼项目相关方法 */
 

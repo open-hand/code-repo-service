@@ -201,6 +201,17 @@ public interface BaseServiceFeignClient {
                                                                             @RequestParam(required = false) String loginName,
                                                                             @RequestParam(required = false) String params);
 
+    /**
+     * 判断用户是否是组织管理员
+     *
+     * @param organizationId
+     * @param userId
+     * @return
+     */
+    @GetMapping(value = "/v1/organizations/{organization_id}/users/{user_id}/check_is_root")
+    ResponseEntity<Boolean> checkIsOrgRoot(@PathVariable(name = "organization_id") Long organizationId,
+                                           @PathVariable(name = "user_id") Long userId);
+
     /* 其他 */
     // -------------------------------
 }

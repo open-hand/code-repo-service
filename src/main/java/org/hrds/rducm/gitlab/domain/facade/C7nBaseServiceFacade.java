@@ -127,6 +127,15 @@ public interface C7nBaseServiceFacade {
     List<C7nUserVO> listOrgAdministrator(Long organizationId);
 
     /**
+     * 判断是否是组织管理员
+     *
+     * @param organizationId
+     * @param userId
+     * @return
+     */
+    Boolean checkIsOrgAdmin(Long organizationId, Long userId);
+
+    /**
      * 组织层
      * 查询组织下用户的项目列表
      *

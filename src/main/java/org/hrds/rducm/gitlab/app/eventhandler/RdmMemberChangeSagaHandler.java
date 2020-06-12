@@ -202,6 +202,13 @@ public class RdmMemberChangeSagaHandler {
 
         // 删除该成员权限
         rdmMemberRepository.deleteByProjectIdAndUserId(organizationId, projectId, userId);
+
+        // 是否是组织管理员
+        boolean isOrgAdmin = c7nBaseServiceFacade.checkIsOrgAdmin(organizationId, userId);
+        if (isOrgAdmin) {
+            // <> 插入该成员Owner权限
+            insertProjectOwner(organizationId, projectId, userId);
+        }
     }
 
     private void handleProjectAdminOnProjectLevel(Long organizationId, Long projectId, Long userId) {
@@ -209,6 +216,15 @@ public class RdmMemberChangeSagaHandler {
         rdmMemberRepository.deleteByProjectIdAndUserId(organizationId, projectId, userId);
 
         // <> 插入该成员Owner权限
+        insertProjectOwner(organizationId, projectId, userId);
+    }
+
+    private void handleRemoveMemberOnOrgLevel(Long organizationId, Long userId) {
+        // 删除该成员在整个组织的权限
+        rdmMemberRepository.deleteByOrganizationIdAndUserId(organizationId, userId);
+    }
+
+    private void insertProjectOwner(Long organizationId, Long projectId, Long userId) {
         Integer glUserId = c7nBaseServiceFacade.userIdToGlUserId(userId);
         List<C7nAppServiceVO> appServiceVOS = c7nDevOpsServiceFacade.listAppServiceByActive(projectId);
         appServiceVOS.forEach(appServiceVO -> {
@@ -216,11 +232,6 @@ public class RdmMemberChangeSagaHandler {
             Integer glProjectId = Math.toIntExact(appServiceVO.getGitlabProjectId());
             rdmMemberRepository.insertWithOwner(organizationId, projectId, repositoryId, userId, glProjectId, glUserId);
         });
-    }
-
-    private void handleRemoveMemberOnOrgLevel(Long organizationId, Long userId) {
-        // 删除该成员在整个组织的权限
-        rdmMemberRepository.deleteByOrganizationIdAndUserId(organizationId, userId);
     }
 
     private Long getOrganizationId(Long projectId) {
