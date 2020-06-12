@@ -83,6 +83,6 @@ public class TestController extends BaseController {
     @PostMapping("/organizations/{organizationId}/rdmMemberChangeSagaHandler")
     public void rdmMemberChangeSagaHandler(@PathVariable Long organizationId,
                                            @RequestBody String payload) {
-        rdmMemberChangeSagaHandler.handleGitlabGroupMemberEvent(payload);
+        rdmMemberChangeSagaHandler.handleUpdateMemberRoleEvent(payload);
     }
 }
