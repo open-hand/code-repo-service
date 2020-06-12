@@ -180,13 +180,13 @@ public class RdmMemberChangeSagaHandler {
             }
         }
         // 组织层
-        else if (userMemberRoleList.contains(RoleLabelEnum.TENANT_ROLE.value())) {
-            if (userMemberRoleList.contains(RoleLabelEnum.TENANT_ADMIN.value())) {
-                return RoleLabelEnum.TENANT_ADMIN.value();
-            } else if (userMemberRoleList.contains(RoleLabelEnum.TENANT_MEMBER.value())) {
-                return RoleLabelEnum.TENANT_MEMBER.value();
-            }
+//        else if (userMemberRoleList.contains(RoleLabelEnum.TENANT_ROLE.value())) {
+        if (userMemberRoleList.contains(RoleLabelEnum.TENANT_ADMIN.value())) {
+            return RoleLabelEnum.TENANT_ADMIN.value();
+        } else if (userMemberRoleList.contains(RoleLabelEnum.TENANT_MEMBER.value())) {
+            return RoleLabelEnum.TENANT_MEMBER.value();
         }
+//        }
 
         return null;
     }
