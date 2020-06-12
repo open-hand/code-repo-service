@@ -44,11 +44,11 @@ public class RdmMemberChangeSagaHandler {
     /**
      * 角色同步事件
      */
-    @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_UPDATE_MEMBER,
+    @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_UPDATE_MEMBER_ROLE,
             description = "角色同步事件",
             sagaCode = SagaTopicCodeConstants.IAM_UPDATE_MEMBER_ROLE,
             maxRetryCount = 3, seq = 1)
-    public List<GitlabGroupMemberVO> handleGitlabGroupMemberEvent(String payload) {
+    public List<GitlabGroupMemberVO> handleUpdateMemberRoleEvent(String payload) {
         final List<GitlabGroupMemberVO> gitlabGroupMemberVOList = gson.fromJson(payload,
                 new TypeToken<List<GitlabGroupMemberVO>>() {
                 }.getType());
@@ -59,6 +59,34 @@ public class RdmMemberChangeSagaHandler {
         handleOrgLevel(gitlabGroupMemberVOList);
 
         logger.info("update user role end");
+        return gitlabGroupMemberVOList;
+    }
+
+    /**
+     * 删除角色同步事件
+     */
+    @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_DELETE_MEMBER_ROLE,
+            description = "删除角色同步事件",
+            sagaCode = SagaTopicCodeConstants.IAM_DELETE_MEMBER_ROLE,
+            maxRetryCount = 3, seq = 1)
+    public List<GitlabGroupMemberVO> handleDeleteMemberRoleEvent(String payload) {
+        List<GitlabGroupMemberVO> gitlabGroupMemberVOList = gson.fromJson(payload,
+                new TypeToken<List<GitlabGroupMemberVO>>() {
+                }.getType());
+        logger.info("delete gitlab role start");
+
+        gitlabGroupMemberVOList.stream()
+                .filter(gitlabGroupMemberVO -> gitlabGroupMemberVO.getResourceType().equals(ResourceLevel.PROJECT.value()))
+                .forEach(gitlabGroupMemberVO -> {
+                    Long projectId = gitlabGroupMemberVO.getResourceId();
+                    Long userId = gitlabGroupMemberVO.getUserId();
+                    Long organizationId = getOrganizationId(projectId);
+
+                    // 删除团队成员, 删除权限
+                    handleRemoveMemberOnProjectLevel(organizationId, projectId, userId);
+                });
+
+        logger.info("delete gitlab role end");
         return gitlabGroupMemberVOList;
     }
 

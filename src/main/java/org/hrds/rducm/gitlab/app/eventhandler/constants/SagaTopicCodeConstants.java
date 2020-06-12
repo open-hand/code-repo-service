@@ -15,6 +15,11 @@ public class SagaTopicCodeConstants {
      */
     public static final String IAM_UPDATE_MEMBER_ROLE = "iam-update-memberRole";
 
+    /**
+     * IAM删除角色
+     */
+    public static final String IAM_DELETE_MEMBER_ROLE = "iam-delete-memberRole";
+
     private SagaTopicCodeConstants() {
     }
 }
