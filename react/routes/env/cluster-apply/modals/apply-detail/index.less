@@ -1,0 +1,214 @@
+ @import '~choerodon-ui/lib/style/themes/default';
+
+.env-cluster-detail-modal {
+  .env-cluster-detail-modal-item {
+    display: flex;
+    justify-content: start;
+    position: relative;
+    .env-cluster-detail-modal-item-label {
+      width: 1.4rem;
+      height: 0.2rem;
+      color: rgba(0, 0, 0, 0.65);
+      line-height: 0.2rem;
+    }
+    .env-cluster-detail-modal-item-value {
+      color: rgba(0, 0, 0, 1);
+      line-height: 0.2rem;
+      display: flex;
+      align-items: center;
+    }
+  }
+  .env-cluster-detail-modal-divider {
+    height: 0.01rem;
+    background-color: rgba(216, 216, 216, 1);
+  }
+  .env-cluster-detail-modal-top {
+    padding: 0.24rem;
+    .env-cluster-detail-modal-user {
+      display: flex;
+      justify-content: start;
+      position: relative;
+      .env-cluster-detail-modal-user-label {
+        width: 1.4rem;
+        height: 0.2rem;
+        color: rgba(0, 0, 0, 0.65);
+        line-height: 0.2rem;
+      }
+      .env-cluster-detail-modal-user-value {
+        color: rgba(0, 0, 0, 1);
+        line-height: 0.2rem;
+        display: flex;
+        align-items: center;
+      }
+      .env-cluster-detail-modal-user-state-label {
+        position: absolute;
+        right: 0;
+
+        height: 0.17rem;
+        font-size: 0.12rem;
+        color: rgba(58, 52, 95, 0.65);
+        line-height: 0.17rem;
+      }
+
+      .env-cluster-detail-modal-user-state-label-circle {
+        width: 0.08rem;
+        height: 0.08rem;
+        background: rgba(255, 185, 106, 1);
+        border: 0.04rem solid rgba(255, 185, 106, 0.1);
+        border-radius: 50% 50%;
+        display: inline-block;
+      }
+
+      .env-cluster-detail-modal-user-state-value {
+        height: 0.22rem;
+        font-size: 0.16rem;
+        font-weight: 500;
+        color: rgba(255, 185, 106, 1);
+        line-height: 0.22rem;
+      }
+    }
+  }
+  .env-cluster-detail-modal-content {
+    padding: 0.16rem 0.24rem 0.2rem;
+    background: rgba(245, 246, 250, 1);
+
+    .env-cluster-detail-modal-content-card {
+      background: rgba(255, 255, 255, 1);
+      border-radius: 0.04rem;
+      margin-top: 0.16rem;
+      .env-cluster-detail-modal-content-card-title {
+        padding: 0.12rem 0.16rem;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 1);
+        line-height: 0.2rem;
+      }
+      .env-cluster-detail-modal-content-card-second-title {
+        padding: 0.03rem 0 0.12rem;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 1);
+        line-height: 0.2rem;
+      }
+      .env-cluster-detail-modal-content-card-content {
+        .env-cluster-detail-modal-content-card-content-progress {
+          margin-top: 15px;
+          .env-cluster-detail-modal-content-card-content-progress-circle {
+            display: inline-block;
+            width: 0.08rem;
+            height: 0.08rem;
+            background: rgba(104, 135, 232, 1);
+            border-radius: 50% 50%;
+            flex-shrink: 0;
+          }
+          .env-cluster-detail-modal-content-card-content-progress-line {
+            display: inline-block;
+            height: 0.02rem;
+            background: rgba(104, 135, 232, 1);
+            border-radius: 0.02rem;
+          }
+        }
+        .env-cluster-detail-modal-content-second-card {
+          width: 3.2rem;
+          background: rgba(255, 255, 255, 1);
+          box-shadow: 0 0.01rem 0.04rem 0.01rem rgba(52, 51, 60, 0.16);
+          border-radius: 0.04rem;
+          padding: 0.16rem 0.16rem;
+          .env-cluster-detail-modal-content-second-card-title {
+            height: 0.2rem;
+            font-size: 0.16rem;
+            font-weight: 500;
+            color: rgba(0, 0, 0, 1);
+            line-height: 0.2rem;
+          }
+          .env-cluster-detail-modal-content-second-card-label {
+            height: 0.17rem;
+            font-size: 0.12rem;
+            color: rgba(0, 0, 0, 0.65);
+            line-height: 0.17rem;
+          }
+          .env-cluster-detail-modal-content-second-card-value {
+            margin-top: 0.08rem;
+            height: 0.22rem;
+            font-size: 0.16rem;
+            font-weight: 500;
+            color: rgba(0, 0, 0, 1);
+            line-height: 0.22rem;
+          }
+          .env-cluster-detail-modal-content-second-card-desc {
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            display: -webkit-box;
+
+            margin-top: 0.12rem;
+            height: 0.4rem;
+            font-size: 0.13rem;
+            color: rgba(0, 0, 0, 0.65);
+            line-height: 0.2rem;
+          }
+        }
+      }
+    }
+  }
+  .env-cluster-detail-modal-content-card-flow {
+    display: flex;
+    flex-flow: row wrap;
+    > div:nth-child(2n+1) {
+        margin: 0 0.16rem 0.16rem 0;
+    }
+    > div:nth-child(2n+2) {
+        margin-bottom: 0.16rem;
+    }
+  }
+
+  .@{c7n-prefix}-steps-item-title {
+    font-size: 0.13rem;
+    font-weight: 400;
+    color: rgba(0, 0, 0, 1);
+  }
+  .@{c7n-prefix}-steps-item-finish .@{c7n-prefix}-steps-item-icon > .@{c7n-prefix}-steps-icon .@{c7n-prefix}-steps-icon-dot {
+    background: rgba(104, 135, 232, 1);
+  }
+  .@{c7n-prefix}-steps-item-finish > .@{c7n-prefix}-steps-item-tail::after {
+    background-color: rgba(104, 135, 232, 1);
+  }
+  .@{c7n-prefix}-steps-dot .@{c7n-prefix}-steps-item-tail::after {
+    width: ~'calc(100% - .2rem)';
+    height: 0.02rem;
+    margin-left: 0.12rem;
+}
+}
+
+  .cluster-apply-detail-status-dot {
+    display: inline-block;
+    width: 0.04rem;
+    height: 0.04rem;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    border-radius: 0.04rem;
+    margin-right: 0.07rem;
+    margin-bottom: 0.02rem;
+    &-waiting_submit {
+        background: rgba(166, 166, 192, 1);
+        border: 4px solid  rgba(166, 166, 192, 0.1);
+        box-shadow: 0 0 0 0.04rem rgba(166, 166, 192, 0.1);
+      }
+
+      &-approved {
+        background: rgba(0, 191, 165, 1);
+        border: 4px solid  rgba(0, 191, 165, 0.1);
+        box-shadow: 0 0 0 0.04rem rgba(0, 191, 165, 0.1);
+      }
+
+      &-waiting_approve {
+        background: rgba(253, 174, 84,1);
+        border: 4px solid  rgba(253, 174, 84, 0.1);
+        box-shadow: 0 0 0 0.04rem rgba(253, 174, 84, 0.1);
+      }
+
+      &-rejected {
+        background: rgba(247,122,112,1);
+        border: 4px solid  rgba(247, 122, 112, 0.1);
+        box-shadow: 0 0 0 0.04rem rgba(247, 122, 112, 0.1);
+      }
+  }

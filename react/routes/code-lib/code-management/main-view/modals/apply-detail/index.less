@@ -1,0 +1,77 @@
+@import '~choerodon-ui/lib/style/themes/default';
+@import "~choerodon-ui-font/style/theme";
+
+.code-lib-ps-approval {
+  &-sider {
+    .devider {
+      margin: .3rem 0 .2rem 0;
+      border-bottom: .01rem solid #d8d8d8;
+    }
+    .mb-20 {
+      margin-bottom: .2rem !important;
+    }
+    .@{c7n-pro-prefix}-modal-body {
+      padding: .24rem 0;
+    }
+    &-hidden-ok {
+      .c7n-modal-btn {
+        &-ok {
+          display: none;
+        }
+        &-cancel {
+          margin: 0 !important;
+        }
+      }
+    }
+    &-content {
+      background: #fff;
+      border-radius: .02rem;
+      margin-bottom: .20rem;
+      padding: 0 .2rem;
+      .@{c7n-pro-prefix}-radio-wrapper {
+        margin-top: .16rem;
+      }
+      &-input-box {
+        width: 100%;
+      }
+    }
+
+    &-value {
+      &.approved {
+        font-weight: 500;
+        color: #00bfa5;
+      }
+      &.rejected {
+        font-weight: 500;
+        color: #d50000;
+      }
+    }
+
+    &-label {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.65);
+      line-height: .20rem;
+    }
+
+    &-title {
+      margin-bottom: .16rem;
+      font-size: 16px;
+      color: rgba(0, 0, 0, 0.87);
+      line-height: .24rem;
+    }
+    &-failed {
+      color: #d50000;
+      padding: 0 .2rem;
+    }
+
+    .c7n-row {
+      margin-top: .12rem;
+    }
+    .@{c7n-pro-prefix}-radio-wrapper {
+      margin-right: .72rem;
+    }
+    .@{c7n-pro-prefix}-select-box-wrapper {
+      margin-top: .16rem;
+    }
+  }
+}
