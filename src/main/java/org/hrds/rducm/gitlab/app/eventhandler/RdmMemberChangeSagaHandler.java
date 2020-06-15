@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.app.eventhandler;
 
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.choerodon.asgard.saga.annotation.SagaTask;
@@ -11,9 +12,11 @@ import org.hrds.rducm.gitlab.app.eventhandler.payload.GitlabGroupMemberVO;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.enums.RoleLabelEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hzero.core.util.AssertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +25,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
+ * 处理用户角色变更的Saga
+ * 总体逻辑:
+ * 如果项目层的团队成员的角色为 项目管理员或组织管理员, 默认设置为Owner权限
+ * 如果项目层的团队成员的角色为 项目成员且非组织管理员, 默认不设置权限, 需手动分配
+ *
  * @author ying.xie@hand-china.com
  * @date 2020/6/8
  */
@@ -75,6 +85,7 @@ public class RdmMemberChangeSagaHandler {
                 }.getType());
         logger.info("delete gitlab role start");
 
+        // 项目层
         gitlabGroupMemberVOList.stream()
                 .filter(gitlabGroupMemberVO -> gitlabGroupMemberVO.getResourceType().equals(ResourceLevel.PROJECT.value()))
                 .forEach(gitlabGroupMemberVO -> {
@@ -86,12 +97,26 @@ public class RdmMemberChangeSagaHandler {
                     handleRemoveMemberOnProjectLevel(organizationId, projectId, userId);
                 });
 
+        // 组织层
+        gitlabGroupMemberVOList.stream()
+                .filter(gitlabGroupMemberVO -> gitlabGroupMemberVO.getResourceType().equals(ResourceLevel.ORGANIZATION.value()))
+                .forEach(gitlabGroupMemberVO -> {
+                    Long organizationId = gitlabGroupMemberVO.getResourceId();
+                    Long userId = gitlabGroupMemberVO.getUserId();
+
+                    // 删除组织管理员
+                    if (gitlabGroupMemberVO.getRoleLabels().contains(RoleLabelEnum.TENANT_ADMIN.value())) {
+                        handleRemoveOrgAdmin(organizationId, userId);
+                    }
+                });
+
         logger.info("delete gitlab role end");
         return gitlabGroupMemberVOList;
     }
 
     /**
      * 处理项目层的团队成员角色变更
+     * 由于saga参数只给出了修改后的角色信息, 没有给出修改前的角色信息, 无法做更精确的判断
      */
     private void handleProjectLevel(List<GitlabGroupMemberVO> gitlabGroupMemberVOList) {
         gitlabGroupMemberVOList.stream()
@@ -128,6 +153,8 @@ public class RdmMemberChangeSagaHandler {
 
     /**
      * 处理组织层的成员角色变更
+     * 由于saga参数只给出了修改后的角色信息, 没有给出修改前的角色信息, 无法做更精确的判断
+     * 例如: saga参数的角色为空, 无法得知是由组织管理员 -> 空, 还是组织成员 -> 空
      */
     private void handleOrgLevel(List<GitlabGroupMemberVO> gitlabGroupMemberVOList) {
         gitlabGroupMemberVOList.stream()
@@ -138,18 +165,32 @@ public class RdmMemberChangeSagaHandler {
 
                     List<String> userMemberRoleList = gitlabGroupMemberVO.getRoleLabels();
                     if (CollectionUtils.isEmpty(userMemberRoleList)) {
-                        // do nothing
+                        // 如果角色为空
+                        handleRemoveOrgAdmin(organizationId, userId);
                     } else {
                         String roleType = fetchRoleLabel(userMemberRoleList);
                         RoleLabelEnum roleLabelEnum = Optional.ofNullable(EnumUtils.getEnum(RoleLabelEnum.class, roleType)).orElseThrow(IllegalArgumentException::new);
 
                         switch (roleLabelEnum) {
                             case TENANT_MEMBER:
-                                // do nothing
+                                // 如果角色变为组织成员
+                                handleRemoveOrgAdmin(organizationId, userId);
                                 break;
                             case TENANT_ADMIN:
-                                // 添加组织管理员角色需删除该组织下的权限
+                                // 添加组织管理员角色
+                                // 1. 删除该组织下的权限
                                 handleRemoveMemberOnOrgLevel(organizationId, userId);
+
+                                // 2. 组织的所有项目中, 如果该用户在项目中, 需添加Owner权限
+                                Set<Long> projectIds = c7nBaseServiceFacade.listProjectIds(organizationId);
+                                projectIds.forEach(projectId -> {
+                                    Map<Long, C7nUserVO> voMap = c7nBaseServiceFacade.listC7nUserToMapOnProjectLevel(projectId, Sets.newHashSet(userId));
+                                    boolean isProjectMember = !voMap.isEmpty();
+                                    if (isProjectMember) {
+                                        // <> 插入该成员Owner权限
+                                        insertProjectOwner(organizationId, projectId, userId);
+                                    }
+                                });
                                 break;
                             default:
                                 break;
@@ -219,6 +260,25 @@ public class RdmMemberChangeSagaHandler {
         insertProjectOwner(organizationId, projectId, userId);
     }
 
+    /**
+     * 移除组织管理员
+     */
+    private void handleRemoveOrgAdmin(Long organizationId, Long userId) {
+        // 1. 删除该组织下的权限
+        handleRemoveMemberOnOrgLevel(organizationId, userId);
+
+        // 2. 组织的所有项目中, 如果该用户在项目中, 并且是项目管理员, 需添加Owner权限
+        Set<Long> projectIds = c7nBaseServiceFacade.listProjectIds(organizationId);
+        projectIds.forEach(projectId -> {
+            Map<Long, C7nUserVO> voMap = c7nBaseServiceFacade.listC7nUserToMapOnProjectLevel(projectId, Sets.newHashSet(userId));
+            boolean isProjectAdmin = !voMap.isEmpty() && isProjectAdmin(voMap.get(userId));
+            if (isProjectAdmin) {
+                // <> 插入该成员Owner权限
+                insertProjectOwner(organizationId, projectId, userId);
+            }
+        });
+    }
+
     private void handleRemoveMemberOnOrgLevel(Long organizationId, Long userId) {
         // 删除该成员在整个组织的权限
         rdmMemberRepository.deleteByOrganizationIdAndUserId(organizationId, userId);
@@ -239,5 +299,10 @@ public class RdmMemberChangeSagaHandler {
         Long organizationId = Optional.ofNullable(c7nProjectVO).map(C7nProjectVO::getOrganizationId).orElse(null);
         AssertUtils.notNull(organizationId, "organizationId cannot null");
         return organizationId;
+    }
+
+    private Boolean isProjectAdmin(C7nUserVO vo) {
+        return vo.getRoles().stream()
+                .anyMatch(r -> IamRoleCodeEnum.PROJECT_OWNER.getCode().equals(r.getCode()));
     }
 }
