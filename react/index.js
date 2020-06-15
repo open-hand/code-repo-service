@@ -14,8 +14,8 @@ const codeManagement = asyncRouter(() => import('./routes/code-lib/code-manageme
 const codeLibAudit = asyncRouter(() => import('./routes/code-lib/code-lib-audit'));
 
 // 环境管理
-const clusterApply = asyncRouter(() => import('./routes/env/cluster-apply'));
-const clusterApproval = asyncRouter(() => import('./routes/env/cluster-approval'));
+// const clusterApply = asyncRouter(() => import('./routes/env/cluster-apply'));
+// const clusterApproval = asyncRouter(() => import('./routes/env/cluster-approval'));
 
 
 function RDUCMIndex({ match, AppState: { currentLanguage: language } }) {
@@ -27,8 +27,8 @@ function RDUCMIndex({ match, AppState: { currentLanguage: language } }) {
           <Route path={`${match.url}/personal-setting`} component={personalSetting} />
           <Route path={`${match.url}/code-lib-management`} component={codeManagement} /> {/* 代码库项目级页面，包括很多tab页 */}
           <Route path={`${match.url}/code-lib-org`} component={codeLibAudit} /> {/* 代码库库组织级审计页面，包括很多tab页 */}
-          <Route path={`${match.url}/cluster-apply`} component={clusterApply} />
-          <Route path={`${match.url}/cluster-approval`} component={clusterApproval} />
+          {/* <Route path={`${match.url}/cluster-apply`} component={clusterApply} />
+          <Route path={`${match.url}/cluster-approval`} component={clusterApproval} /> */}
           <Route path="*" component={nomatch} />
         </Switch>
         <ModalContainer />
