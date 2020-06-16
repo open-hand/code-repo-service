@@ -1,6 +1,7 @@
-// import { axios } from '@choerodon/boot';
+import React from 'react';
 import moment from 'moment';
 import { map } from 'lodash';
+import Tips from '@/components/new-tips';
 
 export default ((intlPrefix, formatMessage, organizationId, projectId, branchServiceDs) => ({
   autoQuery: false,
@@ -80,8 +81,22 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
       name: 'glAccessLevel',
       type: 'string',
       required: true,
-      label: formatMessage({ id: `${intlPrefix}.permission` }),
+      // label: formatMessage({ id: `${intlPrefix}.permission` }),
       lookupCode: 'RDUCM.ACCESS_LEVEL',
+      label: (
+        <Tips
+          title={formatMessage({ id: `${intlPrefix}.permission` })}
+          helpText={
+            <div>
+              权限逻辑：<br />
+              团队成员中<br />
+              1. 组织管理员默认初始化为Owner权限<br />
+              2. 项目管理员默认初始化为Owner权限<br />
+              3. 项目成员默认不初始化权限<br />
+            </div>
+          }
+        />
+      ),
     },
     {
       name: 'glExpiresAt',
