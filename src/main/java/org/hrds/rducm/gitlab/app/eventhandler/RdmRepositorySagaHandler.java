@@ -92,7 +92,7 @@ public class RdmRepositorySagaHandler {
             sagaCode = SagaTopicCodeConstants.DEVOPS_APP_DELETE,
             description = "Devops删除应用服务", maxRetryCount = 3,
             seq = 2)
-    public void deletePrivilege(String data) {
+    public String deletePrivilege(String data) {
         DevOpsAppServicePayload devOpsAppServicePayload;
         try {
             devOpsAppServicePayload = OBJECT_MAPPER.readValue(data, DevOpsAppServicePayload.class);
@@ -107,5 +107,7 @@ public class RdmRepositorySagaHandler {
         rdmMemberRepository.deleteByRepositoryId(organizationId, projectId, repositoryId);
 
         logger.info("删除应用服务后情况代码库权限成功，repositoryId：{}", repositoryId);
+
+        return data;
     }
 }
