@@ -1,6 +1,6 @@
 {
   "name": "hrds-code-repo",
-  "routeName": "infra",
+  "routeName": "rducm",
   "version": "0.1.0",
   "description": "",
   "main": "./lib/index.js",
