@@ -18,4 +18,14 @@ public interface RdmMemberApplicantRepository extends BaseRepository<RdmMemberAp
      * @return
      */
     RdmMemberApplicant selectOneWithPending(Long projectId, Long repositoryId, Long applicantUserId);
+
+    /**
+     * 删除指定代码库下的记录
+     *
+     * @param organizationId
+     * @param projectId
+     * @param repositoryId
+     * @return
+     */
+    int deleteByRepositoryId(Long organizationId, Long projectId, Long repositoryId);
 }

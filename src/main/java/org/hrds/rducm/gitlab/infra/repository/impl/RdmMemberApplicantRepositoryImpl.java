@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.infra.repository.impl;
 
+import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberApplicantRepository;
 import org.hrds.rducm.gitlab.infra.enums.ApprovalStateEnum;
@@ -29,4 +30,16 @@ public class RdmMemberApplicantRepositoryImpl extends BaseRepositoryImpl<RdmMemb
         return this.selectOne(rdmMemberApplicant);
     }
 
+    @Override
+    public int deleteByRepositoryId(Long organizationId, Long projectId, Long repositoryId) {
+        AssertUtils.notNull(organizationId, "organizationId not null");
+        AssertUtils.notNull(projectId, "projectId not null");
+        AssertUtils.notNull(repositoryId, "repositoryId not null");
+
+        RdmMemberApplicant param = new RdmMemberApplicant();
+        param.setOrganizationId(organizationId);
+        param.setProjectId(projectId);
+        param.setRepositoryId(repositoryId);
+        return this.delete(param);
+    }
 }

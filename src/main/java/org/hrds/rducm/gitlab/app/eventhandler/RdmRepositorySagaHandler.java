@@ -9,14 +9,13 @@ import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.DevOpsAppServicePayload;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
-import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.domain.repository.*;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -41,6 +40,14 @@ public class RdmRepositorySagaHandler {
     private C7nDevOpsServiceFacade c7nDevOpsServiceFacade;
     @Autowired
     private RdmMemberRepository rdmMemberRepository;
+    @Autowired
+    private RdmMemberApplicantRepository rdmMemberApplicantRepository;
+    @Autowired
+    private MemberAuditLogRepository memberAuditLogRepository;
+    @Autowired
+    private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
+    @Autowired
+    private RdmOperationLogRepository rdmOperationLogRepository;
 
     /**
      * 代码库初始化权限
@@ -104,7 +111,15 @@ public class RdmRepositorySagaHandler {
         Long repositoryId = devOpsAppServicePayload.getAppServiceId();
         Long organizationId = c7nBaseServiceFacade.getOrganizationId(projectId);
 
+        // 删除权限
         rdmMemberRepository.deleteByRepositoryId(organizationId, projectId, repositoryId);
+        // 删除审计记录
+        memberAuditLogRepository.deleteByRepositoryId(organizationId, projectId, repositoryId);
+        rdmMemberAuditRecordRepository.deleteByRepositoryId(organizationId, projectId, repositoryId);
+        // 删除操作日志
+        rdmOperationLogRepository.deleteByRepositoryId(organizationId, projectId, repositoryId);
+        // 删除权限申请记录
+        rdmMemberApplicantRepository.deleteByRepositoryId(organizationId, projectId, repositoryId);
 
         logger.info("删除应用服务后情况代码库权限成功，repositoryId：{}", repositoryId);
 
