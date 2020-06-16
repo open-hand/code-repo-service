@@ -1,9 +1,11 @@
 package org.hrds.rducm.gitlab.infra.feign.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class C7nAppServiceVO {
     @ApiModelProperty("应用服务id")
     private Long id;

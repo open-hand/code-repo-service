@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.app.eventhandler.payload;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 
 import java.util.Date;
@@ -8,6 +9,7 @@ import java.util.List;
 /**
  * @author crcokitwood
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DevOpsAppServicePayload {
 
     private Integer userId;
