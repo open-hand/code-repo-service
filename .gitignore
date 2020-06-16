@@ -50,3 +50,20 @@ src/main/resources/application-dev.yml
 src/main/resources/application-remote.yml
 
 init-local-database-dev.sh
+
+### front ###
+
+config-local.js
+
+# npm
+/node_modules
+/npm-debug.log
+/yarn-error.log
+/yarn-lock.json
+/package-lock.json
+/yarn.lock
+
+# folder
+/dist
+/lib
+/.history

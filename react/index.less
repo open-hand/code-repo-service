@@ -1,0 +1,49 @@
+@import "~choerodon-ui/lib/style/themes/default";
+
+@TABLE_FONT_COLOR: rgba(0, 0, 0, 0.65);
+
+.hrds-code-repo {
+  .no-border-top-table {
+    .c7n-pro-table-filter-select {
+      border-top: none !important;
+    }
+  }
+
+  .c7n-pro-table {
+    color: rgba(0, 0, 0, 0.65);
+  }
+
+  .link-cell {
+    color: #000;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    &:hover {
+      text-decoration: underline;
+      cursor: pointer;
+      color: #3f51b5;
+    }
+  }
+
+  .img-user-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .text-user-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 13px;
+    background: rgba(104, 135, 232, 0.2);
+    color: rgba(104, 135, 232, 1);
+    border-radius: 50%;
+    line-height: 18px;
+    text-align: center;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

@@ -1,0 +1,152 @@
+@import '~choerodon-ui/lib/style/themes/default';
+
+.c7n-infra-code-management {
+  &-table-ps-overview-number-color {
+    &:hover {
+      color: @primary-color;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    color: @primary-color;
+  }
+  .@{c7n-pro-prefix}-table-tbody {
+    color: rgba(0, 0, 0, 0.65);
+  }
+  &-tab-list {
+    height: 100%;
+    .page-container {
+      height: ~"calc(100% - 130px)";
+      position: absolute;
+      top: 1.26rem;
+      padding-left: 0.2rem;
+      overflow: auto;
+      padding-bottom: 0.3rem;
+      padding-right: 0.2rem;
+      margin-top: .12rem;
+    }
+  }
+  .c7n-infra-code-management-table-name {
+    color: #000;
+    line-height: .20rem;
+    // margin-left: .08rem;
+
+    &:hover {
+      color: @primary-color;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .@{c7n-pro-prefix}-table-filter-select {
+      border-top: none !important;
+    }
+  }
+  &-user-head-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: .20rem;
+    color: rgba(0, 0, 0, 0.65);
+  }
+
+  &-table {
+    .c7n-tag-geekblue {
+      background: #f0f5ff !important;
+    }
+    .c7n-tag-red {
+      background: #ffeae6 !important;
+    }
+    &-name {
+      color: #000;
+
+      &:hover {
+        color: @primary-color;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+    }
+    color: rgba(0, 0, 0, 0.65);
+    .@{c7n-pro-prefix}-table-filter-select {
+      border-top: none !important;
+    }
+  }
+  .ps-branch-icon {
+    text-align: center;
+    font-size: 13px;
+    border-radius: 50%;
+    height: 18px;
+    width: 18px;
+    display: inline-block;
+    margin-right: 6px;
+    line-height: 18px;
+    font-weight: bold;
+    vertical-align: middle;
+
+    &.icon {
+      &-master {
+        color: #4d90fe;
+        background: rgba(77, 144, 254, 0.2);
+      }
+
+      &-feature {
+        color: #f953ba;
+        background: rgba(249, 83, 186, 0.2);
+      }
+
+      &-hotfix {
+        color: #f44336;
+        background: rgba(244, 67, 54, 0.2);
+      }
+
+      &-develop {
+        color: #ffb100;
+        background: rgba(255, 177, 0, 0.2);
+      }
+
+      &-release {
+        color: #00bf96;
+        background: rgba(27, 193, 35, 0.2);
+      }
+
+      &-custom {
+        color: #af4cff;
+        background: rgba(175, 76, 255, 0.2);
+      }
+
+      &-bugfix {
+        color: #ffb100;
+        background: rgba(255, 177, 0, 0.2);
+      }
+    }
+  }
+  .ps-branch-tips-title {
+    height: 0.45rem;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    font-weight: 500;
+    font-size: 16px;
+    margin-top: 0.07rem;
+  }
+  .assign-member-external-user {
+    display: inline-block;
+    background: rgba(244, 133, 144, 0.1);
+    border: 0.01rem solid #F48590;
+    border-radius: 0.02rem;
+    font-size: 0.10rem;
+    color: #F48590;
+    text-align: left;
+    line-height: 0.18rem;
+    margin: 0 0.06rem;
+    height: 0.18rem;
+    width: 0.42rem;
+    text-align: center;
+    &-text {
+      display: inline-block;
+      transform: scale(0.84);
+    }
+  }
+}

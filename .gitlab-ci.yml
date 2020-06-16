@@ -23,7 +23,7 @@ build front:
       - .circleci/**/*
       - .gitignore
       - .github/**/*
-      # - .gitlab-ci.yml
+      - .gitlab-ci.yml
       - "*.md"
     variables:
       - $CI_COMMIT_MESSAGE =~ /combine/
@@ -67,7 +67,7 @@ build backend:
       - react/**/*
       - .gitignore
       - .github/**/*
-      # - .gitlab-ci.yml
+      - .gitlab-ci.yml
       - "*.md"
     variables:
       - $CI_COMMIT_MESSAGE =~ /combine/
@@ -134,7 +134,7 @@ release backend:
       - react/**/*
       - .gitignore
       - .github/**/*
-      # - .gitlab-ci.yml
+      - .gitlab-ci.yml
       - "*.md"
     variables:
       - $CI_COMMIT_MESSAGE =~ /combine/

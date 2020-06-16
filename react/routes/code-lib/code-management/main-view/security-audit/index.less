@@ -1,0 +1,206 @@
+@import '~choerodon-ui/lib/style/themes/default';
+
+.code-lib-management-security-audio {
+  &-icon-wrapper {
+    display: 'flex';
+    .@{c7n-prefix}-slider {
+      margin: 0.10rem 0.06rem 0.10rem 0;
+    }
+    .@{c7n-prefix}-slider-dot {
+      position: absolute;
+      top: -0.02rem;
+      width: 0.01rem;
+      height: 0.08rem;
+      margin-left: -0.04rem;
+      vertical-align: middle;
+      background-color: #fff;
+      border: none;
+    }
+    .@{c7n-prefix}-slider-rail {
+      position: absolute;
+      width: 100%;
+      height: 0.06rem;
+      background-color: rgba(0, 0, 0, 0.04);
+      border-radius: 0.03rem;
+      -webkit-transition: background-color 0.3s;
+      transition: background-color 0.3s;
+    }
+    .@{c7n-prefix}-slider-track {
+      position: absolute;
+      height: 0.06rem;
+      background-color: rgba(0, 191, 165, 1);
+      // border-radius: 0.03rem;
+      border-radius: 0.03rem 0 0 0.03rem;
+      -webkit-transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease;
+    }
+    .@{c7n-prefix}-slider-step {
+      position: absolute;
+      width: 100%;
+      height: 0.06rem;
+      background: rgba(0, 0, 0, 0.04);
+    }
+    .@{c7n-prefix}-slider-handle {
+      position: absolute;
+      width: 0;
+      height: 0.14rem;
+      margin-top: -0.05rem;
+      margin-left: -0.07rem;
+      background-color: #fff;
+      border: none;
+      // border-radius: 50%;
+      cursor: pointer;
+      -webkit-transition: border-color 0.3s, -webkit-transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      transition: border-color 0.3s, -webkit-transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      transition: border-color 0.3s, transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      transition: border-color 0.3s, transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), -webkit-transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+    .@{c7n-prefix}-slider-disabled {
+      cursor: default;
+    }
+    .@{c7n-prefix}-slider-disabled .@{c7n-prefix}-slider-mark-text, .@{c7n-prefix}-slider-disabled .@{c7n-prefix}-slider-dot {
+      cursor: default !important;
+    }
+    .@{c7n-prefix}-slider-disabled .@{c7n-prefix}-slider-track {
+      background-color: rgba(0, 191, 165, 1) !important;
+    }
+    .@{c7n-prefix}-slider:hover .@{c7n-prefix}-slider-rail {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+  }
+  &-icon-wrapper-warning {
+    display: 'flex';
+    .@{c7n-prefix}-slider {
+      margin: 0.10rem 0.06rem 0.10rem 0;
+    }
+    .@{c7n-prefix}-slider-dot {
+      position: absolute;
+      top: -0.02rem;
+      width: 0.01rem;
+      height: 0.08rem;
+      margin-left: -0.04rem;
+      vertical-align: middle;
+      background-color: #fff;
+      border: none;
+    }
+    .@{c7n-prefix}-slider-rail {
+      position: absolute;
+      width: 100%;
+      height: 0.06rem;
+      background-color: rgba(0, 0, 0, 0.04);
+      border-radius: 0.03rem;
+      -webkit-transition: background-color 0.3s;
+      transition: background-color 0.3s;
+    }
+    .@{c7n-prefix}-slider-track {
+      position: absolute;
+      height: 0.06rem;
+      background-color: rgba(0, 191, 165, 1);
+      // border-radius: 0.03rem;
+      border-radius: 0.03rem 0 0 0.03rem;
+      -webkit-transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease;
+    }
+    .@{c7n-prefix}-slider-step {
+      position: absolute;
+      width: 100%;
+      height: 0.06rem;
+      background: rgba(0, 0, 0, 0.04);
+    }
+    .@{c7n-prefix}-slider-handle {
+      position: absolute;
+      width: 0;
+      height: 0.14rem;
+      margin-top: -0.05rem;
+      margin-left: -0.07rem;
+      background-color: #fff;
+      border: none;
+      // border-radius: 50%;
+      cursor: pointer;
+      -webkit-transition: border-color 0.3s, -webkit-transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      transition: border-color 0.3s, -webkit-transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      transition: border-color 0.3s, transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      transition: border-color 0.3s, transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), -webkit-transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+    .@{c7n-prefix}-slider-disabled {
+      cursor: default;
+    }
+    .@{c7n-prefix}-slider-disabled .@{c7n-prefix}-slider-mark-text, .@{c7n-prefix}-slider-disabled .@{c7n-prefix}-slider-dot {
+      cursor: default !important;
+    }
+    .@{c7n-prefix}-slider-disabled .@{c7n-prefix}-slider-track {
+      background-color: #FFB100 !important;
+    }
+    .@{c7n-prefix}-slider:hover .@{c7n-prefix}-slider-rail {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+  }
+
+  &-icon-wrapper-full {
+    display: 'flex';
+    .@{c7n-prefix}-slider {
+      margin: 0.10rem 0.06rem 0.10rem 0;
+    }
+    .@{c7n-prefix}-slider-dot {
+      position: absolute;
+      top: -0.02rem;
+      width: 0.01rem;
+      height: 0.08rem;
+      margin-left: -0.04rem;
+      vertical-align: middle;
+      background-color: #fff;
+      border: none;
+      cursor: default;
+    }
+    .@{c7n-prefix}-slider-rail {
+      position: absolute;
+      width: 100%;
+      height: 0.06rem;
+      background-color: rgba(0, 0, 0, 0.04);
+      border-radius: 0.03rem;
+      -webkit-transition: background-color 0.3s;
+      transition: background-color 0.3s;
+    }
+    .@{c7n-prefix}-slider-track {
+      position: absolute;
+      height: 0.06rem;
+      background-color: #FFB100;
+      border-radius: 0.03rem;
+      -webkit-transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease;
+    }
+    .@{c7n-prefix}-slider-step {
+      position: absolute;
+      width: 100%;
+      height: 0.06rem;
+      background: rgba(0, 0, 0, 0.04);
+    }
+    .@{c7n-prefix}-slider-handle {
+      position: absolute;
+      width: 0;
+      height: 0.14rem;
+      margin-top: -0.05rem;
+      margin-left: -0.07rem;
+      background-color: #fff;
+      border: none;
+      // border-radius: 50%;
+      cursor: pointer;
+      -webkit-transition: border-color 0.3s, -webkit-transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      transition: border-color 0.3s, -webkit-transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      transition: border-color 0.3s, transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      transition: border-color 0.3s, transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), -webkit-transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+    .@{c7n-prefix}-slider-disabled {
+      cursor: default;
+    }
+    .@{c7n-prefix}-slider-disabled .@{c7n-prefix}-slider-mark-text, .@{c7n-prefix}-slider-disabled .@{c7n-prefix}-slider-dot {
+      cursor: default !important;
+    }
+    .@{c7n-prefix}-slider-disabled .@{c7n-prefix}-slider-track {
+      background-color: #FFB100 !important;
+    }
+    .@{c7n-prefix}-slider:hover .@{c7n-prefix}-slider-rail {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+  }
+}
