@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.domain.facade;
 
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nTenantVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 
 import java.util.List;
@@ -177,4 +178,11 @@ public interface C7nBaseServiceFacade {
      * @return
      */
     Map<Long, C7nProjectVO> listProjectsByIdsToMap(Set<Long> projectIds);
+
+    /**
+     * 获取所有组织
+     *
+     * @return
+     */
+    List<C7nTenantVO> listAllOrgs();
 }

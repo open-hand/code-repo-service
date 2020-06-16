@@ -1,9 +1,11 @@
 package org.hrds.rducm.gitlab.infra.feign;
 
 import io.choerodon.core.domain.Page;
+import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.infra.feign.fallback.BaseServiceFeignClientFallBackFactory;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nOrgAdministratorVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nTenantVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -211,6 +213,18 @@ public interface BaseServiceFeignClient {
     @GetMapping(value = "/v1/organizations/{organization_id}/users/{user_id}/check_is_root")
     ResponseEntity<Boolean> checkIsOrgRoot(@PathVariable(name = "organization_id") Long organizationId,
                                            @PathVariable(name = "user_id") Long userId);
+
+    /* 组织相关 */
+    // -------------------------------
+
+    /**
+     * 查询所有组织基本信息
+     *
+     * @return
+     */
+    @ApiOperation(value = "分页查询所有组织基本信息")
+    @GetMapping(value = "/v1/organizations/all")
+    ResponseEntity<Page<C7nTenantVO>> getAllOrgs();
 
     /* 其他 */
     // -------------------------------

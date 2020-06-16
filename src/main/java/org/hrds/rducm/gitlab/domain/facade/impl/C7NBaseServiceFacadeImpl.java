@@ -5,6 +5,7 @@ import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nOrgAdministratorVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nTenantVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
 import org.slf4j.Logger;
@@ -247,5 +248,15 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
         } else {
             return Collections.emptyMap();
         }
+    }
+
+    /* 组织相关方法 */
+
+    @Override
+    public List<C7nTenantVO> listAllOrgs() {
+        ResponseEntity<Page<C7nTenantVO>> responseEntity = baseServiceFeignClient.getAllOrgs();
+        Page<C7nTenantVO> c7nTenantVOS = FeignUtils.handleResponseEntity(responseEntity);
+
+        return c7nTenantVOS.getContent();
     }
 }

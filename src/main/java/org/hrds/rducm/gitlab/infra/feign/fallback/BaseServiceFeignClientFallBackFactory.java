@@ -5,6 +5,7 @@ import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nOrgAdministratorVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nTenantVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -74,6 +75,11 @@ public class BaseServiceFeignClientFallBackFactory implements FallbackFactory<Ba
 
             @Override
             public ResponseEntity<Boolean> checkIsOrgRoot(Long organizationId, Long userId) {
+                return null;
+            }
+
+            @Override
+            public ResponseEntity<Page<C7nTenantVO>> getAllOrgs() {
                 return null;
             }
 
