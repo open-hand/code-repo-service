@@ -156,14 +156,14 @@
     </dependencies>
 
     <repositories>
-        <repository>
-            <id>Hzero</id>
-            <name>Hzero Repository</name>
-            <url>http://nexus.saas.hand-china.com/content/groups/hzero/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
+<!--        <repository>-->
+<!--            <id>Hzero</id>-->
+<!--            <name>Hzero Repository</name>-->
+<!--            <url>http://nexus.saas.hand-china.com/content/groups/hzero/</url>-->
+<!--            <releases>-->
+<!--                <enabled>true</enabled>-->
+<!--            </releases>-->
+<!--        </repository>-->
         <!-- 按项目实际情况修改
             <repository>
             <id>HzeroRelease</id>
@@ -183,6 +183,9 @@
         </repository> -->
     </repositories>
 
+    <build>
+        <finalName>app</finalName>
+    </build>
 </project>
 
 
