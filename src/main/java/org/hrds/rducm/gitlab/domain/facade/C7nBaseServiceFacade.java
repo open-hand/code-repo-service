@@ -185,4 +185,12 @@ public interface C7nBaseServiceFacade {
      * @return
      */
     List<C7nTenantVO> listAllOrgs();
+
+    /**
+     * 根据项目id获取组织id
+     *
+     * @param projectId
+     * @return
+     */
+    Long getOrganizationId(Long projectId);
 }

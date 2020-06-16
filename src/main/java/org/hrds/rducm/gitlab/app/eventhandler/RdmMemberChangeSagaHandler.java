@@ -91,7 +91,7 @@ public class RdmMemberChangeSagaHandler {
                 .forEach(gitlabGroupMemberVO -> {
                     Long projectId = gitlabGroupMemberVO.getResourceId();
                     Long userId = gitlabGroupMemberVO.getUserId();
-                    Long organizationId = getOrganizationId(projectId);
+                    Long organizationId = c7nBaseServiceFacade.getOrganizationId(projectId);
 
                     // 删除团队成员, 删除权限
                     handleRemoveMemberOnProjectLevel(organizationId, projectId, userId);
@@ -124,7 +124,7 @@ public class RdmMemberChangeSagaHandler {
                 .forEach(gitlabGroupMemberVO -> {
                     Long projectId = gitlabGroupMemberVO.getResourceId();
                     Long userId = gitlabGroupMemberVO.getUserId();
-                    Long organizationId = getOrganizationId(projectId);
+                    Long organizationId = c7nBaseServiceFacade.getOrganizationId(projectId);
 
                     List<String> userMemberRoleList = gitlabGroupMemberVO.getRoleLabels();
                     if (CollectionUtils.isEmpty(userMemberRoleList)) {
@@ -292,13 +292,6 @@ public class RdmMemberChangeSagaHandler {
             Integer glProjectId = Math.toIntExact(appServiceVO.getGitlabProjectId());
             rdmMemberRepository.insertWithOwner(organizationId, projectId, repositoryId, userId, glProjectId, glUserId);
         });
-    }
-
-    private Long getOrganizationId(Long projectId) {
-        C7nProjectVO c7nProjectVO = c7nBaseServiceFacade.detailC7nProject(projectId);
-        Long organizationId = Optional.ofNullable(c7nProjectVO).map(C7nProjectVO::getOrganizationId).orElse(null);
-        AssertUtils.notNull(organizationId, "organizationId cannot null");
-        return organizationId;
     }
 
     private Boolean isProjectAdmin(C7nUserVO vo) {

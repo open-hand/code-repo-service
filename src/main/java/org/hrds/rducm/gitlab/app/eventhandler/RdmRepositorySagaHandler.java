@@ -100,9 +100,9 @@ public class RdmRepositorySagaHandler {
             throw new CommonException(e);
         }
 
-        Long organizationId = devOpsAppServicePayload.getOrganizationId();
         Long projectId = devOpsAppServicePayload.getIamProjectId();
         Long repositoryId = devOpsAppServicePayload.getAppServiceId();
+        Long organizationId = c7nBaseServiceFacade.getOrganizationId(projectId);
 
         rdmMemberRepository.deleteByRepositoryId(organizationId, projectId, repositoryId);
 
