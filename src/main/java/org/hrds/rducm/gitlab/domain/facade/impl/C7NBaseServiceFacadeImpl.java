@@ -5,8 +5,10 @@ import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nOrgAdministratorVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nTenantVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
+import org.hzero.core.util.AssertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -247,5 +249,23 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
         } else {
             return Collections.emptyMap();
         }
+    }
+
+    /* 组织相关方法 */
+
+    @Override
+    public List<C7nTenantVO> listAllOrgs() {
+        ResponseEntity<Page<C7nTenantVO>> responseEntity = baseServiceFeignClient.getAllOrgs();
+        Page<C7nTenantVO> c7nTenantVOS = FeignUtils.handleResponseEntity(responseEntity);
+
+        return c7nTenantVOS.getContent();
+    }
+
+    @Override
+    public Long getOrganizationId(Long projectId) {
+        C7nProjectVO c7nProjectVO = this.detailC7nProject(projectId);
+        Long organizationId = Optional.ofNullable(c7nProjectVO).map(C7nProjectVO::getOrganizationId).orElse(null);
+        AssertUtils.notNull(organizationId, "organizationId cannot null");
+        return organizationId;
     }
 }

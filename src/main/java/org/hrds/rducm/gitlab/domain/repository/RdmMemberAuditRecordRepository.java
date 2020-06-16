@@ -26,4 +26,14 @@ public interface RdmMemberAuditRecordRepository extends BaseRepository<RdmMember
      * @return
      */
     int batchInsertCustom(List<RdmMemberAuditRecord> list);
+
+    /**
+     * 删除指定代码库的记录
+     *
+     * @param organizationId
+     * @param projectId
+     * @param repositoryId
+     * @return
+     */
+    int deleteByRepositoryId(Long organizationId, Long projectId, Long repositoryId);
 }

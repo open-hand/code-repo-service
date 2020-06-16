@@ -9,5 +9,13 @@ import org.hzero.mybatis.base.BaseRepository;
  * @author ying.xie@hand-china.com 2020-04-02 14:57:44
  */
 public interface MemberAuditLogRepository extends BaseRepository<MemberAuditLog> {
-
+    /**
+     * 删除指定代码库的记录
+     *
+     * @param organizationId
+     * @param projectId
+     * @param repositoryId
+     * @return
+     */
+    int deleteByRepositoryId(Long organizationId, Long projectId, Long repositoryId);
 }
