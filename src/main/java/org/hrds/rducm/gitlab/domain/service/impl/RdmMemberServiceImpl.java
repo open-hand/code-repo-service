@@ -7,6 +7,7 @@ import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.mybatis.domain.AuditDomain;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+import org.gitlab4j.api.models.AccessLevel;
 import org.gitlab4j.api.models.Member;
 import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
@@ -380,14 +381,19 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     public void syncMemberFromGitlab(RdmMember param) {
         // <1> 获取Gitlab成员, 并更新数据库
         Integer glUserId = Objects.requireNonNull(param.getGlUserId());
-        Member glMember = gitlabProjectApi.getAllMember(Objects.requireNonNull(param.getGlProjectId()), glUserId);
+        Member glMember = gitlabProjectApi.getMember(Objects.requireNonNull(param.getGlProjectId()), glUserId);
         // 理论上只会查询到一个成员
         if (glMember == null) {
             // 移除数据库成员
             rdmMemberRepository.deleteByPrimaryKey(param.getId());
         } else {
-            // 更新数据库成员
-            updateMemberAfter(param, glMember);
+            if (glMember.getAccessLevel().toValue() >= AccessLevel.OWNER.toValue()) {
+                // 移除数据库成员
+                rdmMemberRepository.deleteByPrimaryKey(param.getId());
+            } else {
+                // 更新数据库成员
+                updateMemberAfter(param, glMember);
+            }
         }
     }
 
