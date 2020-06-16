@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.app.eventhandler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import io.choerodon.asgard.saga.annotation.SagaTask;
 import io.choerodon.core.exception.CommonException;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +33,7 @@ public class RdmRepositorySagaHandler {
     private static final Logger logger = LoggerFactory.getLogger(RdmRepositorySagaHandler.class);
 
     private static final Gson gson = new Gson();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Autowired
     private C7nBaseServiceFacade c7nBaseServiceFacade;
@@ -90,7 +93,12 @@ public class RdmRepositorySagaHandler {
             description = "Devops删除应用服务", maxRetryCount = 3,
             seq = 2)
     public void deletePrivilege(String data) {
-        DevOpsAppServicePayload devOpsAppServicePayload = gson.fromJson(data, DevOpsAppServicePayload.class);
+        DevOpsAppServicePayload devOpsAppServicePayload;
+        try {
+            devOpsAppServicePayload = OBJECT_MAPPER.readValue(data, DevOpsAppServicePayload.class);
+        } catch (IOException e) {
+            throw new CommonException(e);
+        }
 
         Long organizationId = devOpsAppServicePayload.getOrganizationId();
         Long projectId = devOpsAppServicePayload.getIamProjectId();
