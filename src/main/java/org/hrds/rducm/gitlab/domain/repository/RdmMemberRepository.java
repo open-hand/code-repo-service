@@ -19,6 +19,16 @@ public interface RdmMemberRepository extends BaseRepository<RdmMember> {
     RdmMember selectOneByUk(Long projectId, Long repositoryId, Long userId);
 
     /**
+     * 删除一个应用服务的权限
+     *
+     * @param organizationId
+     * @param projectId
+     * @param repositoryId
+     * @return
+     */
+    int deleteByRepositoryId(Long organizationId, Long projectId, Long repositoryId);
+
+    /**
      * 删除指定项目下指定用户的代码库权限
      *
      * @param organizationId

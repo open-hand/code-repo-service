@@ -11,8 +11,11 @@ import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -25,6 +28,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class RdmRepositorySagaHandler {
+    private static final Logger logger = LoggerFactory.getLogger(RdmRepositorySagaHandler.class);
+
     private static final Gson gson = new Gson();
 
     @Autowired
@@ -73,5 +78,26 @@ public class RdmRepositorySagaHandler {
             rdmMemberRepository.insertWithOwner(organizationId, projectId, repositoryId, r.getId(), glProjectId, glUserId);
         });
         return data;
+    }
+
+    /**
+     * Devops删除应用服务
+     *
+     * @param data
+     */
+    @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_DELETE_PRIVILEGE,
+            sagaCode = SagaTopicCodeConstants.DEVOPS_APP_DELETE,
+            description = "Devops删除应用服务", maxRetryCount = 3,
+            seq = 2)
+    public void deletePrivilege(String data) {
+        DevOpsAppServicePayload devOpsAppServicePayload = gson.fromJson(data, DevOpsAppServicePayload.class);
+
+        Long organizationId = devOpsAppServicePayload.getOrganizationId();
+        Long projectId = devOpsAppServicePayload.getIamProjectId();
+        Long repositoryId = devOpsAppServicePayload.getAppServiceId();
+
+        rdmMemberRepository.deleteByRepositoryId(organizationId, projectId, repositoryId);
+
+        logger.info("删除应用服务后情况代码库权限成功，repositoryId：{}", repositoryId);
     }
 }

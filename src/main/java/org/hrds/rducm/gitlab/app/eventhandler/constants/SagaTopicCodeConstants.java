@@ -21,10 +21,18 @@ public class SagaTopicCodeConstants {
     public static final String IAM_DELETE_MEMBER_ROLE = "iam-delete-memberRole";
 
     /* Devops创建应用服务 */
+
     /**
      * Devops创建应用服务
      */
     public static final String DEVOPS_CREATE_APPLICATION_SERVICE = "devops-create-application-service";
+
+    /* Devops删除应用服务 */
+
+    /**
+     * Devops删除应用服务
+     */
+    public static final String DEVOPS_APP_DELETE = "devops-app-delete";
 
     private SagaTopicCodeConstants() {
     }
