@@ -79,7 +79,7 @@ public class BaseServiceFeignClientFallBackFactory implements FallbackFactory<Ba
             }
 
             @Override
-            public ResponseEntity<Page<C7nTenantVO>> getAllOrgs() {
+            public ResponseEntity<Page<C7nTenantVO>> getAllOrgs(int page, int size) {
                 return null;
             }
 
