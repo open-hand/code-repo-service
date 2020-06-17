@@ -7,6 +7,7 @@ import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RepositoryPrivilegeViewDTO;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
 import org.hzero.core.base.BaseController;
@@ -14,10 +15,10 @@ import org.hzero.core.util.Results;
 import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author ying.xie@hand-china.com
@@ -40,5 +41,22 @@ public class RdmProjectController extends BaseController {
                                                                         @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON) @PathVariable Long userId,
                                                                         PageRequest pageRequest) {
         return Results.success(iRdmMemberService.pageMemberPermissions(organizationId, projectId, userId, pageRequest));
+    }
+
+    /**
+     * 获取用户拥有权限的代码库
+     *
+     * @param organizationId
+     * @param projectId
+     * @param userIds
+     * @return
+     */
+    @ApiOperation(value = "获取用户拥有权限的代码库")
+    @Permission(level = ResourceLevel.ORGANIZATION, permissionWithin = true)
+    @PostMapping("/members/repositories/within")
+    public ResponseEntity<List<RepositoryPrivilegeViewDTO>> listMemberRepositories(@PathVariable Long organizationId,
+                                                                                   @PathVariable Long projectId,
+                                                                                   @RequestBody Set<Long> userIds) {
+        return Results.success(iRdmMemberService.selectRepositoriesByPrivilege(organizationId, projectId, userIds));
     }
 }

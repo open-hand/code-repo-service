@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.infra.feign.fallback;
 
 import feign.hystrix.FallbackFactory;
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nGlUserVO;
@@ -23,27 +24,27 @@ public class DevOpsServiceFeignClientFallBackFactory implements FallbackFactory<
         return new DevOpsServiceFeignClient() {
             @Override
             public ResponseEntity<List<C7nAppServiceVO>> listAppServiceByActive(Long projectId) {
-                return null;
+                throw new CommonException("error.feign.fallback");
             }
 
             @Override
             public ResponseEntity<Page<C7nAppServiceVO>> pageAppServiceByOptions(Long projectId, Boolean doPage, Integer page, Integer size, String params) {
-                return null;
+                throw new CommonException("error.feign.fallback");
             }
 
             @Override
             public ResponseEntity<Page<C7nAppServiceVO>> listOrPageProjectAppServices(Long projectId, Set<Long> ids, Boolean doPage, Integer page, Integer size) {
-                return null;
+                throw new CommonException("error.feign.fallback");
             }
 
             @Override
             public ResponseEntity<Page<C7nAppServiceVO>> listAppServiceByIds(Set<Long> ids) {
-                return null;
+                throw new CommonException("error.feign.fallback");
             }
 
             @Override
             public ResponseEntity<List<C7nGlUserVO>> listUsersByGitlabUserIds(Set<Integer> gitlabUserIds) {
-                return null;
+                throw new CommonException("error.feign.fallback");
             }
         };
     }
