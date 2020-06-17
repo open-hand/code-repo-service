@@ -6,6 +6,7 @@ import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberPrivilegeViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RepositoryPrivilegeViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseUserQueryDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
@@ -109,6 +110,7 @@ public interface IRdmMemberService {
 
     /**
      * 查询当前用户指定应用服务的代码库权限
+     *
      * @param organizationId
      * @param projectId
      * @param repositoryIds
@@ -117,6 +119,16 @@ public interface IRdmMemberService {
     List<MemberPrivilegeViewDTO> selfPrivilege(Long organizationId,
                                                Long projectId,
                                                Set<Long> repositoryIds);
+
+    /**
+     * 查询用户拥有权限的应用服务
+     *
+     * @param organizationId
+     * @param projectId
+     * @param userIds
+     * @return
+     */
+    List<RepositoryPrivilegeViewDTO> selectRepositoriesByPrivilege(Long organizationId, Long projectId, Set<Long> userIds);
 
     /**
      * 发送成员操作审计事件

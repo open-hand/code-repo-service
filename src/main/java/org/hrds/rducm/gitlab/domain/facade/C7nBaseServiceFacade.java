@@ -39,6 +39,17 @@ public interface C7nBaseServiceFacade {
     Map<Long, C7nUserVO> listC7nUserToMap(Set<Long> userIds);
 
     /**
+     * 项目层
+     * 根据用户id查询项目成员用户信息
+     * 附带角色信息
+     *
+     * @param projectId
+     * @param userId
+     * @return
+     */
+    C7nUserVO listC7nUserOnProjectLevel(Long projectId, Long userId);
+
+    /**
      * 查询一组用户信息, 并转换成Map
      * 附带角色信息
      *

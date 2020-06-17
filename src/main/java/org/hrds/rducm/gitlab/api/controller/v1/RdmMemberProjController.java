@@ -131,4 +131,21 @@ public class RdmMemberProjController extends BaseController {
         return Results.success(iRdmMemberService.selfPrivilege(organizationId, projectId, repositoryIds));
 
     }
+
+    /**
+     * 获取指定用户拥有的代码库权限
+     *
+     * @param organizationId
+     * @param projectId
+     * @param userIds
+     * @return
+     */
+    @ApiOperation(value = "获取指定用户拥有的代码库权限")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @PostMapping("/privilege/appServices")
+    public ResponseEntity<List<RepositoryPrivilegeViewDTO>> listRepositoriesByPrivilege(@PathVariable Long organizationId,
+                                                                                          @PathVariable Long projectId,
+                                                                                          @RequestBody Set<Long> userIds) {
+        return Results.success(iRdmMemberService.selectRepositoriesByPrivilege(organizationId, projectId, userIds));
+    }
 }
