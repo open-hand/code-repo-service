@@ -52,8 +52,8 @@ public class RdmProjectController extends BaseController {
      * @return
      */
     @ApiOperation(value = "获取用户拥有权限的代码库")
-    @Permission(level = ResourceLevel.ORGANIZATION)
-    @PostMapping("/members/repositories")
+    @Permission(level = ResourceLevel.ORGANIZATION, permissionWithin = true)
+    @PostMapping("/members/repositories/within")
     public ResponseEntity<List<RepositoryPrivilegeViewDTO>> listMemberRepositories(@PathVariable Long organizationId,
                                                                                    @PathVariable Long projectId,
                                                                                    @RequestBody Set<Long> userIds) {
