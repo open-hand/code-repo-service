@@ -331,6 +331,10 @@ const infraCommon = {
 };
 
 const codeManagement = {
+  'infra.docManage.message.exportSuccess': '导出成功',
+  'infra.docManage.message.exportConfirm': '权限导出确认',
+  'infra.docManage.message.confirm.export': '确定导出',
+  'dir.path.permission': '的{dirData}权限?',
   'infra.codeManage.service.name': '服务名称',
   'infra.codeManage.creationDate': '创建日期',
   'infra.codeManage.branch': '分支',
@@ -419,43 +423,6 @@ const codeManagement = {
   'infra.codelib.audit.view.noLog': '暂无操作记录',
   'infra.codelib.audit.model.projectName': '项目名称',
 };
-const env = {
-  'infra.env.cluster.model.applicationNo': '编号',
-  'infra.env.cluster.model.applyStatus': '申请单状态',
-  'infra.env.cluster.model.currentNode': '当前节点',
-  'infra.env.cluster.model.applicationPurpose': '申请用途',
-  'infra.env.cluster.model.applicationDate': '申请日期',
-  'infra.env.cluster.model.opsProject': '运维项目',
-  'infra.env.cluster.model.configuration': '期望配置',
-  'infra.env.cluster.model.deadlineDate': '集群使用期限',
-  'infra.env.cluster.model.detailInfo': '详细信息',
-
-  'infra.env.cluster.view.flow.schedule': '流程进度',
-  'infra.env.cluster.view.deleteDocument': '确认删除{applicationNo}申请单?',
-  'infra.env.cluster.view.others': '其他',
-  'infra.env.cluster.view.infrastructure': '基础设施',
-  'infra.env.cluster.view.add.infrastructure': '添加基础设施',
-  'infra.env.cluster.view.platform': '平台服务',
-  'infra.env.cluster.view.add.platform': '添加平台服务',
-  'infra.env.cluster.view.createApply': '创建申请',
-  'infra.env.cluster.view.createApply.title': '创建集群申请单',
-  'infra.env.cluster.view.updateApply.title': '修改集群申请单：{applicationNo}',
-  'infra.env.cluster.view.detail.title': '集群申请单：{applicationNo}',
-  'infra.env.cluster.view.nodata.title': '暂无申请单',
-  'infra.env.cluster.view.nodata.content': '暂无可操作的集群申请单',
-  'infra.env.approval.view.todo': '我的待办',
-  'infra.env.approval.view.done': '我的已办',
-
-  'infra.env.approval.model.applicationNo': '申请单编号',
-  'infra.env.approval.model.state': '状态',
-  'infra.env.approval.model.applicationPurpose': '用途',
-  'infra.env.approval.model.projectName': '项目',
-  'infra.env.approval.model.user': '申请人',
-  'infra.env.approval.model.applicationDate': '申请时间',
-  'infra.env.approval.model.comment': '审批意见',
-  'infra.env.approval.model.clusterId': '集群',
-  'infra.env.approval.model.others': '其他',
-};
 
 const zhCN = {
   ...commonField,
@@ -463,7 +430,6 @@ const zhCN = {
   ...psManager,
   ...codeManagement,
   ...infraCommon,
-  ...env,
 };
 
 export default zhCN;
