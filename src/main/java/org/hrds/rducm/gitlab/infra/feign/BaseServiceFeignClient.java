@@ -221,10 +221,13 @@ public interface BaseServiceFeignClient {
      * 查询所有组织基本信息
      *
      * @return
+     * @param page
+     * @param size
      */
     @ApiOperation(value = "分页查询所有组织基本信息")
     @GetMapping(value = "/v1/organizations/all")
-    ResponseEntity<Page<C7nTenantVO>> getAllOrgs();
+    ResponseEntity<Page<C7nTenantVO>> getAllOrgs(@RequestParam(required = false) int page,
+                                                 @RequestParam(required = false) int size);
 
     /* 其他 */
     // -------------------------------

@@ -255,7 +255,7 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
 
     @Override
     public List<C7nTenantVO> listAllOrgs() {
-        ResponseEntity<Page<C7nTenantVO>> responseEntity = baseServiceFeignClient.getAllOrgs();
+        ResponseEntity<Page<C7nTenantVO>> responseEntity = baseServiceFeignClient.getAllOrgs(0, 0);
         Page<C7nTenantVO> c7nTenantVOS = FeignUtils.handleResponseEntity(responseEntity);
 
         return c7nTenantVOS.getContent();
