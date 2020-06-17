@@ -8,7 +8,6 @@ import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.api.controller.dto.repository.RepositoryOverViewDTO;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
-import org.hrds.rducm.gitlab.domain.repository.RdmRepositoryRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmRepositoryService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabCommitApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabMergeRequestApi;

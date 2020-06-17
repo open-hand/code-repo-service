@@ -13,6 +13,7 @@ import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberPrivilegeViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RepositoryPrivilegeViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseUserQueryDTO;
 import org.hrds.rducm.gitlab.domain.aggregate.MemberAuthDetailAgg;
@@ -33,6 +34,8 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
+import org.hzero.mybatis.domian.Condition;
+import org.hzero.mybatis.util.Sqls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -410,6 +413,30 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
                     .setAccessLevel(dbMember.getGlAccessLevel());
             return viewDTO;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<RepositoryPrivilegeViewDTO> selectRepositoriesByPrivilege(Long organizationId, Long projectId, Set<Long> userIds) {
+        Condition condition = Condition.builder(RdmMember.class)
+                .andWhere(Sqls.custom()
+                        .andEqualTo(RdmMember.FIELD_ORGANIZATION_ID, organizationId)
+                        .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
+                        .andIn(RdmMember.FIELD_USER_ID, userIds)
+                        // 同步状态需为true
+                        .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, Boolean.TRUE))
+                .build();
+        List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
+        Map<Long, List<RdmMember>> group = rdmMembers.stream().collect(Collectors.groupingBy(RdmMember::getUserId));
+
+        List<RepositoryPrivilegeViewDTO> result = new ArrayList<>();
+        group.forEach((k, v) -> {
+            RepositoryPrivilegeViewDTO viewDTO = new RepositoryPrivilegeViewDTO();
+            viewDTO.setUserId(k);
+            viewDTO.setAppServiceIds(v.stream().map(RdmMember::getRepositoryId).collect(Collectors.toSet()));
+            result.add(viewDTO);
+        });
+
+        return result;
     }
 
     @Override

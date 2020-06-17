@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.infra.feign.vo;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 
 import java.util.Date;
 import java.util.List;
@@ -47,6 +48,16 @@ public class C7nUserVO {
     private Long gitlabUserId;
 
     private List<C7nRoleVO> roles;
+
+    /**
+     * 判断是否是项目管理员
+     *
+     * @return
+     */
+    public Boolean isProjectAdmin() {
+        return this.getRoles().stream()
+                .anyMatch(r -> IamRoleCodeEnum.PROJECT_OWNER.getCode().equals(r.getCode()));
+    }
 
     public Long getId() {
         return id;

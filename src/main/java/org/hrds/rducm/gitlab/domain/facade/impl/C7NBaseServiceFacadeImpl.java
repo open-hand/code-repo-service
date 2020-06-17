@@ -1,6 +1,8 @@
 package org.hrds.rducm.gitlab.domain.facade.impl;
 
+import com.google.common.collect.Sets;
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nOrgAdministratorVO;
@@ -9,6 +11,7 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nTenantVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
 import org.hzero.core.util.AssertUtils;
+import org.hzero.core.util.ResponseUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +75,22 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
             return entity.getBody().stream().collect(Collectors.toMap(C7nUserVO::getId, v -> v));
         } else {
             return Collections.emptyMap();
+        }
+    }
+
+    @Override
+    public C7nUserVO listC7nUserOnProjectLevel(Long projectId, Long userId) {
+        // 查询用户信息, 附带角色信息
+        ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listProjectUsersByIds(projectId, Sets.newHashSet(userId));
+
+        List<C7nUserVO> c7nUserVOS = FeignUtils.handleResponseEntity(entity);
+
+        AssertUtils.notNull(c7nUserVOS, "c7nUserVOS cannot null");
+
+        if (c7nUserVOS.isEmpty()) {
+            return null;
+        } else {
+            return c7nUserVOS.get(0);
         }
     }
 

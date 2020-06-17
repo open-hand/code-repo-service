@@ -9,7 +9,7 @@ The standard labels are frequently used in metadata.
 {{- end -}}
 
 {{- define "service.microservice.labels" -}}
-choerodon.io/version: {{ default (.Chart.Version) .Values.image.tag }}
+choerodon.io/version: {{ .Chart.Version | quote }}
 choerodon.io/service: {{ .Chart.Name | quote }}
 choerodon.io/metrics-port: {{ .Values.env.open.MANAGEMENT_SERVER_PORT | quote }}
 {{- end -}}
