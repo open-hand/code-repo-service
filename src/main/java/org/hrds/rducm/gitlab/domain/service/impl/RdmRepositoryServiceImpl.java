@@ -17,6 +17,7 @@ import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -53,6 +54,10 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
 
             // 查询Gitlab项目
             Project glProject = gitlabProjectApi.getProject(glProjectId);
+
+            // 判断仓库是否初始化了, 暂根据是否有默认分支判定
+            boolean repositoryEnabled = glProject.getDefaultBranch() != null;
+
             // 查询成员数量
             int memberCount = rdmMemberRepository.selectCountByRepositoryId(repo.getRepositoryId());
 
@@ -63,13 +68,16 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
             int openedMergeRequestCount = gitlabMergeRequestApi.getMergeRequests(glProjectId, Constants.MergeRequestState.OPENED).size();
 
             // 查询最近一次提交
-            Commit latestCommit = gitlabCommitApi.getLatestCommit(glProjectId);
+            Commit latestCommit = null;
+            if (!repositoryEnabled) {
+                latestCommit = gitlabCommitApi.getLatestCommit(glProjectId);
+            }
 
             repo.setDeveloperCount(memberCount)
                     .setManagerCount(managerMemberCount)
                     .setDefaultBranch(glProject.getDefaultBranch())
                     .setVisibility(glProject.getVisibility().toValue())
-                    .setLastCommittedDate(latestCommit.getCommittedDate())
+                    .setLastCommittedDate(Optional.ofNullable(latestCommit).map(Commit::getCommittedDate).orElse(null))
                     .setOpenedMergeRequestCount(openedMergeRequestCount)
                     .setRepositoryCreationDate(glProject.getCreatedAt());
         });
