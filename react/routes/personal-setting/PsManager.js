@@ -22,11 +22,12 @@ const PsManager = observer(() => {
       service={['choerodon.code.person.setting.personal-setting.ps.default']}
       className="c7n-infra-personal-setting"
     >
-      <PageWrap noHeader={['gitLabSetting', 'svnSetting']} cache>
+      <PageWrap noHeader={['gitLabSetting', 'svnSetting']}>
         <PageTab
           // title="代码库（GITLAB）设置"
           title={formatMessage({ id: 'infra.personal.message.gitLabSetting' })}
           tabKey="gitLabSetting"
+          route="/rducm/personal-setting/gitlab"
           component={GitLabSetting}
           alwaysShow
         />
@@ -34,12 +35,14 @@ const PsManager = observer(() => {
           // title="文档库（SVN）设置"
           title={formatMessage({ id: 'infra.personal.message.svnSetting' })}
           tabKey="svnSetting"
+          route="/rducm/personal-setting/svn"
           component={SvnSetting}
           alwaysShow
         />
         <PageTab
           title={formatMessage({ id: 'infra.personal.message.prodSetting' })}
           tabKey="prodSetting"
+          route="/rducm/personal-setting/product"
           component={ProdSetting}
           alwaysShow
         />

@@ -29,52 +29,60 @@ const MainView = observer(() => {
   return (
     <Page className="c7n-infra-code-management" >
       <div className="c7n-infra-code-management-tab-list">
-        <PageWrap noHeader={[]} cache>
+        <PageWrap noHeader={[]} >
           <PageTab
             title={formatMessage({ id: `${intlPrefix}.psSet` })}
             tabKey="psSet"
+            route="/rducm/code-lib-management/assign"
             component={PsSet}
             alwaysShow
           />
           <PageTab
             title={formatMessage({ id: 'infra.codeManage.ps.message.applyView' })}
-            tabKey="psApproval"
+            tabKey="applyView"
+            route="/rducm/code-lib-management/apply"
             component={ApplyView}
             alwaysShow={hasMemberPermission}
           />
           <PageTab
             title={formatMessage({ id: 'infra.codeManage.ps.message.psApproval' })}
             tabKey="psApproval"
+            route="/rducm/code-lib-management/approve"
             component={PsApproval}
             alwaysShow={hasPermission}
           />
           <PageTab
             title={formatMessage({ id: 'infra.codeManage.ps.message.psAudit' })}
             tabKey="psAudit"
+            route="/rducm/code-lib-management/audit"
             component={PsAudit}
             alwaysShow={hasPermission}
           />
           <PageTab
             title={formatMessage({ id: 'infra.codeManage.ps.message.securityAudit' })}
             tabKey="securityAudit"
+            route="/rducm/code-lib-management/security"
             component={SecurityAudit}
             alwaysShow={hasPermission}
           />
           <PageTab
             title={formatMessage({ id: 'infra.codeManage.ps.message.psBranch' })}
             tabKey="psBranch"
+            route="/rducm/code-lib-management/branch"
             component={PsBranch}
             alwaysShow={hasPermission}
           />
           <PageTab
             title={formatMessage({ id: 'infra.codeManage.ps.message.operationLog' })}
             tabKey="operationLog"
+            route="/rducm/code-lib-management/log"
             component={OperationLog}
             alwaysShow={hasPermission}
           />
           <PageTab
             title={formatMessage({ id: `${intlPrefix}.psOverView` })}
             tabKey="psOverView"
+            route="/rducm/code-lib-management/view"
             component={PsOverView}
             alwaysShow={hasPermission}
           />

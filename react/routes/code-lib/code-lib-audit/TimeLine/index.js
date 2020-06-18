@@ -37,9 +37,9 @@ const TimeLine = ({ formatMessage, activeProject, timeLineStore, optLogDs, activ
   useEffect(() => {
     if (activeTabKey === TabKeyEnum.OPTLOG) {
       if (activeProject.id && activeProject.id !== 'all') {
-        optLogDs.setQueryParameter('projectId', activeProject.id);
+        optLogDs.setQueryParameter('projectIds', activeProject.id);
       } else if (activeProject.id === 'all') {
-        optLogDs.setQueryParameter('projectId', undefined);
+        optLogDs.setQueryParameter('projectIds', undefined);
       }
       loadData();
     }
