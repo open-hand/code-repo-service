@@ -1,12 +1,14 @@
 package org.hrds.rducm.gitlab.domain.facade.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nGlUserVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
 import org.hrds.rducm.gitlab.infra.util.TypeUtil;
@@ -175,5 +177,17 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
         ResponseEntity<List<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.listAppServiceByActive(projectId);
 
         return FeignUtils.handleResponseEntity(responseEntity);
+    }
+
+    @Override
+    public C7nDevopsProjectVO detailDevopsProjectById(Long projectId) {
+        ResponseEntity<List<C7nDevopsProjectVO>> responseEntity = devOpsServiceFeignClient.listDevopsProjectByIds(projectId, Sets.newHashSet(projectId));
+
+        List<C7nDevopsProjectVO> c7nDevopsProjectVOS = FeignUtils.handleResponseEntity(responseEntity);
+        if (c7nDevopsProjectVOS.isEmpty()) {
+            return null;
+        } else {
+            return c7nDevopsProjectVOS.get(0);
+        }
     }
 }

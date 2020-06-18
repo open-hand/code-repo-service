@@ -47,7 +47,7 @@ public interface C7nBaseServiceFacade {
      * @param userId
      * @return
      */
-    C7nUserVO listC7nUserOnProjectLevel(Long projectId, Long userId);
+    C7nUserVO detailC7nUserOnProjectLevel(Long projectId, Long userId);
 
     /**
      * 查询一组用户信息, 并转换成Map

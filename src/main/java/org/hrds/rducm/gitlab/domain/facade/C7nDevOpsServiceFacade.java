@@ -3,6 +3,7 @@ package org.hrds.rducm.gitlab.domain.facade;
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
 
 import java.util.List;
 import java.util.Map;
@@ -111,4 +112,12 @@ public interface C7nDevOpsServiceFacade {
      * @return
      */
     List<C7nAppServiceVO> listAppServiceByActive(Long projectId);
+
+    /**
+     * 获取devops服务项目的信息
+     *
+     * @param projectId
+     * @return
+     */
+    C7nDevopsProjectVO detailDevopsProjectById(Long projectId);
 }

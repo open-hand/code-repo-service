@@ -79,7 +79,7 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
     }
 
     @Override
-    public C7nUserVO listC7nUserOnProjectLevel(Long projectId, Long userId) {
+    public C7nUserVO detailC7nUserOnProjectLevel(Long projectId, Long userId) {
         // 查询用户信息, 附带角色信息
         ResponseEntity<List<C7nUserVO>> entity = baseServiceFeignClient.listProjectUsersByIds(projectId, Sets.newHashSet(userId));
 

@@ -17,6 +17,7 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.admin.GitlabAdminApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
@@ -268,7 +269,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         // 填补userId
         List<RdmMemberAuditRecord> memberAuditsWrapper = fill(memberAudits);
 
-        // 排除组织管理员用户(组织管理员不进行审计)
+        // 排除组织管理员且Gitlab权限为Owner的用户(是组织管理员且Gitlab权限正常的不进行审计)
         List<RdmMemberAuditRecord> result = excludeOrgAdmin(memberAuditsWrapper);
 
         return result;
@@ -305,7 +306,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         Set<Long> orgAdminUserIds = orgAdministrators.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
 
         return memberAudits.stream()
-                .filter(m -> !orgAdminUserIds.contains(m.getUserId()))
+                .filter(m -> !(orgAdminUserIds.contains(m.getUserId()) && AccessLevel.OWNER.toValue().equals(m.getGlAccessLevel())))
                 .collect(Collectors.toList());
     }
 

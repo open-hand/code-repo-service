@@ -15,4 +15,14 @@ public interface RdmMemberAuditAppService {
      *                     2 表示 当前 <- Gitlab
      */
     void syncByStrategy(Long id, int syncStrategy);
+
+    /**
+     * 修复审计权限
+     *
+     * @param organizationId
+     * @param projectId
+     * @param repositoryId
+     * @param id
+     */
+    void auditFix(Long organizationId, Long projectId, Long repositoryId, Long id);
 }

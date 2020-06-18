@@ -5,6 +5,7 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nGlUserVO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -44,6 +45,11 @@ public class DevOpsServiceFeignClientFallBackFactory implements FallbackFactory<
 
             @Override
             public ResponseEntity<List<C7nGlUserVO>> listUsersByGitlabUserIds(Set<Integer> gitlabUserIds) {
+                throw new CommonException("error.feign.fallback");
+            }
+
+            @Override
+            public ResponseEntity<List<C7nDevopsProjectVO>> listDevopsProjectByIds(Long projectId, Set<Long> projectIds) {
                 throw new CommonException("error.feign.fallback");
             }
         };

@@ -12,6 +12,17 @@ import java.util.List;
  */
 public interface RdmMemberAuditRecordRepository extends BaseRepository<RdmMemberAuditRecord> {
     /**
+     * 根据唯一键查询
+     *
+     * @param organizationId
+     * @param projectId
+     * @param repositoryId
+     * @param id
+     * @return
+     */
+    RdmMemberAuditRecord selectByUk(Long organizationId, Long projectId, Long repositoryId, Long id);
+
+    /**
      * 将同步标识设置为true
      *
      * @param record

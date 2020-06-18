@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.infra.repository.impl;
 
-import org.hrds.rducm.gitlab.domain.entity.MemberAuditLog;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.infra.mapper.RdmMemberAuditRecordMapper;
@@ -20,6 +19,21 @@ import java.util.List;
 public class RdmMemberAuditRecordRepositoryImpl extends BaseRepositoryImpl<RdmMemberAuditRecord> implements RdmMemberAuditRecordRepository {
     @Autowired
     private RdmMemberAuditRecordMapper rdmMemberAuditRecordMapper;
+
+    @Override
+    public RdmMemberAuditRecord selectByUk(Long organizationId, Long projectId, Long repositoryId, Long id) {
+        AssertUtils.notNull(organizationId, "organizationId not null");
+        AssertUtils.notNull(projectId, "projectId not null");
+        AssertUtils.notNull(repositoryId, "repositoryId not null");
+        AssertUtils.notNull(id, "id not null");
+
+        RdmMemberAuditRecord param = new RdmMemberAuditRecord();
+        param.setOrganizationId(organizationId);
+        param.setProjectId(projectId);
+        param.setRepositoryId(repositoryId);
+        param.setId(id);
+        return this.selectOne(param);
+    }
 
     @Override
     public int updateSyncTrueByPrimaryKeySelective(RdmMemberAuditRecord record) {

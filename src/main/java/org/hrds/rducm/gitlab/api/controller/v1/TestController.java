@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.app.eventhandler.RdmMemberChangeSagaHandler;
 import org.hrds.rducm.gitlab.app.job.MemberInitJob;
 import org.hrds.rducm.gitlab.app.job.MembersAuditJob;
+import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hzero.core.base.BaseController;
@@ -71,7 +72,7 @@ public class TestController extends BaseController {
     @PostMapping("/organizations/{organizationId}/membersAuditJob")
     public void initMembers(@PathVariable Long organizationId) {
         Map<String, Object> map = new HashMap<>();
-        map.put("organizationId", organizationId);
+        map.put("auditOrganizationId", organizationId + "");
         membersAuditJob.membersAuditJob(map);
     }
 
@@ -85,4 +86,18 @@ public class TestController extends BaseController {
                                            @RequestBody String payload) {
         rdmMemberChangeSagaHandler.handleUpdateMemberRoleEvent(payload);
     }
+
+    @Autowired
+    private RdmMemberAuditAppService rdmMemberAuditAppService;
+
+    @ApiOperation(value = "auditFix")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @PostMapping("/organizations/{organizationId}/{projectId}/{repositoryId}/fix")
+    public void auditFix(@PathVariable Long organizationId,
+                                           @PathVariable Long projectId,
+                                           @PathVariable Long repositoryId,
+                                           Long id) {
+        rdmMemberAuditAppService.auditFix(organizationId, projectId, repositoryId, id);
+    }
+
 }

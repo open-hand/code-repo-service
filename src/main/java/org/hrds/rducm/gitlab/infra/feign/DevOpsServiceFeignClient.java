@@ -3,6 +3,7 @@ package org.hrds.rducm.gitlab.infra.feign;
 import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.infra.feign.fallback.DevOpsServiceFeignClientFallBackFactory;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nGlUserVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -72,4 +73,17 @@ public interface DevOpsServiceFeignClient {
      */
     @PostMapping(value = "v1/users/list_by_gitlab_user_ids")
     ResponseEntity<List<C7nGlUserVO>> listUsersByGitlabUserIds(@RequestBody Set<Integer> gitlabUserIds);
+
+    /* 项目相关 */
+
+    /**
+     * 查询项目信息(带有gitlab groupId)
+     *
+     * @param projectId  无用参数
+     * @param projectIds 项目ids
+     * @return
+     */
+    @PostMapping(value = "/v1/projects/{project_id}/gitlab_groups")
+    ResponseEntity<List<C7nDevopsProjectVO>> listDevopsProjectByIds(@PathVariable(value = "project_id") Long projectId,
+                                                                    @RequestBody Set<Long> projectIds);
 }
