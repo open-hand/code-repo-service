@@ -127,12 +127,11 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
     },
     {
       name: 'repositoryIds',
-      type: 'string',
+      type: 'number',
       label: formatMessage({ id: `${intlPrefix}.service` }),
       textField: 'repositoryName',
       valueField: 'repositoryId',
       options: branchServiceDs,
-      // lookupUrl: `/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/list-by-active`,
     }, // 服务名称
     // {
     //   name: 'employeeObject',

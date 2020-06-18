@@ -40,8 +40,10 @@ const PsBranch = observer(() => {
   }
 
   useEffect(() => {
-    refreshBranch();
-    refreshTag();
+    if (branchAppId) {
+      refreshBranch();
+      refreshTag();
+    }
   }, [branchAppId]);
 
   function handleDelete(type) {
@@ -112,10 +114,10 @@ const PsBranch = observer(() => {
     });
   }
   /**
-   * 获取列表的icon
-   * @param name 分支名称
-   * @returns {*}
-   */
+ * 获取列表的icon
+ * @param name 分支名称
+ * @returns {*}
+ */
   function getIcon(name) {
     const nameArr = ['feature', 'release', 'bugfix', 'hotfix'];
     let type = '';
