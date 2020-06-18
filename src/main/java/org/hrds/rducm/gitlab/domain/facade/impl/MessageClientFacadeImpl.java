@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  */
 @Service
 public class MessageClientFacadeImpl implements MessageClientFacade {
-    public static final String APPLICANT_TEMPLATE_CODE = "RDUCM_MEMBER_APPLICANT.WEB";
+    public static final String APPLICANT_TEMPLATE_CODE = "RDUCM.MEMBER_APPLICANT.WEB";
     public static final String MEMBER_EXPIRE_NOTICE_TEMPLATE_CODE = "RDUCM.MEMBER_EXPIRE_NOTICE.WEB";
 
 
