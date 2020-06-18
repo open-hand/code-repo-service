@@ -66,7 +66,7 @@ public class RdmMemberAuditRecordProjController extends BaseController {
 
     @ApiOperation(value = "权限修复")
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @PostMapping("/{id}/auditFix")
+    @PostMapping("/{id}/audit-fix")
     public ResponseEntity<?> auditFix(@PathVariable Long organizationId,
                                       @PathVariable Long projectId,
                                       @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGMAR) @PathVariable Long id,
