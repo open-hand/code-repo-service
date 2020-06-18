@@ -69,7 +69,7 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
 
             // 查询最近一次提交
             Commit latestCommit = null;
-            if (!repositoryEnabled) {
+            if (repositoryEnabled) {
                 latestCommit = gitlabCommitApi.getLatestCommit(glProjectId);
             }
 
