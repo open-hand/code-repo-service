@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
-import org.hrds.rducm.gitlab.app.job.MemberInitJob;
+import org.hrds.rducm.migration.app.job.MemberInitJob;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.repository.RdmUserRepository;
 import org.hrds.rducm.gitlab.domain.service.IMemberAuditService;

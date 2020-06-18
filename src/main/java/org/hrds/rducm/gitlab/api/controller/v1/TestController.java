@@ -2,14 +2,11 @@ package org.hrds.rducm.gitlab.api.controller.v1;
 
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.swagger.annotation.Permission;
-import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.core.oauth.DetailsHelper;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.app.eventhandler.RdmMemberChangeSagaHandler;
-import org.hrds.rducm.gitlab.app.job.MemberInitJob;
 import org.hrds.rducm.gitlab.app.job.MembersAuditJob;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
-import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hzero.core.base.BaseController;
 import org.slf4j.Logger;
