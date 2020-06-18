@@ -13,7 +13,6 @@ import java.util.Date;
  */
 public class RepositoryOverViewDTO {
     @ApiModelProperty(value = ApiInfoConstants.REPOSITORY_ID)
-    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON)
     private Long repositoryId;
     @ApiModelProperty(value = "代码库名称")
     private String repositoryName;
