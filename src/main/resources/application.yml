@@ -130,9 +130,9 @@ choerodon:
 
 
 gitlab:
-  url: "http://git.staging.saas.hand-china.com/"
+  url: ${GITLAB_URL:http://git.example.com/}
+  privateToken: ${GITLAB_PRIVATE_TOKEN:xxx} # 管理员token
 #  privateToken: ${GITLAB_PRIVATE_TOKEN:7xwy6_nDo-DPrykbKvVW} # 个人测试环境token
-  privateToken: "YrAUZrvXDuqwcmDSzrJj" # 管理员token
 
 
 
