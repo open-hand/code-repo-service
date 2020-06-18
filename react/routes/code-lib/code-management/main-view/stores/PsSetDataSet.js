@@ -127,7 +127,7 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
     },
     {
       name: 'repositoryIds',
-      type: 'string',
+      type: 'number',
       label: formatMessage({ id: `${intlPrefix}.service` }),
       textField: 'repositoryName',
       valueField: 'repositoryId',
