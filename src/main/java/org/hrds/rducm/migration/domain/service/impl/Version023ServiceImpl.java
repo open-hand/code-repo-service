@@ -11,7 +11,6 @@ import org.hrds.rducm.gitlab.infra.util.FeignUtils;
 import org.hrds.rducm.migration.domain.service.Version023Service;
 import org.hrds.rducm.migration.infra.feign.MigDevOpsServiceFeignClient;
 import org.hrds.rducm.migration.infra.feign.vo.DevopsUserPermissionVO;
-import org.hzero.core.base.AopProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,16 +67,16 @@ public class Version023ServiceImpl implements Version023Service {
             }
 
             pool.execute(() -> {
-                transactionTemplate.execute(status -> {
-                    try {
-                        // 每个组织提交一个事务
-                        orgLevel(vo.getTenantId());
-                        return null;
-                    } finally {
-                        semaphore.release();
-                        countDownLatch.countDown();
-                    }
-                });
+                try {
+                    // 每个组织提交一个事务
+                    orgLevel(vo.getTenantId());
+                } catch (Exception e) {
+                    logger.error("导入失败的组织为:{}", vo.getTenantId());
+                    throw e;
+                } finally {
+                    semaphore.release();
+                    countDownLatch.countDown();
+                }
             });
         });
 
@@ -93,15 +92,9 @@ public class Version023ServiceImpl implements Version023Service {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void orgLevel(Long organizationId) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-
-        // <> 删除权限
-        RdmMember delete = new RdmMember();
-        delete.setOrganizationId(organizationId);
-        rdmMemberRepository.delete(delete);
 
         // <1> 获取组织下所有项目
         Set<Long> projectIds = c7nBaseServiceFacade.listProjectIds(organizationId);
@@ -109,13 +102,29 @@ public class Version023ServiceImpl implements Version023Service {
         logger.info("该组织{} 下的所有项目为{}", organizationId, projectIds);
 
         // <2> 获取项目下所有代码库id和Gitlab项目id
+        List<RdmMember> orgList = new ArrayList<>();
         projectIds.forEach(projectId -> {
             Map<Long, Long> appServiceIdMap = c7nDevOpsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
 
             appServiceIdMap.forEach((repositoryId, glProjectId) -> {
                 logger.info("组织id为{}, 项目id为{}, 代码库id为{}", organizationId, projectId, repositoryId);
-                projectLevel(organizationId, projectId, repositoryId);
+                orgList.addAll(projectLevel(organizationId, projectId, repositoryId));
             });
+        });
+
+        // 开启事务
+        transactionTemplate.execute(status -> {
+            // <> 删除权限
+            RdmMember delete = new RdmMember();
+            delete.setOrganizationId(organizationId);
+            rdmMemberRepository.delete(delete);
+
+            // <> 批量插入
+            if (!orgList.isEmpty()) {
+                rdmMemberRepository.batchInsertCustom(orgList);
+            }
+
+            return null;
         });
 
         stopWatch.stop();
@@ -123,7 +132,7 @@ public class Version023ServiceImpl implements Version023Service {
     }
 
 
-    public void projectLevel(Long organizationId, Long projectId, Long appServiceId) {
+    public List<RdmMember> projectLevel(Long organizationId, Long projectId, Long appServiceId) {
         // 查询项目成员权限
         ResponseEntity<Page<DevopsUserPermissionVO>> responseEntity = migDevOpsServiceFeignClient.pagePermissionUsers(projectId, appServiceId, 0, 0, "{}");
         Page<DevopsUserPermissionVO> devopsUserPermissionVOS = FeignUtils.handleResponseEntity(responseEntity);
@@ -144,7 +153,8 @@ public class Version023ServiceImpl implements Version023Service {
         });
 
         List<RdmMember> rdmMembers = transform(organizationId, projectId, appServiceId, list);
-        rdmMemberRepository.batchInsertSelective(rdmMembers);
+
+        return rdmMembers;
     }
 
     private List<RdmMember> transform(Long organizationId, Long projectId, Long appServiceId, List<DevopsUserPermissionVO> list) {
