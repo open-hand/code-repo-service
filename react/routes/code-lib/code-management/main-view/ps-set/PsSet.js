@@ -9,8 +9,7 @@ import { Page, Action, Choerodon } from '@choerodon/boot';
 import { Table, Modal, Button, Form, TextField, Select } from 'choerodon-ui/pro';
 import { Tooltip } from 'choerodon-ui';
 import { observer } from 'mobx-react-lite';
-import { isNil } from 'lodash';
-import queryString from 'querystring';
+import { isNil, map } from 'lodash';
 import TimePopover from '@/components/time-popover/TimePopover';
 import UserAvatar from '@/components/user-avatar';
 import { usPsManagerStore } from '../stores';
@@ -25,14 +24,14 @@ const modalKey = Modal.key();
 const PsSet = observer(() => {
   const {
     intlPrefix,
-    // prefixCls,
     intl: { formatMessage },
-    // appServiceDs,
     psSetDs,
-    appId,
     AppState: { currentMenuType: { id: projectId, organizationId } },
     overStores,
     hasPermission,
+    branchServiceDs,
+    repositoryIds,
+    setRepositoryIds,
   } = usPsManagerStore();
   const modalProps = {
     modify: {
@@ -45,21 +44,18 @@ const PsSet = observer(() => {
     psSetDs.query();
   }
 
+
   const initFilter = async () => {
-    // eslint-disable-next-line no-restricted-globals
-    const { appServiceIds } = queryString.parse(location.href);
     // 应用服务跳转过来 => repositoryIds设置为地址栏参数为默认值
-    if (appServiceIds) {
-      psSetDs.queryDataSet.getField('repositoryIds').set('defaultValue', appServiceIds);
-      // psSetDs.queryDataSet.records[0].set('repositoryIds', repositoryIds);
-      // psSetDs.queryDataSet.current.set('repositoryIds', repositoryIds);
+    if (repositoryIds) {
+      psSetDs.setQueryParameter('repositoryIds', repositoryIds);
     }
     await psSetDs.query();
   };
 
   useEffect(() => {
     initFilter();
-  }, [appId]);
+  }, [repositoryIds]);
 
   function renderTime({ value }) {
     return isNil(value) ? '' : <TimePopover content={value} />;
@@ -216,20 +212,43 @@ const PsSet = observer(() => {
 
   const handleReset = () => {
     psSetDs.queryDataSet.current.reset();
-    psSetDs.queryDataSet.current.set('repositoryIds', null);
+    psSetDs.setQueryParameter('repositoryIds', null);
+    setRepositoryIds(null);
+    branchServiceDs.current.set('appServiceIds', null);
     refresh();
   };
 
+  function handleSelect(value) {
+    psSetDs.setQueryParameter('repositoryIds', value);
+    setRepositoryIds(value);
+  }
   const renderQueryBar = () => (
     <Form
-      dataSet={psSetDs.queryDataSet}
       labelLayout="float"
       columns={9}
       className="c7n-infra-code-management-table-filter-form"
     >
-      <TextField colSpan={2} name="realName" onChange={refresh} />
-      <TextField colSpan={2} name="loginName" onChange={refresh} />
-      <Select colSpan={2} name="repositoryIds" onChange={refresh} />
+      <TextField colSpan={2} name="realName" onChange={refresh} dataSet={psSetDs.queryDataSet} />
+      <TextField colSpan={2} name="loginName" onChange={refresh} dataSet={psSetDs.queryDataSet} />
+      <Select
+        style={{ width: '100%' }}
+        searchable
+        dataSet={branchServiceDs}
+        name="appServiceIds"
+        value={repositoryIds}
+        onChange={handleSelect}
+        colSpan={2}
+      >
+        {
+          map(branchServiceDs.toData(), ({ repositoryId, repositoryName }) => (
+            <Select.Option
+              value={repositoryId}
+              key={repositoryId}
+            >
+              {repositoryName}
+            </Select.Option>))
+        }
+      </Select>
       <div colSpan={3} style={{ width: '0.46rem', float: 'right' }}>
         <Button
           className="c7n-infra-code-management-table-filter-form-btn"
@@ -241,6 +260,10 @@ const PsSet = observer(() => {
       </div>
     </Form >
 
+  );
+
+  const renderServiceName = ({ text }) => (
+    <Tooltip title={text} >{text}</Tooltip>
   );
 
   return (
@@ -261,7 +284,7 @@ const PsSet = observer(() => {
         <Column name="realName" renderer={renderName} width={200} />
         <Column renderer={renderAction} width={70} />
         <Column name="loginName" />
-        <Column name="repositoryName" />
+        <Column name="repositoryName" renderer={renderServiceName} />
         <Column name="roleNames" renderer={renderRole} />
         <Column name="glAccessLevel" renderer={renderLevel} />
         <Column name="glExpiresAt" />
