@@ -3,6 +3,8 @@ import { inject } from 'mobx-react';
 import { injectIntl } from 'react-intl';
 import { DataSet } from 'choerodon-ui/pro';
 import { useCheckPermission } from '@/utils/index';
+import queryString from 'querystring';
+
 import PsSetDataSet from './PsSetDataSet';
 import BranchDataSet from './BranchDataSet';
 import TagDataSet from './TagDataSet';
@@ -16,6 +18,7 @@ import PsApprovalDS from './PsApprovalDS';
 import PsAuditDS from './PsAuditDS';
 import SecurityAuditDS from './SecurityAuditDS';
 import ApplyViewDS from './ApplyViewDS';
+import { useManagementStore } from '../../stores';
 
 const Store = createContext();
 
@@ -30,9 +33,13 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
     intl: { formatMessage },
     children,
   } = props;
+  const { location } = useManagementStore();
+  const { appServiceIds } = queryString.parse(location.search);
 
   const [appId, setApp] = useState(undefined);
   const [branchAppId, setBranchApp] = useState(undefined);
+  const [repositoryIds, setRepositoryIds] = useState(appServiceIds);
+
 
   const hasPermission = useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-owner']);
   const hasMemberPermission = useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-member']);
@@ -62,6 +69,10 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
     branchServiceDs.query().then((res) => {
       branchServiceDs.current.set('repositoryIds', res[0].repositoryId);
       setBranchApp(res[0].repositoryId);
+
+      // 应用服务菜单跳转过来时，设置初始的应用服务查询参数
+      branchServiceDs.current.set('appServiceIds', appServiceIds);
+      setRepositoryIds(appServiceIds);
     });
   }, [projectId]);
 
@@ -94,6 +105,8 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
     hasPermission,
     hasMemberPermission,
     applyViewDs,
+    repositoryIds,
+    setRepositoryIds,
   };
   return (
     <Store.Provider value={value}>
