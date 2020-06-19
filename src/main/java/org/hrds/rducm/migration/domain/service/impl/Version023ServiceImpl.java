@@ -5,19 +5,20 @@ import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
-import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nTenantVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
 import org.hrds.rducm.migration.domain.service.Version023Service;
 import org.hrds.rducm.migration.infra.feign.MigDevOpsServiceFeignClient;
 import org.hrds.rducm.migration.infra.feign.vo.DevopsUserPermissionVO;
+import org.hzero.core.base.AopProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StopWatch;
 
 import java.util.*;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
  * @date 2020/6/12
  */
 @Service
-public class Version023ServiceImpl implements Version023Service {
+public class Version023ServiceImpl implements Version023Service, AopProxy<Version023ServiceImpl> {
     private static final Logger logger = LoggerFactory.getLogger(Version023ServiceImpl.class);
     @Autowired
     private MigDevOpsServiceFeignClient migDevOpsServiceFeignClient;
@@ -39,6 +40,8 @@ public class Version023ServiceImpl implements Version023Service {
     private C7nBaseServiceFacade c7nBaseServiceFacade;
     @Autowired
     private RdmMemberRepository rdmMemberRepository;
+    @Autowired
+    private TransactionTemplate transactionTemplate;
 
     @Override
     public void initAllPrivilegeOnSiteLevel() {
@@ -64,9 +67,15 @@ public class Version023ServiceImpl implements Version023Service {
             }
 
             pool.execute(() -> {
-                orgLevel(vo.getTenantId());
-
-                semaphore.release();
+                transactionTemplate.execute(status -> {
+                    try {
+                        // 每个组织提交一个事务
+                        orgLevel(vo.getTenantId());
+                        return null;
+                    } finally {
+                        semaphore.release();
+                    }
+                });
             });
         });
 
