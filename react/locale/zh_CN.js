@@ -188,6 +188,7 @@ const commonField = {
   startDate: '开始时间',
   endDate: '结束时间',
   projectCode: '项目编码',
+  fix: '修复',
 };
 
 const userInfo = {
@@ -381,7 +382,8 @@ const codeManagement = {
   'infra.codeManage.ps.message.apply.detail': '审批详情',
   'infra.codeManage.ps.message.approveDrawerTitle': '审批“{name}”的权限申请',
   'infra.codeManage.ps.message.approveDetail': '“{name}”的审批详情',
-  'infra.codeManage.ps.operate.asyncPs': '同步权限',
+  'infra.codeManage.ps.operate.fixPs': '修复权限',
+  'infra.codeManage.ps.operate.fixPs.confirm': '确认将Gitlab权限修复为与代码库成员一致?',
   'infra.codeManage.ps.model.executionDate': '审计执行日期：',
   'infra.codeManage.ps.model.diffCount': '差异数据总数：',
   'infra.codeManage.ps.message.modifyPs': '修改成员权限',
@@ -390,6 +392,7 @@ const codeManagement = {
   'infra.codeManage.ps.message.psApproval': '权限审批',
   'infra.codeManage.ps.message.applyView': '权限申请',
   'infra.codeManage.ps.message.psAudit': '权限审计',
+  'infra.codeManage.ps.message.psAudit.tips': '权限审计将会定时审计代码库权限与Gitlab权限不一致的数据，便于检查权限异常情况',
   'infra.codeManage.ps.message.securityAudit': '安全审计',
   'infra.codeManage.ps.message.psBranch': '保护分支/标记',
   'infra.codeManage.ps.message.operationLog': '操作日志',
