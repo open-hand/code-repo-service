@@ -38,8 +38,6 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
 
   const [appId, setApp] = useState(undefined);
   const [branchAppId, setBranchApp] = useState(undefined);
-  const [repositoryIds, setRepositoryIds] = useState(appServiceIds);
-
 
   const hasPermission = useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-owner']);
   const hasMemberPermission = useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-member']);
@@ -47,7 +45,7 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
 
   const intlPrefix = 'infra';
   const branchServiceDs = useMemo(() => new DataSet(BranchServiceDs(formatMessage)), [projectId]); // 分支/标签的应用服务下拉框数据
-  const psSetDs = useMemo(() => new DataSet(PsSetDataSet(intlPrefix, formatMessage, organizationId, projectId, branchServiceDs)), [formatMessage, projectId, branchServiceDs]);
+  const psSetDs = useMemo(() => new DataSet(PsSetDataSet(intlPrefix, formatMessage, organizationId, projectId, branchServiceDs, appServiceIds)), [formatMessage, projectId, branchServiceDs, appServiceIds]);
   const branchDs = useMemo(() => new DataSet(BranchDataSet(formatMessage, projectId, branchAppId)), [formatMessage, projectId, branchAppId]);
   const tagDs = useMemo(() => new DataSet(TagDataSet(formatMessage, projectId, branchAppId)), [formatMessage, projectId, branchAppId]);
   const psOverViewDs = useMemo(() => new DataSet(PsOverViewDataSet(formatMessage, organizationId, projectId, branchServiceDs)), [formatMessage, projectId, branchServiceDs]);
@@ -69,10 +67,6 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
     branchServiceDs.query().then((res) => {
       branchServiceDs.current.set('repositoryIds', res[0].repositoryId);
       setBranchApp(res[0].repositoryId);
-
-      // 应用服务菜单跳转过来时，设置初始的应用服务查询参数
-      branchServiceDs.current.set('appServiceIds', appServiceIds);
-      setRepositoryIds(appServiceIds);
     });
   }, [projectId]);
 
@@ -105,8 +99,6 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
     hasPermission,
     hasMemberPermission,
     applyViewDs,
-    repositoryIds,
-    setRepositoryIds,
   };
   return (
     <Store.Provider value={value}>

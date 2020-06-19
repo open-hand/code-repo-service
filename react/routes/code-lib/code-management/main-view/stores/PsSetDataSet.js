@@ -3,7 +3,7 @@ import moment from 'moment';
 import { map } from 'lodash';
 import Tips from '@/components/new-tips';
 
-export default ((intlPrefix, formatMessage, organizationId, projectId, branchServiceDs) => ({
+export default ((intlPrefix, formatMessage, organizationId, projectId, branchServiceDs, repositoryIds) => ({
   autoQuery: false,
   selection: false,
   pageSize: 10,
@@ -127,10 +127,11 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
     },
     {
       name: 'repositoryIds',
-      type: 'number',
+      type: 'string',
       label: formatMessage({ id: `${intlPrefix}.service` }),
       textField: 'repositoryName',
       valueField: 'repositoryId',
+      defaultValue: repositoryIds,
       options: branchServiceDs,
     }, // 服务名称
     // {

@@ -79,7 +79,7 @@ export default observer(() => {
   return (
     <Form dataSet={formDs}>
       <TextField name="applicantUserName" disabled />
-      <Select name="repositoryId" clearButton={false} onChange={handleSelect} />
+      <Select name="repositoryId" clearButton={false} onChange={handleSelect} searchable />
       <Select name="applicantType" disabled />
       <Select
         name="accessLevel"
