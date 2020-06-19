@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * @date 2020/6/12
  */
 @Service
-public class Version023ServiceImpl implements Version023Service, AopProxy<Version023ServiceImpl> {
+public class Version023ServiceImpl implements Version023Service {
     private static final Logger logger = LoggerFactory.getLogger(Version023ServiceImpl.class);
     @Autowired
     private MigDevOpsServiceFeignClient migDevOpsServiceFeignClient;
