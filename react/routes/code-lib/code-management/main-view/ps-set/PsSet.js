@@ -233,6 +233,7 @@ const PsSet = observer(() => {
       <Select
         style={{ width: '100%' }}
         searchable
+        clearButton
         dataSet={branchServiceDs}
         name="appServiceIds"
         value={repositoryIds}

@@ -96,6 +96,7 @@ const OperationLogTab = () => {
               onChange={val => handleSearch({ repositoryIds: val })}
               // eslint-disable-next-line
               clearButton={true}
+              searchable
               style={{ maxWidth: '2.85rem', marginRight: '0.12rem' }}
             >
               {
