@@ -8,6 +8,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Page, Content, Header, Breadcrumb } from '@choerodon/boot';
 import { Tabs, Button } from 'choerodon-ui';
 import { observer } from 'mobx-react-lite';
+import Tips from '@/components/new-tips';
 import { useStore, TabKeyEnum } from './stores';
 import ProjectList from './ProjectList';
 import TimeLine from './TimeLine';
@@ -88,7 +89,13 @@ const Container = () => {
             <TabPane tab={formatMessage({ id: `${intlPrefix}.view.psView` })} key={TabKeyEnum.PSVIEW}>
               <PSView {...psViewProps} />
             </TabPane>
-            <TabPane tab={formatMessage({ id: `${intlPrefix}.view.puAudit`, defaultMessage: '权限审计' })} key={TabKeyEnum.PSAUDIT}>
+            <TabPane
+              tab={<Tips
+                helpText={formatMessage({ id: 'infra.codeManage.ps.message.psAudit.tips' })}
+                title={formatMessage({ id: 'infra.codeManage.ps.message.psAudit' })}
+              />}
+              key={TabKeyEnum.PSAUDIT}
+            >
               <PsAudit {...psAuditProps} />
             </TabPane>
             <TabPane tab={formatMessage({ id: `${intlPrefix}.view.optLog`, defaultMessage: '操作日志' })} key={TabKeyEnum.OPTLOG}>
