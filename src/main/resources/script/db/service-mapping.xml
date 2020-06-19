@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--服务映射-->
+<services>
+    <schema-merge>
+        <oracle merge="true" target-schema="" />
+        <mysql merge="false" target-schema="" />
+        <sqlserver merge="false" target-schema="" />
+        <postgresql merge="false" target-schema="" />
+    </schema-merge>
+
+    <service name="hrds_code_repo" filename="hrds_code_repo" schema="hrds_code_repo" description="代码库服务"/>
+
+</services>
