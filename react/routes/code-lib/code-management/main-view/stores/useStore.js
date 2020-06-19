@@ -34,7 +34,7 @@ export default function useStore() {
     },
     // 同步权限
     asyncPermission(params) {
-      return axios.post(`/rducm/v1/organizations/${params.organizationId}/projects/${params.projectId}/member-audit-records/${params.id}/sync?syncStrategy=${params.syncStrategy}`);
+      return axios.post(`/rducm/v1/organizations/${params.organizationId}/projects/${params.projectId}/member-audit-records/${params.id}/audit-fix?repositoryId=${params.repositoryId}`);
     },
   }));
 }

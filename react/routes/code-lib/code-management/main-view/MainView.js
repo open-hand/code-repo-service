@@ -7,6 +7,7 @@
 import React from 'react';
 import { PageWrap, PageTab, Page } from '@choerodon/boot';
 import { observer } from 'mobx-react-lite';
+import Tips from '@/components/new-tips';
 import { usPsManagerStore } from './stores';
 import PsSet from './ps-set';
 import ApplyView from './apply-view';
@@ -52,7 +53,10 @@ const MainView = observer(() => {
             alwaysShow={hasPermission}
           />
           <PageTab
-            title={formatMessage({ id: 'infra.codeManage.ps.message.psAudit' })}
+            title={<Tips
+              helpText={formatMessage({ id: 'infra.codeManage.ps.message.psAudit.tips' })}
+              title={formatMessage({ id: 'infra.codeManage.ps.message.psAudit' })}
+            />}
             tabKey="psAudit"
             route="/rducm/code-lib-management/audit"
             component={PsAudit}

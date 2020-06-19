@@ -7,14 +7,13 @@
 import React, { useEffect } from 'react';
 import { Page, Action, Choerodon } from '@choerodon/boot';
 import { Table, Modal } from 'choerodon-ui/pro';
-import { Tooltip, Row, Col, Icon } from 'choerodon-ui';
+import { Tooltip, Row, Col, Icon, message } from 'choerodon-ui';
 import { observer } from 'mobx-react-lite';
 import { isNil } from 'lodash';
 import TimeAgo from 'timeago-react';
 import moment from 'moment';
 import UserAvatar from '@/components/user-avatar';
 import { usPsManagerStore } from '../stores';
-import PsAsync from '../modals/ps-async';
 import './index.less';
 
 const { Column } = Table;
@@ -60,23 +59,52 @@ const PsSet = observer(() => {
     fetchExecutionDate();
   }, [appId]);
 
-  const openAsyncModal = (record) => {
+  async function handleOk(record) {
+    const params = {
+      organizationId,
+      projectId,
+      id: record.get('id'),
+      repositoryId: record.get('repositoryId'),
+    };
+    const result = await overStores.asyncPermission(params).then((res) => {
+      if (res.failed) {
+        message.error(res.message);
+        return false;
+      } else {
+        refresh();
+        message.success(formatMessage({ id: 'infra.codeManage.ps.message.asyncSuccess' }));
+        return true;
+      }
+    })
+      .catch((error) => {
+        Choerodon.handleResponseError(error);
+        return false;
+      });
+    return result;
+  }
+  const openDelete = (record) => {
     Modal.open({
       key: modalKey,
-      title: formatMessage({ id: `${intlPrefix}.operate.asyncPs` }),
-      children: <PsAsync formatMessage={formatMessage} organizationId={organizationId} projectId={projectId} dataSet={psAuditDs} record={record} onOk={refresh} onAsyncPermission={overStores.asyncPermission} />,
-      drawer: false,
-      destroyOnClose: true,
-      style: { width: '5.2rem' },
-      okText: formatMessage({ id: 'ok' }),
+      title: formatMessage({ id: `${intlPrefix}.operate.fixPs` }),
+      children: formatMessage({ id: `${intlPrefix}.operate.fixPs.confirm` }),
+      // okText: formatMessage({ id: 'fix' }),
+      // okProps: { color: 'red' },
+      // cancelProps: { color: 'dark' },
+      onOk: () => handleOk(record),
+      footer: ((okBtn, cancelBtn) => (
+        <React.Fragment>
+          {cancelBtn}{okBtn}
+        </React.Fragment>
+      )),
+      movable: false,
     });
   };
 
   function renderAction({ record }) {
     const actionData = [{
       service: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
-      text: formatMessage({ id: 'async' }),
-      action: () => openAsyncModal(record),
+      text: formatMessage({ id: 'fix' }),
+      action: () => openDelete(record),
     }];
     return <Action data={actionData} />;
   }
