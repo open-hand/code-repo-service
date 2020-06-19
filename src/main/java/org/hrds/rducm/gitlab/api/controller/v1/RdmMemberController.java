@@ -83,15 +83,4 @@ public class RdmMemberController extends BaseController {
         rdmMemberAppService.syncMember(memberId);
         return Results.success();
     }
-
-    // TODO delete
-//    @ApiOperation(value = "同步Gitlab代码库成员到本服务")
-//    @Permission(level = ResourceLevel.ORGANIZATION)
-//    @PostMapping("/sync-from-gitlab")
-//    public ResponseEntity<?> syncMembersFromGitlab(@PathVariable Long organizationId,
-//                                                   @PathVariable Long projectId,
-//                                                   @PathVariable Long repositoryId) {
-//        rdmMemberService.syncAllMembersFromGitlab(organizationId, projectId, repositoryId);
-//        return Results.success();
-//    }
 }
