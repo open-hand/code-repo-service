@@ -10,8 +10,11 @@ export default ((formatMessage) => ({
       name: 'repositoryIds',
       type: 'number',
       label: formatMessage({ id: 'infra.service' }),
-      // options: branchServiceDs,
-      // lookupUrl: `/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/list-by-active`,
-    }, // 服务名称
+    }, // 保护分支、标记的【应用服务】查询条件
+    {
+      name: 'appServiceIds',
+      type: 'number',
+      label: formatMessage({ id: 'infra.service' }),
+    }, // 权限分配的【应用服务】查询条件
   ],
 }));
