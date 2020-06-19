@@ -58,6 +58,7 @@ public class Version023ServiceImpl implements Version023Service {
         List<C7nTenantVO> c7nTenantVOS = c7nBaseServiceFacade.listAllOrgs();
 
         Semaphore semaphore = new Semaphore(5);
+        CountDownLatch countDownLatch = new CountDownLatch(c7nTenantVOS.size());
 
         c7nTenantVOS.forEach(vo -> {
             try {
@@ -74,10 +75,17 @@ public class Version023ServiceImpl implements Version023Service {
                         return null;
                     } finally {
                         semaphore.release();
+                        countDownLatch.countDown();
                     }
                 });
             });
         });
+
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         stopWatch.stop();
         logger.info(stopWatch.prettyPrint());
