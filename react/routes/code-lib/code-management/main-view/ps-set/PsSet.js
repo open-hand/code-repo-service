@@ -6,15 +6,14 @@
  */
 import React, { useEffect } from 'react';
 import { Page, Action, Choerodon } from '@choerodon/boot';
-import { Table, Modal, Button, Form, TextField, Select } from 'choerodon-ui/pro';
+import { Table, Modal } from 'choerodon-ui/pro';
 import { Tooltip } from 'choerodon-ui';
 import { observer } from 'mobx-react-lite';
-import { isNil, map } from 'lodash';
+import { isNil } from 'lodash';
 import TimePopover from '@/components/time-popover/TimePopover';
 import UserAvatar from '@/components/user-avatar';
 import { usPsManagerStore } from '../stores';
 import Sider from '../modals/ps-set';
-import './index.less';
 
 const { Column } = Table;
 const intlPrefix2 = 'infra.codeManage.ps';
@@ -29,9 +28,6 @@ const PsSet = observer(() => {
     AppState: { currentMenuType: { id: projectId, organizationId } },
     overStores,
     hasPermission,
-    branchServiceDs,
-    repositoryIds,
-    setRepositoryIds,
   } = usPsManagerStore();
   const modalProps = {
     modify: {
@@ -44,18 +40,9 @@ const PsSet = observer(() => {
     psSetDs.query();
   }
 
-
-  const initFilter = async () => {
-    // 应用服务跳转过来 => repositoryIds设置为地址栏参数为默认值
-    if (repositoryIds) {
-      psSetDs.setQueryParameter('repositoryIds', repositoryIds);
-    }
-    await psSetDs.query();
-  };
-
   useEffect(() => {
-    initFilter();
-  }, [repositoryIds]);
+    refresh();
+  }, []);
 
   function renderTime({ value }) {
     return isNil(value) ? '' : <TimePopover content={value} />;
@@ -209,60 +196,6 @@ const PsSet = observer(() => {
   function renderRole({ value }) {
     return value.join();
   }
-
-  const handleReset = () => {
-    psSetDs.queryDataSet.current.reset();
-    psSetDs.setQueryParameter('repositoryIds', null);
-    setRepositoryIds(null);
-    branchServiceDs.current.set('appServiceIds', null);
-    refresh();
-  };
-
-  function handleSelect(value) {
-    psSetDs.setQueryParameter('repositoryIds', value);
-    setRepositoryIds(value);
-  }
-  const renderQueryBar = () => (
-    <Form
-      labelLayout="float"
-      columns={9}
-      className="c7n-infra-code-management-table-filter-form"
-    >
-      <TextField colSpan={2} name="realName" onChange={refresh} dataSet={psSetDs.queryDataSet} />
-      <TextField colSpan={2} name="loginName" onChange={refresh} dataSet={psSetDs.queryDataSet} />
-      <Select
-        style={{ width: '100%' }}
-        searchable
-        clearButton
-        dataSet={branchServiceDs}
-        name="appServiceIds"
-        value={repositoryIds}
-        onChange={handleSelect}
-        colSpan={2}
-      >
-        {
-          map(branchServiceDs.toData(), ({ repositoryId, repositoryName }) => (
-            <Select.Option
-              value={repositoryId}
-              key={repositoryId}
-            >
-              {repositoryName}
-            </Select.Option>))
-        }
-      </Select>
-      <div colSpan={3} style={{ width: '0.46rem', float: 'right' }}>
-        <Button
-          className="c7n-infra-code-management-table-filter-form-btn"
-          funcType="raised"
-          onClick={handleReset}
-        >
-          {formatMessage({ id: 'reset', defaultMessage: '重置' })}
-        </Button>
-      </div>
-    </Form >
-
-  );
-
   const renderServiceName = ({ text }) => (
     <Tooltip title={text} >{text}</Tooltip>
   );
@@ -275,11 +208,10 @@ const PsSet = observer(() => {
         'choerodon.code.project.infra.code-lib-management.ps.project-member',
       ]}
     >
-      {renderQueryBar()}
       <Table
         dataSet={psSetDs}
         filter={handleTableFilter}
-        queryBar="none"
+        queryBar="bar"
         queryFieldsLimit={3}
       >
         <Column name="realName" renderer={renderName} width={200} />
