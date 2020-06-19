@@ -15,4 +15,33 @@
           </if>
         group by rgm.user_id
     </select>
+
+    <insert id="batchInsertCustom" parameterType="org.hrds.rducm.gitlab.domain.entity.RdmMember">
+        insert into rducm_gitlab_member
+            (organization_id,
+             project_id,
+             repository_id,
+             user_id,
+             gl_project_id,
+             gl_user_id,
+             gl_access_level,
+             gl_expires_at,
+             sync_gitlab_flag,
+             sync_gitlab_date,
+             sync_gitlab_error_msg)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.organizationId},
+            #{item.projectId},
+            #{item.repositoryId},
+            #{item.userId},
+            #{item.glProjectId},
+            #{item.glUserId},
+            #{item.glAccessLevel},
+            #{item.glExpiresAt},
+            #{item.syncGitlabFlag},
+            #{item.syncGitlabDate},
+            #{item.syncGitlabErrorMsg})
+        </foreach>
+    </insert>
 </mapper>
