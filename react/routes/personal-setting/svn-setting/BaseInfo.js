@@ -31,8 +31,8 @@ function BaseInfo() {
   const loadEnablePwd = () => {
     setLoading(true);
     // TODO
-    axios.get(`/rdudm/v1/${organizationId}/doc-users/selectDefaultPwd/${loginName}`)
-    // axios.get(`/rdudm/v1/${organizationId}/doc-users/selectDefaultPwd/4`)
+    axios.get(`/rdudm/v1/doc-users/selectDefaultPwd/${loginName}`)
+      // axios.get(`/rdudm/v1/${organizationId}/doc-users/selectDefaultPwd/4`)
       .then((response) => {
         setEnablePwd(response);
         setLoading(false);
@@ -99,7 +99,7 @@ function BaseInfo() {
                 <span className={`${prefixCls}-info-container-account-title`}>{intl.formatMessage({ id: 'infra.personal.model.createdAt' })}</span>
                 <span className={`${prefixCls}-info-container-account-content`}>{creationDate}</span>
               </div>
-              { enablePwd.pwdUpdateFlag !== 1 && (
+              {enablePwd.pwdUpdateFlag !== 1 && (
                 <div>
                   <span className={`${prefixCls}-info-container-account-title`} style={{ marginRight: '.95rem' }}>{intl.formatMessage({ id: 'infra.personal.model.initPassword' })}</span>
                   <Password value={userPassword} />
