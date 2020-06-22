@@ -137,7 +137,7 @@ const PsView = ({ psViewDs, activeProject, activeTabKey }) => {
         <Column name="glExpiresAt" />
         <Column
           name="createdByName"
-          renderer={({ record }) => record.get('createdUser').imageUrl && record.get('createdUser').realName && rendererIcon(record.get('createdUser').imageUrl, record.get('createdUser').realName)}
+          renderer={({ record }) => record.get('createdUser').realName && rendererIcon(record.get('createdUser').imageUrl, record.get('createdUser').realName)}
         />
         <Column name="creationDate" renderer={renderTime} />
       </Table>

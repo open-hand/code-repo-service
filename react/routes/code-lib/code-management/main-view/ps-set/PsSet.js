@@ -94,7 +94,7 @@ const PsSet = observer(() => {
       return <Action data={asyncData} />;
     }
     // 权限层级大于50，不允许编辑和删除
-    if (Number(record.get('glAccessLevel').substring(1)) >= 50) {
+    if (record.get('glAccessLevel') && Number(record.get('glAccessLevel').substring(1)) >= 50) {
       return null;
     }
     return <Action data={actionData} />;
@@ -156,7 +156,7 @@ const PsSet = observer(() => {
 
     if (record.get('syncGitlabFlag')) {
       return (
-        (Number(record.get('glAccessLevel').substring(1)) < 50 && hasPermission) ? (
+        (record.get('glAccessLevel') && Number(record.get('glAccessLevel').substring(1)) < 50 && hasPermission) ? (
           <React.Fragment>{avatar}<span onClick={() => openModal('modify')} className="c7n-infra-code-management-table-name">{record.get('user').realName}</span></React.Fragment>
         ) : avatar2
       );
@@ -182,7 +182,7 @@ const PsSet = observer(() => {
     }
   }
   function renderLevel({ text, record }) {
-    if (record.get('syncGitlabFlag') && Number(record.get('glAccessLevel').substring(1)) < 50 && hasPermission) {
+    if (record.get('syncGitlabFlag') && record.get('glAccessLevel') && Number(record.get('glAccessLevel').substring(1)) < 50 && hasPermission) {
       return (
         <span onClick={() => openModal('modify')} className="c7n-infra-code-management-table-name">{text}</span>
       );
@@ -219,7 +219,7 @@ const PsSet = observer(() => {
         <Column name="loginName" />
         <Column name="repositoryName" renderer={renderServiceName} />
         <Column name="roleNames" renderer={renderRole} />
-        <Column name="glAccessLevel" renderer={renderLevel} />
+        <Column name="glAccessLevelList" renderer={renderLevel} />
         <Column name="glExpiresAt" />
         <Column
           name="createdByName"
