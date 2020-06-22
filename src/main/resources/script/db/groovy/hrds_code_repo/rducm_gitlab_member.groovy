@@ -32,7 +32,6 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member.groovy') {
 
         }
 
-        addUniqueConstraint(columnNames: "gl_project_id,gl_user_id", tableName: "rducm_gitlab_member", constraintName: "uk_gl_project_id_gl_user_id")
         addUniqueConstraint(columnNames: "organization_id,project_id,repository_id,user_id", tableName: "rducm_gitlab_member", constraintName: "uk_project_id_repository_id_user_id")
         addUniqueConstraint(columnNames: "repository_id,user_id", tableName: "rducm_gitlab_member", constraintName: "uk_repository_id_user_id")
     }
