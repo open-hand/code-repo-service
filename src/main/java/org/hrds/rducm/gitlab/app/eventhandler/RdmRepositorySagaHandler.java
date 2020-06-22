@@ -66,6 +66,7 @@ public class RdmRepositorySagaHandler {
         Long repositoryId = devOpsAppServicePayload.getAppServiceId();
 
         initPrivilege(organizationId, projectId, repositoryId);
+
         return data;
     }
 
