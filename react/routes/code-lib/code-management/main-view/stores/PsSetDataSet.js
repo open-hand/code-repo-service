@@ -21,6 +21,7 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
             const tempList = map(data.list || data.content || [], item => ({
               ...item,
               glAccessLevel: item.glAccessLevel ? `L${item.glAccessLevel}` : '',
+              glAccessLevelList: item.glAccessLevel ? `L${item.glAccessLevel}` : '',
               loginName: item.user ? item.user.loginName : undefined,
               realName: item.user ? item.user.realName : undefined,
             }));
@@ -78,7 +79,7 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
       label: formatMessage({ id: 'projectRole' }),
     }, // 项目角色
     {
-      name: 'glAccessLevel',
+      name: 'glAccessLevelList',
       type: 'string',
       required: true,
       // label: formatMessage({ id: `${intlPrefix}.permission` }),
@@ -97,6 +98,13 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
           }
         />
       ),
+    },
+    {
+      name: 'glAccessLevel',
+      type: 'string',
+      required: true,
+      label: formatMessage({ id: `${intlPrefix}.permission` }),
+      lookupCode: 'RDUCM.ACCESS_LEVEL',
     },
     {
       name: 'glExpiresAt',
