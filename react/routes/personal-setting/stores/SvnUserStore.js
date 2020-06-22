@@ -28,7 +28,7 @@ class SvnUserStore {
   }
 
   // 文档库-修改默认密码
-  updatePassword = (organizationId, body) => axios.post(`/rdudm/v1/${organizationId}/doc-users/updatePwd`, JSON.stringify(body));
+  updatePassword = (organizationId, body) => axios.post('/rdudm/v1/doc-users/updatePwd', JSON.stringify(body));
 }
 
 export default SvnUserStore;
