@@ -59,6 +59,9 @@ public class Version023ServiceImpl implements Version023Service {
         Semaphore semaphore = new Semaphore(5);
         CountDownLatch countDownLatch = new CountDownLatch(c7nTenantVOS.size());
 
+        // 记录导入失败的组织
+        Map<Long, String> errorOrg = new HashMap<>();
+
         c7nTenantVOS.forEach(vo -> {
             try {
                 semaphore.acquire();
@@ -72,6 +75,7 @@ public class Version023ServiceImpl implements Version023Service {
                     orgLevel(vo.getTenantId());
                 } catch (Exception e) {
                     logger.error("导入失败的组织为:{}", vo.getTenantId());
+                    errorOrg.put(vo.getTenantId(), e.getMessage());
                     throw e;
                 } finally {
                     semaphore.release();
@@ -88,6 +92,13 @@ public class Version023ServiceImpl implements Version023Service {
 
         stopWatch.stop();
         logger.info(stopWatch.prettyPrint());
+
+        if (errorOrg.isEmpty()) {
+            logger.info("导入成功");
+        } else {
+            logger.error("部分组织导入失败, 失败的组织为:{}", errorOrg);
+        }
+
         pool.shutdown();
     }
 
