@@ -19,7 +19,7 @@ const PsManager = observer(() => {
   return (
     // <Page service={detailPermissions} >
     <Page
-      service={['choerodon.code.person.setting.personal-setting.ps.default']}
+      // service={['choerodon.code.person.setting.personal-setting.ps.default']}
       className="c7n-infra-personal-setting"
     >
       <PageWrap noHeader={['gitLabSetting', 'svnSetting']}>
