@@ -29,7 +29,7 @@ public class MemberInitJob {
     private Version023Service version023Service;
 
     /**
-     * 上线时初始化Gitlab成员到代码库
+     * 0.23.0版本上线时初始化Gitlab成员到代码库
      *
      * @param map
      */
