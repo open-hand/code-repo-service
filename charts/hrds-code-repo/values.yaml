@@ -1,3 +1,18 @@
+preJob:
+  timeout: 1200
+  image: registry.cn-shanghai.aliyuncs.com/c7n/dbtool:0.7.0
+  preInitDB:
+    # 是否初始化本服务数据库
+    enabled: false
+    datasource:
+      # 初始化数据库更新数据的时候忽略的表或列
+      exclusion:
+      # 本服务数据库相关信息
+      url: jdbc:mysql://localhost:3306/?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true&serverTimezone=Asia/Shanghai
+      username: xxx
+      password: xxx
+      driver: com.mysql.jdbc.Driver
+
 ## 实例运行数量
 replicaCount: 1
 
@@ -47,11 +62,21 @@ env:
     # 注册服务地址
     EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://register-server:8000/eureka/
 
+    # Redis配置
+    SPRING_REDIS_HOST: localhost
+    SPRING_REDIS_PORT: 6379
+    SPRING_REDIS_DATABASE: 0
+
+    # 数据库配置
+    SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/hrds_code_repo?useUnicode=true&characterEncoding=utf-8&useSSL=false&useInformationSchema=true&remarks=true&serverTimezone=Asia/Shanghai
+    SPRING_DATASOURCE_USERNAME: hzero
+    SPRING_DATASOURCE_PASSWORD: hzero
 
     # Gitlab http(s) 协议访问地址
     GITLAB_URL: http://git.example.com
     # Gitlab admin 用户 private token
     GITLAB_PRIVATETOKEN: xxx
+
     ## Skywalking 配置参数
     # SKYWALKING_OPTS: >-
     #   -javaagent:/agent/skywalking-agent.jar
