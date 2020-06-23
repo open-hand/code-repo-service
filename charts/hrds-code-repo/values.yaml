@@ -3,7 +3,7 @@ preJob:
   image: registry.cn-shanghai.aliyuncs.com/c7n/dbtool:0.7.0
   preInitDB:
     # 是否初始化本服务数据库
-    enabled: false
+    enabled: true
     datasource:
       # 初始化数据库更新数据的时候忽略的表或列
       exclusion:
