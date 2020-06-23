@@ -41,18 +41,19 @@ public class MemberExportDTO {
     @ExcelColumn(title = "添加时间", pattern = BaseConstants.Pattern.DATETIME)
     private Date creationDate;
 
-    @ExcelColumn(title = "Gitlab同步标识", renderers = SyncGitlabFlagValueRenderer.class)
-    private Boolean syncGitlabFlag;
+    @ExcelColumn(title = "Gitlab同步标识")
+    private String syncGitlabFlag;
 
     @ExcelColumn(title = "Gitlab同步时间", pattern = BaseConstants.Pattern.DATETIME)
     private Date syncDateGitlab;
 
-    public static class SyncGitlabFlagValueRenderer implements ValueRenderer {
-        @Override
-        public Object render(Object value, Object data) {
-            return (Boolean) value ? "已同步" : "未同步";
-        }
-    }
+    // TODO 先注释掉, 待Hzero修复
+//    public static class SyncGitlabFlagValueRenderer implements ValueRenderer {
+//        @Override
+//        public Object render(Object value, Object data) {
+//            return (Boolean) value ? "已同步" : "未同步";
+//        }
+//    }
 
     public interface GroupProject {}
 
@@ -122,11 +123,11 @@ public class MemberExportDTO {
         return this;
     }
 
-    public Boolean getSyncGitlabFlag() {
+    public String getSyncGitlabFlag() {
         return syncGitlabFlag;
     }
 
-    public MemberExportDTO setSyncGitlabFlag(Boolean syncGitlabFlag) {
+    public MemberExportDTO setSyncGitlabFlag(String syncGitlabFlag) {
         this.syncGitlabFlag = syncGitlabFlag;
         return this;
     }
