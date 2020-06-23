@@ -4,17 +4,16 @@
 
 `hrds-code-repo` hrds-code-repo是Choerodon平台的代码库管理服务. 当前版本为: `0.23.0-alpha.1`
 
-hrds-code-repo通过与Gitlab集成, 实现在Choerodon平台一站式管理代码库的功能。
+hrds-code-repo通过与Gitlab集成, 提供权限管理等功能, 通过在Choerodon平台一站式管理代码库。
 
 ## 特性
 `hrds-code-repo` 含有以下功能:    
 
-- `权限分配` ：对应用服务进行管理
 - `权限分配`: 支持查看和分配团队成员的代码库权限
 - `权限申请`: 支持向项目管理员申请应用服务的权限
 - `权限审计`: 支持定时审计代码库与Gitlab权限不一致的数据, 并支持修复不一致权限
 - `安全审计`: 支持查看团队成员的权限分布情况
-- `保护分支/标记`: 支持查看和设置保护分支和保护标记, 用于对分支(branches)和标记(tags)的权限进行限制
+- `保护分支/标记`: 支持查看和设置保护分支和保护标记, 用于对分支(branches)和标记(tags)的权限进行设置
 - `操作日志`: 记录了权限分配的操作日志
 - `总览`: 支持查看各应用服务的一些信息
 
@@ -31,12 +30,12 @@ hrds-code-repo通过与Gitlab集成, 实现在Choerodon平台一站式管理代�
 ## 服务依赖
 
 * `go-register-server`: 注册中心，在线上环境代替本地的`eureka-server`
-* `iam-service`：用户服务，与用户有关的操作依赖与此服务
+* `iam-service`: 用户服务，与用户有关的操作依赖与此服务
 * `api-gateway`: 网关服务
 * `oauth-server`: 授权服务
 * `manager-service`: 管理服务
-* `asgard-service` : 事务一致性服务
-* `notify-service` : 通知服务
+* `asgard-service`: 事务一致性服务
+* `notify-service`: 通知服务
 * `devops-service`: Devops服务
 
 ## 服务配置
