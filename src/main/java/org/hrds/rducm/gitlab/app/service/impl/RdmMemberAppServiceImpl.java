@@ -379,6 +379,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             exportDTO.setCreatedByName(dto.getCreatedUser().getRealName());
             exportDTO.setProjectName(dto.getProject().getProjectName());
             exportDTO.setGlAccessLevel(dto.getGlAccessLevel() == null ? null : RdmAccessLevel.forValue(dto.getGlAccessLevel()).toDesc());
+            exportDTO.setSyncGitlabFlag(dto.getSyncGitlabFlag() ? "已同步" : "未同步"); // TODO 待hzero导出组件修复
             return exportDTO;
         });
 
