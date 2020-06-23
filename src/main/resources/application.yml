@@ -99,9 +99,9 @@ mybatis:
 
 logging:
   level:
-    org.apache.ibatis: debug
-    io.choerodon: debug
-    org.hzero: debug
+    org.apache.ibatis: ${LOGGER_LEVEL:info}
+    io.choerodon: ${LOGGER_LEVEL:info}
+    org.hzero: ${LOGGER_LEVEL:info}
 
 choerodon:
   category:
