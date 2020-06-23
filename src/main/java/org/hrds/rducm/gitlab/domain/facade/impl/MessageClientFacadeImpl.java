@@ -6,6 +6,7 @@ import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.MessageClientFacade;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hzero.boot.message.MessageClient;
 import org.hzero.boot.message.entity.Receiver;
@@ -40,6 +41,7 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
 
     @Override
     public void sendApprovalMessage(Long projectId) {
+        C7nProjectVO c7nProjectVO = c7NBaseServiceFacade.detailC7nProject(projectId);
         // 查询该项目下所有用户
         List<C7nUserVO> c7nUserVOS = c7NBaseServiceFacade.listC7nUsersOnProjectLevel(projectId);
         // 过滤并获取所有"项目管理员"角色的用户
@@ -64,6 +66,8 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
                     .setTargetUserTenantId(tenantId);
             receivers.add(receiver);
         });
+
+        args.put("projectName", c7nProjectVO.getName());
 
         logger.info("tenantId:[{}], receivers:[{}]", tenantId, receivers);
 
@@ -111,7 +115,7 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
             sb.append("[").append(projectName).append("]项目[").append(repositoryName).append("]应用服务").append("[")
                     .append(realName).append("]的权限即将于")
                     .append(expiresAtStr).append("(").append(days).append("天后)")
-                    .append("到期<br/>");
+                    .append("到期。<br/>");
         });
         args.put("membersInfo", sb.toString());
 
