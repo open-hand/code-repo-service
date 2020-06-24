@@ -286,7 +286,7 @@ public class RdmMemberChangeSagaHandler {
 
     private void insertProjectOwner(Long organizationId, Long projectId, Long userId) {
         Integer glUserId = c7nBaseServiceFacade.userIdToGlUserId(userId);
-        List<C7nAppServiceVO> appServiceVOS = c7nDevOpsServiceFacade.listAppServiceByActive(projectId);
+        List<C7nAppServiceVO> appServiceVOS = c7nDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId);
         appServiceVOS.forEach(appServiceVO -> {
             Long repositoryId = appServiceVO.getId();
             Integer glProjectId = Math.toIntExact(appServiceVO.getGitlabProjectId());
