@@ -84,7 +84,7 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
         // 将参数转换为json格式
         String params = TypeUtil.castToSearchParam("name", appServiceName);
 
-        ResponseEntity<Page<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, 0, 0, params);
+        ResponseEntity<Page<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, false, false, 0, 0, params);
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getContent())) {
             List<C7nAppServiceVO> c7nAppServiceVOS = responseEntity.getBody().getContent();
@@ -123,7 +123,7 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
     @Override
     public List<C7nAppServiceVO> listC7nAppServiceOnProjectLevel(Long projectId) {
         // 将参数转换为json格式
-        ResponseEntity<Page<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, 0, 0, "");
+        ResponseEntity<Page<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, false, false, false, 0, 0, "");
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getContent())) {
             List<C7nAppServiceVO> c7nAppServiceVOS = responseEntity.getBody().getContent();
@@ -174,9 +174,9 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
     @Override
     public List<C7nAppServiceVO> listAppServiceByActive(Long projectId) {
         // 获取所有已经启用的服务
-        ResponseEntity<List<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.listAppServiceByActive(projectId);
+        ResponseEntity<Page<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppServiceByOptions(projectId, true, false, false, 0, 0, "{}");
 
-        return FeignUtils.handleResponseEntity(responseEntity);
+        return FeignUtils.handleResponseEntity(responseEntity).getContent();
     }
 
     @Override

@@ -102,6 +102,7 @@ public class RdmMemberQueryHelper {
                 userIdsSet2 = futureTask2.get();
                 repositoryIdSet = futureTask3.get();
             } catch (InterruptedException | ExecutionException e) {
+                Thread.currentThread().interrupt();
                 e.printStackTrace();
             }
             Set<Long> userIdsSet = new HashSet<>();

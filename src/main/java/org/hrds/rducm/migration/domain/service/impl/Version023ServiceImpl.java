@@ -66,6 +66,7 @@ public class Version023ServiceImpl implements Version023Service {
             try {
                 semaphore.acquire();
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 throw new RuntimeException(e);
             }
 
@@ -87,6 +88,7 @@ public class Version023ServiceImpl implements Version023Service {
         try {
             countDownLatch.await();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
 
