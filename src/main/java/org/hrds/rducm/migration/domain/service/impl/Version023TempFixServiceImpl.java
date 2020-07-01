@@ -122,7 +122,7 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
 
         // <2> 获取项目下所有代码库id和Gitlab项目id
         List<RdmMember> orgList = new ArrayList<>();
-        Map<Long, Long> deleteReps = new HashMap<>();
+        Set<String> deleteReps = new HashSet<>();
         projectIds.forEach(projectId -> {
             // 修复: 排除已导入的应用服务
             Map<Long, Long> allAppServiceIdMap = c7nDevOpsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
@@ -135,18 +135,22 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
                 logger.info("组织id为{}, 项目id为{}, 代码库id为{}", organizationId, projectId, repositoryId);
                 orgList.addAll(projectLevel(organizationId, projectId, repositoryId));
 
-                deleteReps.put(projectId, repositoryId);
+                deleteReps.add(projectId + "-" + repositoryId);
             });
         });
 
         // 开启事务
         transactionTemplate.execute(status -> {
             // <> 删除权限, 只删除之前导入遗漏的
-            deleteReps.forEach((k, v) -> {
+            deleteReps.forEach(val -> {
+                String[] split = val.split("-");
+                Long projectId = Long.valueOf(split[0]);
+                Long repositoryId = Long.valueOf(split[1]);
+
                 RdmMember delete = new RdmMember();
                 delete.setOrganizationId(organizationId);
-                delete.setProjectId(k);
-                delete.setRepositoryId(v);
+                delete.setProjectId(projectId);
+                delete.setRepositoryId(repositoryId);
                 rdmMemberRepository.delete(delete);
             });
 
