@@ -54,12 +54,7 @@ public class Version023ServiceTemp1Impl implements Version023STemp1ervice {
 
     @Override
     public void initAllPrivilegeOnSiteLevel() {
-        // <> 判断代码库是否有数据
-        Page<Object> records = PageHelper.doPage(0, 1, () -> rdmMemberRepository.selectAll());
-        if (!records.isEmpty()) {
-            logger.warn("代码库已有数据, 跳过, 不进行初始化");
-            return;
-        }
+
 
         final ExecutorService pool = new ThreadPoolExecutor(THREAD_COUNT,
                 THREAD_COUNT,
@@ -173,7 +168,7 @@ public class Version023ServiceTemp1Impl implements Version023STemp1ervice {
             deleteReps.forEach(val -> {
 //                String[] split = val.split("-");
 //                Long projectId = Long.valueOf(split[0]);
-                Long repositoryId = Long.valueOf(val);
+                Long repositoryId = val;
 
                 RdmMember delete = new RdmMember();
                 delete.setOrganizationId(organizationId);
