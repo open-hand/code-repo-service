@@ -9,6 +9,8 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nTenantVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
+import org.hrds.rducm.migration.domain.facade.MigDevopsServiceFacade;
+import org.hrds.rducm.migration.domain.service.Version023STemp1ervice;
 import org.hrds.rducm.migration.domain.service.Version023Service;
 import org.hrds.rducm.migration.infra.feign.MigDevOpsServiceFeignClient;
 import org.hrds.rducm.migration.infra.feign.vo.DevopsUserPermissionVO;
@@ -25,13 +27,15 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static org.hrds.rducm.migration.domain.service.impl.Version023TempFixServiceImpl.getDifferenceSetByGuava;
+
 /**
  * @author ying.xie@hand-china.com
  * @date 2020/6/12
  */
 @Service
-public class Version023ServiceImpl implements Version023Service {
-    private static final Logger logger = LoggerFactory.getLogger(Version023ServiceImpl.class);
+public class Version023ServiceTemp1Impl implements Version023STemp1ervice {
+    private static final Logger logger = LoggerFactory.getLogger(Version023ServiceTemp1Impl.class);
 
     private static final int THREAD_COUNT = Runtime.getRuntime().availableProcessors() + 1;
 
@@ -45,15 +49,12 @@ public class Version023ServiceImpl implements Version023Service {
     private RdmMemberRepository rdmMemberRepository;
     @Autowired
     private TransactionTemplate transactionTemplate;
+    @Autowired
+    private MigDevopsServiceFacade migDevopsServiceFacade;
 
     @Override
     public void initAllPrivilegeOnSiteLevel() {
-        // <> 判断代码库是否有数据
-        Page<Object> records = PageHelper.doPage(0, 1, () -> rdmMemberRepository.selectAll());
-        if (!records.isEmpty()) {
-            logger.warn("代码库已有数据, 跳过, 不进行初始化");
-            return;
-        }
+
 
         final ExecutorService pool = new ThreadPoolExecutor(THREAD_COUNT,
                 THREAD_COUNT,
@@ -81,6 +82,8 @@ public class Version023ServiceImpl implements Version023Service {
             orgProjects.put(organizationId, projectIds);
             projectCount.addAndGet(projectIds.size());
         });
+//        Semaphore semaphore = new Semaphore(THREAD_COUNT);
+
 
         // 保证所有线程完成后, 再继续主线程
         CountDownLatch countDownLatch = new CountDownLatch(projectCount.get());
@@ -92,15 +95,23 @@ public class Version023ServiceImpl implements Version023Service {
             logger.info("该组织{} 下的所有项目为{}", organizationId, projectIds);
 
             projectIds.forEach(projectId -> {
+//                try {
+//                    semaphore.acquire();
+//                } catch (InterruptedException e) {
+//                    Thread.currentThread().interrupt();
+//                    throw new RuntimeException(e);
+//                }
+
                 pool.execute(() -> {
                     try {
                         // 每个项目提交一个事务
                         projectLevel(organizationId, projectId);
                     } catch (Exception e) {
-                        logger.error("导入失败的组织项目为:{}-{}", organizationId, projectId);
+                        logger.error("导入失败的组织项目为:{}", organizationId);
                         errorProjects.put(organizationId + "-" + projectId, e.getMessage());
                         throw e;
                     } finally {
+//                        semaphore.release();
                         countDownLatch.countDown();
                     }
                 });
@@ -134,15 +145,38 @@ public class Version023ServiceImpl implements Version023Service {
         // <> 获取项目下所有代码库id和Gitlab项目id
         List<RdmMember> projectList = new ArrayList<>();
 
-        Map<Long, Long> appServiceIdMap = c7nDevOpsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
+        // 修复: 排除已导入的应用服务
+        Map<Long, Long> allAppServiceIdMap = c7nDevOpsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
 
-        appServiceIdMap.forEach((repositoryId, glProjectId) -> {
+        Map<Long, Long> appServiceIdMap = migDevopsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
+
+        Map<Long, Long> newMap = getDifferenceSetByGuava(allAppServiceIdMap, appServiceIdMap);
+
+
+        Set<Long> deleteReps = new HashSet<>();
+
+        newMap.forEach((repositoryId, glProjectId) -> {
             logger.info("组织id为{}, 项目id为{}, 代码库id为{}", organizationId, projectId, repositoryId);
             projectList.addAll(repositoryLevel(organizationId, projectId, repositoryId));
+
+            deleteReps.add(repositoryId);
         });
 
         // 开启事务
         transactionTemplate.execute(status -> {
+            // <> 删除权限, 只删除之前导入遗漏的
+            deleteReps.forEach(val -> {
+//                String[] split = val.split("-");
+//                Long projectId = Long.valueOf(split[0]);
+                Long repositoryId = val;
+
+                RdmMember delete = new RdmMember();
+                delete.setOrganizationId(organizationId);
+                delete.setProjectId(projectId);
+                delete.setRepositoryId(repositoryId);
+                rdmMemberRepository.delete(delete);
+            });
+
             // <> 批量插入
             if (!projectList.isEmpty()) {
                 rdmMemberRepository.batchInsertCustom(projectList);
