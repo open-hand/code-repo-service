@@ -1,7 +1,8 @@
 package org.hrds.rducm.migration.domain.service.impl;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import io.choerodon.core.domain.Page;
-import io.choerodon.mybatis.pagehelper.PageHelper;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
@@ -9,7 +10,8 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nTenantVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
-import org.hrds.rducm.migration.domain.service.Version023Service;
+import org.hrds.rducm.migration.domain.facade.MigDevopsServiceFacade;
+import org.hrds.rducm.migration.domain.service.Version023TempFixService;
 import org.hrds.rducm.migration.infra.feign.MigDevOpsServiceFeignClient;
 import org.hrds.rducm.migration.infra.feign.vo.DevopsUserPermissionVO;
 import org.slf4j.Logger;
@@ -25,12 +27,14 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
+ * 临时修复, TODO 后续删除
+ *
  * @author ying.xie@hand-china.com
- * @date 2020/6/12
+ * @date 2020/7/1
  */
 @Service
-public class Version023ServiceImpl implements Version023Service {
-    private static final Logger logger = LoggerFactory.getLogger(Version023ServiceImpl.class);
+public class Version023TempFixServiceImpl implements Version023TempFixService {
+    private static final Logger logger = LoggerFactory.getLogger(Version023TempFixServiceImpl.class);
     @Autowired
     private MigDevOpsServiceFeignClient migDevOpsServiceFeignClient;
     @Autowired
@@ -41,16 +45,11 @@ public class Version023ServiceImpl implements Version023Service {
     private RdmMemberRepository rdmMemberRepository;
     @Autowired
     private TransactionTemplate transactionTemplate;
+    @Autowired
+    private MigDevopsServiceFacade migDevopsServiceFacade;
 
     @Override
     public void initAllPrivilegeOnSiteLevel() {
-        // <> 判断代码库是否有数据
-        long count = PageHelper.count(() -> rdmMemberRepository.selectAll());
-        if (count > 0) {
-            logger.warn("代码库已有数据, 跳过, 不进行初始化");
-            return;
-        }
-
         final ExecutorService pool = new ThreadPoolExecutor(5,
                 5,
                 1000,
@@ -66,38 +65,29 @@ public class Version023ServiceImpl implements Version023Service {
         Semaphore semaphore = new Semaphore(5);
         CountDownLatch countDownLatch = new CountDownLatch(c7nTenantVOS.size());
 
-        // 记录导入失败的组织和项目
-        Map<String, String> errorProjects = new HashMap<>();
+        // 记录导入失败的组织
+        Map<Long, String> errorOrg = new HashMap<>();
 
         c7nTenantVOS.forEach(vo -> {
-            Long organizationId = vo.getTenantId();
+            try {
+                semaphore.acquire();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(e);
+            }
 
-            // <1> 获取组织下所有项目
-            Set<Long> projectIds = c7nBaseServiceFacade.listProjectIds(organizationId);
-            logger.info("该组织{} 下的所有项目为{}", organizationId, projectIds);
-
-            projectIds.forEach(projectId -> {
+            pool.execute(() -> {
                 try {
-                    semaphore.acquire();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException(e);
+                    // 每个组织提交一个事务
+                    orgLevel(vo.getTenantId());
+                } catch (Exception e) {
+                    logger.error("导入失败的组织为:{}", vo.getTenantId());
+                    errorOrg.put(vo.getTenantId(), e.getMessage());
+                    throw e;
+                } finally {
+                    semaphore.release();
+                    countDownLatch.countDown();
                 }
-
-                pool.execute(() -> {
-                    try {
-                        // 每个项目提交一个事务
-                        projectLevel(organizationId, projectId);
-                    } catch (Exception e) {
-                        logger.error("导入失败的组织项目为:{}", vo.getTenantId());
-                        errorProjects.put(organizationId + "-" + projectId, e.getMessage());
-                        throw e;
-                    } finally {
-                        semaphore.release();
-                        countDownLatch.countDown();
-                    }
-                });
-
             });
         });
 
@@ -111,36 +101,51 @@ public class Version023ServiceImpl implements Version023Service {
         stopWatch.stop();
         logger.info(stopWatch.prettyPrint());
 
-        if (errorProjects.isEmpty()) {
+        if (errorOrg.isEmpty()) {
             logger.info("导入成功");
         } else {
-            logger.error("部分组织导入失败, 失败的组织为:{}", errorProjects);
+            logger.error("部分组织导入失败, 失败的组织为:{}", errorOrg);
         }
 
         pool.shutdown();
     }
 
-    private void projectLevel(Long organizationId, Long projectId) {
+
+    public void orgLevel(Long organizationId) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
+        // <1> 获取组织下所有项目
+        Set<Long> projectIds = c7nBaseServiceFacade.listProjectIds(organizationId);
 
+        logger.info("该组织{} 下的所有项目为{}", organizationId, projectIds);
 
         // <2> 获取项目下所有代码库id和Gitlab项目id
-        List<RdmMember> projectList = new ArrayList<>();
+        List<RdmMember> orgList = new ArrayList<>();
+        projectIds.forEach(projectId -> {
+            // 修复: 排除已导入的应用服务
+            Map<Long, Long> allAppServiceIdMap = c7nDevOpsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
 
-        Map<Long, Long> appServiceIdMap = c7nDevOpsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
+            Map<Long, Long> appServiceIdMap = migDevopsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
 
-        appServiceIdMap.forEach((repositoryId, glProjectId) -> {
-            logger.info("组织id为{}, 项目id为{}, 代码库id为{}", organizationId, projectId, repositoryId);
-            projectList.addAll(repositoryLevel(organizationId, projectId, repositoryId));
+            Map<Long, Long> newMap = getDifferenceSetByGuava(allAppServiceIdMap, appServiceIdMap);
+
+            newMap.forEach((repositoryId, glProjectId) -> {
+                logger.info("组织id为{}, 项目id为{}, 代码库id为{}", organizationId, projectId, repositoryId);
+                orgList.addAll(projectLevel(organizationId, projectId, repositoryId));
+            });
         });
 
         // 开启事务
         transactionTemplate.execute(status -> {
+//            // <> 删除权限
+//            RdmMember delete = new RdmMember();
+//            delete.setOrganizationId(organizationId);
+//            rdmMemberRepository.delete(delete);
+
             // <> 批量插入
-            if (!projectList.isEmpty()) {
-                rdmMemberRepository.batchInsertCustom(projectList);
+            if (!orgList.isEmpty()) {
+                rdmMemberRepository.batchInsertCustom(orgList);
             }
 
             return null;
@@ -151,7 +156,7 @@ public class Version023ServiceImpl implements Version023Service {
     }
 
 
-    public List<RdmMember> repositoryLevel(Long organizationId, Long projectId, Long appServiceId) {
+    public List<RdmMember> projectLevel(Long organizationId, Long projectId, Long appServiceId) {
         // 查询项目成员权限
         ResponseEntity<Page<DevopsUserPermissionVO>> responseEntity = migDevOpsServiceFeignClient.pagePermissionUsers(projectId, appServiceId, 0, 0, "{}");
         Page<DevopsUserPermissionVO> devopsUserPermissionVOS = FeignUtils.handleResponseEntity(responseEntity);
@@ -218,5 +223,23 @@ public class Version023ServiceImpl implements Version023Service {
             return null;
         }).filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 两个map取差集
+     *
+     * @param bigMap
+     * @param smallMap
+     * @return
+     */
+    public static Map<Long, Long> getDifferenceSetByGuava(Map<Long, Long> bigMap, Map<Long, Long> smallMap) {
+        Set<Long> bigMapKey = bigMap.keySet();
+        Set<Long> smallMapKey = smallMap.keySet();
+        Set<Long> differenceSet = Sets.difference(bigMapKey, smallMapKey);
+        Map<Long, Long> result = Maps.newHashMap();
+        for (Long key : differenceSet) {
+            result.put(key, bigMap.get(key));
+        }
+        return result;
     }
 }
