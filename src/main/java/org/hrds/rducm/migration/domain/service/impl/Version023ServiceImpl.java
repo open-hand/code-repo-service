@@ -97,7 +97,7 @@ public class Version023ServiceImpl implements Version023Service {
                         // 每个项目提交一个事务
                         projectLevel(organizationId, projectId);
                     } catch (Exception e) {
-                        logger.error("导入失败的组织项目为:{}", organizationId);
+                        logger.error("导入失败的组织项目为:{}-{}", organizationId, projectId);
                         errorProjects.put(organizationId + "-" + projectId, e.getMessage());
                         throw e;
                     } finally {
