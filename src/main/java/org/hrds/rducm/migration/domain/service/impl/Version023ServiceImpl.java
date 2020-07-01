@@ -22,6 +22,7 @@ import org.springframework.util.StopWatch;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -31,6 +32,9 @@ import java.util.stream.Collectors;
 @Service
 public class Version023ServiceImpl implements Version023Service {
     private static final Logger logger = LoggerFactory.getLogger(Version023ServiceImpl.class);
+
+    private static final int THREAD_COUNT = Runtime.getRuntime().availableProcessors() + 1;
+
     @Autowired
     private MigDevOpsServiceFeignClient migDevOpsServiceFeignClient;
     @Autowired
@@ -45,14 +49,14 @@ public class Version023ServiceImpl implements Version023Service {
     @Override
     public void initAllPrivilegeOnSiteLevel() {
         // <> 判断代码库是否有数据
-        long count = PageHelper.count(() -> rdmMemberRepository.selectAll());
-        if (count > 0) {
+        Page<Object> records = PageHelper.doPage(0, 1, () -> rdmMemberRepository.selectAll());
+        if (!records.isEmpty()) {
             logger.warn("代码库已有数据, 跳过, 不进行初始化");
             return;
         }
 
-        final ExecutorService pool = new ThreadPoolExecutor(5,
-                5,
+        final ExecutorService pool = new ThreadPoolExecutor(THREAD_COUNT,
+                THREAD_COUNT,
                 1000,
                 TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<>(50),
@@ -63,37 +67,50 @@ public class Version023ServiceImpl implements Version023Service {
 
         List<C7nTenantVO> c7nTenantVOS = c7nBaseServiceFacade.listAllOrgs();
 
-        Semaphore semaphore = new Semaphore(5);
-        CountDownLatch countDownLatch = new CountDownLatch(c7nTenantVOS.size());
-
-        // 记录导入失败的组织和项目
-        Map<String, String> errorProjects = new HashMap<>();
-
+        // 需要导入的项目集合
+        Map<Long, Set<Long>> orgProjects = new HashMap<>();
+        // 项目总数
+        AtomicInteger projectCount = new AtomicInteger();
         c7nTenantVOS.forEach(vo -> {
             Long organizationId = vo.getTenantId();
 
             // <1> 获取组织下所有项目
             Set<Long> projectIds = c7nBaseServiceFacade.listProjectIds(organizationId);
+            logger.info("该组织{} 下的项目查询完毕", organizationId);
+
+            orgProjects.put(organizationId, projectIds);
+            projectCount.addAndGet(projectIds.size());
+        });
+//        Semaphore semaphore = new Semaphore(THREAD_COUNT);
+
+
+        // 保证所有线程完成后, 再继续主线程
+        CountDownLatch countDownLatch = new CountDownLatch(projectCount.get());
+
+        // 记录导入失败的组织和项目
+        Map<String, String> errorProjects = new HashMap<>(16);
+
+        orgProjects.forEach((organizationId, projectIds) -> {
             logger.info("该组织{} 下的所有项目为{}", organizationId, projectIds);
 
             projectIds.forEach(projectId -> {
-                try {
-                    semaphore.acquire();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException(e);
-                }
+//                try {
+//                    semaphore.acquire();
+//                } catch (InterruptedException e) {
+//                    Thread.currentThread().interrupt();
+//                    throw new RuntimeException(e);
+//                }
 
                 pool.execute(() -> {
                     try {
                         // 每个项目提交一个事务
                         projectLevel(organizationId, projectId);
                     } catch (Exception e) {
-                        logger.error("导入失败的组织项目为:{}", vo.getTenantId());
+                        logger.error("导入失败的组织项目为:{}", organizationId);
                         errorProjects.put(organizationId + "-" + projectId, e.getMessage());
                         throw e;
                     } finally {
-                        semaphore.release();
+//                        semaphore.release();
                         countDownLatch.countDown();
                     }
                 });
@@ -124,9 +141,7 @@ public class Version023ServiceImpl implements Version023Service {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-
-
-        // <2> 获取项目下所有代码库id和Gitlab项目id
+        // <> 获取项目下所有代码库id和Gitlab项目id
         List<RdmMember> projectList = new ArrayList<>();
 
         Map<Long, Long> appServiceIdMap = c7nDevOpsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
