@@ -191,6 +191,7 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
         ResponseEntity<Page<DevopsUserPermissionVO>> responseEntity = migDevOpsServiceFeignClient.pagePermissionUsers(projectId, appServiceId, 0, 0, "{}");
         Page<DevopsUserPermissionVO> devopsUserPermissionVOS = FeignUtils.handleResponseEntity(responseEntity);
         List<DevopsUserPermissionVO> list = devopsUserPermissionVOS.getContent();
+        logger.info("组织{}, 项目{}, 应用服务{}, 查询到需导入的成员数量{}", organizationId, projectId, appServiceId, list.size());
 
         // 获取组织管理员
         List<C7nUserVO> orgAdmins = c7nBaseServiceFacade.listOrgAdministrator(organizationId);
