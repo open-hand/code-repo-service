@@ -62,13 +62,12 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
                 new ArrayBlockingQueue<>(50),
                 new ThreadPoolExecutor.CallerRunsPolicy());
 
+        logger.info("主线程为{}", Thread.currentThread().getName());
+
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        // TODO delete start
-        List<C7nTenantVO> c7nTenantVOS = c7nBaseServiceFacade.listAllOrgs()
-                .stream().filter(v->v.getTenantId() == 7).collect(Collectors.toList());
-        // TODO delete end
+        List<C7nTenantVO> c7nTenantVOS = c7nBaseServiceFacade.listAllOrgs();
 
         Semaphore semaphore = new Semaphore(5);
         CountDownLatch countDownLatch = new CountDownLatch(c7nTenantVOS.size());
@@ -86,6 +85,7 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
 
             pool.execute(() -> {
                 try {
+                    logger.info("组织{}, 当前执行任务的线程为:{}", vo.getTenantId(), Thread.currentThread().getName());
                     // 每个组织提交一个事务
                     orgLevel(vo.getTenantId());
                 } catch (Exception e) {
@@ -124,10 +124,7 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
         stopWatch.start();
 
         // <1> 获取组织下所有项目
-        // TODO delete start
-        Set<Long> projectIds = c7nBaseServiceFacade.listProjectIds(organizationId)
-                .stream().filter(v -> v == 8).collect(Collectors.toSet());
-        // TODO delete end
+        Set<Long> projectIds = c7nBaseServiceFacade.listProjectIds(organizationId);
 
         logger.info("该组织{} 下的所有项目为{}", organizationId, projectIds);
 
@@ -143,11 +140,7 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
             Map<Long, Long> newMap = getDifferenceSetByGuava(allAppServiceIdMap, appServiceIdMap);
             logger.info("组织{}, 项目{}, 需补录的应用服务{}", organizationId, projectId, newMap);
 
-            // TODO delete start
-            Map<Long, Long> nnMap = new HashMap<>();
-            nnMap.put(1693L, newMap.get(1693L));
-            // TODO delete end
-            nnMap.forEach((repositoryId, glProjectId) -> {
+            newMap.forEach((repositoryId, glProjectId) -> {
                 logger.info("组织id为{}, 项目id为{}, 代码库id为{}", organizationId, projectId, repositoryId);
                 orgList.addAll(projectLevel(organizationId, projectId, repositoryId));
 

@@ -82,7 +82,7 @@ public class Version023ServiceTemp1Impl implements Version023STemp1ervice {
             orgProjects.put(organizationId, projectIds);
             projectCount.addAndGet(projectIds.size());
         });
-//        Semaphore semaphore = new Semaphore(THREAD_COUNT);
+        Semaphore semaphore = new Semaphore(THREAD_COUNT);
 
 
         // 保证所有线程完成后, 再继续主线程
@@ -95,12 +95,12 @@ public class Version023ServiceTemp1Impl implements Version023STemp1ervice {
             logger.info("该组织{} 下的所有项目为{}", organizationId, projectIds);
 
             projectIds.forEach(projectId -> {
-//                try {
-//                    semaphore.acquire();
-//                } catch (InterruptedException e) {
-//                    Thread.currentThread().interrupt();
-//                    throw new RuntimeException(e);
-//                }
+                try {
+                    semaphore.acquire();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(e);
+                }
 
                 pool.execute(() -> {
                     try {
@@ -111,7 +111,7 @@ public class Version023ServiceTemp1Impl implements Version023STemp1ervice {
                         errorProjects.put(organizationId + "-" + projectId, e.getMessage());
                         throw e;
                     } finally {
-//                        semaphore.release();
+                        semaphore.release();
                         countDownLatch.countDown();
                     }
                 });
