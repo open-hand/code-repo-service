@@ -58,10 +58,10 @@ public class Version023ServiceTemp1Impl implements Version023STemp1ervice {
 
         final ExecutorService pool = new ThreadPoolExecutor(THREAD_COUNT,
                 THREAD_COUNT,
-                1000,
-                TimeUnit.MILLISECONDS,
-                new ArrayBlockingQueue<>(50),
-                new ThreadPoolExecutor.CallerRunsPolicy());
+                60,
+                TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(1000),
+                new ThreadPoolExecutor.AbortPolicy());
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
