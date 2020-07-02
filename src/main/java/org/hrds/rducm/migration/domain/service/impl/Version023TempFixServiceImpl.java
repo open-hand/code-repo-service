@@ -126,10 +126,11 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
         projectIds.forEach(projectId -> {
             // 修复: 排除已导入的应用服务
             Map<Long, Long> allAppServiceIdMap = c7nDevOpsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
-
+            logger.info("组织{}, 项目{}, 总应用服务{}", organizationId, projectId, allAppServiceIdMap);
             Map<Long, Long> appServiceIdMap = migDevopsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
-
+            logger.info("组织{}, 项目{}, 已导入过的应用服务{}", organizationId, projectId, appServiceIdMap);
             Map<Long, Long> newMap = getDifferenceSetByGuava(allAppServiceIdMap, appServiceIdMap);
+            logger.info("组织{}, 项目{}, 需补录的应用服务{}", organizationId, projectId, newMap);
 
             newMap.forEach((repositoryId, glProjectId) -> {
                 logger.info("组织id为{}, 项目id为{}, 代码库id为{}", organizationId, projectId, repositoryId);
@@ -153,11 +154,13 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
                 delete.setRepositoryId(repositoryId);
                 rdmMemberRepository.delete(delete);
             });
+            logger.info("组织{}, 删除的数据为{}", organizationId, deleteReps);
 
 
             // <> 批量插入
             if (!orgList.isEmpty()) {
                 rdmMemberRepository.batchInsertCustom(orgList);
+                logger.info("组织{}的数据导入成功, 共{}条数据", organizationId, orgList.size());
             }
 
             return null;
