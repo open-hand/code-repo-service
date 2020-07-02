@@ -3,6 +3,8 @@ package org.hrds.rducm.migration.domain.service.impl;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.oauth.CustomUserDetails;
+import io.choerodon.core.oauth.DetailsHelper;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
@@ -50,6 +52,9 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
 
     @Override
     public void initAllPrivilegeOnSiteLevel() {
+        CustomUserDetails userDetails = DetailsHelper.getUserDetails();
+        logger.info("userDetails:{}, userId:{}", userDetails, userDetails.getUserId());
+
         final ExecutorService pool = new ThreadPoolExecutor(5,
                 5,
                 1000,
@@ -60,7 +65,10 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        List<C7nTenantVO> c7nTenantVOS = c7nBaseServiceFacade.listAllOrgs();
+        // TODO delete start
+        List<C7nTenantVO> c7nTenantVOS = c7nBaseServiceFacade.listAllOrgs()
+                .stream().filter(v->v.getTenantId() == 7).collect(Collectors.toList());
+        // TODO delete end
 
         Semaphore semaphore = new Semaphore(5);
         CountDownLatch countDownLatch = new CountDownLatch(c7nTenantVOS.size());
@@ -116,7 +124,10 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
         stopWatch.start();
 
         // <1> 获取组织下所有项目
-        Set<Long> projectIds = c7nBaseServiceFacade.listProjectIds(organizationId);
+        // TODO delete start
+        Set<Long> projectIds = c7nBaseServiceFacade.listProjectIds(organizationId)
+                .stream().filter(v -> v == 8).collect(Collectors.toSet());
+        // TODO delete end
 
         logger.info("该组织{} 下的所有项目为{}", organizationId, projectIds);
 
@@ -132,7 +143,11 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
             Map<Long, Long> newMap = getDifferenceSetByGuava(allAppServiceIdMap, appServiceIdMap);
             logger.info("组织{}, 项目{}, 需补录的应用服务{}", organizationId, projectId, newMap);
 
-            newMap.forEach((repositoryId, glProjectId) -> {
+            // TODO delete start
+            Map<Long, Long> nnMap = new HashMap<>();
+            nnMap.put(1693L, newMap.get(1693L));
+            // TODO delete end
+            nnMap.forEach((repositoryId, glProjectId) -> {
                 logger.info("组织id为{}, 项目id为{}, 代码库id为{}", organizationId, projectId, repositoryId);
                 orgList.addAll(projectLevel(organizationId, projectId, repositoryId));
 
