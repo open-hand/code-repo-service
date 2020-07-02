@@ -73,7 +73,7 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
         CountDownLatch countDownLatch = new CountDownLatch(c7nTenantVOS.size());
 
         // 记录导入失败的组织
-        Map<Long, String> errorOrg = new HashMap<>();
+        Map<Long, String> errorOrg = new ConcurrentHashMap<>(16);
 
         c7nTenantVOS.forEach(vo -> {
             try {
