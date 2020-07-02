@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 初始化Gitlab权限到代码库的任务
@@ -58,7 +59,8 @@ public class MemberInitJob {
             params = {@JobParam(name = "organizationId", description = "组织id")})
     public void fixInitRdmMembers(Map<String, Object> param) {
         // <> 获取组织
-        long organizationId = Long.parseLong((String) param.get("organizationId"));
+        String organizationIdStr = (String) param.get("organizationId");
+        Long organizationId = organizationIdStr == null ? null : Long.valueOf(organizationIdStr);
         logger.debug("参数组织id为[{}]", organizationId);
 
         logger.info("开始初始化");
@@ -80,7 +82,8 @@ public class MemberInitJob {
             params = {@JobParam(name = "organizationId", description = "组织id")})
     public void fixInitRdmMembersPlus(Map<String, Object> param) {
         // <> 获取组织
-        long organizationId = Long.parseLong((String) param.get("organizationId"));
+        String organizationIdStr = (String) param.get("organizationId");
+        Long organizationId = organizationIdStr == null ? null : Long.valueOf(organizationIdStr);
         logger.debug("参数组织id为[{}]", organizationId);
 
         logger.info("开始初始化");
