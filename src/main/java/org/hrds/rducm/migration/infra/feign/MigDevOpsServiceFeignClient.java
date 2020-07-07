@@ -34,27 +34,4 @@ public interface MigDevOpsServiceFeignClient {
             @RequestParam(required = false) int page,
             @RequestParam(required = false) int size,
             @RequestBody(required = false) String searchParam);
-
-    //    // FIXME 废弃
-    /**
-     * 项目下分页查询应用服务
-     *
-     * @param projectId
-     * @param isActive    服务是否启用
-     * @param checkMember 是否校验团队成员权限
-     * @param doPage
-     * @param page
-     * @param size
-     * @param params
-     * @return
-     */
-    @PostMapping("/v1/projects/{project_id}/app_service/page_by_options")
-    ResponseEntity<Page<C7nAppServiceVO>> pageAppServiceByOptions(@PathVariable(value = "project_id") Long projectId,
-                                                                  @RequestParam(value = "active", required = false) Boolean isActive,
-                                                                  @RequestParam(value = "checkMember", required = false) Boolean checkMember,
-                                                                  @RequestParam(value = "doPage", required = false) Boolean doPage,
-                                                                  @RequestParam(required = false) Integer page,
-                                                                  @RequestParam(required = false) Integer size,
-                                                                  @RequestBody(required = false) String params);
-
 }
