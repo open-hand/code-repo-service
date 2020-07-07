@@ -134,7 +134,12 @@ public class GitlabProjectApi {
                     .getProjectApi()
                     .getProject(projectId);
         } catch (GitLabApiException e) {
-            throw new GitlabClientException(e, e.getMessage());
+            // Gitlab查询到不存在的资源会返回404
+            if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                return null;
+            } else {
+                throw new GitlabClientException(e, e.getMessage());
+            }
         }
     }
 
