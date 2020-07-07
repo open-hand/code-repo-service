@@ -10,5 +10,4 @@ import java.util.Map;
  * @date 2020/6/30
  */
 public interface MigDevopsServiceFacade {
-    Map<Long, Long> listC7nAppServiceIdsMapOnProjectLevel(Long projectId);
 }

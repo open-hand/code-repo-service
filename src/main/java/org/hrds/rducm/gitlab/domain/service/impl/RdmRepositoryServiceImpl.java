@@ -55,6 +55,11 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
             // 查询Gitlab项目
             Project glProject = gitlabProjectApi.getProject(glProjectId);
 
+            // Gitlab项目为空直接返回
+            if (glProject == null) {
+                return;
+            }
+
             // 判断仓库是否初始化了, 暂根据是否有默认分支判定
             boolean repositoryEnabled = glProject.getDefaultBranch() != null;
 

@@ -107,7 +107,7 @@ public class RdmMemberApplicantProjController extends BaseController {
                                     @PathVariable Long projectId,
                                     @RequestBody MemberApplicantCreateDTO memberApplicantCreateDTO) {
         validObject(memberApplicantCreateDTO);
-        rdmMemberApplicantValidator.validateCreateDTO(projectId, memberApplicantCreateDTO);
+        rdmMemberApplicantValidator.validateCreateDTO(organizationId, projectId, memberApplicantCreateDTO);
 
         iRdmMemberApplicantService.createApproval(organizationId, projectId, memberApplicantCreateDTO);
         return Results.success();
