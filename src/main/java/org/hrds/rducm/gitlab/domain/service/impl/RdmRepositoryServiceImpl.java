@@ -55,6 +55,7 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
             // 查询Gitlab项目
             Project glProject = gitlabProjectApi.getProject(glProjectId);
 
+            // Gitlab项目为空直接返回
             if (glProject == null) {
                 return;
             }
