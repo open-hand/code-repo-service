@@ -1,7 +1,6 @@
 package org.hrds.rducm.migration.domain.service.impl;
 
 import io.choerodon.core.domain.Page;
-import io.choerodon.mybatis.pagehelper.PageHelper;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
@@ -11,7 +10,6 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
 import org.hrds.rducm.migration.domain.facade.MigDevopsServiceFacade;
 import org.hrds.rducm.migration.domain.service.Version023STemp1ervice;
-import org.hrds.rducm.migration.domain.service.Version023Service;
 import org.hrds.rducm.migration.infra.feign.MigDevOpsServiceFeignClient;
 import org.hrds.rducm.migration.infra.feign.vo.DevopsUserPermissionVO;
 import org.slf4j.Logger;
@@ -53,20 +51,24 @@ public class Version023ServiceTemp1Impl implements Version023STemp1ervice {
     private MigDevopsServiceFacade migDevopsServiceFacade;
 
     @Override
-    public void initAllPrivilegeOnSiteLevel() {
+    public void initAllPrivilegeOnSiteLevel(Long paramTenantId) {
 
 
         final ExecutorService pool = new ThreadPoolExecutor(THREAD_COUNT,
                 THREAD_COUNT,
-                1000,
-                TimeUnit.MILLISECONDS,
-                new ArrayBlockingQueue<>(50),
-                new ThreadPoolExecutor.CallerRunsPolicy());
+                60,
+                TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(1000),
+                new ThreadPoolExecutor.AbortPolicy());
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
         List<C7nTenantVO> c7nTenantVOS = c7nBaseServiceFacade.listAllOrgs();
+
+        if (paramTenantId != null) {
+            c7nTenantVOS = c7nTenantVOS.stream().filter(v -> v.getTenantId().equals(paramTenantId)).collect(Collectors.toList());
+        }
 
         // 需要导入的项目集合
         Map<Long, Set<Long>> orgProjects = new HashMap<>();
@@ -82,36 +84,36 @@ public class Version023ServiceTemp1Impl implements Version023STemp1ervice {
             orgProjects.put(organizationId, projectIds);
             projectCount.addAndGet(projectIds.size());
         });
-//        Semaphore semaphore = new Semaphore(THREAD_COUNT);
+        Semaphore semaphore = new Semaphore(THREAD_COUNT);
 
 
         // 保证所有线程完成后, 再继续主线程
         CountDownLatch countDownLatch = new CountDownLatch(projectCount.get());
 
         // 记录导入失败的组织和项目
-        Map<String, String> errorProjects = new HashMap<>(16);
+        Map<String, String> errorProjects = new ConcurrentHashMap<>(16);
 
         orgProjects.forEach((organizationId, projectIds) -> {
             logger.info("该组织{} 下的所有项目为{}", organizationId, projectIds);
 
             projectIds.forEach(projectId -> {
-//                try {
-//                    semaphore.acquire();
-//                } catch (InterruptedException e) {
-//                    Thread.currentThread().interrupt();
-//                    throw new RuntimeException(e);
-//                }
+                try {
+                    semaphore.acquire();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(e);
+                }
 
                 pool.execute(() -> {
                     try {
                         // 每个项目提交一个事务
                         projectLevel(organizationId, projectId);
                     } catch (Exception e) {
-                        logger.error("导入失败的组织项目为:{}", organizationId);
+                        logger.error("导入失败的组织项目为:{}-{}", organizationId, projectId);
                         errorProjects.put(organizationId + "-" + projectId, e.getMessage());
                         throw e;
                     } finally {
-//                        semaphore.release();
+                        semaphore.release();
                         countDownLatch.countDown();
                     }
                 });
@@ -129,6 +131,7 @@ public class Version023ServiceTemp1Impl implements Version023STemp1ervice {
         stopWatch.stop();
         logger.info(stopWatch.prettyPrint());
 
+        logger.info("countDownLatch count:{}", countDownLatch.getCount());
         if (errorProjects.isEmpty()) {
             logger.info("导入成功");
         } else {

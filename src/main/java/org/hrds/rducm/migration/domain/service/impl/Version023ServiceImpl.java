@@ -57,10 +57,10 @@ public class Version023ServiceImpl implements Version023Service {
 
         final ExecutorService pool = new ThreadPoolExecutor(THREAD_COUNT,
                 THREAD_COUNT,
-                1000,
-                TimeUnit.MILLISECONDS,
-                new ArrayBlockingQueue<>(50),
-                new ThreadPoolExecutor.CallerRunsPolicy());
+                60,
+                TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(1000),
+                new ThreadPoolExecutor.AbortPolicy());
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -82,16 +82,25 @@ public class Version023ServiceImpl implements Version023Service {
             projectCount.addAndGet(projectIds.size());
         });
 
+        Semaphore semaphore = new Semaphore(THREAD_COUNT);
+
         // 保证所有线程完成后, 再继续主线程
         CountDownLatch countDownLatch = new CountDownLatch(projectCount.get());
 
         // 记录导入失败的组织和项目
-        Map<String, String> errorProjects = new HashMap<>(16);
+        Map<String, String> errorProjects = new ConcurrentHashMap<>(16);
 
         orgProjects.forEach((organizationId, projectIds) -> {
             logger.info("该组织{} 下的所有项目为{}", organizationId, projectIds);
 
             projectIds.forEach(projectId -> {
+                try {
+                    semaphore.acquire();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(e);
+                }
+
                 pool.execute(() -> {
                     try {
                         // 每个项目提交一个事务
@@ -101,6 +110,7 @@ public class Version023ServiceImpl implements Version023Service {
                         errorProjects.put(organizationId + "-" + projectId, e.getMessage());
                         throw e;
                     } finally {
+                        semaphore.release();
                         countDownLatch.countDown();
                     }
                 });

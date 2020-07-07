@@ -5,5 +5,5 @@ package org.hrds.rducm.migration.domain.service;
  * @date 2020/6/12
  */
 public interface Version023STemp1ervice {
-    void initAllPrivilegeOnSiteLevel();
+    void initAllPrivilegeOnSiteLevel(Long organizationId);
 }
