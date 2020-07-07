@@ -12,6 +12,7 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.infra.enums.ApplicantTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.ApprovalStateEnum;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.AssertExtensionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,7 +40,8 @@ public class RdmMemberApplicantValidator {
         Integer accessLevel = memberApplicantCreateDTO.getAccessLevel();
 
         // 项目管理员和组织管理员禁止申请
-        Boolean isProjectAdmin = c7nBaseServiceFacade.detailC7nUserOnProjectLevel(projectId, applicantUserId).isProjectAdmin();
+        C7nUserVO c7nUserVO = c7nBaseServiceFacade.detailC7nUserOnProjectLevel(projectId, applicantUserId);
+        Boolean isProjectAdmin = c7nUserVO == null ? true : c7nUserVO.isProjectAdmin();
         Boolean isOrgAdmin = c7nBaseServiceFacade.checkIsOrgAdmin(organizationId, projectId);
         if (isProjectAdmin || isOrgAdmin) {
             throw new CommonException("error.applicantUser.is.projectAdmin.or.orgAdmin");
