@@ -3,6 +3,8 @@ package org.hrds.rducm.migration.domain.service.impl;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.oauth.CustomUserDetails;
+import io.choerodon.core.oauth.DetailsHelper;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
@@ -50,12 +52,17 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
 
     @Override
     public void initAllPrivilegeOnSiteLevel() {
+        CustomUserDetails userDetails = DetailsHelper.getUserDetails();
+        logger.info("userDetails:{}, userId:{}", userDetails, userDetails.getUserId());
+
         final ExecutorService pool = new ThreadPoolExecutor(5,
                 5,
                 1000,
                 TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<>(50),
                 new ThreadPoolExecutor.CallerRunsPolicy());
+
+        logger.info("主线程为{}", Thread.currentThread().getName());
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -66,7 +73,7 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
         CountDownLatch countDownLatch = new CountDownLatch(c7nTenantVOS.size());
 
         // 记录导入失败的组织
-        Map<Long, String> errorOrg = new HashMap<>();
+        Map<Long, String> errorOrg = new ConcurrentHashMap<>(16);
 
         c7nTenantVOS.forEach(vo -> {
             try {
@@ -78,6 +85,7 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
 
             pool.execute(() -> {
                 try {
+                    logger.info("组织{}, 当前执行任务的线程为:{}", vo.getTenantId(), Thread.currentThread().getName());
                     // 每个组织提交一个事务
                     orgLevel(vo.getTenantId());
                 } catch (Exception e) {
@@ -126,10 +134,11 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
         projectIds.forEach(projectId -> {
             // 修复: 排除已导入的应用服务
             Map<Long, Long> allAppServiceIdMap = c7nDevOpsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
-
+            logger.info("组织{}, 项目{}, 总应用服务{}", organizationId, projectId, allAppServiceIdMap);
             Map<Long, Long> appServiceIdMap = migDevopsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
-
+            logger.info("组织{}, 项目{}, 已导入过的应用服务{}", organizationId, projectId, appServiceIdMap);
             Map<Long, Long> newMap = getDifferenceSetByGuava(allAppServiceIdMap, appServiceIdMap);
+            logger.info("组织{}, 项目{}, 需补录的应用服务{}", organizationId, projectId, newMap);
 
             newMap.forEach((repositoryId, glProjectId) -> {
                 logger.info("组织id为{}, 项目id为{}, 代码库id为{}", organizationId, projectId, repositoryId);
@@ -153,11 +162,13 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
                 delete.setRepositoryId(repositoryId);
                 rdmMemberRepository.delete(delete);
             });
+            logger.info("组织{}, 删除的数据为{}", organizationId, deleteReps);
 
 
             // <> 批量插入
             if (!orgList.isEmpty()) {
                 rdmMemberRepository.batchInsertCustom(orgList);
+                logger.info("组织{}的数据导入成功, 共{}条数据", organizationId, orgList.size());
             }
 
             return null;
@@ -173,6 +184,7 @@ public class Version023TempFixServiceImpl implements Version023TempFixService {
         ResponseEntity<Page<DevopsUserPermissionVO>> responseEntity = migDevOpsServiceFeignClient.pagePermissionUsers(projectId, appServiceId, 0, 0, "{}");
         Page<DevopsUserPermissionVO> devopsUserPermissionVOS = FeignUtils.handleResponseEntity(responseEntity);
         List<DevopsUserPermissionVO> list = devopsUserPermissionVOS.getContent();
+        logger.info("组织{}, 项目{}, 应用服务{}, 查询到需导入的成员数量{}", organizationId, projectId, appServiceId, list.size());
 
         // 获取组织管理员
         List<C7nUserVO> orgAdmins = c7nBaseServiceFacade.listOrgAdministrator(organizationId);
