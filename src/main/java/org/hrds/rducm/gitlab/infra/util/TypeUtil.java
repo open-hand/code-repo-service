@@ -63,6 +63,14 @@ public class TypeUtil {
         return GSON.toJson(mapParams);
     }
 
+    public static String castToSearchParam(Map<String, Object> params) {
+        Map<String, Map<String, Object>> mapParams = new HashMap<>(16);
+
+        mapParams.put(TypeUtil.SEARCH_PARAM, params);
+
+        return GSON.toJson(mapParams);
+    }
+
     /**
      * 判断对象中属性值是否全为空
      *

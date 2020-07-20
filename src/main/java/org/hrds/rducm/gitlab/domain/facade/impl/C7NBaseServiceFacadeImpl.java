@@ -9,6 +9,7 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nTenantVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
+import org.hrds.rducm.gitlab.infra.util.TypeUtil;
 import org.hzero.core.util.AssertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,7 +191,7 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
 
     @Override
     public List<C7nUserVO> listDeveloperProjectMembers(Long projectId, String name) {
-        ResponseEntity<List<C7nUserVO>> responseEntity = baseServiceFeignClient.listUsersWithRolesOnProjectLevel(projectId, name, name, null, null);
+        ResponseEntity<List<C7nUserVO>> responseEntity = baseServiceFeignClient.listUsersWithRolesOnProjectLevel(projectId, null, null, null, name);
 
         List<C7nUserVO> c7nUserVOS = FeignUtils.handleResponseEntity(responseEntity);
         return c7nUserVOS;

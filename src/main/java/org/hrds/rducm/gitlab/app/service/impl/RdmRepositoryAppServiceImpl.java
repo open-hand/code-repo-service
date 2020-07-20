@@ -26,8 +26,8 @@ public class RdmRepositoryAppServiceImpl implements RdmRepositoryAppService {
      * @return
      */
     @Override
-    public List<BaseC7nAppServiceViewDTO> listByActive(Long projectId) {
-        List<C7nAppServiceVO> appServiceVOS = c7NDevOpsServiceFacade.listAppServiceByActive(projectId);
+    public List<BaseC7nAppServiceViewDTO> listByActive(Long projectId, String condition) {
+        List<C7nAppServiceVO> appServiceVOS = c7NDevOpsServiceFacade.listAppServiceByActive(projectId, condition);
 
         return ConvertUtils.convertList(appServiceVOS, BaseC7nAppServiceViewDTO::convert);
     }

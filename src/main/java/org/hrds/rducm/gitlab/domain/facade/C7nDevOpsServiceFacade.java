@@ -109,9 +109,10 @@ public interface C7nDevOpsServiceFacade {
      * 获取项目已经启用的应用服务
      *
      * @param projectId
+     * @param condition 支持编码和名称查询
      * @return
      */
-    List<C7nAppServiceVO> listAppServiceByActive(Long projectId);
+    List<C7nAppServiceVO> listAppServiceByActive(Long projectId, String condition);
 
     /**
      * 获取devops服务项目的信息
