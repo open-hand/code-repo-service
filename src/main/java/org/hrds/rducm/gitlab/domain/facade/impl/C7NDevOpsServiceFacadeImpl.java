@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.domain.facade.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -175,12 +177,17 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
     public List<C7nAppServiceVO> listAppServiceByActive(Long projectId, String condition) {
         // 获取所有已经启用的服务
         // 将参数转换为json格式
-        Map<String, Object> map = new HashMap<>(16);
-        map.put("active", "1");
-        map.put("code", condition);
-        map.put("name", condition);
+//        Map<String, Object> map = new HashMap<>(16);
+//        map.put("active", "1");
+//        map.put("code", condition);
+//        map.put("name", condition);
+//
+//        String params = TypeUtil.castToSearchParam(map);
 
-        String params = TypeUtil.castToSearchParam(map);
+        String params = new TypeUtil.ParamsBuilder()
+                .searchParam("active", "1")
+                .param("params", condition)
+                .build();
 
         ResponseEntity<Page<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppService(projectId, 0, 0, params);
 

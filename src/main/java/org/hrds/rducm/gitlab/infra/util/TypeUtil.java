@@ -98,4 +98,32 @@ public class TypeUtil {
     public static <T> List<T> getListWithType(Map<Class, List> map, Class<T> key) {
         return (List<T>) map.get(key);
     }
+
+    public static class ParamsBuilder {
+        private Map<String, Object> searchParamMap = new HashMap<>();
+        private Map<String, Object> paramMap = new HashMap<>();
+
+        public ParamsBuilder searchParam(String key, Object value) {
+            searchParamMap.put(key, value);
+            return this;
+        }
+
+        public ParamsBuilder param(String key, Object value) {
+            paramMap.put(key, value);
+            return this;
+        }
+
+        public String build() {
+            Map<String, Object> result = new HashMap<>();
+            if (!searchParamMap.isEmpty()) {
+                result.put(TypeUtil.SEARCH_PARAM, searchParamMap);
+            }
+
+            if (!paramMap.isEmpty()) {
+                result.put(TypeUtil.PARAMS, paramMap);
+            }
+
+            return GSON.toJson(result);
+        }
+    }
 }
