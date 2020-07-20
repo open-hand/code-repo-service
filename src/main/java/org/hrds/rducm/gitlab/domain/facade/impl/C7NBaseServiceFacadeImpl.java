@@ -190,7 +190,7 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
 
     @Override
     public List<C7nUserVO> listDeveloperProjectMembers(Long projectId, String name) {
-        ResponseEntity<List<C7nUserVO>> responseEntity = baseServiceFeignClient.listUsersWithRolesOnProjectLevel(projectId, null, name, null, null);
+        ResponseEntity<List<C7nUserVO>> responseEntity = baseServiceFeignClient.listUsersWithRolesOnProjectLevel(projectId, name, name, null, null);
 
         List<C7nUserVO> c7nUserVOS = FeignUtils.handleResponseEntity(responseEntity);
         return c7nUserVOS;
