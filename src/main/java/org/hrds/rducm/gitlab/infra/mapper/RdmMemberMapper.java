@@ -23,4 +23,12 @@ public interface RdmMemberMapper extends BaseMapper<RdmMember> {
     List<MemberAuthDetailAgg> selectMembersRepositoryAuthorized(@Param("organizationId") Long organizationId,
                                                                 @Param("projectId") Long projectId,
                                                                 @Param("userIds") Set<Long> userIds);
+
+    /**
+     * 批量插入
+     *
+     * @param list
+     * @return
+     */
+    int batchInsertCustom(List<RdmMember> list);
 }

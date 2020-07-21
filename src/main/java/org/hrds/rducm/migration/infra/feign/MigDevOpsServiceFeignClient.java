@@ -2,6 +2,7 @@ package org.hrds.rducm.migration.infra.feign;
 
 import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.infra.feign.fallback.DevOpsServiceFeignClientFallBackFactory;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.migration.infra.feign.vo.DevopsUserPermissionVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;

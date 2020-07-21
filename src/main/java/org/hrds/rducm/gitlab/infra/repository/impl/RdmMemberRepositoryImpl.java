@@ -110,6 +110,11 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
         return this.selectCountByCondition(condition);
     }
 
+    @Override
+    public int batchInsertCustom(List<RdmMember> list) {
+        return rdmMemberMapper.batchInsertCustom(list);
+    }
+
     //
     // 不可复用方法
     // ------------------------------------------------------------------------------

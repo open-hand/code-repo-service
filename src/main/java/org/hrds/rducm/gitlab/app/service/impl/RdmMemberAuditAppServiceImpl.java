@@ -94,7 +94,8 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
         AssertExtensionUtils.notNull(dbRecord, "该记录不存在");
 
         Long userId = dbRecord.getUserId();
-        Integer glUserId = dbRecord.getGlUserId();
+        // 若glUserId为null, 获取glUserId
+        Integer glUserId = dbRecord.getGlUserId() != null ? dbRecord.getGlUserId() : c7NBaseServiceFacade.userIdToGlUserId(userId);
         Integer glProjectId = dbRecord.getGlProjectId();
         C7nDevopsProjectVO c7nDevopsProjectVO = c7NDevOpsServiceFacade.detailDevopsProjectById(projectId);
         Integer glGroupId = Math.toIntExact(c7nDevopsProjectVO.getGitlabGroupId());

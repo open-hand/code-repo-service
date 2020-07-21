@@ -1,19 +1,13 @@
 package org.hrds.rducm.migration.app.job;
 
 import io.choerodon.asgard.schedule.annotation.JobTask;
-import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
-import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
-import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.migration.domain.service.Version023Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StopWatch;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 初始化Gitlab权限到代码库的任务
@@ -29,7 +23,7 @@ public class MemberInitJob {
     private Version023Service version023Service;
 
     /**
-     * 上线时初始化Gitlab成员到代码库
+     * 0.23.0版本上线时初始化Gitlab成员到代码库
      *
      * @param map
      */

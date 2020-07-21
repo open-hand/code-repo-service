@@ -25,18 +25,19 @@ public interface DevOpsServiceFeignClient {
     ResponseEntity<List<C7nAppServiceVO>> listAppServiceByActive(@PathVariable Long projectId);
 
     /**
-     * 项目下分页查询应用服务
+     * 内部查询项目下的应用服务 / 不区分权限
      *
      * @param projectId
-     * @param doPage
+     * @param page
+     * @param size
      * @param params
+     * @return
      */
-    @PostMapping("/v1/projects/{project_id}/app_service/page_by_options")
-    ResponseEntity<Page<C7nAppServiceVO>> pageAppServiceByOptions(@PathVariable(value = "project_id") Long projectId,
-                                                                  @RequestParam(value = "doPage", required = false) Boolean doPage,
-                                                                  @RequestParam(required = false) Integer page,
-                                                                  @RequestParam(required = false) Integer size,
-                                                                  @RequestBody(required = false) String params);
+    @PostMapping("/v1/projects/{project_id}/app_service/page_by_options_internal")
+    ResponseEntity<Page<C7nAppServiceVO>> pageAppService(@PathVariable("project_id") Long projectId,
+                                                         @RequestParam(required = false) Integer page,
+                                                         @RequestParam(required = false) Integer size,
+                                                         @RequestBody(required = false) String params);
 
     /**
      * 通过一组id分页查询或者不传id时进行分页查询

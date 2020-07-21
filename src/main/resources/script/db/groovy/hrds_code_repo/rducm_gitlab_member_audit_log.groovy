@@ -1,7 +1,7 @@
 package script.db.groovy.hrds_code_repo
 
 databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member_audit_log.groovy') {
-    changeSet(author: "ying.xie@hand-china.com", id: "2020-06-05-rducm_gitlab_member_audit_log") {
+    changeSet(author: "ying.xie@hand-china.com", id: "2020-06-19-rducm_gitlab_member_audit_log") {
         def weight = 1
         if (helper.isSqlServer()) {
             weight = 2
@@ -12,7 +12,7 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member_audit_log.groo
             createSequence(sequenceName: 'rducm_gitlab_member_audit_log_s', startValue: "1")
         }
         createTable(tableName: "rducm_gitlab_member_audit_log", remarks: "成员权限审计日志表") {
-            column(name: "id", type: "bigint(20)", autoIncrement: true, remarks: "主键") { constraints(primaryKey: true) }
+            column(name: "id", type: "bigint(20)", autoIncrement: true, remarks: "") { constraints(primaryKey: true) }
             column(name: "organization_id", type: "bigint(20)", remarks: "组织id")
             column(name: "project_id", type: "bigint(20)", remarks: "项目id")
             column(name: "repository_id", type: "bigint(20)", remarks: "代码库id")

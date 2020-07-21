@@ -2,7 +2,6 @@ package org.hrds.rducm.gitlab.domain.facade.impl;
 
 import com.google.common.collect.Sets;
 import io.choerodon.core.domain.Page;
-import io.choerodon.core.exception.CommonException;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nOrgAdministratorVO;
@@ -11,7 +10,6 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nTenantVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
 import org.hzero.core.util.AssertUtils;
-import org.hzero.core.util.ResponseUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

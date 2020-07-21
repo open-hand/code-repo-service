@@ -29,7 +29,7 @@ public class DevOpsServiceFeignClientFallBackFactory implements FallbackFactory<
             }
 
             @Override
-            public ResponseEntity<Page<C7nAppServiceVO>> pageAppServiceByOptions(Long projectId, Boolean doPage, Integer page, Integer size, String params) {
+            public ResponseEntity<Page<C7nAppServiceVO>> pageAppService(Long projectId, Integer page, Integer size, String params) {
                 throw new CommonException("error.feign.fallback");
             }
 

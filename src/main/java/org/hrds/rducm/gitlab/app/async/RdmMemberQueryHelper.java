@@ -14,10 +14,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.*;
 
 /**
+ * TODO 查询多线程优化, 待完成
  * @author ying.xie@hand-china.com
  * @date 2020/6/8
  */
@@ -70,13 +73,49 @@ public class RdmMemberQueryHelper {
         logger.info("封装通用查询, 异步开启");
         // 根据params多条件查询
         if (!StringUtils.isEmpty(params)) {
-            Set<Long> userIdsSet1 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, params, null);
-            Set<Long> userIdsSet2 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, null, params);
+
+            FutureTask<Set<Long>> futureTask1 = new FutureTask<>(() -> {
+                Set<Long> userIdsSet1 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, params, null);
+                return userIdsSet1;
+            });
+
+            FutureTask<Set<Long>> futureTask2 = new FutureTask<>(() -> {
+                Set<Long> userIdsSet2 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, null, params);
+                return userIdsSet2;
+            });
+
+            FutureTask<Set<Long>> futureTask3 = new FutureTask<>(() -> {
+                Set<Long> repositoryIdSet = c7NDevOpsServiceFacade.listC7nAppServiceIdsByNameOnProjectLevel(projectId, params);
+                return repositoryIdSet;
+            });
+
+            ExecutorService executorService = Executors.newFixedThreadPool(3);
+            executorService.submit(futureTask1);
+            executorService.submit(futureTask2);
+            executorService.submit(futureTask3);
+
+            Set<Long> userIdsSet1 = Collections.emptySet();
+            Set<Long> userIdsSet2 = Collections.emptySet();
+            Set<Long> repositoryIdSet = Collections.emptySet();
+            try {
+                userIdsSet1 = futureTask1.get();
+                userIdsSet2 = futureTask2.get();
+                repositoryIdSet = futureTask3.get();
+            } catch (InterruptedException | ExecutionException e) {
+                Thread.currentThread().interrupt();
+                e.printStackTrace();
+            }
             Set<Long> userIdsSet = new HashSet<>();
             userIdsSet.addAll(userIdsSet1);
             userIdsSet.addAll(userIdsSet2);
 
-            Set<Long> repositoryIdSet = c7NDevOpsServiceFacade.listC7nAppServiceIdsByNameOnProjectLevel(projectId, params);
+//            Set<Long> userIdsSet1 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, params, null);
+//            Set<Long> userIdsSet2 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, null, params);
+//            Set<Long> userIdsSet = new HashSet<>();
+//            userIdsSet.addAll(userIdsSet1);
+//            userIdsSet.addAll(userIdsSet2);
+//
+//            Set<Long> repositoryIdSet = c7NDevOpsServiceFacade.listC7nAppServiceIdsByNameOnProjectLevel(projectId, params);
 
             boolean userIsEmpty = userIdsSet.isEmpty();
             boolean repositoryIsEmpty = repositoryIdSet.isEmpty();

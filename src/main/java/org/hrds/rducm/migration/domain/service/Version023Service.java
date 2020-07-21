@@ -8,6 +8,4 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public interface Version023Service {
     void initAllPrivilegeOnSiteLevel();
-
-    void orgLevel(Long organizationId);
 }

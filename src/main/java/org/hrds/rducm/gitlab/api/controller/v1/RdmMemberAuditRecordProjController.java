@@ -49,21 +49,6 @@ public class RdmMemberAuditRecordProjController extends BaseController {
         return Results.success(iRdmMemberAuditRecordService.pageByOptions(organizationId, Collections.singleton(projectId), repositoryIds, pageRequest, queryDTO, ResourceLevel.ORGANIZATION));
     }
 
-    /**
-     * TODO 废弃
-     * @param id
-     * @param syncStrategy
-     * @return
-     */
-    @ApiOperation(value = "同步(废弃)")
-    @Permission(level = ResourceLevel.ORGANIZATION)
-    @PostMapping("/{id}/sync")
-    @Deprecated
-    public ResponseEntity<?> sync(@Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGMAR) @PathVariable Long id, @RequestParam int syncStrategy) {
-        rdmMemberAuditAppService.syncByStrategy(id, syncStrategy);
-        return Results.success();
-    }
-
     @ApiOperation(value = "权限修复")
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/{id}/audit-fix")

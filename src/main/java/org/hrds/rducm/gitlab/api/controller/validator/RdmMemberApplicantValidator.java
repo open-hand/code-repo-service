@@ -6,11 +6,13 @@ import org.apache.commons.lang3.EnumUtils;
 import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApplicantCreateDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberApplicantRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.infra.enums.ApplicantTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.ApprovalStateEnum;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.AssertExtensionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,13 +29,23 @@ public class RdmMemberApplicantValidator {
     private RdmMemberApplicantRepository rdmMemberApplicantRepository;
     @Autowired
     private RdmMemberRepository rdmMemberRepository;
+    @Autowired
+    private C7nBaseServiceFacade c7nBaseServiceFacade;
 
-    public void validateCreateDTO(Long projectId, MemberApplicantCreateDTO memberApplicantCreateDTO) {
+    public void validateCreateDTO(Long organizationId, Long projectId, MemberApplicantCreateDTO memberApplicantCreateDTO) {
         Long repositoryId = memberApplicantCreateDTO.getRepositoryId();
         Long applicantUserId = DetailsHelper.getUserDetails().getUserId();
         String applicantType = memberApplicantCreateDTO.getApplicantType();
 
         Integer accessLevel = memberApplicantCreateDTO.getAccessLevel();
+
+        // 项目管理员和组织管理员禁止申请
+        C7nUserVO c7nUserVO = c7nBaseServiceFacade.detailC7nUserOnProjectLevel(projectId, applicantUserId);
+        Boolean isProjectAdmin = c7nUserVO == null ? true : c7nUserVO.isProjectAdmin();
+        Boolean isOrgAdmin = c7nBaseServiceFacade.checkIsOrgAdmin(organizationId, projectId);
+        if (isProjectAdmin || isOrgAdmin) {
+            throw new CommonException("error.applicantUser.is.projectAdmin.or.orgAdmin");
+        }
 
         // 校验是否有为待审批的申请
         RdmMemberApplicant dbRdmMemberApplicant = rdmMemberApplicantRepository.selectOneWithPending(projectId, repositoryId, applicantUserId);

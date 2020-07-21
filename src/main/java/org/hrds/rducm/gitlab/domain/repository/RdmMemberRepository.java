@@ -86,4 +86,11 @@ public interface RdmMemberRepository extends BaseRepository<RdmMember> {
      */
     List<MemberAuthDetailAgg> selectMembersRepositoryAuthorized(Long organizationId, Long projectId, Set<Long> userIds);
 
+    /**
+     * 批量插入
+     *
+     * @param list
+     * @return
+     */
+    int batchInsertCustom(List<RdmMember> list);
 }

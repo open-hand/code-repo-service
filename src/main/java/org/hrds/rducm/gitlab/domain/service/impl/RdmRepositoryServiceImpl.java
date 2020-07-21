@@ -17,6 +17,7 @@ import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 import java.util.Set;
 
@@ -46,14 +47,23 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
         Page<RepositoryOverViewDTO> repositoryOverViewDTOPageInfo = ConvertUtils.convertPage(c7nRepositories, s -> new RepositoryOverViewDTO()
                 .setRepositoryId(s.getId())
                 .setRepositoryName(s.getName())
-                .setGlProjectId(Math.toIntExact(s.getGitlabProjectId())));
+                .setGlProjectId(Optional.ofNullable(s.getGitlabProjectId()).map(Long::intValue).orElse(null)));
 
         // <2> 封装展示参数
         repositoryOverViewDTOPageInfo.getContent().forEach(repo -> {
             Integer glProjectId = repo.getGlProjectId();
 
+            if (glProjectId == null) {
+                return;
+            }
+
             // 查询Gitlab项目
             Project glProject = gitlabProjectApi.getProject(glProjectId);
+
+            // Gitlab项目为空直接返回
+            if (glProject == null) {
+                return;
+            }
 
             // 判断仓库是否初始化了, 暂根据是否有默认分支判定
             boolean repositoryEnabled = glProject.getDefaultBranch() != null;

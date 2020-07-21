@@ -6,6 +6,7 @@ import io.choerodon.asgard.saga.annotation.SagaTask;
 import io.choerodon.core.exception.CommonException;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTaskCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
+import org.hrds.rducm.gitlab.app.eventhandler.payload.AppServiceImportPayload;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.DevOpsAppServicePayload;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
@@ -50,43 +51,62 @@ public class RdmRepositorySagaHandler {
     private RdmOperationLogRepository rdmOperationLogRepository;
 
     /**
-     * 代码库初始化权限
+     * 创建应用服务事件后 代码库初始化权限
      */
     @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_INIT_PRIVILEGE,
             description = "代码库初始化权限",
             sagaCode = SagaTopicCodeConstants.DEVOPS_CREATE_APPLICATION_SERVICE,
             maxRetryCount = 3,
             seq = 2)
-    public String initPrivilege(String data) {
+    public String initPrivilegeWhenCreate(String data) {
         DevOpsAppServicePayload devOpsAppServicePayload = gson.fromJson(data, DevOpsAppServicePayload.class);
+
         Long projectId = devOpsAppServicePayload.getIamProjectId();
         Long organizationId = devOpsAppServicePayload.getOrganizationId();
         Long repositoryId = devOpsAppServicePayload.getAppServiceId();
-        Integer glProjectId = c7nDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
 
-        // 初始化权限到代码库
+        initPrivilege(organizationId, projectId, repositoryId);
 
-        // 获取项目团队成员
-        List<C7nUserVO> c7nUserVOS = c7nBaseServiceFacade.listC7nUsersOnProjectLevel(projectId);
-        // 获取组织管理员
-        List<C7nUserVO> orgAdmins = c7nBaseServiceFacade.listOrgAdministrator(organizationId);
-        Map<Long, C7nUserVO> orgAdminsMap = orgAdmins.stream().collect(Collectors.toMap(C7nUserVO::getId, v -> v));
+        return data;
+    }
 
-        // 获取需初始化的用户
-        List<C7nUserVO> result = c7nUserVOS.stream()
-                // 筛选出"项目管理员"或"组织管理员"用户
-                .filter(vo -> {
-                    // 是否是项目管理员
-                    boolean isProjectAdmin = vo.getRoles().stream().anyMatch(r -> r.getCode().equals(IamRoleCodeEnum.PROJECT_OWNER.getCode()));
-                    // 是否是组织管理员
-                    boolean isOrgAdmin = orgAdminsMap.containsKey(vo.getId());
-                    return isProjectAdmin || isOrgAdmin;
-                }).collect(Collectors.toList());
+    /**
+     * Devops从外部代码平台导入到gitlab项目事件后, 初始化代码库权限
+     */
+    @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_INIT_PRIVILEGE,
+            description = "Devops从外部代码平台导入到gitlab项目",
+            sagaCode = SagaTopicCodeConstants.DEVOPS_IMPORT_GITLAB_PROJECT,
+            maxRetryCount = 3,
+            seq = 2)
+    public String initPrivilegeWhenImportFromGit(String data) {
+        DevOpsAppServicePayload devOpsAppServicePayload = gson.fromJson(data, DevOpsAppServicePayload.class);
 
-        result.forEach(r -> {
-            Integer glUserId = Optional.ofNullable(c7nBaseServiceFacade.userIdToGlUserId(r.getId())).orElseThrow(() -> new CommonException("error.glUserId.is.null"));
-            rdmMemberRepository.insertWithOwner(organizationId, projectId, repositoryId, r.getId(), glProjectId, glUserId);
-        });
+        Long projectId = devOpsAppServicePayload.getIamProjectId();
+        Long organizationId = devOpsAppServicePayload.getOrganizationId();
+        Long repositoryId = devOpsAppServicePayload.getAppServiceId();
+
+        initPrivilege(organizationId, projectId, repositoryId);
+
+        return data;
+    }
+
+    /**
+     * devops导入内部应用服务后, 初始化代码库权限
+     */
+    @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_INIT_PRIVILEGE,
+            description = "devops导入内部应用服务",
+            sagaCode = SagaTopicCodeConstants.DEVOPS_IMPORT_INTERNAL_APPLICATION_SERVICE,
+            maxRetryCount = 3,
+            seq = 2)
+    public String initPrivilegeWhenImportInternal(String data) {
+        AppServiceImportPayload appServiceImportPayload = gson.fromJson(data, AppServiceImportPayload.class);
+
+        Long projectId = appServiceImportPayload.getProjectId();
+        Long organizationId = c7nBaseServiceFacade.getOrganizationId(projectId);
+        Long repositoryId = appServiceImportPayload.getAppServiceId();
+
+        initPrivilege(organizationId, projectId, repositoryId);
+
         return data;
     }
 
@@ -124,5 +144,41 @@ public class RdmRepositorySagaHandler {
         logger.info("删除应用服务后情况代码库权限成功，repositoryId：{}", repositoryId);
 
         return data;
+    }
+
+    /**
+     * 创建应用服务有3个来源, 都需要初始化代码库权限
+     *
+     * @param organizationId
+     * @param projectId
+     * @param repositoryId
+     */
+    private void initPrivilege(Long organizationId, Long projectId, Long repositoryId) {
+
+        Integer glProjectId = c7nDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
+
+        // 初始化权限到代码库
+
+        // 获取项目团队成员
+        List<C7nUserVO> c7nUserVOS = c7nBaseServiceFacade.listC7nUsersOnProjectLevel(projectId);
+        // 获取组织管理员
+        List<C7nUserVO> orgAdmins = c7nBaseServiceFacade.listOrgAdministrator(organizationId);
+        Map<Long, C7nUserVO> orgAdminsMap = orgAdmins.stream().collect(Collectors.toMap(C7nUserVO::getId, v -> v));
+
+        // 获取需初始化的用户
+        List<C7nUserVO> result = c7nUserVOS.stream()
+                // 筛选出"项目管理员"或"组织管理员"用户
+                .filter(vo -> {
+                    // 是否是项目管理员
+                    boolean isProjectAdmin = vo.getRoles().stream().anyMatch(r -> r.getCode().equals(IamRoleCodeEnum.PROJECT_OWNER.getCode()));
+                    // 是否是组织管理员
+                    boolean isOrgAdmin = orgAdminsMap.containsKey(vo.getId());
+                    return isProjectAdmin || isOrgAdmin;
+                }).collect(Collectors.toList());
+
+        result.forEach(r -> {
+            Integer glUserId = Optional.ofNullable(c7nBaseServiceFacade.userIdToGlUserId(r.getId())).orElseThrow(() -> new CommonException("error.glUserId.is.null"));
+            rdmMemberRepository.insertWithOwner(organizationId, projectId, repositoryId, r.getId(), glProjectId, glUserId);
+        });
     }
 }
