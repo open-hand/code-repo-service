@@ -33,8 +33,8 @@ public class RdmRepositoryProjController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/list-by-active")
     public ResponseEntity<List<BaseC7nAppServiceViewDTO>> listByActive(@PathVariable(value = "projectId") Long projectId,
-                                                                       @RequestParam(required = false) String params) {
-        return ResponseEntity.ok(rdmRepositoryAppService.listByActive(projectId, params));
+                                                                       @RequestParam(required = false) String condition) {
+        return ResponseEntity.ok(rdmRepositoryAppService.listByActive(projectId, condition));
     }
 
     @ApiOperation(value = "查询项目总览(项目层)")

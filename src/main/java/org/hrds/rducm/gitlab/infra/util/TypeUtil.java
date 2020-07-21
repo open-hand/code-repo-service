@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,16 +101,22 @@ public class TypeUtil {
     }
 
     public static class ParamsBuilder {
-        private Map<String, Object> searchParamMap = new HashMap<>();
-        private Map<String, Object> paramMap = new HashMap<>();
+        private final Map<String, Object> searchParamMap = new HashMap<>();
+        private final List<String> paramList = new ArrayList<>();
 
         public ParamsBuilder searchParam(String key, Object value) {
-            searchParamMap.put(key, value);
+            if (StringUtils.isNotEmpty(key)) {
+                searchParamMap.put(key, value);
+            }
+
             return this;
         }
 
-        public ParamsBuilder param(String key, Object value) {
-            paramMap.put(key, value);
+        public ParamsBuilder param(String value) {
+            if (StringUtils.isNotEmpty(value)) {
+                paramList.add(value);
+            }
+
             return this;
         }
 
@@ -119,8 +126,8 @@ public class TypeUtil {
                 result.put(TypeUtil.SEARCH_PARAM, searchParamMap);
             }
 
-            if (!paramMap.isEmpty()) {
-                result.put(TypeUtil.PARAMS, paramMap);
+            if (!paramList.isEmpty()) {
+                result.put(TypeUtil.PARAMS, paramList);
             }
 
             return GSON.toJson(result);

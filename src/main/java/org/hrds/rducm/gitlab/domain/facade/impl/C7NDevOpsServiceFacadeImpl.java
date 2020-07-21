@@ -177,16 +177,9 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
     public List<C7nAppServiceVO> listAppServiceByActive(Long projectId, String condition) {
         // 获取所有已经启用的服务
         // 将参数转换为json格式
-//        Map<String, Object> map = new HashMap<>(16);
-//        map.put("active", "1");
-//        map.put("code", condition);
-//        map.put("name", condition);
-//
-//        String params = TypeUtil.castToSearchParam(map);
-
         String params = new TypeUtil.ParamsBuilder()
                 .searchParam("active", "1")
-                .param("params", condition)
+                .param(condition)
                 .build();
 
         ResponseEntity<Page<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.pageAppService(projectId, 0, 0, params);
