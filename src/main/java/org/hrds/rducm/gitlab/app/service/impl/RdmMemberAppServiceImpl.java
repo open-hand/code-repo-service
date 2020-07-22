@@ -95,20 +95,9 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                         .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
                         .andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIds, true))
                 .build();
-        // TODO 使用多线程优化
+        // TODO 可使用多线程优化
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-//        try {
-//            ListenableFuture<Integer> future1 = rdmMemberQueryHelper.userCondition(projectId, realName, loginName, condition);
-//            ListenableFuture<Integer> future2 = rdmMemberQueryHelper.repositoryCondition(projectId, repositoryName, condition);
-//            ListenableFuture<Integer> future3 = rdmMemberQueryHelper.paramsCondition(projectId, params, condition);
-//
-//            if (future1.get() == 0 || future2.get() == 0 || future3.get() == 0) {
-//                return new Page<>();
-//            }
-//        } catch (InterruptedException | ExecutionException e) {
-//            throw new RuntimeException(e);
-//        }
 
         // 调用外部接口模糊查询 用户名或登录名
         if (!StringUtils.isEmpty(realName) || !StringUtils.isEmpty(loginName)) {
@@ -397,34 +386,6 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         // <2> 处理过期成员
         iRdmMemberService.batchExpireMembers(expiredRdmMembers);
-    }
-
-    @Override
-    @Saga(code = RDUCM_BATCH_ADD_MEMBERS, description = "批量添加代码库成员")
-    @Transactional(rollbackFor = Exception.class)
-    public void batchAddMemberSagaDemo(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
-        // <0> 校验入参 + 转换
-        List<RdmMember> rdmMembers = rdmMemberAssembler.rdmMemberBatchDTOToRdmMembers(organizationId, projectId, rdmMemberBatchDTO);
-
-        // <1> 数据库添加成员, 已存在需要更新, 发起一个新事务
-        // 开启新事务的目的是使这一步操作独立执行, 保证预操作成功
-        self().batchAddOrUpdateMembersBeforeRequestsNew(rdmMembers);
-
-        // 检测Gitlab是否无法修改权限
-        // 当该成员
-
-
-        // 创建saga
-        producer.apply(
-                StartSagaBuilder.newBuilder()
-                        .withLevel(ResourceLevel.PROJECT)
-//                        .withRefType("hrds-code-repo")
-                        .withSagaCode(RDUCM_BATCH_ADD_MEMBERS)
-                        .withPayloadAndSerialize("hello")
-//                        .withRefId(null)
-                        .withSourceId(projectId),
-                builder -> {
-                });
     }
 
     /**

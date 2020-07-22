@@ -1,12 +1,6 @@
 package org.hrds.rducm.gitlab.api.controller.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
-import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nProjectViewDTO;
-import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
-
-import java.util.Date;
-import java.util.List;
 
 
 public class MemberPrivilegeViewDTO {
