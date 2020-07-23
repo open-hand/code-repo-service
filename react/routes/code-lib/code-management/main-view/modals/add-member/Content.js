@@ -52,6 +52,10 @@ export default observer(() => {
     const flag = !(Number(record.data.value.substring(1)) >= 50);
     return flag;
   }
+  function searchMatcher({ record, text, textField }) {
+    const isTrue = record.get(textField).indexOf(text) !== -1 || record.get('loginName').indexOf(text) !== -1;
+    return isTrue;
+  }
 
   return (
     <div style={{ width: '5.12rem' }}>
@@ -74,6 +78,7 @@ export default observer(() => {
             searchable
             colSpan={4}
             optionsFilter={optionsFilter}
+            searchMatcher={searchMatcher}
           />
           <Select
             name="glAccessLevel"

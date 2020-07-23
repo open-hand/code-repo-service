@@ -76,10 +76,16 @@ export default observer(() => {
     return flag;
   }
 
+  // eslint-disable-next-line no-shadow
+  function searchMatcher({ record, text, textField }) {
+    const isTrue = record.get(textField).indexOf(text) !== -1 || record.get('repositoryCode').indexOf(text) !== -1;
+    return isTrue;
+  }
+
   return (
     <Form dataSet={formDs}>
       <TextField name="applicantUserName" disabled />
-      <Select name="repositoryId" clearButton={false} onChange={handleSelect} searchable />
+      <Select name="repositoryId" clearButton={false} onChange={handleSelect} searchable searchMatcher={searchMatcher} />
       <Select name="applicantType" disabled />
       <Select
         name="accessLevel"
