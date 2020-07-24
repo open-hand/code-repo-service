@@ -8,7 +8,7 @@ export default ({ formatMessage, intlPrefix, userOptions }) => (
       // 用户
       {
         name: 'userId',
-        type: 'number',
+        type: 'string',
         required: true,
         label: formatMessage({ id: `${intlPrefix}.user` }),
         textField: 'realName',
