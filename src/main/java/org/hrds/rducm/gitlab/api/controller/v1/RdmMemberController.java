@@ -45,7 +45,7 @@ public class RdmMemberController extends BaseController {
     public ResponseEntity<?> updateMember(@PathVariable Long organizationId,
                                           @PathVariable Long projectId,
                                           @PathVariable Long repositoryId,
-                                          @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGM) @PathVariable Long memberId,
+                                          @Encrypt @PathVariable Long memberId,
                                           @RequestBody RdmMemberUpdateDTO rdmMemberUpdateDTO) {
         validObject(rdmMemberUpdateDTO);
         rdmMemberAppService.updateMember(memberId, rdmMemberUpdateDTO);
@@ -63,7 +63,7 @@ public class RdmMemberController extends BaseController {
     public ResponseEntity<?> removeMember(@PathVariable Long organizationId,
                                           @PathVariable Long projectId,
                                           @PathVariable Long repositoryId,
-                                          @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGM) @PathVariable Long memberId) {
+                                          @Encrypt @PathVariable Long memberId) {
         rdmMemberAppService.removeMember(memberId);
         return Results.success();
     }
@@ -79,7 +79,7 @@ public class RdmMemberController extends BaseController {
     public ResponseEntity<?> syncMember(@PathVariable Long organizationId,
                                         @PathVariable Long projectId,
                                         @PathVariable Long repositoryId,
-                                        @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGM) @PathVariable Long memberId) {
+                                        @Encrypt @PathVariable Long memberId) {
         rdmMemberAppService.syncMember(memberId);
         return Results.success();
     }

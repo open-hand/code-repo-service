@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.api.controller.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import java.util.Date;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
  */
 public class OperationLogQueryDTO {
     @ApiModelProperty(value = "操作人，用户id")
+    @Encrypt
     private Long opUserId;
 
     @ApiModelProperty(value = "开始日期")

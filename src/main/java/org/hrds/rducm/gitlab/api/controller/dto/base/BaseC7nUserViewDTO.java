@@ -13,6 +13,7 @@ import org.hzero.starter.keyencrypt.core.Encrypt;
  * @date 2020/3/17
  */
 public class BaseC7nUserViewDTO {
+    @Encrypt
     @ApiModelProperty(value = "用户id")
     private Long userId;
 

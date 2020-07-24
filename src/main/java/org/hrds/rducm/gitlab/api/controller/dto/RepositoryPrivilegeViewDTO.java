@@ -1,14 +1,17 @@
 package org.hrds.rducm.gitlab.api.controller.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import java.util.Set;
 
 
 public class RepositoryPrivilegeViewDTO {
     @ApiModelProperty("用户id")
+    @Encrypt
     private Long userId;
     @ApiModelProperty("应用服务id")
+    @Encrypt
     private Set<Long> appServiceIds;
 
     public Long getUserId() {

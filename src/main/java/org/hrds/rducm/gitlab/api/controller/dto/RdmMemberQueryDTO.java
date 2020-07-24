@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.api.controller.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import java.util.Set;
 
@@ -16,6 +17,7 @@ public class RdmMemberQueryDTO {
      * 项目层
      */
     @ApiModelProperty(value = "应用服务id")
+    @Encrypt
     private Set<Long> repositoryIds;
 
     @ApiModelProperty(value = "应用服务名称")

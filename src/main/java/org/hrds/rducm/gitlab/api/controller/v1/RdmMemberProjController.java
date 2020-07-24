@@ -17,6 +17,7 @@ import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.hzero.export.vo.ExportParam;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -127,7 +128,7 @@ public class RdmMemberProjController extends BaseController {
     @PostMapping("/self/privilege")
     public ResponseEntity<List<MemberPrivilegeViewDTO>> selfPrivilege(@PathVariable Long organizationId,
                                                                       @PathVariable Long projectId,
-                                                                      @RequestBody Set<Long> repositoryIds) {
+                                                                      @Encrypt @RequestBody Set<Long> repositoryIds) {
         return Results.success(iRdmMemberService.selfPrivilege(organizationId, projectId, repositoryIds));
 
     }

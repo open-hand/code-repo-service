@@ -13,13 +13,14 @@ import java.util.Date;
  */
 public class RdmMemberApplicantViewDTO {
     @ApiModelProperty("表ID，主键")
-    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGMA)
+    @Encrypt
     private Long id;
 
     @ApiModelProperty(value = "项目id")
     private Long projectId;
 
     @ApiModelProperty(value = "代码库id")
+    @Encrypt
     private Long repositoryId;
 
     @ApiModelProperty(value = "代码库名称")
@@ -52,6 +53,7 @@ public class RdmMemberApplicantViewDTO {
     @ApiModelProperty(value = "旧权限等级")
     private Integer oldAccessLevel;
 
+    @Encrypt
     private Long createdBy;
     private Date creationDate;
     private Long objectVersionNumber;

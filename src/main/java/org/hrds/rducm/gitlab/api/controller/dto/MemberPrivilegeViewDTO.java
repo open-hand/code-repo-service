@@ -1,10 +1,12 @@
 package org.hrds.rducm.gitlab.api.controller.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 
 public class MemberPrivilegeViewDTO {
     @ApiModelProperty("应用服务id")
+    @Encrypt
     private Long repositoryId;
 
     @ApiModelProperty("权限")

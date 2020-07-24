@@ -60,7 +60,7 @@ public class RdmMemberApplicantProjController extends BaseController {
                                                                          @SortDefault(value = RdmMemberApplicant.FIELD_CREATION_DATE,
                                                                                  direction = Sort.Direction.DESC)
                                                                          @ApiIgnore PageRequest pageRequest,
-                                                                         @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                         @Encrypt @RequestParam(required = false) Set<Long> repositoryIds,
                                                                          @RequestParam(required = false) String applicantUserName,
                                                                          @RequestParam(required = false) String approvalState) {
 
@@ -81,7 +81,7 @@ public class RdmMemberApplicantProjController extends BaseController {
                                                                              @SortDefault(value = RdmMemberApplicant.FIELD_CREATION_DATE,
                                                                                      direction = Sort.Direction.DESC)
                                                                              @ApiIgnore PageRequest pageRequest,
-                                                                             @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                             @Encrypt @RequestParam(required = false) Set<Long> repositoryIds,
                                                                              @RequestParam(required = false) String approvalState) {
 
         return Results.success(iRdmMemberApplicantService.pageByOptionsSelf(projectId, pageRequest, repositoryIds, approvalState));
@@ -91,7 +91,7 @@ public class RdmMemberApplicantProjController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/self/detect-applicant-type")
     public ResponseEntity<DetectApplicantTypeDTO> detectApplicantType(@PathVariable Long projectId,
-                                                                      @RequestParam Long repositoryId) {
+                                                                      @Encrypt @RequestParam Long repositoryId) {
         DetectApplicantTypeDTO dto = iRdmMemberApplicantService.detectApplicantType(projectId, repositoryId);
         return ResponseEntity.ok(dto);
     }
@@ -121,7 +121,7 @@ public class RdmMemberApplicantProjController extends BaseController {
     })
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/{id}/pass")
-    public ResponseEntity<?> passAndHandleMember(@Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGMA) @PathVariable Long id,
+    public ResponseEntity<?> passAndHandleMember(@Encrypt @PathVariable Long id,
                                                  @RequestParam Long objectVersionNumber,
                                                  RdmMemberApplicantPassDTO passDTO) {
         validObject(passDTO);
@@ -133,7 +133,7 @@ public class RdmMemberApplicantProjController extends BaseController {
     @ApiOperation(value = "成员权限申请-审批拒绝")
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/{id}/refuse")
-    public ResponseEntity<?> refuse(@Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGMA) @PathVariable Long id,
+    public ResponseEntity<?> refuse(@Encrypt @PathVariable Long id,
                                     @RequestParam Long objectVersionNumber,
                                     @RequestBody String approvalMessage) {
         rdmMemberApplicantAppService.refuse(id, objectVersionNumber, approvalMessage);
