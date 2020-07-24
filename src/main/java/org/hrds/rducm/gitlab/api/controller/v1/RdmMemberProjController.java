@@ -57,7 +57,7 @@ public class RdmMemberProjController extends BaseController {
     public ResponseEntity<Page<RdmMemberViewDTO>> pageByOptions(@PathVariable Long organizationId,
                                                                 @PathVariable Long projectId,
                                                                 PageRequest pageRequest,
-                                                                RdmMemberQueryDTO query) {
+                                                                @Encrypt RdmMemberQueryDTO query) {
         return Results.success(rdmMemberAppService.pageByOptions(projectId, pageRequest, query));
     }
 
