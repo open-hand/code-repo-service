@@ -8,10 +8,8 @@ import java.util.Set;
 
 public class RepositoryPrivilegeViewDTO {
     @ApiModelProperty("用户id")
-    @Encrypt
     private Long userId;
     @ApiModelProperty("应用服务id")
-    @Encrypt
     private Set<Long> appServiceIds;
 
     public Long getUserId() {
