@@ -32,7 +32,7 @@ export default ({ formatMessage, intlPrefix, organizationId, projectId, userId, 
     },
     {
       name: 'repositoryId',
-      type: 'number',
+      type: 'string',
       required: true,
       label: formatMessage({ id: `${intlPrefix}.service` }),
       textField: 'repositoryName',
