@@ -2,6 +2,9 @@ package org.hrds.rducm.gitlab.app.job;
 
 import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
+import io.choerodon.asgard.schedule.annotation.TaskParam;
+import io.choerodon.asgard.schedule.annotation.TimedTask;
+import io.choerodon.asgard.schedule.enums.TriggerTypeEnum;
 import org.hrds.rducm.gitlab.domain.service.IMemberAuditService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +34,11 @@ public class MembersAuditJob {
             code = "membersAuditJob",
             description = "成员审计定时任务",
             params = {@JobParam(name = "auditOrganizationId", description = "待审计组织id")})
+    @TimedTask(name = "成员审计定时任务",
+            description = "审计代码库权限和Gitlab权限不一样的用户",
+            params = {@TaskParam(name= "auditOrganizationId", value = "7")},
+            triggerType = TriggerTypeEnum.CRON_TRIGGER,
+            cronExpression = "0 0 1 1 * ?")
     public void membersAuditJob(Map<String, Object> param) {
         // <> 获取组织
         long auditOrganizationId = Long.parseLong((String) param.get("auditOrganizationId"));

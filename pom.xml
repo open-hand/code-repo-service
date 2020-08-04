@@ -17,6 +17,7 @@
 
     <properties>
         <choerodon.starters.version>0.16.2-SNAPSHOT</choerodon.starters.version>
+        <choerodon.starter.asgard>0.17.2.RELEASE</choerodon.starter.asgard>
     </properties>
 
     <dependencies>
@@ -145,6 +146,7 @@
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-asgard</artifactId>
+            <version>${choerodon.starter.asgard}</version>
         </dependency>
 
         <dependency>
@@ -155,14 +157,14 @@
     </dependencies>
 
     <repositories>
-        <!--<repository>-->
-            <!--<id>Hzero</id>-->
-            <!--<name>Hzero Repository</name>-->
-            <!--<url>http://nexus.saas.hand-china.com/content/groups/hzero/</url>-->
-            <!--<releases>-->
-                <!--<enabled>true</enabled>-->
-            <!--</releases>-->
-        <!--</repository>-->
+        <repository>
+            <id>Hzero</id>
+            <name>Hzero Repository</name>
+            <url>http://nexus.saas.hand-china.com/content/groups/hzero/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
         <!-- 按项目实际情况修改
             <repository>
             <id>HzeroRelease</id>
