@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.math.BigDecimal;

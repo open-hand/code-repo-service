@@ -25,6 +25,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
+ * 监听应用服务相关saga事件
+ *
  * @author ying.xie@hand-china.com
  * @date 2020/6/15
  */

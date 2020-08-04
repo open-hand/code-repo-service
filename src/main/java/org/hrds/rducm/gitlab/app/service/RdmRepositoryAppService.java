@@ -14,7 +14,8 @@ public interface RdmRepositoryAppService {
      * 查询所有[已启用]的服务
      *
      * @param projectId
+     * @param condition
      * @return
      */
-    List<BaseC7nAppServiceViewDTO> listByActive(Long projectId);
+    List<BaseC7nAppServiceViewDTO> listByActive(Long projectId, String condition);
 }

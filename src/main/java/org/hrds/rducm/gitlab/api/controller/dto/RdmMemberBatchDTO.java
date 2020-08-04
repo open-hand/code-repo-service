@@ -16,6 +16,7 @@ import java.util.List;
 public class RdmMemberBatchDTO {
     @NotEmpty
     @ApiModelProperty(value = ApiInfoConstants.REPOSITORY_ID, dataType = "Long", required = true)
+    @Encrypt
     private List<Long> repositoryIds;
 
     @NotEmpty
@@ -26,6 +27,7 @@ public class RdmMemberBatchDTO {
     public static class GitlabMemberCreateDTO {
         @NotNull
         @ApiModelProperty(value = ApiInfoConstants.USER_ID, required = true)
+        @Encrypt
         private Long userId;
         @NotNull
         @ApiModelProperty(value = ApiInfoConstants.GL_ACCESS_LEVEL, required = true)

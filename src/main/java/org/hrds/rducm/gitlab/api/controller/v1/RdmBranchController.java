@@ -39,7 +39,7 @@ public class RdmBranchController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping
     public ResponseEntity<List<BranchDTO>> getBranches(@PathVariable Long projectId,
-                                                       @PathVariable Long repositoryId,
+                                                       @PathVariable @Encrypt Long repositoryId,
                                                        BranchQueryDTO branchQueryDTO) {
         return Results.success(rdmBranchAppService.getBranches(projectId, repositoryId, branchQueryDTO));
     }
@@ -52,7 +52,7 @@ public class RdmBranchController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/protected-branches")
     public ResponseEntity<List<ProtectedBranchDTO>> getProtectedBranches(@PathVariable Long projectId,
-                                                                         @PathVariable Long repositoryId) {
+                                                                         @PathVariable @Encrypt Long repositoryId) {
         return Results.success(rdmBranchAppService.getProtectedBranches(projectId, repositoryId));
     }
 
@@ -67,7 +67,7 @@ public class RdmBranchController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/protected-branches")
     public ResponseEntity<ProtectedBranchDTO> createProtectedBranch(@PathVariable Long projectId,
-                                                                    @PathVariable Long repositoryId,
+                                                                    @PathVariable @Encrypt Long repositoryId,
                                                                     @RequestParam String branchName,
                                                                     @RequestParam Integer pushAccessLevel,
                                                                     @RequestParam Integer mergeAccessLevel) {
@@ -85,7 +85,7 @@ public class RdmBranchController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PutMapping("/protected-branches")
     public ResponseEntity<ProtectedBranchDTO> updateProtectedBranch(@PathVariable Long projectId,
-                                                                    @PathVariable Long repositoryId,
+                                                                    @PathVariable @Encrypt Long repositoryId,
                                                                     @RequestParam String branchName,
                                                                     @RequestParam Integer pushAccessLevel,
                                                                     @RequestParam Integer mergeAccessLevel) {
@@ -101,7 +101,7 @@ public class RdmBranchController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @DeleteMapping("/protected-branches")
     public ResponseEntity<?> removeProtectedBranch(@PathVariable Long projectId,
-                                                   @PathVariable Long repositoryId,
+                                                   @PathVariable @Encrypt Long repositoryId,
                                                    @RequestParam String branchName) {
         rdmBranchAppService.unprotectBranch(projectId, repositoryId, branchName);
         return Results.success();

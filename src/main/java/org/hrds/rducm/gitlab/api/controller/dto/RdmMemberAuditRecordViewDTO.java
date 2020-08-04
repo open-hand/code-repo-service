@@ -17,7 +17,7 @@ import java.util.Date;
 @ApiModel("成员权限审计记录表")
 public class RdmMemberAuditRecordViewDTO {
     @ApiModelProperty("主键")
-    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGMAR)
+    @Encrypt
     private Long id;
 
     @ApiModelProperty(value = "组织id", required = true)
@@ -30,12 +30,14 @@ public class RdmMemberAuditRecordViewDTO {
     private BaseC7nProjectViewDTO project;
 
     @ApiModelProperty(value = "代码仓库id", required = true)
+    @Encrypt
     private Long repositoryId;
 
     @ApiModelProperty(value = "代码仓库名称")
     private String repositoryName;
 
     @ApiModelProperty(value = "用户id")
+    @Encrypt
     private Long userId;
 
     @ApiModelProperty(value = "用户信息")

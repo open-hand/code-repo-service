@@ -8,7 +8,7 @@ export default ((formatMessage) => ({
   fields: [
     {
       name: 'repositoryIds',
-      type: 'number',
+      type: 'string',
       label: formatMessage({ id: 'infra.service' }),
     }, // 保护分支、标记的【应用服务】查询条件
   ],

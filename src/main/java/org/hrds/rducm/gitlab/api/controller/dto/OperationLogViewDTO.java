@@ -13,7 +13,7 @@ import java.util.Date;
  */
 public class OperationLogViewDTO {
     @ApiModelProperty("主键")
-    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGMAL)
+    @Encrypt
     private Long id;
 
     @ApiModelProperty(value = "项目层，项目id", required = true)
@@ -23,6 +23,7 @@ public class OperationLogViewDTO {
     private BaseC7nProjectViewDTO project;
 
     @ApiModelProperty(value = "代码仓库id", required = true)
+    @Encrypt
     private Long repositoryId;
 
     @ApiModelProperty(value = "代码仓库名称")
@@ -32,6 +33,7 @@ public class OperationLogViewDTO {
     private String repositoryImageUrl;
 
     @ApiModelProperty(value = "操作人，用户id", required = true)
+    @Encrypt
     private Long opUserId;
 
     @ApiModelProperty(value = "操作人，用户名", required = true)

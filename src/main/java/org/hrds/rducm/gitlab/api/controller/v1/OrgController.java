@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hzero.core.base.BaseController;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +36,7 @@ public class OrgController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/users/{userId}/projects")
     public ResponseEntity<List<C7nProjectVO>> listProjectsByUserId(@PathVariable Long organizationId,
-                                                                   @PathVariable Long userId,
+                                                                   @PathVariable @Encrypt Long userId,
                                                                    @RequestParam(required = false) String name) {
         List<C7nProjectVO> c7nProjectVOS = c7NBaseServiceFacade.listProjectsByUserIdOnOrgLevel(organizationId, userId, name);
         return ResponseEntity.ok(c7nProjectVOS);

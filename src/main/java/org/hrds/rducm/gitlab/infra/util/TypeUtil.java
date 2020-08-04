@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,14 @@ public class TypeUtil {
         return GSON.toJson(mapParams);
     }
 
+    public static String castToSearchParam(Map<String, Object> params) {
+        Map<String, Map<String, Object>> mapParams = new HashMap<>(16);
+
+        mapParams.put(TypeUtil.SEARCH_PARAM, params);
+
+        return GSON.toJson(mapParams);
+    }
+
     /**
      * 判断对象中属性值是否全为空
      *
@@ -89,5 +98,39 @@ public class TypeUtil {
 
     public static <T> List<T> getListWithType(Map<Class, List> map, Class<T> key) {
         return (List<T>) map.get(key);
+    }
+
+    public static class ParamsBuilder {
+        private final Map<String, Object> searchParamMap = new HashMap<>();
+        private final List<String> paramList = new ArrayList<>();
+
+        public ParamsBuilder searchParam(String key, Object value) {
+            if (StringUtils.isNotEmpty(key)) {
+                searchParamMap.put(key, value);
+            }
+
+            return this;
+        }
+
+        public ParamsBuilder param(String value) {
+            if (StringUtils.isNotEmpty(value)) {
+                paramList.add(value);
+            }
+
+            return this;
+        }
+
+        public String build() {
+            Map<String, Object> result = new HashMap<>();
+            if (!searchParamMap.isEmpty()) {
+                result.put(TypeUtil.SEARCH_PARAM, searchParamMap);
+            }
+
+            if (!paramList.isEmpty()) {
+                result.put(TypeUtil.PARAMS, paramList);
+            }
+
+            return GSON.toJson(result);
+        }
     }
 }

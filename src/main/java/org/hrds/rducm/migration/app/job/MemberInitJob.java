@@ -1,6 +1,8 @@
 package org.hrds.rducm.migration.app.job;
 
+import io.choerodon.asgard.schedule.QuartzDefinition;
 import io.choerodon.asgard.schedule.annotation.JobTask;
+import io.choerodon.asgard.schedule.annotation.TimedTask;
 import org.hrds.rducm.migration.domain.service.Version023Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,9 @@ public class MemberInitJob {
     @JobTask(maxRetryCount = 3,
             code = "initRdmMembers",
             description = "0.23版本代码库初始化成员")
+    @TimedTask(name = "initRdmMembers", description = "0.23版本代码库初始化成员",
+            oneExecution = true, repeatCount = 0, repeatInterval = 100, repeatIntervalUnit = QuartzDefinition.SimpleRepeatIntervalUnit.HOURS,
+            params = {})
     public void initRdmMembers(Map<String, Object> map) {
         logger.info("开始初始化");
 

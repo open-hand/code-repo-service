@@ -40,7 +40,7 @@ public class RdmTagController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping
     public ResponseEntity<List<TagDTO>> getTags(@PathVariable Long projectId,
-                                                @PathVariable Long repositoryId,
+                                                @Encrypt @PathVariable Long repositoryId,
                                                 TagQueryDTO tagQueryDTO) {
         return Results.success(rdmTagAppService.getTags(projectId, repositoryId, tagQueryDTO));
     }
@@ -53,7 +53,7 @@ public class RdmTagController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/protected-tags")
     public ResponseEntity<List<ProtectedTagDTO>> getProtectedTags(@PathVariable Long projectId,
-                                                                  @PathVariable Long repositoryId) {
+                                                                  @Encrypt @PathVariable Long repositoryId) {
         return Results.success(rdmTagAppService.getProtectedTags(projectId, repositoryId));
     }
 
@@ -67,7 +67,7 @@ public class RdmTagController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/protected-tags")
     public ResponseEntity<ProtectedTagDTO> createProtectedTag(@PathVariable Long projectId,
-                                                              @PathVariable Long repositoryId,
+                                                              @Encrypt @PathVariable Long repositoryId,
                                                               @RequestParam String tagName,
                                                               @RequestParam Integer createAccessLevel) {
         return Results.created(rdmTagAppService.protectTag(projectId, repositoryId, tagName, createAccessLevel));
@@ -83,7 +83,7 @@ public class RdmTagController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PutMapping("/protected-tags")
     public ResponseEntity<ProtectedTagDTO> updateProtectedTag(@PathVariable Long projectId,
-                                                              @PathVariable Long repositoryId,
+                                                              @Encrypt @PathVariable Long repositoryId,
                                                               @RequestParam String tagName,
                                                               @RequestParam Integer createAccessLevel) {
         return Results.created(rdmTagAppService.updateProtectedTag(projectId, repositoryId, tagName, createAccessLevel));
@@ -98,7 +98,7 @@ public class RdmTagController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @DeleteMapping("/protected-tags")
     public ResponseEntity<ProtectedTag> deleteProtectedTag(@PathVariable Long projectId,
-                                                           @PathVariable Long repositoryId,
+                                                           @Encrypt @PathVariable Long repositoryId,
                                                            @RequestParam String tagName) {
         rdmTagAppService.unprotectTag(projectId, repositoryId, tagName);
         return Results.success();

@@ -288,9 +288,13 @@ public class RdmMemberChangeSagaHandler {
         Integer glUserId = c7nBaseServiceFacade.userIdToGlUserId(userId);
         List<C7nAppServiceVO> appServiceVOS = c7nDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId);
         appServiceVOS.forEach(appServiceVO -> {
-            Long repositoryId = appServiceVO.getId();
-            Integer glProjectId = Math.toIntExact(appServiceVO.getGitlabProjectId());
-            rdmMemberRepository.insertWithOwner(organizationId, projectId, repositoryId, userId, glProjectId, glUserId);
+            if (appServiceVO.getId() == null || appServiceVO.getGitlabProjectId() == null) {
+                logger.warn("项目{}, 应用服务{}, 未查询到对应GitlabProjectId, 跳过该应用服务", projectId, appServiceVO.getId());
+            } else {
+                Long repositoryId = appServiceVO.getId();
+                Integer glProjectId = Math.toIntExact(appServiceVO.getGitlabProjectId());
+                rdmMemberRepository.insertWithOwner(organizationId, projectId, repositoryId, userId, glProjectId, glUserId);
+            }
         });
     }
 
