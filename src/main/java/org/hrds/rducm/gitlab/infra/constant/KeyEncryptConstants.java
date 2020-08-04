@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.infra.constant;
 
 /**
+ * 主键加密key
  * Utils
  */
 public class KeyEncryptConstants {

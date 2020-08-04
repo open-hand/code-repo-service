@@ -27,7 +27,7 @@ public class RdmMemberViewDTO {
     /**
      * 成员id, 主键
      */
-    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGM)
+    @Encrypt
     private Long id;
 
     @ApiModelProperty("项目id")
@@ -37,6 +37,7 @@ public class RdmMemberViewDTO {
     private BaseC7nProjectViewDTO project;
 
     @ApiModelProperty("代码库id")
+    @Encrypt
     private Long repositoryId;
 
     @JsonIgnore

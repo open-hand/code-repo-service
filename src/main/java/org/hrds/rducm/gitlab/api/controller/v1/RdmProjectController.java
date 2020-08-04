@@ -38,7 +38,7 @@ public class RdmProjectController extends BaseController {
     })
     public ResponseEntity<Page<RdmMemberViewDTO>> pageMemberPermissions(@PathVariable Long organizationId,
                                                                         @PathVariable Long projectId,
-                                                                        @PathVariable Long userId,
+                                                                        @Encrypt @PathVariable Long userId,
                                                                         PageRequest pageRequest) {
         return Results.success(iRdmMemberService.pageMemberPermissions(organizationId, projectId, userId, pageRequest));
     }

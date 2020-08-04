@@ -43,7 +43,7 @@ public class RdmMemberAuditRecordProjController extends BaseController {
     @GetMapping
     public ResponseEntity<Page<RdmMemberAuditRecordViewDTO>> pageByOptions(@PathVariable Long organizationId,
                                                                            @PathVariable Long projectId,
-                                                                           @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                           @Encrypt @RequestParam(required = false) Set<Long> repositoryIds,
                                                                            PageRequest pageRequest,
                                                                            MemberAuditRecordQueryDTO queryDTO) {
         return Results.success(iRdmMemberAuditRecordService.pageByOptions(organizationId, Collections.singleton(projectId), repositoryIds, pageRequest, queryDTO, ResourceLevel.ORGANIZATION));
@@ -54,8 +54,8 @@ public class RdmMemberAuditRecordProjController extends BaseController {
     @PostMapping("/{id}/audit-fix")
     public ResponseEntity<?> auditFix(@PathVariable Long organizationId,
                                       @PathVariable Long projectId,
-                                      @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGMAR) @PathVariable Long id,
-                                      @RequestParam Long repositoryId) {
+                                      @Encrypt @PathVariable Long id,
+                                      @Encrypt @RequestParam Long repositoryId) {
         rdmMemberAuditAppService.auditFix(organizationId, projectId, repositoryId, id);
         return Results.success();
     }

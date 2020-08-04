@@ -56,7 +56,7 @@ public class RdmOperationLogOrgController extends BaseController {
                                                                                     direction = Sort.Direction.DESC)
                                                                             @ApiIgnore PageRequest pageRequest,
                                                                             @RequestParam(required = false) Set<Long> projectIds,
-                                                                            @RequestParam(required = false) Set<Long> repositoryIds,
+                                                                            @Encrypt @RequestParam(required = false) Set<Long> repositoryIds,
                                                                             OperationLogQueryDTO queryDTO) {
 
         Page<OperationLogViewDTO> list = operationLogService.pageByOptionsMemberLogOnOrg(organizationId, projectIds, repositoryIds, pageRequest, queryDTO);

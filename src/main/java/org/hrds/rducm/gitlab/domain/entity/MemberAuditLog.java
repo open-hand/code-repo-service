@@ -50,13 +50,14 @@ public class MemberAuditLog extends AuditDomain {
     @ApiModelProperty("主键")
     @Id
     @GeneratedValue
-    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_RGMAL)
+    @Encrypt
     private Long id;
     @ApiModelProperty(value = "组织id")
     private Long organizationId;
     @ApiModelProperty(value = "项目id")
     private Long projectId;
     @ApiModelProperty(value = "代码库id")
+    @Encrypt
     private Long repositoryId;
     @ApiModelProperty(value = "审计流水号", required = true)
     @NotBlank

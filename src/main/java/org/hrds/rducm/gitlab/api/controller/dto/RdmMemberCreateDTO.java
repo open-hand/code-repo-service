@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.api.controller.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
@@ -10,6 +11,7 @@ import java.util.Date;
 public class RdmMemberCreateDTO {
     @NotNull
     @ApiModelProperty(value = ApiInfoConstants.USER_ID, required = true)
+    @Encrypt
     private Long userId;
 
     @NotNull

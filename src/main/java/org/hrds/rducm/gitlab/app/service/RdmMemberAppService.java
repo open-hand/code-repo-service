@@ -103,13 +103,4 @@ public interface RdmMemberAppService {
      * 处理过期的成员(定时任务调用)
      */
     void handleExpiredMembers();
-
-    /**
-     * saga测试demo
-     *
-     * @param organizationId
-     * @param projectId
-     * @param rdmMemberBatchDTO
-     */
-    void batchAddMemberSagaDemo(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO);
 }

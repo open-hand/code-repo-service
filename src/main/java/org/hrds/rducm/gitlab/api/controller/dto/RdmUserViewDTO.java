@@ -6,7 +6,7 @@ import org.hzero.starter.keyencrypt.core.Encrypt;
 import java.util.Date;
 
 public class RdmUserViewDTO {
-    @Encrypt(KeyEncryptConstants.KEY_ENCRYPT_COMMON)
+    @Encrypt
     private Long userId;
 
     /* gitlab用户信息 */

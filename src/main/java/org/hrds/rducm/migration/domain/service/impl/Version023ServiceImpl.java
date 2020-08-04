@@ -46,6 +46,12 @@ public class Version023ServiceImpl implements Version023Service {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    /**
+     * 初始化规则
+     * 1. 调用猪齿鱼原应用服务权限的接口pagePermissionUsers, 获取某个分配了应用服务代码库权限的人员
+     * 2. 如果是项目管理员或组织管理员, 初始化为Owner权限
+     * 3. 如果是项目成员, 初始化为developer权限
+     */
     @Override
     public void initAllPrivilegeOnSiteLevel() {
         // <> 判断代码库是否有数据

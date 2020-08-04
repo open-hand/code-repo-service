@@ -10,6 +10,7 @@ import { Page, Choerodon } from '@choerodon/boot';
 import { Table } from 'choerodon-ui/pro';
 // import ClickText from '@/components/click-text';
 import TimePopover from '@/components/time-popover/TimePopover';
+import renderFullName from '@/utils/renderer';
 // import MouseOverWrapper from '@/components/mouseover-wrapper';
 // import ClickText from '@/components/click-text';
 import { usPsManagerStore } from '../stores';
@@ -74,14 +75,14 @@ const PsOverView = () => {
         queryFieldsLimit={3}
       // editMode="inline"
       >
-        <Column name="repositoryName" width={170} />
+        <Column name="repositoryName" width={170} renderer={renderFullName} />
         <Column name="managerCount" width={120} style={{ paddingRight: '.20rem' }} />
         <Column name="developerCount" width={120} />
         <Column name="defaultBranch" />
         <Column name="visibility" />
         <Column name="lastCommittedDate" renderer={renderTime} />
         <Column name="openedMergeRequestCount" renderer={renderName} width={150} />
-        <Column name="repositoryCreationDate" />
+        <Column name="repositoryCreationDate" renderer={renderFullName} />
         {/* <Column header="操作" width={60} command={['delete']} lock="right" /> */}
       </Table>
     </Page>

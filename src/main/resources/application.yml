@@ -95,6 +95,8 @@ mybatis:
   mapperLocations: classpath*:/mapper/*.xml
   configuration:
     mapUnderscoreToCamelCase: true
+    # 雪花id主键配置
+    key-generator: snowflake
 
 
 logging:

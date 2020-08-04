@@ -17,6 +17,7 @@ import java.util.Optional;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseC7nAppServiceViewDTO {
+    @Encrypt
     private Long repositoryId;
     private String repositoryName;
     private String repositoryCode;
