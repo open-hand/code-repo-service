@@ -66,17 +66,15 @@ public class ExpiredMembersJob {
             //params = {@JobParam(name = "days", description = "提前x天通知")})
     @TimedTask(name = "expiredNotification",
             description = "代码库权限过期提醒",
-            params = {@TaskParam(name= "days", value = "3")},
+            params = {},
             triggerType = TriggerTypeEnum.CRON_TRIGGER,
             cronExpression = "0 0 9 * * ?")
     private void expiredNotification(Map<String, Object> map) {
         logger.info("代码库权限过期提醒定时任务开始执行");
 
         // 获取参数
-        int days = Integer.parseInt((String) map.get("days"));
-        if (days <= 0) {
-            throw new IllegalArgumentException("param 'days' is wrong");
-        }
+        int days = 3;
+//        Integer.parseInt((String) map.get("days"));
 
         // <1> 查询x天后过期的成员
         Condition condition = new Condition(RdmMember.class);
