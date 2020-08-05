@@ -218,6 +218,10 @@ public class RdmMemberChangeSagaHandler {
                 return RoleLabelEnum.PROJECT_ADMIN.value();
             } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value())) {
                 return RoleLabelEnum.PROJECT_MEMBER.value();
+            } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_OWNER.value())){
+                return RoleLabelEnum.PROJECT_ADMIN.value();
+            } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_DEVELOPER.value())) {
+                return RoleLabelEnum.PROJECT_MEMBER.value();
             }
         }
         // 组织层
