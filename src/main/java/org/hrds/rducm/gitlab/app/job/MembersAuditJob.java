@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.app.job;
 
-import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.asgard.schedule.annotation.TaskParam;
 import io.choerodon.asgard.schedule.annotation.TimedTask;
@@ -36,7 +35,6 @@ public class MembersAuditJob {
             //params = {@JobParam(name = "auditOrganizationId", description = "待审计组织id")})
     @TimedTask(name = "membersAuditJob",
             description = "成员审计定时任务",
-            oneExecution = true,
             params = {@TaskParam(name= "auditOrganizationId", value = "7")},
             triggerType = TriggerTypeEnum.CRON_TRIGGER,
             cronExpression = "0 0 1 1 * ?")
