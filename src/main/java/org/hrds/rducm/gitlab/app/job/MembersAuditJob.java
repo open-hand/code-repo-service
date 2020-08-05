@@ -32,10 +32,11 @@ public class MembersAuditJob {
      */
     @JobTask(maxRetryCount = 3,
             code = "membersAuditJob",
+            description = "成员审计定时任务")
+            //params = {@JobParam(name = "auditOrganizationId", description = "待审计组织id")})
+    @TimedTask(name = "membersAuditJob",
             description = "成员审计定时任务",
-            params = {@JobParam(name = "auditOrganizationId", description = "待审计组织id")})
-    @TimedTask(name = "成员审计定时任务",
-            description = "审计代码库权限和Gitlab权限不一样的用户",
+            oneExecution = true,
             params = {@TaskParam(name= "auditOrganizationId", value = "7")},
             triggerType = TriggerTypeEnum.CRON_TRIGGER,
             cronExpression = "0 0 1 1 * ?")

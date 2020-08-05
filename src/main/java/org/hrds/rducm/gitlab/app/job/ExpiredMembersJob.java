@@ -40,10 +40,12 @@ public class ExpiredMembersJob {
     @Autowired
     private RdmMemberAssembler rdmMemberAssembler;
 
-    @JobTask(maxRetryCount = 3, code = "handleExpiredMembers", description = "代码库移除过期成员")
-    @TimedTask(name = "权限到期删除定时任务",
-            description = "删除权限过期的用户",
-            params = {@TaskParam(name= "", value = "")},
+    @JobTask(maxRetryCount = 3,
+            code = "handleExpiredMembers",
+            description = "代码库移除过期成员")
+    @TimedTask(name = "handleExpiredMembers",
+            description = "代码库移除过期成员",
+            params = {},
             triggerType = TriggerTypeEnum.CRON_TRIGGER,
             cronExpression = "0 0 2 * * ?")
     public void handleExpiredMembers(Map<String, Object> map) {
@@ -60,10 +62,10 @@ public class ExpiredMembersJob {
      */
     @JobTask(maxRetryCount = 3,
             code = "expiredNotification",
+            description = "代码库权限过期提醒")
+            //params = {@JobParam(name = "days", description = "提前x天通知")})
+    @TimedTask(name = "expiredNotification",
             description = "代码库权限过期提醒",
-            params = {@JobParam(name = "days", description = "提前x天通知")})
-    @TimedTask(name = "代码库权限过期提醒",
-            description = "提前三天通知即将过期的用户",
             params = {@TaskParam(name= "days", value = "3")},
             triggerType = TriggerTypeEnum.CRON_TRIGGER,
             cronExpression = "0 0 9 * * ?")
