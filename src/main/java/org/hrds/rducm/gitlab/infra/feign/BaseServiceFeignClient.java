@@ -103,6 +103,7 @@ public interface BaseServiceFeignClient {
      * @param size
      * @param loginName
      * @param realName
+     * @param enabled
      * @return
      */
     @GetMapping("/v1/projects/{project_id}/users/search")
@@ -110,7 +111,8 @@ public interface BaseServiceFeignClient {
                                                                      @RequestParam(required = false) int page,
                                                                      @RequestParam(required = false) int size,
                                                                      @RequestParam(required = false) String loginName,
-                                                                     @RequestParam(required = false) String realName);
+                                                                     @RequestParam(required = false) String realName,
+                                                                     @RequestParam(required = false) Boolean enabled);
 
     /**
      * 组织层

@@ -112,7 +112,7 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
     @Override
     public Set<Long> listC7nUserIdsByNameOnProjectLevel(Long projectId, String realName, String loginName) {
         // 0为不分页
-        ResponseEntity<Page<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnProjectLevel(projectId, 0, 0, loginName, realName);
+        ResponseEntity<Page<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnProjectLevel(projectId, 0, 0, loginName, realName, null);
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getContent())) {
             List<C7nUserVO> c7nUserVOS = responseEntity.getBody().getContent();
@@ -125,15 +125,11 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
     @Override
     public Set<Long> listC7nUserIdsByNameOnProjectLevelAndEnabled(Long projectId, String realName, String loginName, Boolean enabled) {
         // 0为不分页
-        ResponseEntity<Page<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnProjectLevel(projectId, 0, 0, loginName, realName);
+        ResponseEntity<Page<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnProjectLevel(projectId, 0, 0, loginName, realName, enabled);
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getContent())) {
             List<C7nUserVO> c7nUserVOS = responseEntity.getBody().getContent();
-            if (Objects.nonNull(enabled)) {
-                return c7nUserVOS.stream().filter(c7nUserVO -> c7nUserVO.getEnabled().equals(enabled)).map(C7nUserVO::getId).collect(Collectors.toSet());
-            } else {
-                return c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
-            }
+            return c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
         } else {
             return Collections.emptySet();
         }
@@ -155,7 +151,7 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
     @Override
     public List<C7nUserVO> listC7nUsersOnProjectLevel(Long projectId) {
         // 0为不分页
-        ResponseEntity<Page<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnProjectLevel(projectId, 0, 0, null, null);
+        ResponseEntity<Page<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnProjectLevel(projectId, 0, 0, null, null, null);
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getContent())) {
             List<C7nUserVO> c7nUserVOS = responseEntity.getBody().getContent();
