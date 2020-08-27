@@ -53,7 +53,7 @@ public class RdmMemberViewDTO {
     private Boolean syncGitlabFlag;
 
     @ApiModelProperty("Gitlab同步时间")
-    private Date syncDateGitlab;
+    private Date syncGitlabDate;
 
     @JsonIgnore
     private Long createdBy;
@@ -164,11 +164,11 @@ public class RdmMemberViewDTO {
     }
 
     public Date getSyncDateGitlab() {
-        return syncDateGitlab;
+        return syncGitlabDate;
     }
 
-    public RdmMemberViewDTO setSyncDateGitlab(Date syncDateGitlab) {
-        this.syncDateGitlab = syncDateGitlab;
+    public RdmMemberViewDTO setSyncDateGitlab(Date syncGitlabDate) {
+        this.syncGitlabDate = syncGitlabDate;
         return this;
     }
 

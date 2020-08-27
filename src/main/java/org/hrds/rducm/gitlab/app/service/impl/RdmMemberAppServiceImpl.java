@@ -199,7 +199,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         }
 
         // 调用外部接口模糊查询 用户名或登录名
-        if (!StringUtils.isEmpty(realName) || !StringUtils.isEmpty(loginName) || !Objects.nonNull(enabled)) {
+        if (!StringUtils.isEmpty(realName) || !StringUtils.isEmpty(loginName) || Objects.nonNull(enabled)) {
             Set<Long> userIdsSet = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevelAndEnabled(projectId, realName, loginName, enabled);
 
             if (userIdsSet.isEmpty()) {
