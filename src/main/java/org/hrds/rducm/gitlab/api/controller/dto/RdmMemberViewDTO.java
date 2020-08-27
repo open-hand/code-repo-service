@@ -163,11 +163,11 @@ public class RdmMemberViewDTO {
         return this;
     }
 
-    public Date getSyncDateGitlab() {
+    public Date getSyncGitlabDate() {
         return syncGitlabDate;
     }
 
-    public RdmMemberViewDTO setSyncDateGitlab(Date syncGitlabDate) {
+    public RdmMemberViewDTO setSyncGitlabDate(Date syncGitlabDate) {
         this.syncGitlabDate = syncGitlabDate;
         return this;
     }
