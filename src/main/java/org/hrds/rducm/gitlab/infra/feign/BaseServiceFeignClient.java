@@ -182,7 +182,7 @@ public interface BaseServiceFeignClient {
      * @return
      */
     @PostMapping(value = "/v1/users/list_by_ids")
-    ResponseEntity<List<C7nUserVO>> listUsersByIds(@RequestParam(value = "only_enabled", defaultValue = "true", required = false) Boolean onlyEnabled,
+    ResponseEntity<List<C7nUserVO>> listUsersByIds(@RequestParam(value = "only_enabled", defaultValue = "false", required = false) Boolean onlyEnabled,
                                                    @RequestBody Set<Long> ids);
 
 
