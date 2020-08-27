@@ -29,12 +29,13 @@ public class BaseC7nUserViewDTO {
     @ApiModelProperty(value = "邮箱")
     private String email;
 
+    @ApiModelProperty(value = "是否启用")
+    private Boolean enabled;
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @ApiModelProperty(value = "组织id")
     private Long organizationId;
 
-    @ApiModelProperty(value = "是否启用")
-    private Boolean enabled;
 
     //
     // 工具方法

@@ -70,7 +70,7 @@ public class RdmMemberProjController extends BaseController {
             @ApiImplicitParam(name = "realName", value = "用户名(模糊)", paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "loginName", value = "登录名(模糊)", paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "params", value = "通用查询参数(模糊)", paramType = "query", dataType = "String"),
-            @ApiImplicitParam(name = "enabled", value = "用户过期标志", paramType = "query", dataType = "Boolean"),
+            @ApiImplicitParam(name = "enabled", value = "用户启用标志", paramType = "query", dataType = "Boolean"),
             @ApiImplicitParam(name = "syncGitlabFlag", value = "Gitlab同步标识", paramType = "query", dataType = "Boolean"),
             @ApiImplicitParam(name = "glExpiresFlag", value = "Gitlab过期标识", paramType = "query", dataType = "Boolean"),
     })

@@ -140,7 +140,7 @@ public class RdmMemberAssembler {
         });
 
         // 查询用户信息
-        Map<Long, C7nUserVO> userVOMap = c7NBaseServiceFacade.listC7nUserToMap(Sets.newHashSet(userIds));
+        //Map<Long, C7nUserVO> userVOMap = c7NBaseServiceFacade.listC7nUserToMap(Sets.newHashSet(userIds));
 
         // 查询应用服务信息
         Map<Long, C7nAppServiceVO> appServiceVOMap = c7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
@@ -153,8 +153,8 @@ public class RdmMemberAssembler {
 
         // 填充数据
         for (RdmMemberViewDTO viewDTO : rdmMemberViewDTOS.getContent()) {
-            C7nUserVO c7nUserVO = Optional.ofNullable(userVOMap.get(viewDTO.getUserId())).orElse(new C7nUserVO());
-            C7nUserVO c7nCreateUserVO = Optional.ofNullable(userVOMap.get(viewDTO.getCreatedBy())).orElse(new C7nUserVO());
+            C7nUserVO c7nUserVO = Optional.ofNullable(userWithRolesVOMap.get(viewDTO.getUserId())).orElse(new C7nUserVO());
+            C7nUserVO c7nCreateUserVO = Optional.ofNullable(userWithRolesVOMap.get(viewDTO.getCreatedBy())).orElse(new C7nUserVO());
 
             C7nUserVO c7nUserWithRolesVO = Optional.ofNullable(userWithRolesVOMap.get(viewDTO.getUserId())).orElse(new C7nUserVO().setRoles(Collections.emptyList()));
 
