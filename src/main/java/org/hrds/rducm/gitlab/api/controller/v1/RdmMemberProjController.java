@@ -61,6 +61,27 @@ public class RdmMemberProjController extends BaseController {
         return Results.success(rdmMemberAppService.pageByOptions(projectId, pageRequest, query));
     }
 
+    @ApiOperation(value = "列表查询代码库成员(项目层)")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "organizationId", value = "组织id", paramType = "path", dataType = "Long", required = true),
+            @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", dataType = "Long", required = true),
+            @ApiImplicitParam(name = "repositoryIds", value = "应用服务id", paramType = "query", dataType = "Long", allowMultiple = true),
+            @ApiImplicitParam(name = "repositoryName", value = "应用服务名称(模糊)", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "realName", value = "用户名(模糊)", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "loginName", value = "登录名(模糊)", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "params", value = "通用查询参数(模糊)", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "enabled", value = "用户过期标志", paramType = "query", dataType = "Boolean"),
+            @ApiImplicitParam(name = "syncGitlabFlag", value = "Gitlab同步标识", paramType = "query", dataType = "Boolean"),
+            @ApiImplicitParam(name = "glExpiresFlag", value = "Gitlab过期标识", paramType = "query", dataType = "Boolean"),
+    })
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @GetMapping("/list")
+    public ResponseEntity<List<RdmMemberViewDTO>> listByOptions(@PathVariable Long organizationId,
+                                                                @PathVariable Long projectId,
+                                                                @Encrypt RdmMemberQueryDTO query) {
+        return Results.success(rdmMemberAppService.listByOptions(projectId,  query));
+    }
+
     @ApiOperation(value = "批量新增代码库成员(项目层)")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "organizationId", value = "组织id", paramType = "path", dataType = "Long", required = true),

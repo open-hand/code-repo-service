@@ -123,6 +123,23 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
     }
 
     @Override
+    public Set<Long> listC7nUserIdsByNameOnProjectLevelAndEnabled(Long projectId, String realName, String loginName, Boolean enabled) {
+        // 0为不分页
+        ResponseEntity<Page<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnProjectLevel(projectId, 0, 0, loginName, realName);
+
+        if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getContent())) {
+            List<C7nUserVO> c7nUserVOS = responseEntity.getBody().getContent();
+            if (Objects.nonNull(enabled)) {
+                return c7nUserVOS.stream().filter(c7nUserVO -> c7nUserVO.getEnabled().equals(enabled)).map(C7nUserVO::getId).collect(Collectors.toSet());
+            } else {
+                return c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
+            }
+        } else {
+            return Collections.emptySet();
+        }
+    }
+
+    @Override
     public Set<Long> listC7nUserIdsByNameOnSiteLevel(String realName, String loginName) {
         // 0为不分页
         ResponseEntity<Page<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnSiteLevel(0, 0, loginName, realName);

@@ -71,6 +71,18 @@ public interface C7nBaseServiceFacade {
     Set<Long> listC7nUserIdsByNameOnProjectLevel(Long projectId, String realName, String loginName);
 
     /**
+     * 项目层
+     * 查询用户信息, 根据实际名称和登录名和是否启用模糊查询
+     *
+     * @param projectId
+     * @param realName
+     * @param loginName
+     * @param enabled
+     * @return
+     */
+    Set<Long> listC7nUserIdsByNameOnProjectLevelAndEnabled(Long projectId, String realName, String loginName, Boolean enabled);
+
+    /**
      * 平台层
      * 查询用户信息, 根据实际名称和登录名模糊查询
      *

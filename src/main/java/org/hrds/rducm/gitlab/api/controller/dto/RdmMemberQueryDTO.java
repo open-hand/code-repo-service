@@ -28,6 +28,12 @@ public class RdmMemberQueryDTO {
     private String loginName;
     @ApiModelProperty(value = "通用参数")
     private String params;
+    @ApiModelProperty(value = "是否启用")
+    private Boolean enabled;
+    @ApiModelProperty(value = "是否同步")
+    private Boolean syncGitlabFlag;
+    @ApiModelProperty(value = "是否过期")
+    private Boolean glExpiresFlag;
 
     public Set<Long> getProjectIds() {
         return projectIds;
@@ -80,6 +86,33 @@ public class RdmMemberQueryDTO {
 
     public RdmMemberQueryDTO setParams(String params) {
         this.params = params;
+        return this;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public RdmMemberQueryDTO setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+        return this;
+    }
+
+    public Boolean getSyncGitlabFlag() {
+        return syncGitlabFlag;
+    }
+
+    public RdmMemberQueryDTO setSyncGitlabFlag(Boolean syncGitlabFlag) {
+        this.syncGitlabFlag = syncGitlabFlag;
+        return this;
+    }
+
+    public Boolean getGlExpiresFlag() {
+        return glExpiresFlag;
+    }
+
+    public RdmMemberQueryDTO setGlExpiresFlag(Boolean glExpiresFlag) {
+        this.glExpiresFlag = glExpiresFlag;
         return this;
     }
 }
