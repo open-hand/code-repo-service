@@ -26,7 +26,7 @@ public class C7nUserVO {
 
     private String profilePhoto;
 
-    private Boolean isEnabled;
+    private Boolean enabled;
 
     private Boolean ldap;
 
@@ -141,11 +141,11 @@ public class C7nUserVO {
     }
 
     public Boolean getEnabled() {
-        return isEnabled;
+        return enabled;
     }
 
     public C7nUserVO setEnabled(Boolean enabled) {
-        isEnabled = enabled;
+        this.enabled = enabled;
         return this;
     }
 

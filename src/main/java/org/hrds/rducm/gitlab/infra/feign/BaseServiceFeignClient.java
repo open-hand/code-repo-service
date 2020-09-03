@@ -103,6 +103,7 @@ public interface BaseServiceFeignClient {
      * @param size
      * @param loginName
      * @param realName
+     * @param enabled
      * @return
      */
     @GetMapping("/v1/projects/{project_id}/users/search")
@@ -110,7 +111,8 @@ public interface BaseServiceFeignClient {
                                                                      @RequestParam(required = false) int page,
                                                                      @RequestParam(required = false) int size,
                                                                      @RequestParam(required = false) String loginName,
-                                                                     @RequestParam(required = false) String realName);
+                                                                     @RequestParam(required = false) String realName,
+                                                                     @RequestParam(required = false) Boolean enabled);
 
     /**
      * 组织层
@@ -180,7 +182,7 @@ public interface BaseServiceFeignClient {
      * @return
      */
     @PostMapping(value = "/v1/users/list_by_ids")
-    ResponseEntity<List<C7nUserVO>> listUsersByIds(@RequestParam(value = "only_enabled", defaultValue = "true", required = false) Boolean onlyEnabled,
+    ResponseEntity<List<C7nUserVO>> listUsersByIds(@RequestParam(value = "only_enabled", defaultValue = "false", required = false) Boolean onlyEnabled,
                                                    @RequestBody Set<Long> ids);
 
 

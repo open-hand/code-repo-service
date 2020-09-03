@@ -29,9 +29,13 @@ public class BaseC7nUserViewDTO {
     @ApiModelProperty(value = "邮箱")
     private String email;
 
+    @ApiModelProperty(value = "是否启用")
+    private Boolean enabled;
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @ApiModelProperty(value = "组织id")
     private Long organizationId;
+
 
     //
     // 工具方法
@@ -43,7 +47,8 @@ public class BaseC7nUserViewDTO {
                 .setRealName(c7nUserVO.getRealName())
                 .setLoginName(c7nUserVO.getLoginName())
                 .setImageUrl(c7nUserVO.getImageUrl())
-                .setEmail(c7nUserVO.getEmail());
+                .setEmail(c7nUserVO.getEmail())
+                .setEnabled(c7nUserVO.getEnabled());
     }
 
     public Long getUserId() {
@@ -97,6 +102,15 @@ public class BaseC7nUserViewDTO {
 
     public BaseC7nUserViewDTO setOrganizationId(Long organizationId) {
         this.organizationId = organizationId;
+        return this;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public BaseC7nUserViewDTO setEnabled(Boolean enabled) {
+        this.enabled = enabled;
         return this;
     }
 }

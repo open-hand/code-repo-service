@@ -7,6 +7,7 @@ import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
 import org.hzero.export.vo.ExportParam;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author xy
@@ -21,6 +22,15 @@ public interface RdmMemberAppService {
      * @return
      */
     Page<RdmMemberViewDTO> pageByOptions(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query);
+
+    /**
+     * 列表查询成员
+     *
+     * @param projectId   项目id
+     * @param query       查询参数
+     * @return
+     */
+    List<RdmMemberViewDTO> listByOptions(Long projectId, RdmMemberQueryDTO query);
 
     /**
      * 组织层
