@@ -81,78 +81,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
     @Override
     public Page<RdmMemberViewDTO> pageByOptions(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query) {
-        // <1> 封装查询条件
-//        String repositoryName = query.getRepositoryName();
-//        String realName = query.getRealName();
-//        String loginName = query.getLoginName();
-//        Set<Long> repositoryIds = query.getRepositoryIds();
-//        String params = query.getParams();
-//
-//        Condition condition = Condition.builder(RdmMember.class)
-//                .where(Sqls.custom()
-//                        .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
-//                        .andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIds, true))
-//                .build();
-//        // TODO 可使用多线程优化
-//        StopWatch stopWatch = new StopWatch();
-//        stopWatch.start();
-//
-//        // 调用外部接口模糊查询 用户名或登录名
-//        if (!StringUtils.isEmpty(realName) || !StringUtils.isEmpty(loginName)) {
-//            Set<Long> userIdsSet = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, realName, loginName);
-//
-//            if (userIdsSet.isEmpty()) {
-//                return new Page<>();
-//            }
-//
-//            condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
-//        }
-//
-//        // 调用外部接口模糊查询 应用服务
-//        if (!StringUtils.isEmpty(repositoryName)) {
-//            Set<Long> repositoryIdSet = c7NDevOpsServiceFacade.listC7nAppServiceIdsByNameOnProjectLevel(projectId, repositoryName);
-//
-//            if (repositoryIdSet.isEmpty()) {
-//                return new Page<>();
-//            }
-//
-//            condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
-//        }
-//
-//        // 根据params多条件查询
-//        if (!StringUtils.isEmpty(params)) {
-//            Set<Long> userIdsSet1 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, params, null);
-//            Set<Long> userIdsSet2 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, null, params);
-//            Set<Long> userIdsSet = new HashSet<>();
-//            userIdsSet.addAll(userIdsSet1);
-//            userIdsSet.addAll(userIdsSet2);
-//
-//            Set<Long> repositoryIdSet = c7NDevOpsServiceFacade.listC7nAppServiceIdsByNameOnProjectLevel(projectId, params);
-//
-//            boolean userIsEmpty = userIdsSet.isEmpty();
-//            boolean repositoryIsEmpty = repositoryIdSet.isEmpty();
-//
-//            if (userIsEmpty && repositoryIsEmpty) {
-//                // 都为空, 查询结果为空
-//                return new Page<>();
-//            } else if (!userIsEmpty && !repositoryIsEmpty) {
-//                // 都不为空, or条件查询
-//                condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet)
-//                        .orIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
-//            } else if (!userIsEmpty) {
-//                // 用户查询不为空
-//                condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
-//            } else {
-//                // 应用服务查询不为空
-//                condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
-//            }
-//        }
-//
-//        stopWatch.stop();
-//        logger.info(stopWatch.prettyPrint());
-
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> listRdmMemberByOptions(projectId, query));
-
         return rdmMemberAssembler.pageToRdmMemberViewDTO(page, ResourceLevel.PROJECT);
     }
 
