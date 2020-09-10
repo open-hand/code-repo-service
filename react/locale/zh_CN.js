@@ -195,6 +195,10 @@ const userInfo = {
   // 修改密码
   'user.changepwd.twopwd.pattern.msg': '两次密码输入不一致',
   'user.changepwd.header.title': '修改密码',
+  'infra.changepwd.message.svn.noContent.title': '暂无SVN账号',
+  'infra.changepwd.message.svn.noContent.desc': '项目所有者给用户分配文档库权限之后，会自动创建SVN账号，路径：“项目-->文档库管理-->权限分配TAB”',
+  'infra.changepwd.message.prod.noContent.title': '暂无制品库账号',
+  'infra.changepwd.message.prod.noContent.desc': '仓库管理员给用户分配制品库权限之后，会自动创建制品库账号，路径：“项目-->制品库管理-->详情-->权限分配TAB”',
   'user.changepwd.gitlab': '修改仓库密码',
   'user.changepwd.oldpassword': '原密码',
   'user.changepwd.oldpassword.require.msg': '请输入原密码',
