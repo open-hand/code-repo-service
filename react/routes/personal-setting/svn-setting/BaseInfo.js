@@ -3,6 +3,8 @@ import { observer } from 'mobx-react-lite';
 import { Button, Form, Spin } from 'choerodon-ui';
 import { Modal, Password } from 'choerodon-ui/pro';
 import { Content, Header, TabPage, Choerodon, axios, Breadcrumb } from '@choerodon/boot';
+import Empty from '@/components/empty';
+import empty from '@/assets/empty.png';
 import './BaseInfo.less';
 import { usPsManagerStore } from '../stores';
 import EditPassword from './EditPassword';
@@ -15,6 +17,7 @@ function BaseInfo() {
   const { organizationId, imageUrl, loginName } = AppState.userInfo;
   const [loading, setLoading] = useState(false);
   const [enablePwd, setEnablePwd] = useState({});
+  const [noContentFlag, setNoContentFlag] = useState(true);
   const { name, userName, creationDate, userPassword } = enablePwd;
   // const [avatar, setAvatar] = useState('');
   const modalRef = React.createRef();
@@ -36,6 +39,7 @@ function BaseInfo() {
       .then((response) => {
         setEnablePwd(response);
         setLoading(false);
+        setNoContentFlag(response.status === 204);
         if (response.failed) {
           Choerodon.prompt(response.message);
         }
@@ -164,14 +168,26 @@ function BaseInfo() {
               className="svg-setting-header-btn"
               onClick={handleUpdatePassword.bind(this)}
               icon="mode_edit"
+              disabled={noContentFlag}
             >
               {intl.formatMessage({ id: 'user.changepwd.header.title' })}
             </Button>
           </Header>
           <Breadcrumb />
-          <Content className={`${prefixCls}-container`}>
-            {renderUserInfo(user)}
-          </Content>
+          {noContentFlag ? (
+            <Content>
+              <Empty
+                // loading={getLoading}
+                pic={empty}
+                title={intl.formatMessage({ id: 'infra.changepwd.message.svn.noContent.title' })}
+                description={intl.formatMessage({ id: 'infra.changepwd.message.svn.noContent.desc' })}
+              />
+            </Content>
+          ) :
+            <Content className={`${prefixCls}-container`}>
+              {renderUserInfo(user)}
+            </Content>
+          }
         </Spin>
       </TabPage>
     );
