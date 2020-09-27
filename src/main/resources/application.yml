@@ -1,6 +1,6 @@
 spring:
   application:
-    name: code-service
+    name: code-repo-service
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://db.hzero.org:3306/hzero_platform?useUnicode=true&characterEncoding=utf-8&useSSL=false}
     username:  ${SPRING_DATASOURCE_USERNAME:hzero}
