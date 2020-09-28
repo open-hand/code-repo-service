@@ -29,7 +29,7 @@ code-repo-service通过与Gitlab集成, 提供权限管理等功能, 通过在Ch
 
 ## 服务依赖
 
-* `go-register-server`: 注册中心，在线上环境代替本地的`eureka-server`
+* `choerodon-register`: 注册中心，在线上环境代替本地的`eureka-server`
 * `choerodon-iam`: 用户服务，与用户有关的操作依赖与此服务
 * `choerodon-gateway`: 网关服务
 * `choerodon-oauth`: 授权服务
