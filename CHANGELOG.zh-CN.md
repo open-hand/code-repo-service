@@ -1,5 +1,5 @@
 # 更新日志
-这个文件记录hrds-code-repo所有版本的重大变动。
+这个文件记录code-repo-service所有版本的重大变动。
 
 ## [0.23.0-RELEASE] 2020-07-31
 

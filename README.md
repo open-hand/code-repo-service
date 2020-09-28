@@ -1,13 +1,13 @@
 简体中文 | [English](./README.en_US.md)
  
-# hrds-code-repo
+# code-repo-service
 
-`hrds-code-repo` hrds-code-repo是Choerodon平台的代码库管理服务. 当前版本为: `0.23.0-alpha.1`
+`code-repo-service` code-repo-service是Choerodon平台的代码库管理服务. 当前版本为: `0.23.0-alpha.1`
 
-hrds-code-repo通过与Gitlab集成, 提供权限管理等功能, 通过在Choerodon平台一站式管理代码库。
+code-repo-service通过与Gitlab集成, 提供权限管理等功能, 通过在Choerodon平台一站式管理代码库。
 
 ## 特性
-`hrds-code-repo` 含有以下功能:    
+`code-repo-service` 含有以下功能:    
 
 - `权限分配`: 支持查看和分配团队成员的代码库权限
 - `权限申请`: 支持向项目管理员申请应用服务的权限
@@ -18,23 +18,23 @@ hrds-code-repo通过与Gitlab集成, 提供权限管理等功能, 通过在Choer
 - `总览`: 支持查看各应用服务的一些信息
 
 ## 前置要求
-- [JAVA](https://www.java.com/en/)：`hrds-code-repo`基于Java8进行开发
-- [GitLab](https://about.gitlab.com/)：`hrds-code-repo`使用`GitLab`进行代码的托管。同时，通过基于`GitLab Runner`实现持续集成以完成代码编译，单元测试执行，代码质量分析，docker镜像生成，helm chart打包，服务版本发布等自动化过程
+- [JAVA](https://www.java.com/en/)：`code-repo-service`基于Java8进行开发
+- [GitLab](https://about.gitlab.com/)：`code-repo-service`使用`GitLab`进行代码的托管。同时，通过基于`GitLab Runner`实现持续集成以完成代码编译，单元测试执行，代码质量分析，docker镜像生成，helm chart打包，服务版本发布等自动化过程
 - [Harbor](https://vmware.github.io/harbor/cn/)：企业级Docker registry 服务，用于存放服务版本所对应的docker镜像
 - [Kubernetes](https://kubernetes.io/)：容器编排管理工具，用于部署服务版本所对应的helm chart包
 - [ChartMuseum](https://chartmuseum.com/)：Helm Chart仓库，用于存放服务版本所对应的helm chart包
 - [Sonarqube](https://www.sonarqube.org/)：管理代码质量的开放平台，用于管理服务的代码质量
-- [MySQL](https://www.mysql.com)：主流数据库之一，用于`hrds-code-repo`的数据持久化
+- [MySQL](https://www.mysql.com)：主流数据库之一，用于`code-repo-service`的数据持久化
 - [Redis](https://redis.io/)：内存数据库，用于数据缓存和部分非持久化数据存储
 
 ## 服务依赖
 
 * `go-register-server`: 注册中心，在线上环境代替本地的`eureka-server`
-* `iam-service`: 用户服务，与用户有关的操作依赖与此服务
-* `api-gateway`: 网关服务
-* `oauth-server`: 授权服务
+* `choerodon-iam`: 用户服务，与用户有关的操作依赖与此服务
+* `choerodon-gateway`: 网关服务
+* `choerodon-oauth`: 授权服务
 * `manager-service`: 管理服务
-* `asgard-service`: 事务一致性服务
+* `choerodon-asgard`: 事务一致性服务
 * `notify-service`: 通知服务
 * `devops-service`: Devops服务
 
@@ -94,7 +94,7 @@ hrds-code-repo通过与Gitlab集成, 提供权限管理等功能, 通过在Choer
   ```yaml
   spring:
     application:
-      name: hrds-code-repo
+      name: code-repo-service
     datasource:
       url: ${SPRING_DATASOURCE_URL:jdbc:mysql://db.hzero.org:3306/hzero_platform?useUnicode=true&characterEncoding=utf-8&useSSL=false}
       username:  ${SPRING_DATASOURCE_USERNAME:hzero}
@@ -209,7 +209,7 @@ hrds-code-repo通过与Gitlab集成, 提供权限管理等功能, 通过在Choer
         retry-interval: 3
         skip-services: config**, **register-server, **gateway**, zipkin**, hystrix**, oauth**
     saga:
-      service: hzero-asgard
+      service: choerodon-asgard
       consumer:
         enabled: false # 启动消费端
         thread-num: 2 # saga消息消费线程池大小
@@ -240,10 +240,10 @@ hrds-code-repo通过与Gitlab集成, 提供权限管理等功能, 通过在Choer
    FLUSH PRIVILEGES;
    ```
 
-2. 拉取`hrds-code-repo`代码到本地：
+2. 拉取`code-repo-service`代码到本地：
 
    ```sh
-   git clone https://github.com/choerodon/hrds-code-repo.git
+   git clone https://github.com/choerodon/code-repo-service.git
    ```
 
 3. 在项目根目录执行命令： `sh init-database.sh`
@@ -260,7 +260,7 @@ hrds-code-repo通过与Gitlab集成, 提供权限管理等功能, 通过在Choer
 
 ## 反馈途径
 
-如果您发现任何缺陷或bug，请及时 [issue](https://github.com/choerodon/hrds-code-repo/issues/new)告知我们 。
+如果您发现任何缺陷或bug，请及时 [issue](https://github.com/choerodon/code-repo-service/issues/new)告知我们 。
 
 ## 如何参与
 
