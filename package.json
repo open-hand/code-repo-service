@@ -1,5 +1,5 @@
 {
-  "name": "hrds-code-repo",
+  "name": "@choerodon/code-repo",
   "routeName": "rducm",
   "version": "0.23.0",
   "description": "",
