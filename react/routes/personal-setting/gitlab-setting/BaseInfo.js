@@ -14,7 +14,7 @@ function BaseInfo() {
   const { UserInfoStore, intl, prefixCls } = context;
   const [enablePwd, setEnablePwd] = useState({});
   const [gitLabInfo, setGitLabInfo] = useState({});
-  const [isFailed, setFileFlag] = useState(false);
+  // const [isFailed, setFileFlag] = useState(false);
   const [loading, setLoading] = useState(false);
   const { glAvatarUrl, glUsername, glName, glState, glWebUrl, userId } = gitLabInfo;
 
@@ -25,7 +25,7 @@ function BaseInfo() {
         setGitLabInfo(response);
         setLoading(false);
         if (response.failed) {
-          setFileFlag(true);
+          // setFileFlag(true);
           Choerodon.prompt(response.message);
         }
       })
@@ -223,7 +223,6 @@ function BaseInfo() {
               className="gitlab-user-info-header-btn"
               onClick={handleUpdateStore.bind(this)}
               icon="mode_edit"
-              disabled={isFailed}
               style={{
                 textTransform: 'none',
               }}
