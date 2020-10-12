@@ -123,14 +123,25 @@ function BaseInfo() {
     return false;
   }
   function openResetGitlab() {
-    const resetModal = Modal.open({
-      key: resetGitlabKey,
-      title: intl.formatMessage({ id: 'infra.personal.operate.resetPassword' }),
-      children: intl.formatMessage({ id: 'infra.personal.operate.updateInfo' }),
-      okText: intl.formatMessage({ id: 'reset' }),
-      movable: false,
-      onOk: () => handleResetGitlab(resetModal),
-    });
+    if (enablePwd.enable_reset) {
+      const resetModal = Modal.open({
+        key: resetGitlabKey,
+        title: intl.formatMessage({ id: 'infra.personal.operate.resetPassword' }),
+        children: intl.formatMessage({ id: 'infra.personal.operate.updateInfo' }),
+        okText: intl.formatMessage({ id: 'reset' }),
+        movable: false,
+        onOk: () => handleResetGitlab(resetModal),
+      });
+    } else {
+      OldModal.info({
+        className: 'c7n-iam-confirm-modal',
+        title: intl.formatMessage({ id: 'infra.personal.operate.resetPassword' }),
+        content: intl.formatMessage({ id: 'infra.personal.message.noUrl' }),
+        okText: intl.formatMessage({ id: 'infra.personal.message.iKnow' }),
+        width: 560,
+        onOk() { },
+      });
+    }
   }
 
   function renderUserInfo() {
@@ -171,19 +182,30 @@ function BaseInfo() {
   }
 
   function handleUpdateStore() {
-    OldModal.confirm({
-      className: 'c7n-iam-confirm-modal',
-      title: intl.formatMessage({ id: 'infra.personal.message.modifyGitlabPassword' }),
-      content: intl.formatMessage({ id: 'infra.personal.message.modifyConfirm' }),
-      okText: intl.formatMessage({ id: 'edit' }),
-      width: 560,
-      onOk: () => {
-        const { resetGitlabPasswordUrl } = enablePwd;
-        if (enablePwd.enable_reset) {
-          window.open(resetGitlabPasswordUrl);
-        }
-      },
-    });
+    if (enablePwd.enable_reset) {
+      OldModal.confirm({
+        className: 'c7n-iam-confirm-modal',
+        title: intl.formatMessage({ id: 'infra.personal.operate.updatePassword' }),
+        content: intl.formatMessage({ id: 'infra.personal.message.modifyConfirm' }),
+        okText: intl.formatMessage({ id: 'edit' }),
+        width: 560,
+        onOk: () => {
+          const { resetGitlabPasswordUrl } = enablePwd;
+          if (enablePwd.enable_reset) {
+            window.open(resetGitlabPasswordUrl);
+          }
+        },
+      });
+    } else {
+      OldModal.info({
+        className: 'c7n-iam-confirm-modal',
+        title: intl.formatMessage({ id: 'infra.personal.operate.updatePassword' }),
+        content: intl.formatMessage({ id: 'infra.personal.message.noUrl' }),
+        okText: intl.formatMessage({ id: 'infra.personal.message.iKnow' }),
+        width: 560,
+        onOk() { },
+      });
+    }
   }
 
   useEffect(() => {
@@ -201,7 +223,10 @@ function BaseInfo() {
               className="gitlab-user-info-header-btn"
               onClick={handleUpdateStore.bind(this)}
               icon="mode_edit"
-              disabled={!enablePwd.enable_reset || isFailed}
+              disabled={isFailed}
+              style={{
+                textTransform: 'none',
+              }}
             >
               {intl.formatMessage({ id: 'infra.personal.operate.updatePassword' })}
             </Button>
