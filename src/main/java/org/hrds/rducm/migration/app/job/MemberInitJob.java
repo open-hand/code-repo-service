@@ -42,4 +42,5 @@ public class MemberInitJob {
 
         logger.info("Gitlab成员初始化完成");
     }
+
 }
