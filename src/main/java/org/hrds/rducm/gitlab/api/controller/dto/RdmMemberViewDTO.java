@@ -40,7 +40,6 @@ public class RdmMemberViewDTO {
     @Encrypt
     private Long repositoryId;
 
-    @JsonIgnore
     private Long userId;
 
     @ApiModelProperty("权限")
