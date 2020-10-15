@@ -3,6 +3,8 @@ import { observer } from 'mobx-react-lite';
 import { Button, Form, Spin } from 'choerodon-ui';
 import { Modal, Password } from 'choerodon-ui/pro';
 import { Content, Header, TabPage, Choerodon, axios, Breadcrumb } from '@choerodon/boot';
+import Empty from '@/components/empty';
+import empty from '@/assets/empty.png';
 import './BaseInfo.less';
 import { usPsManagerStore } from '../stores';
 import EditPassword from './EditPassword';
@@ -16,6 +18,7 @@ function BaseInfo() {
   const { organizationId, imageUrl, id, realName } = AppState.userInfo;
   const [loading, setLoading] = useState(false);
   const [enablePwd, setEnablePwd] = useState({});
+  const [noContentFlag, setNoContentFlag] = useState(true);
   const { loginName, creationDate, password, pwdUpdateFlag } = enablePwd;
   const modalRef = React.createRef();
 
@@ -25,6 +28,7 @@ function BaseInfo() {
       .then((response) => {
         setEnablePwd(response);
         setLoading(false);
+        setNoContentFlag(response.status === 204);
         if (response.failed) {
           Choerodon.prompt(response.message);
         }
@@ -133,14 +137,26 @@ function BaseInfo() {
             className="prod-setting-header-btn"
             onClick={handleUpdatePassword.bind(this)}
             icon="mode_edit"
+            disabled={noContentFlag}
           >
             {intl.formatMessage({ id: 'user.changepwd.header.title' })}
           </Button>
         </Header>
         <Breadcrumb />
-        <Content className={`${prefixCls}-container`}>
-          {renderUserInfo()}
-        </Content>
+        {noContentFlag ? (
+          <Content>
+            <Empty
+              // loading={getLoading}
+              pic={empty}
+              title={intl.formatMessage({ id: 'infra.changepwd.message.prod.noContent.title' })}
+              description={intl.formatMessage({ id: 'infra.changepwd.message.prod.noContent.desc' })}
+            />
+          </Content>
+        ) :
+          <Content className={`${prefixCls}-container`}>
+            {renderUserInfo()}
+          </Content>
+        }
       </Spin>
     </TabPage>
   );

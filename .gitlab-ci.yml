@@ -28,16 +28,16 @@ build front:
     variables:
       - $CI_COMMIT_MESSAGE =~ /combine/
 
-tag front:
-  stage: build
-  script:
-    - npm install --registry ${NPM_REPO} --sass-binary-site=http://npm.taobao.org/mirrors/node-sass
-    - chmod -R 755 node_modules
-    - npm run compile
-    - echo "//${NPM_REGISTRY}:_authToken=${NPM_TOKEN}">.npmrc
-    - npm publish --registry ${NPM_PUBLISH_REGISTRY}
-  only:
-    - tags
+#tag front:
+#  stage: build
+#  script:
+#    - npm install --registry ${NPM_REPO} --sass-binary-site=http://npm.taobao.org/mirrors/node-sass
+#    - chmod -R 755 node_modules
+#    - npm run compile
+#    - echo "//${NPM_REGISTRY}:_authToken=${NPM_TOKEN}">.npmrc
+#    - npm publish --registry ${NPM_PUBLISH_REGISTRY}
+#  only:
+#    - tags
 
 build backend:
   stage: build
