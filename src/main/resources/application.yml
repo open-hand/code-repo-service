@@ -1,6 +1,6 @@
 spring:
   application:
-    name: hrds-code-repo
+    name: code-repo-service
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://db.hzero.org:3306/hzero_platform?useUnicode=true&characterEncoding=utf-8&useSSL=false}
     username:  ${SPRING_DATASOURCE_USERNAME:hzero}
@@ -97,7 +97,12 @@ mybatis:
     mapUnderscoreToCamelCase: true
     # 雪花id主键配置
     key-generator: snowflake
-
+    snowflake:
+      start-timestamp: 1577808000000
+      meta-provider: redis
+      meta-provider-redis-db: ${SPRING_REDIS_DATABASE:1}
+      meta-provider-redis-refresh-interval: 540000
+      meta-provider-redis-expire: 600000
 
 logging:
   level:
@@ -117,7 +122,7 @@ choerodon:
       retry-interval: 3
       skip-services: config**, **register-server, **gateway**, zipkin**, hystrix**, oauth**
   saga:
-    service: hzero-asgard
+    service: choerodon-asgard
     consumer:
       enabled: true # 启动消费端
       thread-num: 2 # saga消息消费线程池大小
@@ -130,6 +135,26 @@ choerodon:
       poll-interval-ms: 1000 # 拉取间隔，默认1000毫秒
   cleanPermission: false
 
+hzero:
+  service:
+    platform:
+      name: choerodon-platform
+    oauth:
+      name: choerodon-oauth
+    iam:
+      name: choerodon-iam
+    file:
+      name: choerodon-file
+    message:
+      name: choerodon-message
+    admin:
+      name: choerodon-admin
+    swagger:
+      name: choerodon-swagger
+    gateway:
+      name: choerodon-gateway
+    monitor:
+      name: choerodon-monitor
 
 gitlab:
   url: ${GITLAB_URL:http://git.example.com/}
