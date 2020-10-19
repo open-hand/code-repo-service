@@ -218,6 +218,10 @@ public class RdmMemberChangeSagaHandler {
                 return RoleLabelEnum.PROJECT_ADMIN.value();
             } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value())) {
                 return RoleLabelEnum.PROJECT_MEMBER.value();
+            } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_OWNER.value())){
+                return RoleLabelEnum.PROJECT_ADMIN.value();
+            } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_DEVELOPER.value())) {
+                return RoleLabelEnum.PROJECT_MEMBER.value();
             }
         }
         // 组织层
@@ -225,6 +229,8 @@ public class RdmMemberChangeSagaHandler {
         if (userMemberRoleList.contains(RoleLabelEnum.TENANT_ADMIN.value())) {
             return RoleLabelEnum.TENANT_ADMIN.value();
         } else if (userMemberRoleList.contains(RoleLabelEnum.TENANT_MEMBER.value())) {
+            return RoleLabelEnum.TENANT_MEMBER.value();
+        } else if (userMemberRoleList.contains(RoleLabelEnum.TENANT_ROLE.value())) {
             return RoleLabelEnum.TENANT_MEMBER.value();
         }
 //        }

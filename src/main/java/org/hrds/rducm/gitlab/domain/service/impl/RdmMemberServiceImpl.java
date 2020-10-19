@@ -392,6 +392,10 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             // 移除数据库成员
             rdmMemberRepository.deleteByPrimaryKey(param.getId());
         } else {
+            //TODO 此处逻辑待确认
+            //当添加了一个项目层自定义角色{GITLAB_OWNER}的团队成员用户A，此时gitlab中用户A已经是OWNER了
+            //且在代码库分配权限时（Maintainer，developer， reporter，guest）时，rducm_gitlab_member会提示无法移除owner权限，
+            //因此调用同步方法时，会判断gitlab中的用户A权限级别为50>=owner，走此处的删除方法，直接在代码库中删除了这个成员
             if (glMember.getAccessLevel().toValue() >= AccessLevel.OWNER.toValue()) {
                 // 移除数据库成员
                 rdmMemberRepository.deleteByPrimaryKey(param.getId());
