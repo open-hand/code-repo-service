@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberCreateDTO;
@@ -57,6 +58,9 @@ public class RdmMemberAssembler {
         Map<Long, Integer> userIdToGlUserIdMap = new HashMap<>();
         rdmMemberBatchDTO.getMembers().forEach(m -> {
             Integer glUserId = c7NBaseServiceFacade.userIdToGlUserId(m.getUserId());
+            if (Objects.isNull(glUserId)) {
+                throw new CommonException("error.gitlab.user.id.null", m.getUserId());
+            }
             userIdToGlUserIdMap.put(m.getUserId(), glUserId);
         });
 
