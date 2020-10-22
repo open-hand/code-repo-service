@@ -36,6 +36,8 @@ public class BaseC7nUserViewDTO {
     @ApiModelProperty(value = "组织id")
     private Long organizationId;
 
+    private Boolean projectMember;
+
 
     //
     // 工具方法
@@ -48,7 +50,8 @@ public class BaseC7nUserViewDTO {
                 .setLoginName(c7nUserVO.getLoginName())
                 .setImageUrl(c7nUserVO.getImageUrl())
                 .setEmail(c7nUserVO.getEmail())
-                .setEnabled(c7nUserVO.getEnabled());
+                .setEnabled(c7nUserVO.getEnabled())
+                .setProjectMember(c7nUserVO.getProjectMember());
     }
 
     public Long getUserId() {
@@ -111,6 +114,15 @@ public class BaseC7nUserViewDTO {
 
     public BaseC7nUserViewDTO setEnabled(Boolean enabled) {
         this.enabled = enabled;
+        return this;
+    }
+
+    public Boolean getProjectMember() {
+        return projectMember;
+    }
+
+    public BaseC7nUserViewDTO setProjectMember(Boolean projectMember) {
+        this.projectMember = projectMember;
         return this;
     }
 }

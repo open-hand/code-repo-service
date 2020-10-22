@@ -69,7 +69,8 @@ public class ProjectController extends BaseController {
                             .setEmail(u.getEmail())
                             .setOrganizationId(u.getOrganizationId())
                             .setRealName(u.getRealName())
-                            .setImageUrl(u.getImageUrl());
+                            .setImageUrl(u.getImageUrl())
+                            .setProjectMember(u.getProjectMember());
                     return baseC7NUserViewDTO;
                 }).collect(Collectors.toList());
         return Results.success(baseC7NUserViewDTOS);
