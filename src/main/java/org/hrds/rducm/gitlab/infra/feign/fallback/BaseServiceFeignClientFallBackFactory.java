@@ -46,7 +46,7 @@ public class BaseServiceFeignClientFallBackFactory implements FallbackFactory<Ba
             }
 
             @Override
-            public ResponseEntity<Page<C7nUserVO>> pageUsersByOptionsOnSiteLevel(int page, int size, String loginName, String realName) {
+            public ResponseEntity<Page<C7nUserVO>> pageUsersByOptionsOnSiteLevel(int page, int size, String loginName, String realName, String params) {
                 throw new CommonException("error.feign.fallback");
             }
 

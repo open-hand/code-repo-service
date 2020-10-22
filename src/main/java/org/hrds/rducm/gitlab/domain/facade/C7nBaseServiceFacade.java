@@ -123,15 +123,15 @@ public interface C7nBaseServiceFacade {
      */
     Set<Long> listC7nUserIdsByNameOnOrgLevel(Long organizationId, String realName, String loginName);
 
-//    /**
-//     * 平台层
-//     * 查询用户ids, 根据实际名称和登录名模糊查询
-//     *
-//     * @param realName
-//     * @param loginName
-//     * @return
-//     */
-//    Set<Long> listC7nUserIdsByNameOnSiteLevel(String realName, String loginName);
+    /**
+     * 平台层
+     * 查询用户, 根据实际名称和登录名模糊查询
+     *
+     * @param realName
+     * @param loginName
+     * @return
+     */
+    List<C7nUserVO> listC7nUsersByNameOnSiteLevel(String realName, String loginName);
 
     /**
      * 查询项目开发成员, 并排除自己(项目层)

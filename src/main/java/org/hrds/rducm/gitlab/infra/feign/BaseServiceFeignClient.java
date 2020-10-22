@@ -146,7 +146,8 @@ public interface BaseServiceFeignClient {
     ResponseEntity<Page<C7nUserVO>> pageUsersByOptionsOnSiteLevel(@RequestParam(required = false) int page,
                                                                   @RequestParam(required = false) int size,
                                                                   @RequestParam(required = false) String loginName,
-                                                                  @RequestParam(required = false) String realName);
+                                                                  @RequestParam(required = false) String realName,
+                                                                  @RequestParam(required = false) String params);
 
     /**
      * 项目层

@@ -34,7 +34,7 @@ public class ProjectController extends BaseController {
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
 
-    @ApiOperation(value = "查询项目成员, 排除'项目管理员'和'组织管理员'角色,并排除自己(项目层)")
+    @ApiOperation(value = "查询项目成员和非项目成员, 排除'项目管理员'和'组织管理员'角色,并排除自己(项目层)")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
             @ApiImplicitParam(name = "name", value = "真实名称或登录名模糊搜索", paramType = "query"),
@@ -46,7 +46,12 @@ public class ProjectController extends BaseController {
                                                                                 @RequestParam(required = false) String name) {
         List<C7nUserVO> c7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listDeveloperProjectMembers(projectId, name))
                 .orElse(Collections.emptyList());
-
+        c7nUserVOS = c7nUserVOS.stream().map(a -> a.setProjectMember(true)).collect(Collectors.toList());
+        List<C7nUserVO> allC7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listC7nUsersByNameOnSiteLevel(name, name))
+                .orElse(Collections.emptyList());
+        Set<Long> allC7nUserIds = allC7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
+        List<C7nUserVO> nonProjectMember = allC7nUserVOS.stream().filter(a -> !allC7nUserIds.contains(a.getId())).map(a -> a.setProjectMember(false)).collect(Collectors.toList());
+        c7nUserVOS.addAll(nonProjectMember);
         // 获取组织管理员
         List<C7nUserVO> orgAdministrators = Optional.ofNullable(c7NBaseServiceFacade.listOrgAdministrator(organizationId))
                 .orElse(Collections.emptyList());
