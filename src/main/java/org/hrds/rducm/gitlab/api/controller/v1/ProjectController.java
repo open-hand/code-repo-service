@@ -35,7 +35,7 @@ public class ProjectController extends BaseController {
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
 
-    @ApiOperation(value = "查询项目成员和非项目成员, 排除'项目管理员'和'组织管理员'角色,并排除自己(项目层)")
+    @ApiOperation(value = "查询项目成员, 排除'项目管理员'和'组织管理员'角色,并排除自己(项目层)")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
             @ApiImplicitParam(name = "name", value = "真实名称或登录名模糊搜索", paramType = "query"),
@@ -59,16 +59,9 @@ public class ProjectController extends BaseController {
                 .orElse(Collections.emptyList());
         Set<Long> orgAdmins = orgAdministrators.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
 
-        //当name 参数不为空时 获取其他项目成员
-        if(Objects.nonNull(name)) {
-            List<C7nUserVO> allC7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listC7nUsersByNameOnSiteLevel(name, null))
-                    .orElse(Collections.emptyList());
-            Set<Long> allC7nUserIds = allC7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
-            List<C7nUserVO> nonProjectMember = allC7nUserVOS.stream().filter(a -> !allC7nUserIds.contains(a.getId())).map(a -> a.setProjectMember(false)).collect(Collectors.toList());
-            c7nUserVOS.addAll(nonProjectMember);
-        }
-
         List<BaseC7nUserViewDTO> baseC7NUserViewDTOS = c7nUserVOS.stream()
+                // 过滤“项目所有者”角色的用户
+
                 // 过滤掉"组织管理员"角色的用户
                 .filter(u -> !orgAdmins.contains(u.getId()))
                 .map(u -> {
@@ -84,6 +77,41 @@ public class ProjectController extends BaseController {
                 }).collect(Collectors.toList());
         return Results.success(baseC7NUserViewDTOS);
 
+    }
+
+    @ApiOperation(value = "查询非项目成员")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectId", value = "项目id", paramType = "path", required = true),
+            @ApiImplicitParam(name = "name", value = "真实名称或登录名模糊搜索", paramType = "query"),
+    })
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @GetMapping("/c7n/non-project-members")
+    public ResponseEntity<List<BaseC7nUserViewDTO>> listNonProjectMembers(@PathVariable Long organizationId,
+                                                                          @PathVariable Long projectId,
+                                                                          @RequestParam String name) {
+        //查询项目开发成员
+        List<C7nUserVO> c7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listDeveloperProjectMembers(projectId, name))
+                .orElse(Collections.emptyList());
+
+        // 过滤当前项目成员
+        List<C7nUserVO> allC7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listC7nUsersByNameOnSiteLevel(name, null))
+                .orElse(Collections.emptyList());
+        Set<Long> allC7nUserIds = allC7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
+        List<C7nUserVO> nonProjectMember = allC7nUserVOS.stream().filter(a -> !allC7nUserIds.contains(a.getId())).map(a -> a.setProjectMember(false)).collect(Collectors.toList());
+
+        List<BaseC7nUserViewDTO> baseC7NUserViewDTOS = nonProjectMember.stream()
+                .map(u -> {
+                    BaseC7nUserViewDTO baseC7NUserViewDTO = new BaseC7nUserViewDTO();
+                    baseC7NUserViewDTO.setUserId(u.getId())
+                            .setLoginName(u.getLoginName())
+                            .setEmail(u.getEmail())
+                            .setOrganizationId(u.getOrganizationId())
+                            .setRealName(u.getRealName())
+                            .setImageUrl(u.getImageUrl())
+                            .setProjectMember(u.getProjectMember());
+                    return baseC7NUserViewDTO;
+                }).collect(Collectors.toList());
+        return Results.success(baseC7NUserViewDTOS);
     }
 
 
