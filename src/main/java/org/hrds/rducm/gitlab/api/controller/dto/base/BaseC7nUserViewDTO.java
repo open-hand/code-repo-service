@@ -2,7 +2,6 @@ package org.hrds.rducm.gitlab.api.controller.dto.base;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
-import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hzero.starter.keyencrypt.core.Encrypt;
 
@@ -36,8 +35,8 @@ public class BaseC7nUserViewDTO {
     @ApiModelProperty(value = "组织id")
     private Long organizationId;
 
+    @ApiModelProperty(value = "是否为项目成员")
     private Boolean projectMember;
-
 
     //
     // 工具方法

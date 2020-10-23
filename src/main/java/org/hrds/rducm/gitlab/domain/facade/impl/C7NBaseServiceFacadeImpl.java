@@ -192,7 +192,7 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
     @Override
     public List<C7nUserVO> listC7nUsersByNameOnSiteLevel(String realName, String loginName) {
         // 0为不分页
-        ResponseEntity<Page<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnSiteLevel(0, 0, null, null, realName);
+        ResponseEntity<Page<C7nUserVO>> responseEntity = baseServiceFeignClient.pageUsersByOptionsOnSiteLevel(0, 0, loginName, realName, null);
 
         if (!CollectionUtils.isEmpty(Objects.requireNonNull(responseEntity.getBody()).getContent())) {
             List<C7nUserVO> c7nUserVOS = responseEntity.getBody().getContent();
