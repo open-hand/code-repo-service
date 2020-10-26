@@ -87,4 +87,9 @@ public class MemberAuditServiceImpl implements IMemberAuditService {
             memberAuditLogRepository.insertSelective(log);
         });
     }
+
+    @Override
+    public void repairMemberPermission(Long organizationId, List<RdmMemberAuditRecord> memberAuditRecordList) {
+
+    }
 }

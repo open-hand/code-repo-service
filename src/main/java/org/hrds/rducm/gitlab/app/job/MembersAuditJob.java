@@ -37,7 +37,7 @@ public class MembersAuditJob {
             description = "成员审计定时任务",
             params = {},
             triggerType = TriggerTypeEnum.CRON_TRIGGER,
-            cronExpression = "0 0 1 1 * ?")
+            cronExpression = "0 0 2 * * ?")
     public void membersAuditJob(Map<String, Object> param) {
         // <> 获取组织
         long auditOrganizationId = 7L;
