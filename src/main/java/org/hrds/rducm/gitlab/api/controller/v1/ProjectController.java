@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -50,10 +49,6 @@ public class ProjectController extends BaseController {
                 .orElse(Collections.emptyList());
         c7nUserVOS = c7nUserVOS.stream().map(a -> a.setProjectMember(true)).collect(Collectors.toList());
 
-        //过滤"项目所有者"角色的用户
-        c7nUserVOS = c7nUserVOS.stream()
-                .filter(u -> u.getRoles().stream().noneMatch(r -> r.getCode().equals(IamRoleCodeEnum.PROJECT_OWNER.getCode()))).collect(Collectors.toList());
-
         // 获取组织管理员
         List<C7nUserVO> orgAdministrators = Optional.ofNullable(c7NBaseServiceFacade.listOrgAdministrator(organizationId))
                 .orElse(Collections.emptyList());
@@ -61,7 +56,7 @@ public class ProjectController extends BaseController {
 
         List<BaseC7nUserViewDTO> baseC7NUserViewDTOS = c7nUserVOS.stream()
                 // 过滤“项目所有者”角色的用户
-
+                .filter(u -> u.getRoles().stream().noneMatch(r -> r.getCode().equals(IamRoleCodeEnum.PROJECT_OWNER.getCode())))
                 // 过滤掉"组织管理员"角色的用户
                 .filter(u -> !orgAdmins.contains(u.getId()))
                 .map(u -> {
@@ -96,8 +91,8 @@ public class ProjectController extends BaseController {
         // 过滤当前项目成员
         List<C7nUserVO> allC7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listC7nUsersByNameOnSiteLevel(name, null))
                 .orElse(Collections.emptyList());
-        Set<Long> allC7nUserIds = allC7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
-        List<C7nUserVO> nonProjectMember = allC7nUserVOS.stream().filter(a -> !allC7nUserIds.contains(a.getId())).map(a -> a.setProjectMember(false)).collect(Collectors.toList());
+        Set<Long> memberIds = c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
+        List<C7nUserVO> nonProjectMember = allC7nUserVOS.stream().filter(a -> !memberIds.contains(a.getId())).map(a -> a.setProjectMember(false)).collect(Collectors.toList());
 
         List<BaseC7nUserViewDTO> baseC7NUserViewDTOS = nonProjectMember.stream()
                 .map(u -> {
