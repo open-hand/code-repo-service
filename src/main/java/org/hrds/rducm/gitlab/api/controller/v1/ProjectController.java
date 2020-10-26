@@ -86,11 +86,11 @@ public class ProjectController extends BaseController {
                                                                           @PathVariable Long projectId,
                                                                           @RequestParam String name) {
         //查询项目开发成员
-        List<C7nUserVO> c7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listEnabledUsersByUserName(projectId, name))
+        List<C7nUserVO> c7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listDeveloperProjectMembers(projectId, name))
                 .orElse(Collections.emptyList());
 
         // 过滤当前项目成员
-        List<C7nUserVO> allC7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listC7nUsersByNameOnSiteLevel(name, null))
+        List<C7nUserVO> allC7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listEnabledUsersByUserName(projectId, name))
                 .orElse(Collections.emptyList());
         Set<Long> memberIds = c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
         List<C7nUserVO> nonProjectMember = allC7nUserVOS.stream().filter(a -> !memberIds.contains(a.getId())).map(a -> a.setProjectMember(false)).collect(Collectors.toList());
