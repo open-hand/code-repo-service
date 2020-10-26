@@ -93,6 +93,18 @@ public interface BaseServiceFeignClient {
 //    ResponseEntity<List<C7nUserVO>> listProjectUsersByName(@PathVariable(name = "project_id") Long projectId,
 //                                                           @RequestParam(required = false) String param);
 
+    /**
+     * 项目层
+     * 根据用户名/登录名精确查询启用的用户
+     *
+     * @param projectId
+     * @param userName 用户名/登录名
+     * @return
+     */
+    @GetMapping("/v1/projects/{project_id}/enableUsers")
+    ResponseEntity<List<C7nUserVO>> listEnabledUsersByUserName(@PathVariable(name = "project_id") Long projectId,
+                                                               @RequestParam(name = "user_name") String userName);
+
 
     /**
      * 项目层

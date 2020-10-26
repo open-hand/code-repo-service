@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * @author ying.xie
  * @date 2020/6/5
  */
-//@Api(tags = SwaggerTags.GITLAB_MEMBER)
+
 @RestController("projectController.v1")
 @RequestMapping("/v1/{organizationId}/projects/{projectId}")
 public class ProjectController extends BaseController {
@@ -64,6 +64,7 @@ public class ProjectController extends BaseController {
                     baseC7NUserViewDTO.setUserId(u.getId())
                             .setLoginName(u.getLoginName())
                             .setEmail(u.getEmail())
+                            .setEnabled(u.getEnabled())
                             .setOrganizationId(u.getOrganizationId())
                             .setRealName(u.getRealName())
                             .setImageUrl(u.getImageUrl())
@@ -85,7 +86,7 @@ public class ProjectController extends BaseController {
                                                                           @PathVariable Long projectId,
                                                                           @RequestParam String name) {
         //查询项目开发成员
-        List<C7nUserVO> c7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listDeveloperProjectMembers(projectId, name))
+        List<C7nUserVO> c7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listEnabledUsersByUserName(projectId, name))
                 .orElse(Collections.emptyList());
 
         // 过滤当前项目成员
@@ -100,6 +101,7 @@ public class ProjectController extends BaseController {
                     baseC7NUserViewDTO.setUserId(u.getId())
                             .setLoginName(u.getLoginName())
                             .setEmail(u.getEmail())
+                            .setEnabled(u.getEnabled())
                             .setOrganizationId(u.getOrganizationId())
                             .setRealName(u.getRealName())
                             .setImageUrl(u.getImageUrl())
