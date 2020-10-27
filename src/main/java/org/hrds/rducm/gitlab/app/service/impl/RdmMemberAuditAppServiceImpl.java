@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 成员权限审计应用服务默认实现
@@ -138,8 +139,10 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                     }
                 }
             } else {
-                // 如果不是团队成员, 移除gitlab权限
-                removeGitlabMemberGP(groupGlMember, projectGlMember, glGroupId, glProjectId, glUserId);
+                if (Objects.isNull(dbMember)) {
+                    // 如果不是团队成员,也不是赋予权限的项目外成员 移除gitlab权限
+                    removeGitlabMemberGP(groupGlMember, projectGlMember, glGroupId, glProjectId, glUserId);
+                }
             }
         }
 
