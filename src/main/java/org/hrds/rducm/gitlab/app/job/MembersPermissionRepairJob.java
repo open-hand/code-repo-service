@@ -31,7 +31,7 @@ public class MembersPermissionRepairJob {
     @JobTask(maxRetryCount = 3,
             code = "membersPermissionRepairJob",
             description = "成员权限修复定时任务",
-    params = {@JobParam(name = "auditOrganizationId", description = "待审计组织id")})
+    params = {@JobParam(name = "repairOrganizationId", description = "待修复组织id")})
     @TimedTask(name = "membersPermissionRepairJob",
             description = "成员权限修复定时任务",
             params = {},
@@ -39,16 +39,16 @@ public class MembersPermissionRepairJob {
             cronExpression = "0 0 3 * * ?")
     public void membersPermissionRepairJob(Map<String, Object> param){
         // <> 获取组织
-        long auditOrganizationId = Long.parseLong((String) param.get("auditOrganizationId"));
-        logger.debug("参数组织id为[{}]", auditOrganizationId);
+        long repairOrganizationId = Long.parseLong((String) param.get("repairOrganizationId"));
+        logger.debug("参数组织id为[{}]", repairOrganizationId);
 
         logger.info("开始修复");
         StopWatch stopWatch = new StopWatch();
 
-        stopWatch.start("组织" + auditOrganizationId);
-        logger.info("开始修复组织[{}]的数据", auditOrganizationId);
+        stopWatch.start("组织" + repairOrganizationId);
+        logger.info("开始修复组织[{}]的数据", repairOrganizationId);
 
-        iMemberPermissionRepairService.repairMemberPermission(auditOrganizationId);
+        iMemberPermissionRepairService.repairMemberPermission(repairOrganizationId);
 
         stopWatch.stop();
         logger.info("修复组织[{}]的数据结束, 耗时[{}]ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
