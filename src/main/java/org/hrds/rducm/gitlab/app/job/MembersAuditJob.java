@@ -39,7 +39,7 @@ public class MembersAuditJob {
             cronExpression = "0 0 2 * * ?")
     public void membersAuditJob(Map<String, Object> param) {
         // <> 获取组织
-        long auditOrganizationId = 1L;
+        long auditOrganizationId = 7L;
 //                Long.parseLong((String) param.get("auditOrganizationId"));
         logger.debug("参数组织id为[{}]", auditOrganizationId);
 

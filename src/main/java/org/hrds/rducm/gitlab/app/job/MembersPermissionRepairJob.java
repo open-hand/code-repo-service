@@ -38,7 +38,7 @@ public class MembersPermissionRepairJob {
             cronExpression = "0 0 3 * * ?")
     public void membersPermissionRepairJob(Map<String, Object> param){
         // <> 获取组织
-        long repairOrganizationId = 1L;
+        long repairOrganizationId = 7L;
                 //Long.parseLong((String) param.get("repairOrganizationId"));
         logger.debug("参数组织id为[{}]", repairOrganizationId);
 
