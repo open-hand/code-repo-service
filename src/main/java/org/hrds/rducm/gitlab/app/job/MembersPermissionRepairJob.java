@@ -2,7 +2,6 @@ package org.hrds.rducm.gitlab.app.job;
 
 import java.util.Map;
 
-import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.asgard.schedule.annotation.TimedTask;
 import io.choerodon.asgard.schedule.enums.TriggerTypeEnum;
@@ -30,8 +29,8 @@ public class MembersPermissionRepairJob {
      */
     @JobTask(maxRetryCount = 3,
             code = "membersPermissionRepairJob",
-            description = "成员权限修复定时任务",
-    params = {@JobParam(name = "repairOrganizationId", description = "待修复组织id")})
+            description = "成员权限修复定时任务")
+            //params = {@JobParam(name = "repairOrganizationId", description = "待修复组织id")})
     @TimedTask(name = "membersPermissionRepairJob",
             description = "成员权限修复定时任务",
             params = {},
@@ -39,7 +38,8 @@ public class MembersPermissionRepairJob {
             cronExpression = "0 0 3 * * ?")
     public void membersPermissionRepairJob(Map<String, Object> param){
         // <> 获取组织
-        long repairOrganizationId = Long.parseLong((String) param.get("repairOrganizationId"));
+        long repairOrganizationId = 1L;
+                //Long.parseLong((String) param.get("repairOrganizationId"));
         logger.debug("参数组织id为[{}]", repairOrganizationId);
 
         logger.info("开始修复");
