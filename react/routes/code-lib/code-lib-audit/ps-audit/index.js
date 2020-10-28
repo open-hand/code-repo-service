@@ -45,7 +45,7 @@ const PsAudit = ({ psAuditDs, formatMessage, activeProject, activeTabKey, organi
   useEffect(() => {
     if (activeProject.id && activeTabKey === TabKeyEnum.PSAUDIT) {
       if (activeProject.id !== 'all') {
-        psAuditDs.setQueryParameter('projectIds', activeProject.id);
+        psAuditDs.setQueryParameter('projectIds', activeProject.id.toString());
       } else if (activeProject.id === 'all') {
         psAuditDs.setQueryParameter('projectIds', undefined);
       }
