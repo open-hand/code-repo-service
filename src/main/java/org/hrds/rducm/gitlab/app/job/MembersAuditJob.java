@@ -34,12 +34,12 @@ public class MembersAuditJob {
     @JobTask(maxRetryCount = 3,
             code = "membersAuditJob",
             description = "代码库成员审计任务",
-            params = {@JobParam(name = "auditOrganizationId", description = "待审计组织id", type = Long.class)})
+            params = {@JobParam(name = "auditOrganizationId", description = "待审计组织id")})
     public void membersAuditJob(Map<String, Object> param) {
         // <> 获取组织
         long auditOrganizationId = 0L;
         if (param.containsKey("auditOrganizationId") && Objects.nonNull(param.get("auditOrganizationId"))) {
-            auditOrganizationId = (Long) param.get("auditOrganizationId");
+            auditOrganizationId = Long.parseLong(param.get("auditOrganizationId").toString());
         }
         logger.debug("参数组织id为[{}]", auditOrganizationId);
 
@@ -70,7 +70,7 @@ public class MembersAuditJob {
         // <> 获取组织
         long auditOrganizationId = 0L;
         if (param.containsKey("auditOrganizationId") && Objects.nonNull(param.get("auditOrganizationId"))) {
-            auditOrganizationId =Long.parseLong(param.get("auditOrganizationId").toString()) ;
+            auditOrganizationId = Long.parseLong(param.get("auditOrganizationId").toString());
         }
 
         logger.debug("参数组织id为[{}]", auditOrganizationId);

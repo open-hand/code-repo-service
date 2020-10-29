@@ -33,12 +33,12 @@ public class MembersPermissionRepairJob {
     @JobTask(maxRetryCount = 3,
             code = "membersPermissionRepairJob",
             description = "代码库成员权限修复任务",
-            params = {@JobParam(name = "repairOrganizationId", description = "待修复组织id", type = Long.class)})
+            params = {@JobParam(name = "repairOrganizationId", description = "待修复组织id")})
     public void membersPermissionRepairJob(Map<String, Object> param){
         // <> 获取组织
         long repairOrganizationId = 0L;
         if (param.containsKey("repairOrganizationId") && Objects.nonNull(param.get("repairOrganizationId"))) {
-            repairOrganizationId = (Long) param.get("repairOrganizationId");
+            repairOrganizationId = Long.parseLong(param.get("repairOrganizationId").toString());
         }
         logger.debug("参数组织id为[{}]", repairOrganizationId);
 
