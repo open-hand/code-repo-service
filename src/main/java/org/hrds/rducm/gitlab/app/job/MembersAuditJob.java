@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.app.job;
 
+import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.asgard.schedule.annotation.TimedTask;
 import io.choerodon.asgard.schedule.enums.TriggerTypeEnum;
@@ -29,17 +30,20 @@ public class MembersAuditJob {
      * 成员审计定时任务
      */
     @JobTask(maxRetryCount = 3,
-            code = "membersAuditJob",
-            description = "成员审计定时任务")
-            //params = {@JobParam(name = "auditOrganizationId", description = "待审计组织id")})
-    @TimedTask(name = "membersAuditJob",
-            description = "成员审计定时任务",
+            code = "codeMembersAuditJob",
+            description = "代码库成员审计定时任务",
+            params = {@JobParam(name = "auditOrganizationId", description = "待审计组织id")})
+    @TimedTask(name = "codeMembersAuditJob",
+            description = "代码库成员审计定时任务",
             params = {},
             triggerType = TriggerTypeEnum.CRON_TRIGGER,
             cronExpression = "0 0 2 * * ?")
-    public void membersAuditJob(Map<String, Object> param) {
+    public void codeMembersAuditJob(Map<String, Object> param) {
         // <> 获取组织
         long auditOrganizationId = 7L;
+        if (param.containsKey("auditOrganizationId")) {
+            auditOrganizationId = Long.parseLong((String) param.get("auditOrganizationId"));
+        }
 //                Long.parseLong((String) param.get("auditOrganizationId"));
         logger.debug("参数组织id为[{}]", auditOrganizationId);
 

@@ -125,7 +125,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
         // 判断是否是项目团队成员
         C7nUserVO c7nUserVO = c7NBaseServiceFacade.detailC7nUserOnProjectLevel(projectId, userId);
         boolean isProjectMember = c7nUserVO != null;
-        logger.info("用户[{}]是否为项目[{}]的成员[{}]", userId, projectId, isOrgAdmin);
+        logger.info("用户[{}]是否为项目[{}]的成员[{}]", userId, projectId, isProjectMember);
 
         // <> 按gitlab group和project两类情况讨论
         // 是否为组织管理员
