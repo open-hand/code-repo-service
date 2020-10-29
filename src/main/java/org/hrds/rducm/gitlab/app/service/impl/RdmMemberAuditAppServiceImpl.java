@@ -115,7 +115,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
         Member groupGlMember = gitlabGroupApi.getMember(glGroupId, glUserId);
         if (Objects.nonNull(groupGlMember)) {
-            logger.info("Gl组[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]",glGroupId, projectGlMember.getId(), projectGlMember.getName(), projectGlMember.getAccessLevel());
+            logger.info("Gl组[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]",glGroupId, groupGlMember.getId(), groupGlMember.getName(), groupGlMember.getAccessLevel());
         }
 
         // 判断是否是组织管理员
