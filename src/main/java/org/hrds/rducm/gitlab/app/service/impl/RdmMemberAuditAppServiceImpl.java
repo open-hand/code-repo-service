@@ -109,18 +109,23 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
         RdmMember dbMember = rdmMemberRepository.selectOneByUk(projectId, repositoryId, userId);
         // 查询gitlab权限
         Member projectGlMember = gitlabProjectApi.getMember(glProjectId, glUserId);
-        logger.info("Gl项目[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]", glProjectId, projectGlMember.getId(), projectGlMember.getName(), projectGlMember.getAccessLevel());
+        if (Objects.nonNull(projectGlMember)){
+            logger.info("Gl项目[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]", glProjectId, projectGlMember.getId(), projectGlMember.getName(), projectGlMember.getAccessLevel());
+        }
+
         Member groupGlMember = gitlabGroupApi.getMember(glGroupId, glUserId);
-        logger.info("Gl组[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]",glGroupId, projectGlMember.getId(), projectGlMember.getName(), projectGlMember.getAccessLevel());
+        if (Objects.nonNull(groupGlMember)) {
+            logger.info("Gl组[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]",glGroupId, projectGlMember.getId(), projectGlMember.getName(), projectGlMember.getAccessLevel());
+        }
 
         // 判断是否是组织管理员
         Boolean isOrgAdmin = c7NBaseServiceFacade.checkIsOrgAdmin(organizationId, userId);
-        logger.info("用户[{}]是否为组织管理员[{}]", userId, isOrgAdmin);
+        logger.info("用户[{}]是否为组织[{}]管理员[{}]", userId, organizationId, isOrgAdmin);
 
         // 判断是否是项目团队成员
         C7nUserVO c7nUserVO = c7NBaseServiceFacade.detailC7nUserOnProjectLevel(projectId, userId);
         boolean isProjectMember = c7nUserVO != null;
-        logger.info("用户[{}]是否为项目成员[{}]", userId, isOrgAdmin);
+        logger.info("用户[{}]是否为项目[{}]的成员[{}]", userId, projectId, isOrgAdmin);
 
         // <> 按gitlab group和project两类情况讨论
         // 是否为组织管理员
