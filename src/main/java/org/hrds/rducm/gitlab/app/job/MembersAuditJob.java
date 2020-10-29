@@ -29,24 +29,50 @@ public class MembersAuditJob {
     private IMemberAuditService iMemberAuditService;
 
     /**
-     * 成员审计定时任务
+     * 成员审计任务
      */
     @JobTask(maxRetryCount = 3,
             code = "membersAuditJob",
-            description = "代码库成员审计定时任务")
-            //params = {@JobParam(name = "auditOrganizationId", description = "待审计组织id")})
-    @TimedTask(name = "membersAuditJob",
+            description = "代码库成员审计任务",
+            params = {@JobParam(name = "auditOrganizationId", description = "待审计组织id", type = Long.class)})
+    public void membersAuditJob(Map<String, Object> param) {
+        // <> 获取组织
+        long auditOrganizationId = 0L;
+        if (param.containsKey("auditOrganizationId") && Objects.nonNull(param.get("auditOrganizationId"))) {
+            auditOrganizationId = (Long) param.get("auditOrganizationId");
+        }
+        logger.debug("参数组织id为[{}]", auditOrganizationId);
+
+        logger.info("开始审计");
+        StopWatch stopWatch = new StopWatch();
+
+        stopWatch.start("组织" + auditOrganizationId);
+        logger.info("开始审计组织[{}]的数据", auditOrganizationId);
+
+        iMemberAuditService.auditMembersByOrganizationId(auditOrganizationId);
+
+        stopWatch.stop();
+        logger.info("审计组织[{}]的数据结束, 耗时[{}]ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
+
+        logger.info("结束审计, 耗时[{}]s, \n{}", stopWatch.getTotalTimeSeconds(), stopWatch.prettyPrint());
+    }
+
+
+    /**
+     * 成员审计任务
+     */
+    @TimedTask(name = "membersAuditTimeTask",
             description = "代码库成员审计定时任务",
             params = {@TaskParam(name = "auditOrganizationId", value = "1009")},
             triggerType = TriggerTypeEnum.CRON_TRIGGER,
             cronExpression = "0 0 2 * * ?")
-    public void membersAuditJob(Map<String, Object> param) {
+    public void membersAuditTimeTask(Map<String, Object> param) {
         // <> 获取组织
-        long auditOrganizationId = 1009L;
+        long auditOrganizationId = 0L;
         if (param.containsKey("auditOrganizationId") && Objects.nonNull(param.get("auditOrganizationId"))) {
-            auditOrganizationId = Long.parseLong((String) param.get("auditOrganizationId"));
+            auditOrganizationId =Long.parseLong(param.get("auditOrganizationId").toString()) ;
         }
-//                Long.parseLong((String) param.get("auditOrganizationId"));
+
         logger.debug("参数组织id为[{}]", auditOrganizationId);
 
         logger.info("开始审计");
