@@ -56,11 +56,11 @@ public class MembersPermissionRepairJob {
         logger.info("结束修复, 耗时[{}]s, \n{}", stopWatch.getTotalTimeSeconds(), stopWatch.prettyPrint());
     }
 
-    @TimedTask(name = "membersPermissionRepairTimeTask",
-            description = "代码库成员权限修复定时任务",
-            params = {@TaskParam(name = "repairOrganizationId", value = "1009")},
-            triggerType = TriggerTypeEnum.CRON_TRIGGER,
-            cronExpression = "0 0 3 * * ?")
+//    @TimedTask(name = "membersPermissionRepairTimeTask",
+//            description = "代码库成员权限修复定时任务",
+//            params = {@TaskParam(name = "repairOrganizationId", value = "1009")},
+//            triggerType = TriggerTypeEnum.CRON_TRIGGER,
+//            cronExpression = "0 0 3 * * ?")
     public void membersPermissionRepairTimeTask(Map<String, Object> param){
         // <> 获取组织
         long repairOrganizationId = 0L;
