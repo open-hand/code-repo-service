@@ -28,7 +28,7 @@ public class MembersPermissionRepairJob {
     private IMemberPermissionRepairService iMemberPermissionRepairService;
 
     /**
-     * 成员审计定时任务
+     * 成员权限修复任务
      */
     @JobTask(maxRetryCount = 3,
             code = "membersPermissionRepairJob",
