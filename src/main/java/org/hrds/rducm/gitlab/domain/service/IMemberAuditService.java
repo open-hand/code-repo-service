@@ -1,6 +1,9 @@
 package org.hrds.rducm.gitlab.domain.service;
 
+import java.util.List;
+
 import org.hrds.rducm.gitlab.domain.entity.MemberAuditLog;
+import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 
 /**
  * @author ying.xie@hand-china.com
@@ -24,4 +27,5 @@ public interface IMemberAuditService {
      * @param organizationId
      */
     void auditMembersByOrganizationId(Long organizationId);
+
 }

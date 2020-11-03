@@ -34,7 +34,7 @@ class ExportAuthority extends Component {
     axios.get(`/rducm/v1/organizations/${organizationId}/projects/gitlab/repositories/members/export`, {
       responseType: 'blob',
       params: {
-        projectIds: this.props.activeProject.id === 'all' ? undefined : this.props.activeProject.id,
+        projectIds: this.props.activeProject.id === 'all' ? undefined : this.props.activeProject.id.toString(),
         ...this.props.psViewDs.queryDataSet.toData()[0],
         exportType: 'DATA',
       },

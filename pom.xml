@@ -15,11 +15,6 @@
     <version>0.23.0.RELEASE</version>
     <name>hrds-code-repo</name>
 
-    <properties>
-        <choerodon.starters.version>0.16.2-SNAPSHOT</choerodon.starters.version>
-        <choerodon.starter.asgard>0.17.2.RELEASE</choerodon.starter.asgard>
-    </properties>
-
     <dependencies>
         <!-- add by ying.xie -->
         <!-- gitlab-api客户端 -->
@@ -146,7 +141,6 @@
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-asgard</artifactId>
-            <version>${choerodon.starter.asgard}</version>
         </dependency>
 
         <dependency>

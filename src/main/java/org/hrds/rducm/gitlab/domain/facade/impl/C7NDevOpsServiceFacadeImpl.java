@@ -149,6 +149,20 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
     }
 
     @Override
+    public Map<Long, Long> listActiveC7nAppServiceIdsMapOnProjectLevel(Long projectId) {
+        List<C7nAppServiceVO> list = this.listC7nAppServiceOnProjectLevel(projectId);
+        list = list.stream().filter(C7nAppServiceVO::getActive).collect(Collectors.toList());
+
+        if (!CollectionUtils.isEmpty(list)) {
+            return list.stream()
+                    .collect(HashMap::new, (m, v) ->
+                            m.put(v.getId(), v.getGitlabProjectId()), HashMap::putAll);
+        } else {
+            return Collections.emptyMap();
+        }
+    }
+
+    @Override
     public Map<Integer, Long> mapGlUserIdsToUserIds(Set<Integer> glUserIds) {
         ResponseEntity<List<C7nGlUserVO>> responseEntity = devOpsServiceFeignClient.listUsersByGitlabUserIds(glUserIds);
 

@@ -42,7 +42,7 @@ const PsView = ({ psViewDs, activeProject, activeTabKey }) => {
   useEffect(() => {
     if (activeProject.id && activeTabKey === TabKeyEnum.PSVIEW) {
       if (activeProject.id !== 'all') {
-        psViewDs.setQueryParameter('projectIds', activeProject.id);
+        psViewDs.setQueryParameter('projectIds', activeProject.id.toString());
       } else if (activeProject.id === 'all') {
         psViewDs.setQueryParameter('projectIds', undefined);
       }

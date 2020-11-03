@@ -164,7 +164,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
     private List<RdmMemberAuditRecord> compareMembersByProjectId(Long organizationId,
                                                                  Long projectId) {
         // 获取项目下所有代码库id和Gitlab项目id
-        Map<Long, Long> appServiceIdMap = c7NDevOpsServiceFacade.listC7nAppServiceIdsMapOnProjectLevel(projectId);
+        Map<Long, Long> appServiceIdMap = c7NDevOpsServiceFacade.listActiveC7nAppServiceIdsMapOnProjectLevel(projectId);
 
 
         List<RdmMemberAuditRecord> list = appServiceIdMap.entrySet()
