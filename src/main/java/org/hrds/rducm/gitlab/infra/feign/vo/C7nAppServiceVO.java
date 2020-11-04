@@ -35,7 +35,7 @@ public class C7nAppServiceVO {
 //    private Boolean synchro;
 
     @ApiModelProperty("应用服务是否启用")
-    private Boolean isActive;
+    private Boolean active;
 
 //    private String publishLevel;
 //    private String contributor;
@@ -170,11 +170,11 @@ public class C7nAppServiceVO {
     }
 
     public Boolean getActive() {
-        return isActive;
+        return active;
     }
 
     public C7nAppServiceVO setActive(Boolean active) {
-        isActive = active;
+        this.active = active;
         return this;
     }
 
