@@ -418,10 +418,10 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void batchInvalidMember(Long organizationId, Long projectId, Long repositoryId) {
+    public List<RdmMember> batchInvalidMember(Long organizationId, Long projectId, Long repositoryId) {
         C7nAppServiceVO c7nAppServiceVO = c7NDevOpsServiceFacade.detailC7nAppService(repositoryId);
         if (Objects.isNull(c7nAppServiceVO) || c7nAppServiceVO.getActive()) {
-            return;
+            return Collections.emptyList();
         }
         Condition condition = Condition.builder(RdmMember.class)
                 .andWhere(Sqls.custom()
@@ -433,7 +433,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         // 过滤项目所有者和组织管理员角色的用户
         List<RdmMember> rdmMemberList = rdmMembers.stream().filter(a -> RdmAccessLevel.OWNER.value > a.getGlAccessLevel()).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(rdmMemberList)) {
-            return;
+            return Collections.emptyList();
         }
         rdmMemberList = rdmMemberList.stream().map(a -> a.setGlExpiresAt(new Date())).collect(Collectors.toList());
         //已同步到Gitlab的成员
@@ -446,13 +446,14 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             iRdmMemberService.tryRemoveMemberToGitlab(member.getGlProjectId(), member.getGlUserId());
         }
         rdmMemberRepository.batchUpdateByPrimaryKeySelective(rdmMemberList);
+        return rdmMemberList;
     }
 
     @Override
-    public void batchValidMember(Long organizationId, Long projectId, Long repositoryId) {
+    public List<RdmMember> batchValidMember(Long organizationId, Long projectId, Long repositoryId) {
         C7nAppServiceVO c7nAppServiceVO = c7NDevOpsServiceFacade.detailC7nAppService(repositoryId);
         if (Objects.isNull(c7nAppServiceVO) || !c7nAppServiceVO.getActive()) {
-            return;
+            return Collections.emptyList();
         }
         Condition condition = Condition.builder(RdmMember.class)
                 .andWhere(Sqls.custom()
@@ -463,7 +464,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
         List<RdmMember> rdmMemberList = rdmMembers.stream().filter(a -> RdmAccessLevel.OWNER.value > a.getGlAccessLevel()).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(rdmMemberList)) {
-            return;
+            return Collections.emptyList();
         }
         rdmMemberList = rdmMemberList.stream().map(a -> a.setGlExpiresAt(null)).collect(Collectors.toList());
 
@@ -474,6 +475,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             member.setSyncGitlabDate(new Date());
         }
         rdmMemberRepository.batchUpdateByPrimaryKeySelective(rdmMemberList);
+        return  rdmMemberList;
     }
 
     /**

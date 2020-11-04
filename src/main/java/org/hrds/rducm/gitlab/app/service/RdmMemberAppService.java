@@ -4,6 +4,7 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.*;
 import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
+import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hzero.export.vo.ExportParam;
 
 import javax.servlet.http.HttpServletResponse;
@@ -124,7 +125,7 @@ public interface RdmMemberAppService {
      * @param projectId
      * @param repositoryId
      */
-    void batchInvalidMember(Long organizationId, Long projectId, Long repositoryId);
+    List<RdmMember> batchInvalidMember(Long organizationId, Long projectId, Long repositoryId);
 
     /**
      * 批量生效应用服务的所有成员权限
@@ -136,5 +137,5 @@ public interface RdmMemberAppService {
      * @param projectId
      * @param repositoryId
      */
-    void batchValidMember(Long organizationId, Long projectId, Long repositoryId);
+    List<RdmMember> batchValidMember(Long organizationId, Long projectId, Long repositoryId);
 }
