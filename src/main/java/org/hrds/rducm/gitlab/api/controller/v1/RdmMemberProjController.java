@@ -153,4 +153,29 @@ public class RdmMemberProjController extends BaseController {
         return Results.success(iRdmMemberService.selfPrivilege(organizationId, projectId, repositoryIds));
 
     }
+
+    /**
+     * 启用/禁用应用服务同步代码库成员权限
+     *
+     * @param organizationId
+     * @param projectId
+     * @param repositoryId
+     * @param active
+     * @return
+     */
+    @ApiOperation(value = "启用/禁用应用服务同步代码库成员权限")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @PostMapping("/batch-valid")
+    public ResponseEntity<Void> batchValid(@PathVariable Long organizationId,
+                                           @PathVariable Long projectId,
+                                           @RequestParam Long repositoryId,
+                                           @RequestParam Boolean active) {
+        if (active) {
+            rdmMemberAppService.batchValidMember(organizationId, projectId, repositoryId);
+        } else {
+            rdmMemberAppService.batchInvalidMember(organizationId, projectId, repositoryId);
+        }
+        return Results.success();
+
+    }
 }

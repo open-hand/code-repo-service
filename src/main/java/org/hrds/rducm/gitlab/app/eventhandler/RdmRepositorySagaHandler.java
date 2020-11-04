@@ -8,10 +8,12 @@ import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTaskCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.AppServiceImportPayload;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.DevOpsAppServicePayload;
+import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.*;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +54,8 @@ public class RdmRepositorySagaHandler {
     private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
     @Autowired
     private RdmOperationLogRepository rdmOperationLogRepository;
+    @Autowired
+    private RdmMemberAppService rdmMemberAppService;
 
     /**
      * 创建应用服务事件后 代码库初始化权限
@@ -145,6 +149,37 @@ public class RdmRepositorySagaHandler {
         rdmMemberApplicantRepository.deleteByRepositoryId(organizationId, projectId, repositoryId);
 
         logger.info("删除应用服务后情况代码库权限成功，repositoryId：{}", repositoryId);
+
+        return data;
+    }
+
+    /**
+     * Devops[停用/启用]应用服务
+     *
+     * @param data
+     */
+    @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_VALID_PRIVILEGE,
+            sagaCode = SagaTopicCodeConstants.DEVOPS_APP_ACTIVE,
+            description = "Devops停用/启用应用服务", maxRetryCount = 3,
+            seq = 1)
+    public String invalidPrivilegeWhenDeactivate(String data) {
+        DevOpsAppServicePayload devOpsAppServicePayload = gson.fromJson(data, DevOpsAppServicePayload.class);
+        C7nAppServiceVO c7nAppServiceVO = devOpsAppServicePayload.getAppServiceDTO();
+        if (Objects.isNull(c7nAppServiceVO) || Objects.isNull(c7nAppServiceVO.getActive())) {
+            return data;
+        }
+
+        Long projectId = devOpsAppServicePayload.getIamProjectId();
+        Long repositoryId = devOpsAppServicePayload.getAppServiceId();
+        Long organizationId = c7nBaseServiceFacade.getOrganizationId(projectId);
+
+        if (c7nAppServiceVO.getActive()) {
+            rdmMemberAppService.batchValidMember(organizationId, projectId, repositoryId);
+            logger.info("启用应用服务后生效代码库权限成功，repositoryId：{}", repositoryId);
+        } else {
+            rdmMemberAppService.batchInvalidMember(organizationId, projectId, repositoryId);
+            logger.info("停用应用服务后失效代码库权限成功，repositoryId：{}", repositoryId);
+        }
 
         return data;
     }
