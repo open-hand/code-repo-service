@@ -258,4 +258,27 @@ public class C7nAppServiceVO {
         this.updateLoginName = updateLoginName;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "C7nAppServiceVO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", code='" + code + '\'' +
+                ", type='" + type + '\'' +
+                ", projectId=" + projectId +
+                ", gitlabProjectId=" + gitlabProjectId +
+                ", repoUrl='" + repoUrl + '\'' +
+                ", active=" + active +
+                ", description='" + description + '\'' +
+                ", objectVersionNumber=" + objectVersionNumber +
+                ", imgUrl='" + imgUrl + '\'' +
+                ", creationDate=" + creationDate +
+                ", lastUpdateDate=" + lastUpdateDate +
+                ", createUserName='" + createUserName + '\'' +
+                ", createLoginName='" + createLoginName + '\'' +
+                ", updateUserName='" + updateUserName + '\'' +
+                ", updateLoginName='" + updateLoginName + '\'' +
+                '}';
+    }
 }
