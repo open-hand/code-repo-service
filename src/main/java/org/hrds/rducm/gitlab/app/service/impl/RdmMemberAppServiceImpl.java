@@ -419,7 +419,8 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<RdmMember> batchInvalidMember(Long organizationId, Long projectId, Long repositoryId) {
-        C7nAppServiceVO c7nAppServiceVO = c7NDevOpsServiceFacade.detailC7nAppService(repositoryId);
+        C7nAppServiceVO c7nAppServiceVO = c7NDevOpsServiceFacade.detailC7nAppServiceById(projectId, repositoryId);
+        logger.info("停用的应用服务：[{}]", c7nAppServiceVO.toString());
         //应用服务为空，或应用服务已经停用则直接返回
         if (Objects.isNull(c7nAppServiceVO) || !c7nAppServiceVO.getActive()) {
             return Collections.emptyList();

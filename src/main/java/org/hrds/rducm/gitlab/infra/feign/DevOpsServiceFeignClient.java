@@ -87,4 +87,15 @@ public interface DevOpsServiceFeignClient {
     @PostMapping(value = "/v1/projects/{project_id}/gitlab_groups")
     ResponseEntity<List<C7nDevopsProjectVO>> listDevopsProjectByIds(@PathVariable(value = "project_id") Long projectId,
                                                                     @RequestBody Set<Long> projectIds);
+
+    /**
+     * 查询单个服务信息
+     *
+     * @param projectId  项目ID
+     * @param appServiceId 应用服务ID
+     * @return
+     */
+    @GetMapping(value = "/v1/projects/{project_id}/app_service/{app_service_id}")
+    ResponseEntity<C7nAppServiceVO> getAppServiceById(@PathVariable(value = "project_id") Long projectId,
+                                                      @PathVariable(value = "app_service_id") Long appServiceId);
 }
