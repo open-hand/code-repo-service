@@ -412,6 +412,12 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         condition.createCriteria().andLessThanOrEqualTo(RdmMember.FIELD_GL_EXPIRES_AT, new Date());
         List<RdmMember> expiredRdmMembers = rdmMemberRepository.selectByCondition(condition);
 
+        // <1.1> 停用应用服务的过期成员权限不做删除
+        Set<Long> repositoryIds = expiredRdmMembers.stream().map(RdmMember::getRepositoryId).collect(Collectors.toSet());
+        List<C7nAppServiceVO> c7nAppServices = c7NDevOpsServiceFacade.listAppServiceByIds(repositoryIds);
+        Set<Long> activeRepositoryIds = c7nAppServices.stream().filter(C7nAppServiceVO::getActive).map(C7nAppServiceVO::getId).collect(Collectors.toSet());
+        expiredRdmMembers = expiredRdmMembers.stream().filter(a -> activeRepositoryIds.contains(a.getRepositoryId())).collect(Collectors.toList());
+
         // <2> 处理过期成员
         iRdmMemberService.batchExpireMembers(expiredRdmMembers);
     }
