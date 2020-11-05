@@ -139,4 +139,20 @@ public interface C7nDevOpsServiceFacade {
      * @return
      */
     C7nDevopsProjectVO detailDevopsProjectById(Long projectId);
+
+    /**
+     * 获取项目下已经启用的应用服务
+     *
+     * @param projectId
+     * @return
+     */
+    List<C7nAppServiceVO> listActiveAppServiceByProjectId(Long projectId);
+
+    /**
+     * 根据应用服务ID数组获取服务列表
+     *
+     * @param repositoryIds
+     * @return
+     */
+    List<C7nAppServiceVO> listAppServiceByIds(Set<Long> repositoryIds);
 }
