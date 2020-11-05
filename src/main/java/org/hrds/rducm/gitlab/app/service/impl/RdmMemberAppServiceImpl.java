@@ -426,10 +426,8 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Transactional(rollbackFor = Exception.class)
     public List<RdmMember> batchInvalidMember(Long organizationId, Long projectId, Long repositoryId) {
         C7nAppServiceVO c7nAppServiceVO = c7NDevOpsServiceFacade.detailC7nAppServiceById(projectId, repositoryId);
-        logger.info("停用的应用服务：[{}]", c7nAppServiceVO.toString());
         //应用服务为空，或应用服务已经停用则直接返回
         if (Objects.isNull(c7nAppServiceVO) || !c7nAppServiceVO.getActive()) {
-            logger.info("应用服务为空，或者应用服务启用状态active = {}", c7nAppServiceVO.getActive());
             return Collections.emptyList();
         }
         Condition condition = Condition.builder(RdmMember.class)
@@ -442,7 +440,6 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         // 过滤项目所有者和组织管理员角色的用户
         List<RdmMember> rdmMemberList = rdmMembers.stream().filter(a -> RdmAccessLevel.OWNER.value > a.getGlAccessLevel()).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(rdmMemberList)) {
-            logger.info("代码库非owner权限用户列表为空");
             return Collections.emptyList();
         }
         rdmMemberList = rdmMemberList.stream().map(a -> a.setGlExpiresAt(new Date())).collect(Collectors.toList());
@@ -460,6 +457,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<RdmMember> batchValidMember(Long organizationId, Long projectId, Long repositoryId) {
         C7nAppServiceVO c7nAppServiceVO = c7NDevOpsServiceFacade.detailC7nAppServiceById(projectId, repositoryId);
         //应用服务为空，或应用服务已经启用则直接返回
@@ -485,7 +483,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             member.setSyncGitlabFlag(true);
             member.setSyncGitlabDate(new Date());
         }
-        rdmMemberRepository.batchUpdateByPrimaryKeySelective(rdmMemberList);
+        rdmMemberRepository.batchUpdateByPrimaryKey(rdmMemberList);
         return  rdmMemberList;
     }
 
