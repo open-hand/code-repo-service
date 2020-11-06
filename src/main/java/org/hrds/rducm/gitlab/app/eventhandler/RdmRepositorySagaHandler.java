@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -179,8 +180,11 @@ public class RdmRepositorySagaHandler {
                 }).collect(Collectors.toList());
 
         result.forEach(r -> {
-            Integer glUserId = Optional.ofNullable(c7nBaseServiceFacade.userIdToGlUserId(r.getId())).orElseThrow(() -> new CommonException("error.glUserId.is.null"));
-            rdmMemberRepository.insertWithOwner(organizationId, projectId, repositoryId, r.getId(), glProjectId, glUserId);
+            //初始化权限时，遇到GitLabId为空的用户跳过 11-06
+            Integer glUserId = c7nBaseServiceFacade.userIdToGlUserId(r.getId());
+            if (Objects.nonNull(glUserId)) {
+                rdmMemberRepository.insertWithOwner(organizationId, projectId, repositoryId, r.getId(), glProjectId, glUserId);
+            }
         });
     }
 }
