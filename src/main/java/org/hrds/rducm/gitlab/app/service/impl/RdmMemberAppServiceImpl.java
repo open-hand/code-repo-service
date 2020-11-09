@@ -426,8 +426,8 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Transactional(rollbackFor = Exception.class)
     public List<RdmMember> batchInvalidMember(Long organizationId, Long projectId, Long repositoryId) {
         C7nAppServiceVO c7nAppServiceVO = c7NDevOpsServiceFacade.detailC7nAppServiceById(projectId, repositoryId);
-        //应用服务为空，或应用服务已经停用则直接返回
-        if (Objects.isNull(c7nAppServiceVO) || !c7nAppServiceVO.getActive()) {
+        //应用服务为空，或应用服务启用状态则直接返回
+        if (Objects.isNull(c7nAppServiceVO) || c7nAppServiceVO.getActive()) {
             return Collections.emptyList();
         }
         Condition condition = Condition.builder(RdmMember.class)
@@ -460,8 +460,8 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Transactional(rollbackFor = Exception.class)
     public List<RdmMember> batchValidMember(Long organizationId, Long projectId, Long repositoryId) {
         C7nAppServiceVO c7nAppServiceVO = c7NDevOpsServiceFacade.detailC7nAppServiceById(projectId, repositoryId);
-        //应用服务为空，或应用服务已经启用则直接返回
-        if (Objects.isNull(c7nAppServiceVO) || c7nAppServiceVO.getActive()) {
+        //应用服务为空，或应用服务停用状态则直接返回
+        if (Objects.isNull(c7nAppServiceVO) || !c7nAppServiceVO.getActive()) {
             return Collections.emptyList();
         }
         Condition condition = Condition.builder(RdmMember.class)

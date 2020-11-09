@@ -159,7 +159,7 @@ public class RdmRepositorySagaHandler {
      * @param data
      */
     @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_VALID_PRIVILEGE,
-            sagaCode = SagaTopicCodeConstants.DEVOPS_APP_ACTIVE,
+            sagaCode = SagaTopicCodeConstants.DEVOPS_APP_SYNC_STATUS,
             description = "Devops停用/启用应用服务", maxRetryCount = 3,
             seq = 1)
     public String invalidPrivilegeWhenDeactivate(String data) {
