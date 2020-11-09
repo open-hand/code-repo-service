@@ -36,6 +36,11 @@ public class BaseServiceFeignClientFallBackFactory implements FallbackFactory<Ba
             }
 
             @Override
+            public ResponseEntity<List<C7nUserVO>> listEnabledUsersByUserName(Long projectId, String userName) {
+                throw new CommonException("error.feign.fallback");
+            }
+
+            @Override
             public ResponseEntity<Page<C7nUserVO>> pageUsersByOptionsOnProjectLevel(Long projectId, int page, int size, String loginName, String realName, Boolean enabled) {
                 throw new CommonException("error.feign.fallback");
             }
@@ -46,7 +51,7 @@ public class BaseServiceFeignClientFallBackFactory implements FallbackFactory<Ba
             }
 
             @Override
-            public ResponseEntity<Page<C7nUserVO>> pageUsersByOptionsOnSiteLevel(int page, int size, String loginName, String realName) {
+            public ResponseEntity<Page<C7nUserVO>> pageUsersByOptionsOnSiteLevel(int page, int size, String loginName, String realName, String params) {
                 throw new CommonException("error.feign.fallback");
             }
 

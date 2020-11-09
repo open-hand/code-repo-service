@@ -16,11 +16,14 @@ import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.AssertExtensionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 成员权限审计应用服务默认实现
@@ -30,6 +33,8 @@ import java.util.Date;
  */
 @Service
 public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
+    private static final Logger logger = LoggerFactory.getLogger(RdmMemberAuditAppServiceImpl.class);
+
     @Autowired
     private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
     @Autowired
@@ -104,19 +109,29 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
         RdmMember dbMember = rdmMemberRepository.selectOneByUk(projectId, repositoryId, userId);
         // 查询gitlab权限
         Member projectGlMember = gitlabProjectApi.getMember(glProjectId, glUserId);
+        if (Objects.nonNull(projectGlMember)){
+            logger.info("Gl项目[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]", glProjectId, projectGlMember.getId(), projectGlMember.getName(), projectGlMember.getAccessLevel());
+        }
+
         Member groupGlMember = gitlabGroupApi.getMember(glGroupId, glUserId);
+        if (Objects.nonNull(groupGlMember)) {
+            logger.info("Gl组[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]",glGroupId, groupGlMember.getId(), groupGlMember.getName(), groupGlMember.getAccessLevel());
+        }
 
         // 判断是否是组织管理员
         Boolean isOrgAdmin = c7NBaseServiceFacade.checkIsOrgAdmin(organizationId, userId);
+        logger.info("用户[{}]是否为组织[{}]管理员[{}]", userId, organizationId, isOrgAdmin);
 
         // 判断是否是项目团队成员
         C7nUserVO c7nUserVO = c7NBaseServiceFacade.detailC7nUserOnProjectLevel(projectId, userId);
         boolean isProjectMember = c7nUserVO != null;
+        logger.info("用户[{}]是否为项目[{}]的成员[{}]", userId, projectId, isProjectMember);
 
         // <> 按gitlab group和project两类情况讨论
         // 是否为组织管理员
         if (isOrgAdmin) {
             // 修复为group Owner权限
+            logger.info("修复用户[{}]为组织管理员权限", userId);
             updateGitlabGroupMemberWithOwner(groupGlMember, glGroupId, glUserId);
         } else {
             // 是否为团队成员
@@ -126,20 +141,29 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                 Boolean isProjectAdmin = c7nUserVO.isProjectAdmin();
                 if (isProjectAdmin) {
                     // 修复为group Owner权限
+                    logger.info("修复用户[{}]为项目管理员权限", userId);
                     updateGitlabGroupMemberWithOwner(groupGlMember, glGroupId, glUserId);
                 } else {
                     // 修复为该用户当前的代码库权限
                     if (dbMember == null || !dbMember.getSyncGitlabFlag()) {
                         // 移除gitlab权限
+                        logger.info("用户[{}]为项目成员，但没有代码库权限，移除Gl权限", userId);
                         removeGitlabMemberGP(groupGlMember, projectGlMember, glGroupId, glProjectId, glUserId);
                     } else {
                         // 修改gitlab权限
+                        logger.info("用户[{}]为项目成员，有代码库权限，修复Gl权限", userId);
                         updateGitlabMemberP(dbMember, groupGlMember, projectGlMember, glGroupId, glProjectId, glUserId);
                     }
                 }
             } else {
-                // 如果不是团队成员, 移除gitlab权限
-                removeGitlabMemberGP(groupGlMember, projectGlMember, glGroupId, glProjectId, glUserId);
+                if (Objects.isNull(dbMember)) {
+                    // 如果不是团队成员,也不是赋予权限的项目外成员 移除gitlab权限
+                    logger.info("用户[{}]是项目成员也不是外部成员，没有代码库权限，移除", userId);
+                    removeGitlabMemberGP(groupGlMember, projectGlMember, glGroupId, glProjectId, glUserId);
+                } else {
+                    logger.info("用户[{}]是外部成员，有代码库权限，修复GL权限", userId);
+                    updateGitlabMemberP(dbMember, groupGlMember, projectGlMember, glGroupId, glProjectId, glUserId);
+                }
             }
         }
 

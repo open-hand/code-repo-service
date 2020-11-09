@@ -260,6 +260,8 @@ const psManager = {
   'infra.member.all': '项目下所有人员',
   'infra.member.specific': '项目下特定人员',
   'infra.add.member': '添加成员',
+  'infra.add.outsideMember': '添加外部成员',
+  'infra.add.outsideMember.tips': '此处需精确输入用户名或登录名来搜索对应的用户',
   'infra.permission.request': '权限申请',
   'infra.type': '类型',
   'infra.user.all': '项目下所有人员',
