@@ -89,6 +89,15 @@ public interface C7nDevOpsServiceFacade {
     Map<Long, Long> listC7nAppServiceIdsMapOnProjectLevel(Long projectId);
 
     /**
+     * 项目层
+     * 获取项目启用的的应用服务id对应Gitlab项目id的map
+     *
+     * @param projectId
+     * @return
+     */
+    Map<Long, Long> listActiveC7nAppServiceIdsMapOnProjectLevel(Long projectId);
+
+    /**
      * 根据Gitlab用户id获取用户id
      * [glUserId1, glUserId2] => Map<glUserId, userId>
      *

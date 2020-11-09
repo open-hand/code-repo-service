@@ -49,6 +49,9 @@ public class C7nUserVO {
 
     private List<C7nRoleVO> roles;
 
+    @ApiModelProperty("是否为项目成员")
+    private Boolean projectMember;
+
     /**
      * 判断是否是项目管理员
      *
@@ -236,6 +239,15 @@ public class C7nUserVO {
 
     public C7nUserVO setRoles(List<C7nRoleVO> roles) {
         this.roles = roles;
+        return this;
+    }
+
+    public Boolean getProjectMember() {
+        return projectMember;
+    }
+
+    public C7nUserVO setProjectMember(Boolean projectMember) {
+        this.projectMember = projectMember;
         return this;
     }
 }

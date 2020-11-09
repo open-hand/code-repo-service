@@ -5,6 +5,7 @@ import { Modal } from 'choerodon-ui/pro';
 import { Header, Choerodon } from '@choerodon/boot';
 import HeaderButtons from '@/components/header-buttons';
 import AddMember from './add-member';
+import AddOutsideMember from './add-outside-member';
 // import ImportMember from './import-member';
 import AddBranch from './add-branch';
 import AddTag from './add-tag';
@@ -112,6 +113,21 @@ const EnvModals = observer((props) => {
       okText: formatMessage({ id: 'add' }),
     });
   }
+  function openAddOutside() {
+    Modal.open({
+      key: modalKey,
+      style: modalStyle,
+      drawer: true,
+      title: formatMessage({ id: 'infra.add.outsideMember' }),
+      children: <AddOutsideMember
+        refresh={refresh}
+        intlPrefix={intlPrefix}
+        prefixCls={prefixCls}
+        branchServiceDs={branchServiceDs}
+      />,
+      okText: formatMessage({ id: 'add' }),
+    });
+  }
   function openRequest() {
     Modal.open({
       key: modalKey,
@@ -191,6 +207,14 @@ const EnvModals = observer((props) => {
             name: formatMessage({ id: 'infra.add.member' }),
             icon: 'person_add',
             handler: openAdd,
+            display: true,
+            group: 1,
+            permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
+          },
+          {
+            name: formatMessage({ id: 'infra.add.outsideMember' }),
+            icon: 'person_add',
+            handler: openAddOutside,
             display: true,
             group: 1,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
