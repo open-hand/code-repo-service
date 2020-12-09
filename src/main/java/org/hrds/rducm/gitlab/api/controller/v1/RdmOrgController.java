@@ -26,12 +26,12 @@ public class RdmOrgController {
     @Autowired
     private IRdmMemberService iRdmMemberService;
 
-    @ApiOperation(value = "组织层-查询用户拥有权限的应用服务")
+    @ApiOperation(value = "组织层-查询用户拥有Developer权限的应用服务")
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @GetMapping("/members/{userId}/repositories/within")
+    @GetMapping("/developer/{userId}/repositories/within")
     public ResponseEntity<RepositoryPrivilegeViewDTO> listMemberPermissions(@PathVariable Long organizationId,
                                                                             @Encrypt @PathVariable Long userId) {
-        return Results.success(iRdmMemberService.selectOrgRepositoriesByPrivilege(organizationId, userId));
+        return Results.success(iRdmMemberService.selectOrgRepositoriesByDeveloper(organizationId, userId));
     }
 
 }

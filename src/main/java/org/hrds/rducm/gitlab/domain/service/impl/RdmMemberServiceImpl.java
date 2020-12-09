@@ -442,13 +442,14 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     }
 
     @Override
-    public RepositoryPrivilegeViewDTO selectOrgRepositoriesByPrivilege(Long organizationId, Long userId) {
+    public RepositoryPrivilegeViewDTO selectOrgRepositoriesByDeveloper(Long organizationId, Long userId) {
         Condition condition = Condition.builder(RdmMember.class)
                 .andWhere(Sqls.custom()
                         .andEqualTo(RdmMember.FIELD_ORGANIZATION_ID, organizationId)
                         .andEqualTo(RdmMember.FIELD_USER_ID, userId)
                         // 同步状态需为true
-                        .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, Boolean.TRUE))
+                        .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, Boolean.TRUE)
+                        .andGreaterThanOrEqualTo(RdmMember.FIELD_GL_ACCESS_LEVEL, RdmAccessLevel.DEVELOPER.toValue()))
                 .build();
         List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
         Set<Long> appServiceIds = rdmMembers.stream().map(RdmMember::getRepositoryId).collect(Collectors.toSet());
