@@ -442,6 +442,23 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     }
 
     @Override
+    public RepositoryPrivilegeViewDTO selectOrgRepositoriesByPrivilege(Long organizationId, Long userId) {
+        Condition condition = Condition.builder(RdmMember.class)
+                .andWhere(Sqls.custom()
+                        .andEqualTo(RdmMember.FIELD_ORGANIZATION_ID, organizationId)
+                        .andEqualTo(RdmMember.FIELD_USER_ID, userId)
+                        // 同步状态需为true
+                        .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, Boolean.TRUE))
+                .build();
+        List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
+        Set<Long> appServiceIds = rdmMembers.stream().map(RdmMember::getRepositoryId).collect(Collectors.toSet());
+        RepositoryPrivilegeViewDTO result = new RepositoryPrivilegeViewDTO();
+        result.setUserId(userId);
+        result.setAppServiceIds(appServiceIds);
+        return result;
+    }
+
+    @Override
     public void publishMemberEvent(RdmMember param, MemberEvent.EventType eventType) {
         // 发送事件
         MemberEvent.EventParam eventParam = buildEventParam(param.getOrganizationId(), param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());

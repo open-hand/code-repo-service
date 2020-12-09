@@ -131,6 +131,15 @@ public interface IRdmMemberService {
     List<RepositoryPrivilegeViewDTO> selectRepositoriesByPrivilege(Long organizationId, Long projectId, Set<Long> userIds);
 
     /**
+     * 组织层-查询单个用户拥有权限的应用服务
+     *
+     * @param organizationId
+     * @param userId
+     * @return
+     */
+    RepositoryPrivilegeViewDTO selectOrgRepositoriesByPrivilege(Long organizationId, Long userId);
+
+    /**
      * 发送成员操作审计事件
      *
      * @param param
