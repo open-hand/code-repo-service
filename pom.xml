@@ -11,9 +11,9 @@
     </parent>
 
     <groupId>org.hrds.rducm</groupId>
-    <artifactId>hrds-code-repo</artifactId>
-    <version>0.23.0.RELEASE</version>
-    <name>hrds-code-repo</name>
+    <artifactId>code-repo-service</artifactId>
+    <version>0.24.0-alpha.6.RELEASE</version>
+    <name>code-repo-service</name>
 
     <dependencies>
         <!-- add by ying.xie -->
@@ -151,14 +151,14 @@
     </dependencies>
 
     <repositories>
-        <!--<repository>-->
-            <!--<id>Hzero</id>-->
-            <!--<name>Hzero Repository</name>-->
-            <!--<url>http://nexus.saas.hand-china.com/content/groups/hzero/</url>-->
-            <!--<releases>-->
-                <!--<enabled>true</enabled>-->
-            <!--</releases>-->
-        <!--</repository>-->
+        <repository>
+            <id>Hzero</id>
+            <name>Hzero Repository</name>
+            <url>http://nexus.saas.hand-china.com/content/groups/hzero/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
         <!-- 按项目实际情况修改
             <repository>
             <id>HzeroRelease</id>
@@ -181,6 +181,16 @@
     <build>
         <finalName>app</finalName>
     </build>
+    <distributionManagement>
+        <repository>
+            <id>choerodon-release</id>
+            <url>https://nexus.choerodon.com.cn/repository/choerodon-release</url>
+        </repository>
+        <snapshotRepository>
+            <id>choerodon-snapshot</id>
+            <url>https://nexus.choerodon.com.cn/repository/choerodon-snapshot</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
 
 
