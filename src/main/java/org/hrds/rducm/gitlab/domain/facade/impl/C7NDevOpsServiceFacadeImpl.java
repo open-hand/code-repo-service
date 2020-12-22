@@ -66,6 +66,16 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
     }
 
     @Override
+    public C7nAppServiceVO detailC7nAppServiceById(Long projectId, Long repositoryId) {
+        ResponseEntity<C7nAppServiceVO> entity = devOpsServiceFeignClient.getAppServiceById(projectId, repositoryId);
+        if (Objects.nonNull(entity.getBody())) {
+            return entity.getBody();
+        } else {
+            return null;
+        }
+    }
+
+    @Override
     public Map<Long, C7nAppServiceVO> listC7nAppServiceToMap(Set<Long> repositoryIds) {
         if (repositoryIds.isEmpty()) {
             return Collections.emptyMap();
@@ -210,6 +220,33 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
             return null;
         } else {
             return c7nDevopsProjectVOS.get(0);
+        }
+    }
+
+    @Override
+    public List<C7nAppServiceVO> listActiveAppServiceByProjectId(Long projectId) {
+        ResponseEntity<List<C7nAppServiceVO>> responseEntity = devOpsServiceFeignClient.listAppServiceByActive(projectId);
+        List<C7nAppServiceVO> c7nAppServiceVOS = FeignUtils.handleResponseEntity(responseEntity);
+        if (c7nAppServiceVOS.isEmpty()) {
+            return null;
+        } else {
+            return c7nAppServiceVOS;
+        }
+    }
+
+    @Override
+    public List<C7nAppServiceVO> listAppServiceByIds(Set<Long> repositoryIds) {
+        if (repositoryIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 查询应用服务信息
+        ResponseEntity<Page<C7nAppServiceVO>> entity = devOpsServiceFeignClient.listAppServiceByIds(repositoryIds);
+
+        if (!CollectionUtils.isEmpty(Objects.requireNonNull(entity.getBody()).getContent())) {
+            return entity.getBody().getContent();
+        } else {
+            return Collections.emptyList();
         }
     }
 }

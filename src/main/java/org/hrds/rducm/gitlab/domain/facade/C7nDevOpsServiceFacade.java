@@ -32,6 +32,15 @@ public interface C7nDevOpsServiceFacade {
     C7nAppServiceVO detailC7nAppService(Long repositoryId);
 
     /**
+     * 查询应用服务信息
+     *
+     * @param projectId
+     * @param repositoryId
+     * @return
+     */
+    C7nAppServiceVO detailC7nAppServiceById(Long projectId, Long repositoryId);
+
+    /**
      * 查询一组应用服务信息, 并转换成Map
      *
      * @param repositoryIds
@@ -130,4 +139,20 @@ public interface C7nDevOpsServiceFacade {
      * @return
      */
     C7nDevopsProjectVO detailDevopsProjectById(Long projectId);
+
+    /**
+     * 获取项目下已经启用的应用服务
+     *
+     * @param projectId
+     * @return
+     */
+    List<C7nAppServiceVO> listActiveAppServiceByProjectId(Long projectId);
+
+    /**
+     * 根据应用服务ID数组获取服务列表
+     *
+     * @param repositoryIds
+     * @return
+     */
+    List<C7nAppServiceVO> listAppServiceByIds(Set<Long> repositoryIds);
 }

@@ -29,6 +29,12 @@ public class SagaTaskCodeConstants {
      */
     public static final String CODE_REPO_DELETE_PRIVILEGE = "codeRepoDeletePrivilege";
 
+    /* 应用服务停用/启用事件 */
+    /**
+     * 代码库[生效/失效]应用服务权限
+     */
+    public static final String CODE_REPO_VALID_PRIVILEGE = "codeRepoValidPrivilege";
+
     private SagaTaskCodeConstants() {
     }
 }

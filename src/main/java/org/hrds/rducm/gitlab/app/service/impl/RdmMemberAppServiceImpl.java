@@ -22,6 +22,7 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.core.base.AopProxy;
 import org.hzero.export.annotation.ExcelExport;
@@ -45,6 +46,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants.RDUCM_BATCH_ADD_MEMBERS;
 
@@ -410,8 +412,79 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         condition.createCriteria().andLessThanOrEqualTo(RdmMember.FIELD_GL_EXPIRES_AT, new Date());
         List<RdmMember> expiredRdmMembers = rdmMemberRepository.selectByCondition(condition);
 
+        // <1.1> 停用应用服务的过期成员权限不做删除
+        Set<Long> repositoryIds = expiredRdmMembers.stream().map(RdmMember::getRepositoryId).collect(Collectors.toSet());
+        List<C7nAppServiceVO> c7nAppServices = c7NDevOpsServiceFacade.listAppServiceByIds(repositoryIds);
+        Set<Long> activeRepositoryIds = c7nAppServices.stream().filter(C7nAppServiceVO::getActive).map(C7nAppServiceVO::getId).collect(Collectors.toSet());
+        expiredRdmMembers = expiredRdmMembers.stream().filter(a -> activeRepositoryIds.contains(a.getRepositoryId())).collect(Collectors.toList());
+
         // <2> 处理过期成员
         iRdmMemberService.batchExpireMembers(expiredRdmMembers);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<RdmMember> batchInvalidMember(Long organizationId, Long projectId, Long repositoryId) {
+        C7nAppServiceVO c7nAppServiceVO = c7NDevOpsServiceFacade.detailC7nAppServiceById(projectId, repositoryId);
+        //应用服务为空，或应用服务启用状态则直接返回
+        if (Objects.isNull(c7nAppServiceVO) || c7nAppServiceVO.getActive()) {
+            return Collections.emptyList();
+        }
+        Condition condition = Condition.builder(RdmMember.class)
+                .andWhere(Sqls.custom()
+                        .andEqualTo(RdmMember.FIELD_ORGANIZATION_ID, organizationId)
+                        .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
+                        .andEqualTo(RdmMember.FIELD_REPOSITORY_ID, repositoryId))
+                .build();
+        List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
+        // 过滤项目所有者和组织管理员角色的用户
+        List<RdmMember> rdmMemberList = rdmMembers.stream().filter(a -> RdmAccessLevel.OWNER.value > a.getGlAccessLevel()).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(rdmMemberList)) {
+            return Collections.emptyList();
+        }
+        rdmMemberList = rdmMemberList.stream().map(a -> a.setGlExpiresAt(new Date())).collect(Collectors.toList());
+        //已同步到Gitlab的成员
+        List<RdmMember> syncMembers = rdmMemberList.stream().filter(RdmMember::getSyncGitlabFlag).collect(Collectors.toList());
+        //未同步到Gitlab的成员
+        List<RdmMember> unSyncMembers = rdmMemberList.stream().filter(a -> !syncMembers.contains(a)).collect(Collectors.toList());
+
+        for (RdmMember member : rdmMemberList) {
+            // <2> 调用gitlab api删除成员
+            iRdmMemberService.tryRemoveMemberToGitlab(member.getGlProjectId(), member.getGlUserId());
+        }
+        rdmMemberRepository.batchUpdateByPrimaryKeySelective(rdmMemberList);
+        return rdmMemberList;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<RdmMember> batchValidMember(Long organizationId, Long projectId, Long repositoryId) {
+        C7nAppServiceVO c7nAppServiceVO = c7NDevOpsServiceFacade.detailC7nAppServiceById(projectId, repositoryId);
+        //应用服务为空，或应用服务停用状态则直接返回
+        if (Objects.isNull(c7nAppServiceVO) || !c7nAppServiceVO.getActive()) {
+            return Collections.emptyList();
+        }
+        Condition condition = Condition.builder(RdmMember.class)
+                .andWhere(Sqls.custom()
+                        .andEqualTo(RdmMember.FIELD_ORGANIZATION_ID, organizationId)
+                        .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
+                        .andEqualTo(RdmMember.FIELD_REPOSITORY_ID, repositoryId))
+                .build();
+        List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
+        List<RdmMember> rdmMemberList = rdmMembers.stream().filter(a -> RdmAccessLevel.OWNER.value > a.getGlAccessLevel()).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(rdmMemberList)) {
+            return Collections.emptyList();
+        }
+        rdmMemberList = rdmMemberList.stream().map(a -> a.setGlExpiresAt(null)).collect(Collectors.toList());
+
+        for (RdmMember member : rdmMemberList) {
+            // <2> 调用gitlab api删除成员
+            iRdmMemberService.tryRemoveAndAddMemberToGitlab(member.getGlProjectId(), member.getGlUserId(), member.getGlAccessLevel(), null);
+            member.setSyncGitlabFlag(true);
+            member.setSyncGitlabDate(new Date());
+        }
+        rdmMemberRepository.batchUpdateByPrimaryKey(rdmMemberList);
+        return  rdmMemberList;
     }
 
     /**
