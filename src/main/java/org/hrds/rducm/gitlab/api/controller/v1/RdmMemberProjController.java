@@ -13,6 +13,7 @@ import org.hrds.rducm.gitlab.api.controller.dto.*;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseUserQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
+import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
@@ -152,5 +153,28 @@ public class RdmMemberProjController extends BaseController {
                                                                       @Encrypt @RequestBody Set<Long> repositoryIds) {
         return Results.success(iRdmMemberService.selfPrivilege(organizationId, projectId, repositoryIds));
 
+    }
+
+    /**
+     * 启用/禁用应用服务同步代码库成员权限
+     *
+     * @param organizationId
+     * @param projectId
+     * @param repositoryId
+     * @param active
+     * @return
+     */
+    @ApiOperation(value = "启用/禁用应用服务同步代码库成员权限")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @PostMapping("/batch-valid")
+    public ResponseEntity<List<RdmMember>> batchValid(@PathVariable Long organizationId,
+                                                      @PathVariable Long projectId,
+                                                      @RequestParam Long repositoryId,
+                                                      @RequestParam Boolean active) {
+        if (active) {
+            return Results.success(rdmMemberAppService.batchValidMember(organizationId, projectId, repositoryId));
+        } else {
+            return Results.success(rdmMemberAppService.batchInvalidMember(organizationId, projectId, repositoryId));
+        }
     }
 }

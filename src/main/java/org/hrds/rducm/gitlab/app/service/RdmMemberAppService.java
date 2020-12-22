@@ -4,6 +4,7 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.*;
 import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
+import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hzero.export.vo.ExportParam;
 
 import javax.servlet.http.HttpServletResponse;
@@ -113,4 +114,28 @@ public interface RdmMemberAppService {
      * 处理过期的成员(定时任务调用)
      */
     void handleExpiredMembers();
+
+    /**
+     * 批量失效应用服务的所有成员权限
+     *
+     * 禁用应用服务时将代码库具有该应用服务权限的成员失效
+     * 失效方式：将成员权限的gitlab过期时间设为当前日期，并将Gitlab的权限清除
+     *
+     * @param organizationId
+     * @param projectId
+     * @param repositoryId
+     */
+    List<RdmMember> batchInvalidMember(Long organizationId, Long projectId, Long repositoryId);
+
+    /**
+     * 批量生效应用服务的所有成员权限
+     *
+     * 启用应用服务时将代码库具有该应用服务权限的成员生效
+     * 生效方式：将成员权限的gitlab过期时间清除，并添加Gitlab权限
+     *
+     * @param organizationId
+     * @param projectId
+     * @param repositoryId
+     */
+    List<RdmMember> batchValidMember(Long organizationId, Long projectId, Long repositoryId);
 }
