@@ -184,7 +184,7 @@ public class RdmMemberProjController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "organizationId", value = "组织id", paramType = "path", dataType = "Long", required = true),
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
-            @ApiImplicitParam(name = "rdmMemberViewDTOS", value = "body参数", dataType = "RdmMemberViewDTO", required = true),
+            @ApiImplicitParam(name = "memberIds", value = "body参数", dataType = "Long", required = true),
     })
     @Permission(level = ResourceLevel.ORGANIZATION)
     @DeleteMapping("/batch-remove")
