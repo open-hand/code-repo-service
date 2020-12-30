@@ -181,16 +181,11 @@ public class RdmMemberProjController extends BaseController {
     }
 
     @ApiOperation(value = "批量移除代码库成员(项目层)")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "organizationId", value = "组织id", paramType = "path", dataType = "Long", required = true),
-            @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
-            @ApiImplicitParam(name = "memberIds", value = "body参数", dataType = "Long", required = true),
-    })
     @Permission(level = ResourceLevel.ORGANIZATION)
     @DeleteMapping("/batch-remove")
     public ResponseEntity<?> batchRemoveMember(@PathVariable Long organizationId,
                                                @PathVariable Long projectId,
-                                               @Encrypt @RequestBody Set<Long> memberIds) {
+                                               @Encrypt @RequestParam Set<Long> memberIds) {
         rdmMemberAppService.batchRemoveMembers(organizationId, projectId, memberIds);
         return Results.success();
     }
