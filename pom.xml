@@ -11,9 +11,9 @@
     </parent>
 
     <groupId>org.hrds.rducm</groupId>
-    <artifactId>hrds-code-repo</artifactId>
-    <version>0.23.0.RELEASE</version>
-    <name>hrds-code-repo</name>
+    <artifactId>code-repo-service</artifactId>
+    <version>0.24.0.RELEASE</version>
+    <name>code-repo-service</name>
 
     <dependencies>
         <!-- add by ying.xie -->
@@ -182,6 +182,16 @@
             </snapshots>
         </repository> -->
     </repositories>
+    <distributionManagement>
+        <repository>
+            <id>choerodon-release</id>
+            <url>https://nexus.choerodon.com.cn/repository/choerodon-release</url>
+        </repository>
+        <snapshotRepository>
+            <id>choerodon-snapshot</id>
+            <url>https://nexus.choerodon.com.cn/repository/choerodon-snapshot</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <build>
         <finalName>app</finalName>
