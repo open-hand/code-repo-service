@@ -190,8 +190,7 @@ public class RdmMemberProjController extends BaseController {
     @DeleteMapping("/batch-remove")
     public ResponseEntity<?> batchRemoveMember(@PathVariable Long organizationId,
                                                @PathVariable Long projectId,
-                                               @Encrypt @RequestBody List<RdmMemberViewDTO> rdmMemberViewDTOS) {
-        Set<Long> memberIds = rdmMemberViewDTOS.stream().map(RdmMemberViewDTO::getId).collect(Collectors.toSet());
+                                               @Encrypt @RequestBody Set<Long> memberIds) {
         rdmMemberAppService.batchRemoveMembers(organizationId, projectId, memberIds);
         return Results.success();
     }
