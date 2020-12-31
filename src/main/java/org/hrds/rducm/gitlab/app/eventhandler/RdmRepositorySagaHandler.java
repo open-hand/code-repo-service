@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.app.eventhandler;
 
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import io.choerodon.asgard.saga.annotation.SagaTask;
@@ -164,7 +163,7 @@ public class RdmRepositorySagaHandler {
             description = "Devops停用/启用应用服务", maxRetryCount = 3,
             seq = 1)
     public String invalidPrivilegeWhenDeactivate(String data) {
-        DevOpsAppServicePayload devOpsAppServicePayload = JSONObject.parseObject(data, DevOpsAppServicePayload.class);
+        DevOpsAppServicePayload devOpsAppServicePayload = gson.fromJson(data, DevOpsAppServicePayload.class);
         C7nAppServiceVO c7nAppServiceVO = devOpsAppServicePayload.getAppServiceDTO();
         if (Objects.isNull(c7nAppServiceVO) || Objects.isNull(c7nAppServiceVO.getActive())) {
             return data;
