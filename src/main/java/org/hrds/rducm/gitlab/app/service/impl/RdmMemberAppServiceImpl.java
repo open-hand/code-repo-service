@@ -281,6 +281,29 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void batchRemoveMembers(Long organizationId, Long projectId, Set<Long> memberIds) {
+        if (CollectionUtils.isEmpty(memberIds)) {
+            return;
+        }
+        List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(Condition.builder(RdmMember.class)
+                .andWhere(Sqls.custom().andIn(RdmMember.FIELD_ID, memberIds))
+                .build());
+        // <1> 数据库更新成员, 预删除, 发起新事务
+        self().batchUpdateMemberBeforeRequestsNew(rdmMembers);
+        rdmMembers.forEach( m -> {
+            // <2> 调用gitlab api删除成员
+            iRdmMemberService.tryRemoveMemberToGitlab(m.getGlProjectId(), m.getGlUserId());
+
+            // <3> 数据库删除成员
+            rdmMemberRepository.deleteByPrimaryKey(m.getId());
+
+            // <4> 发送事件
+            iRdmMemberService.publishMemberEvent(m, MemberEvent.EventType.REMOVE_MEMBER);
+        });
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addMember(Long organizationId, Long projectId, Long repositoryId, RdmMemberCreateDTO rdmMemberCreateDTO) {
         // <0> 转换
         final RdmMember param = rdmMemberAssembler.rdmMemberCreateDTOToRdmMember(organizationId, projectId, repositoryId, rdmMemberCreateDTO);
@@ -506,6 +529,16 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public void updateMemberBeforeRequestsNew(RdmMember rdmMember) {
         iRdmMemberService.updateMemberBefore(rdmMember);
+    }
+
+    /**
+     * 数据库批量预更新成员, 发起一个新事务
+     *
+     * @param rdmMembers
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    public void batchUpdateMemberBeforeRequestsNew(List<RdmMember> rdmMembers) {
+        rdmMembers.forEach(m -> iRdmMemberService.updateMemberBefore(m));
     }
 
     /**

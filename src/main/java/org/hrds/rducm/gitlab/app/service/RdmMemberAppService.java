@@ -9,6 +9,7 @@ import org.hzero.export.vo.ExportParam;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author xy
@@ -52,6 +53,15 @@ public interface RdmMemberAppService {
      * @param rdmMemberBatchDTO 参数
      */
     void batchAddOrUpdateMembers(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO);
+
+    /**
+     * 批量移除成员
+     *
+     * @param organizationId
+     * @param projectId
+     * @param memberIds
+     */
+    void batchRemoveMembers(Long organizationId, Long projectId, Set<Long> memberIds);
 
     /**
      * 新增成员

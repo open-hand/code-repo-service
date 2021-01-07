@@ -15,6 +15,7 @@ import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
+import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.hzero.export.vo.ExportParam;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author ying.xie@hand-china.com
@@ -176,5 +178,15 @@ public class RdmMemberProjController extends BaseController {
         } else {
             return Results.success(rdmMemberAppService.batchInvalidMember(organizationId, projectId, repositoryId));
         }
+    }
+
+    @ApiOperation(value = "批量移除代码库成员(项目层)")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @DeleteMapping("/batch-remove")
+    public ResponseEntity<?> batchRemoveMember(@PathVariable Long organizationId,
+                                               @PathVariable Long projectId,
+                                               @Encrypt @RequestParam Set<Long> memberIds) {
+        rdmMemberAppService.batchRemoveMembers(organizationId, projectId, memberIds);
+        return Results.success();
     }
 }

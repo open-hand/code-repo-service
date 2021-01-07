@@ -1,10 +1,11 @@
 package org.hrds.rducm.gitlab.app.eventhandler;
 
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.choerodon.asgard.saga.annotation.SagaTask;
 import io.choerodon.core.exception.CommonException;
+import org.hrds.rducm.gitlab.app.adapter.DateTypeAdapter;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTaskCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.AppServiceImportPayload;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -164,7 +166,11 @@ public class RdmRepositorySagaHandler {
             description = "Devops停用/启用应用服务", maxRetryCount = 3,
             seq = 1)
     public String invalidPrivilegeWhenDeactivate(String data) {
-        DevOpsAppServicePayload devOpsAppServicePayload = JSONObject.parseObject(data, DevOpsAppServicePayload.class);
+        //构建处理时间戳的gson
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Date.class, new DateTypeAdapter());
+        Gson gson1 = gsonBuilder.create();
+        DevOpsAppServicePayload devOpsAppServicePayload = gson1.fromJson(data, DevOpsAppServicePayload.class);
         C7nAppServiceVO c7nAppServiceVO = devOpsAppServicePayload.getAppServiceDTO();
         if (Objects.isNull(c7nAppServiceVO) || Objects.isNull(c7nAppServiceVO.getActive())) {
             return data;
