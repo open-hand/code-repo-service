@@ -1,7 +1,7 @@
 {
   "name": "@choerodon/code-repo",
   "routeName": "rducm",
-  "version": "0.24.0-alpha.4",
+  "version": "0.25.0-alpha.1",
   "description": "",
   "main": "./lib/index.js",
   "scripts": {
