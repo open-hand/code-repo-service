@@ -51,7 +51,7 @@ const PsBranch = observer(() => {
       const record = branchDs.current;
       const modalProps = {
         title: formatMessage({ id: `${intlPrefix}.cancel.protected` }),
-        children: formatMessage({ id: `${intlPrefix}.cancel.protected.confirm` }),
+        children: formatMessage({ id: `${intlPrefix}.cancel.protected.confirm.branch` }),
         okText: formatMessage({ id: 'ok' }),
         okProps: { color: 'red' },
         cancelProps: { color: 'dark' },
@@ -61,7 +61,7 @@ const PsBranch = observer(() => {
       const record = tagDs.current;
       const modalProps = {
         title: formatMessage({ id: `${intlPrefix}.cancel.protected` }),
-        children: formatMessage({ id: `${intlPrefix}.cancel.protected.confirm` }),
+        children: formatMessage({ id: `${intlPrefix}.cancel.protected.confirm.tag` }),
         okText: formatMessage({ id: 'ok' }),
         okProps: { color: 'red' },
         cancelProps: { color: 'dark' },
