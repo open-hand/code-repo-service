@@ -2,8 +2,10 @@ package org.hrds.rducm.gitlab.infra.audit.event;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.oauth.DetailsHelper;
+
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.hrds.rducm.gitlab.domain.entity.RdmOperationLog;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
@@ -22,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.util.StringUtils;
 
 @Component
 public class MemberEventListener implements ApplicationListener<MemberEvent> {
@@ -107,9 +110,17 @@ public class MemberEventListener implements ApplicationListener<MemberEvent> {
 
         C7nUserVO c7nUserS = c7NBaseServiceFacade.detailC7nUser(userId);
         C7nUserVO c7nUserT = c7NBaseServiceFacade.detailC7nUser(targetUserId);
-
-        sourceUserIdStr = c7nUserS.getRealName() + "(" + c7nUserS.getLoginName() + ")";
-        targetUserIdStr = c7nUserT.getRealName() + "(" + c7nUserT.getLoginName() + ")";
+        // 区分ldap用户
+        if (c7nUserS.getLdap()) {
+            sourceUserIdStr = c7nUserS.getRealName() + "(" + c7nUserS.getLoginName() + ")";
+        } else {
+            sourceUserIdStr = c7nUserS.getRealName() + "(" + c7nUserS.getEmail() + ")";
+        }
+        if (c7nUserT.getLdap()) {
+            targetUserIdStr = c7nUserT.getRealName() + "(" + c7nUserT.getLoginName() + ")";
+        } else {
+            targetUserIdStr = c7nUserT.getRealName() + "(" + c7nUserT.getEmail() + ")";
+        }
         accessLevelStr = accessLevel == null ? null : RdmAccessLevel.forValue(accessLevel).toDesc();
 
         expiresAtStr = Optional.ofNullable(expiresAt)

@@ -13,7 +13,9 @@ import org.hrds.rducm.gitlab.api.controller.dto.*;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseUserQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
+import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
+import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.hzero.export.vo.ExportParam;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author ying.xie@hand-china.com
@@ -152,5 +155,38 @@ public class RdmMemberProjController extends BaseController {
                                                                       @Encrypt @RequestBody Set<Long> repositoryIds) {
         return Results.success(iRdmMemberService.selfPrivilege(organizationId, projectId, repositoryIds));
 
+    }
+
+    /**
+     * 启用/禁用应用服务同步代码库成员权限
+     *
+     * @param organizationId
+     * @param projectId
+     * @param repositoryId
+     * @param active
+     * @return
+     */
+    @ApiOperation(value = "启用/禁用应用服务同步代码库成员权限")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @PostMapping("/batch-valid")
+    public ResponseEntity<List<RdmMember>> batchValid(@PathVariable Long organizationId,
+                                                      @PathVariable Long projectId,
+                                                      @RequestParam Long repositoryId,
+                                                      @RequestParam Boolean active) {
+        if (active) {
+            return Results.success(rdmMemberAppService.batchValidMember(organizationId, projectId, repositoryId));
+        } else {
+            return Results.success(rdmMemberAppService.batchInvalidMember(organizationId, projectId, repositoryId));
+        }
+    }
+
+    @ApiOperation(value = "批量移除代码库成员(项目层)")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @DeleteMapping("/batch-remove")
+    public ResponseEntity<?> batchRemoveMember(@PathVariable Long organizationId,
+                                               @PathVariable Long projectId,
+                                               @Encrypt @RequestParam Set<Long> memberIds) {
+        rdmMemberAppService.batchRemoveMembers(organizationId, projectId, memberIds);
+        return Results.success();
     }
 }

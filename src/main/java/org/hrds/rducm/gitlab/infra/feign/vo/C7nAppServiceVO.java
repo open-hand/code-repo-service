@@ -35,7 +35,7 @@ public class C7nAppServiceVO {
 //    private Boolean synchro;
 
     @ApiModelProperty("应用服务是否启用")
-    private Boolean isActive;
+    private Boolean active;
 
 //    private String publishLevel;
 //    private String contributor;
@@ -170,11 +170,11 @@ public class C7nAppServiceVO {
     }
 
     public Boolean getActive() {
-        return isActive;
+        return active;
     }
 
     public C7nAppServiceVO setActive(Boolean active) {
-        isActive = active;
+        this.active = active;
         return this;
     }
 
@@ -257,5 +257,28 @@ public class C7nAppServiceVO {
     public C7nAppServiceVO setUpdateLoginName(String updateLoginName) {
         this.updateLoginName = updateLoginName;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return "C7nAppServiceVO{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", code='" + code + '\'' +
+                ", type='" + type + '\'' +
+                ", projectId=" + projectId +
+                ", gitlabProjectId=" + gitlabProjectId +
+                ", repoUrl='" + repoUrl + '\'' +
+                ", active=" + active +
+                ", description='" + description + '\'' +
+                ", objectVersionNumber=" + objectVersionNumber +
+                ", imgUrl='" + imgUrl + '\'' +
+                ", creationDate=" + creationDate +
+                ", lastUpdateDate=" + lastUpdateDate +
+                ", createUserName='" + createUserName + '\'' +
+                ", createLoginName='" + createLoginName + '\'' +
+                ", updateUserName='" + updateUserName + '\'' +
+                ", updateLoginName='" + updateLoginName + '\'' +
+                '}';
     }
 }

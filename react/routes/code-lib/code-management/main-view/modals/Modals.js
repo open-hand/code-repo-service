@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
+import { message } from 'choerodon-ui';
 import { Modal } from 'choerodon-ui/pro';
-import { Header, Choerodon } from '@choerodon/boot';
+import { Header, Choerodon, axios } from '@choerodon/boot';
 import HeaderButtons from '@/components/header-buttons';
 import AddMember from './add-member';
 import AddOutsideMember from './add-outside-member';
@@ -191,6 +192,21 @@ const EnvModals = observer((props) => {
       okText: formatMessage({ id: 'add' }),
     });
   }
+  async function handleDelete() {
+    const deleteData = psSetDs.selected.map(item => item.get('id'));
+    await axios.delete(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members/batch-remove`, { params: { memberIds: deleteData.join(',') } })
+      .then((res) => {
+        if (res.failed) {
+          message.error(res.message);
+        } else {
+          message.success(formatMessage({ id: 'infra.view.message.deleteSuccess' }));
+          psSetDs.query();
+        }
+      })
+      .catch((error) => {
+        Choerodon.handleResponseError(error);
+      });
+  }
 
   function getButtons() {
     const buttonData = [{
@@ -234,6 +250,15 @@ const EnvModals = observer((props) => {
             display: true,
             group: 1,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-member'],
+          },
+          {
+            name: formatMessage({ id: 'infra.button.batch.delete' }),
+            icon: 'delete',
+            handler: handleDelete,
+            display: true,
+            group: 1,
+            permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
+            disabled: psSetDs.selected.length === 0,
           },
         );
         break;

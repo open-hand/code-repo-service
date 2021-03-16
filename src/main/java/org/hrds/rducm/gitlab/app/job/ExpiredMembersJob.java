@@ -57,6 +57,19 @@ public class ExpiredMembersJob {
         logger.info("移除过期成员定时任务执行完毕");
     }
 
+    @JobTask(maxRetryCount = 3,
+            code = "removeExpiredMembers",
+            description = "代码库移除过期成员")
+    public void removeExpiredMembersJob(Map<String, Object> map) {
+
+        // 移除过期成员
+        logger.info("移除过期成员定时任务开始执行");
+
+        rdmMemberAppService.handleExpiredMembers();
+
+        logger.info("移除过期成员定时任务执行完毕");
+    }
+
     /**
      * 过期提醒, 提前3天发送站内信提醒项目管理员
      */
@@ -94,5 +107,38 @@ public class ExpiredMembersJob {
         });
 
         logger.info("代码库权限过期提醒定时任务执行完毕");
+    }
+
+    /**
+     * 过期提醒, 提前X天发送站内信提醒项目管理员
+     */
+    @JobTask(maxRetryCount = 3,
+            code = "memberExpiredNotice",
+            description = "代码库权限过期提醒",
+            params = {@JobParam(name = "days", description = "提前x天通知")})
+    private void memberExpiredNotice(Map<String, Object> map) {
+        logger.info("代码库权限过期提醒定时任务开始执行");
+
+        // 获取参数
+        int days = Integer.parseInt((String) map.get("days"));
+
+        // <1> 查询x天后过期的成员
+        Condition condition = new Condition(RdmMember.class);
+        condition.createCriteria().andLessThanOrEqualTo(RdmMember.FIELD_GL_EXPIRES_AT, LocalDate.now().plusDays(days));
+        List<RdmMember> expiredRdmMembers = rdmMemberRepository.selectByCondition(condition);
+
+        // 填充用户信息等
+        rdmMemberAssembler.conversionForExpireMembersJob(expiredRdmMembers);
+
+        // 按项目id分组
+        Map<Long, List<RdmMember>> group = expiredRdmMembers.stream().collect(Collectors.groupingBy(m -> m.getProjectId()));
+
+        group.forEach((projectId, members) -> {
+            Long organizationId = members.get(0).getOrganizationId();
+            // 发送站内信
+            messageClientFacade.sendMemberExpireNotification(organizationId, projectId, members);
+        });
+
+        logger.info("代码库权限过期提醒任务执行完毕");
     }
 }

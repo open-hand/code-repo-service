@@ -3,9 +3,16 @@ import moment from 'moment';
 import { map } from 'lodash';
 import Tips from '@/components/new-tips';
 
+function handleLoad({ dataSet }) {
+  dataSet.forEach((record) => {
+    // eslint-disable-next-line no-param-reassign
+    record.selectable = !(record.get('glAccessLevel') && Number(record.get('glAccessLevel').substring(1)) >= 50);// record.get('deleteFlag');
+  });
+}
+
 export default ((intlPrefix, formatMessage, organizationId, projectId, branchServiceDs, repositoryIds) => ({
   autoQuery: false,
-  selection: false,
+  selection: 'multiple',
   pageSize: 10,
   transport: {
     read: () => ({
@@ -163,4 +170,7 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
     //   bind: 'employeeObject.employeeName',
     // },
   ],
+  events: {
+    load: handleLoad,
+  },
 }));

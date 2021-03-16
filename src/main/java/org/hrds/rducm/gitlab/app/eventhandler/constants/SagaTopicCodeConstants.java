@@ -45,6 +45,11 @@ public class SagaTopicCodeConstants {
      */
     public static final String DEVOPS_APP_DELETE = "devops-app-delete";
 
+    /**
+     * Devops 同步应用服务状态
+     */
+    public static final String DEVOPS_APP_SYNC_STATUS = "devops-app-sync-status";
+
     private SagaTopicCodeConstants() {
     }
 }
