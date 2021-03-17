@@ -124,9 +124,10 @@ public class ExpiredMembersJob {
         int days = Integer.parseInt((String) map.get("days"));
         logger.info(">>>>>>>>>>>>>>>>>>>>>>>>days:{}", days);
 
-        // <1> 查询x天后过期的成员
+        // <1> 查询x天后过期的成员,并且是未过期的成员
         Condition condition = new Condition(RdmMember.class);
-        condition.createCriteria().andLessThanOrEqualTo(RdmMember.FIELD_GL_EXPIRES_AT, LocalDate.now().plusDays(days));
+        condition.createCriteria().andLessThanOrEqualTo(RdmMember.FIELD_GL_EXPIRES_AT, LocalDate.now().plusDays(days))
+                .andGreaterThanOrEqualTo(RdmMember.FIELD_GL_EXPIRES_AT, LocalDate.now());;
         List<RdmMember> expiredRdmMembers = rdmMemberRepository.selectByCondition(condition);
 
         // 填充用户信息等
