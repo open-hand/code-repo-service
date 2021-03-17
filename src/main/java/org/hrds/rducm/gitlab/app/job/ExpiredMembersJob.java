@@ -5,6 +5,7 @@ import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.asgard.schedule.annotation.TaskParam;
 import io.choerodon.asgard.schedule.annotation.TimedTask;
 import io.choerodon.asgard.schedule.enums.TriggerTypeEnum;
+
 import org.hrds.rducm.gitlab.app.assembler.RdmMemberAssembler;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
@@ -76,7 +77,7 @@ public class ExpiredMembersJob {
     @JobTask(maxRetryCount = 3,
             code = "expiredNotification",
             description = "代码库权限过期提醒")
-            //params = {@JobParam(name = "days", description = "提前x天通知")})
+    //params = {@JobParam(name = "days", description = "提前x天通知")})
     @TimedTask(name = "expiredNotification",
             description = "代码库权限过期提醒",
             params = {},
@@ -121,6 +122,7 @@ public class ExpiredMembersJob {
 
         // 获取参数
         int days = Integer.parseInt((String) map.get("days"));
+        logger.debug("days:{}", days);
 
         // <1> 查询x天后过期的成员
         Condition condition = new Condition(RdmMember.class);
