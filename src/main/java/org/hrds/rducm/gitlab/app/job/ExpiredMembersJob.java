@@ -74,41 +74,41 @@ public class ExpiredMembersJob {
     /**
      * 过期提醒, 提前3天发送站内信提醒项目管理员
      */
-    @JobTask(maxRetryCount = 3,
-            code = "expiredNotification",
-            description = "代码库权限过期提醒")
-    //params = {@JobParam(name = "days", description = "提前x天通知")})
-    @TimedTask(name = "expiredNotification",
-            description = "代码库权限过期提醒",
-            params = {},
-            triggerType = TriggerTypeEnum.CRON_TRIGGER,
-            cronExpression = "0 0 9 * * ?")
-    private void expiredNotification(Map<String, Object> map) {
-        logger.info("代码库权限过期提醒定时任务开始执行");
-
-        // 获取参数
-        int days = 3;
-//        Integer.parseInt((String) map.get("days"));
-
-        // <1> 查询x天后过期的成员
-        Condition condition = new Condition(RdmMember.class);
-        condition.createCriteria().andLessThanOrEqualTo(RdmMember.FIELD_GL_EXPIRES_AT, LocalDate.now().plusDays(days));
-        List<RdmMember> expiredRdmMembers = rdmMemberRepository.selectByCondition(condition);
-
-        // 填充用户信息等
-        rdmMemberAssembler.conversionForExpireMembersJob(expiredRdmMembers);
-
-        // 按项目id分组
-        Map<Long, List<RdmMember>> group = expiredRdmMembers.stream().collect(Collectors.groupingBy(m -> m.getProjectId()));
-
-        group.forEach((projectId, members) -> {
-            Long organizationId = members.get(0).getOrganizationId();
-            // 发送站内信
-            messageClientFacade.sendMemberExpireNotification(organizationId, projectId, members);
-        });
-
-        logger.info("代码库权限过期提醒定时任务执行完毕");
-    }
+//    @JobTask(maxRetryCount = 3,
+//            code = "expiredNotification",
+//            description = "代码库权限过期提醒")
+//    //params = {@JobParam(name = "days", description = "提前x天通知")})
+//    @TimedTask(name = "expiredNotification",
+//            description = "代码库权限过期提醒",
+//            params = {},
+//            triggerType = TriggerTypeEnum.CRON_TRIGGER,
+//            cronExpression = "0 0 9 * * ?")
+//    private void expiredNotification(Map<String, Object> map) {
+//        logger.info("代码库权限过期提醒定时任务开始执行");
+//
+//        // 获取参数
+//        int days = 3;
+////        Integer.parseInt((String) map.get("days"));
+//
+//        // <1> 查询x天后过期的成员
+//        Condition condition = new Condition(RdmMember.class);
+//        condition.createCriteria().andLessThanOrEqualTo(RdmMember.FIELD_GL_EXPIRES_AT, LocalDate.now().plusDays(days));
+//        List<RdmMember> expiredRdmMembers = rdmMemberRepository.selectByCondition(condition);
+//
+//        // 填充用户信息等
+//        rdmMemberAssembler.conversionForExpireMembersJob(expiredRdmMembers);
+//
+//        // 按项目id分组
+//        Map<Long, List<RdmMember>> group = expiredRdmMembers.stream().collect(Collectors.groupingBy(m -> m.getProjectId()));
+//
+//        group.forEach((projectId, members) -> {
+//            Long organizationId = members.get(0).getOrganizationId();
+//            // 发送站内信
+//            messageClientFacade.sendMemberExpireNotification(organizationId, projectId, members);
+//        });
+//
+//        logger.info("代码库权限过期提醒定时任务执行完毕");
+//    }
 
     /**
      * 过期提醒, 提前X天发送站内信提醒项目管理员
@@ -117,12 +117,12 @@ public class ExpiredMembersJob {
             code = "memberExpiredNotice",
             description = "代码库权限过期提醒",
             params = {@JobParam(name = "days", description = "提前x天通知")})
-    private void memberExpiredNotice(Map<String, Object> map) {
+    public void memberExpiredNoticeNew(Map<String, Object> map) {
         logger.info("代码库权限过期提醒定时任务开始执行");
 
         // 获取参数
         int days = Integer.parseInt((String) map.get("days"));
-        logger.debug("days:{}", days);
+        logger.info(">>>>>>>>>>>>>>>>>>>>>>>>days:{}", days);
 
         // <1> 查询x天后过期的成员
         Condition condition = new Condition(RdmMember.class);
