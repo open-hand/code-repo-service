@@ -362,6 +362,8 @@ const codeManagement = {
   'infra.codeManage.allow.create': '允许创建',
   'infra.codeManage.cancel.protected': '取消保护',
   'infra.codeManage.cancel.protected.confirm': '确定取消保护该标记？',
+  'infra.codeManage.cancel.protected.confirm.branch': '确定取消保护该分支？',
+  'infra.codeManage.cancel.protected.confirm.tag': '确定取消保护该标记？',
   'infra.codeManage.develop.managerCountTips': '权限大于或等于Maintainer的成员数量',
   'infra.codeManage.develop.managerCount': '管理成员总数',
   'infra.codeManage.develop.allMember': '开发成员总数',
