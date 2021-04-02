@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.domain.facade.impl;
 
 import io.choerodon.core.oauth.DetailsHelper;
+
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 public class MessageClientFacadeImpl implements MessageClientFacade {
     public static final String APPLICANT_TEMPLATE_CODE = "RDUCM.MEMBER_APPLICANT.WEB";
     public static final String MEMBER_EXPIRE_NOTICE_TEMPLATE_CODE = "RDUCM.MEMBER_EXPIRE_NOTICE.WEB";
+    private static final String URL = "/#/rducm/code-lib-management/approve?type=project&id=%s&name=%s&organizationId=%s";
 
 
     private static final Logger logger = LoggerFactory.getLogger(MessageClientFacadeImpl.class);
@@ -68,6 +70,7 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
         });
 
         args.put("projectName", c7nProjectVO.getName());
+        args.put("url", String.format(URL, c7nProjectVO.getId(), c7nProjectVO.getName(), c7nProjectVO.getOrganizationId()));
 
         logger.info("tenantId:[{}], receivers:[{}]", tenantId, receivers);
 
