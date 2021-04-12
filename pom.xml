@@ -7,12 +7,12 @@
     <parent>
         <groupId>io.choerodon</groupId>
         <artifactId>choerodon-framework-parent</artifactId>
-        <version>0.19.1-SNAPSHOT</version>
+        <version>0.19.1.RELEASE</version>
     </parent>
 
     <groupId>org.hrds.rducm</groupId>
     <artifactId>code-repo-service</artifactId>
-    <version>0.25.0-alpha.3.RELEASE</version>
+    <version>0.25.0.RELEASE</version>
     <name>code-repo-service</name>
 
     <dependencies>
