@@ -1,22 +1,31 @@
 package org.hrds.rducm.gitlab.app.eventhandler;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
 import io.choerodon.asgard.saga.annotation.SagaTask;
 import io.choerodon.core.iam.ResourceLevel;
+import io.choerodon.mybatis.domain.AuditDomain;
+
 import org.apache.commons.lang3.EnumUtils;
+import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTaskCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.GitlabGroupMemberVO;
+import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
+import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.enums.RoleLabelEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.hrds.rducm.gitlab.infra.util.JsonHelper;
 import org.hzero.core.util.AssertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +59,8 @@ public class RdmMemberChangeSagaHandler {
     private C7nDevOpsServiceFacade c7nDevOpsServiceFacade;
     @Autowired
     private C7nBaseServiceFacade c7nBaseServiceFacade;
+    @Autowired
+    private IRdmMemberService iRdmMemberService;
 
     /**
      * 角色同步事件
@@ -113,6 +124,51 @@ public class RdmMemberChangeSagaHandler {
         logger.info("delete gitlab role end");
         return gitlabGroupMemberVOList;
     }
+
+    //批量添加用户权限，需要异步处理
+    @SagaTask(code = SagaTaskCodeConstants.BATCH_ADD_GITLAB_MEMBER,
+            description = "批量添加用户权限",
+            sagaCode = SagaTopicCodeConstants.BATCH_ADD_GITLAB_MEMBER,
+            maxRetryCount = 3, seq = 1)
+    public void batchAddOrUpdateMembers(String payload) {
+        List<RdmMember> rdmMembers = JsonHelper.unmarshalByJackson(payload, new TypeReference<List<RdmMember>>() {
+        });
+        if (CollectionUtils.isEmpty(rdmMembers)) {
+            return;
+        }
+        rdmMembers.forEach((m) -> {
+            // <2.1> 判断新增或更新
+            boolean isExists;
+            if (m.get_status().equals(AuditDomain.RecordStatus.create)) {
+                isExists = false;
+            } else if (m.get_status().equals(AuditDomain.RecordStatus.update)) {
+                isExists = true;
+            } else {
+                throw new IllegalArgumentException("record status is invalid");
+            }
+
+            // <2.2> 新增或更新成员至gitlab
+            try {
+                Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
+
+                // <2.3> 回写数据库
+                iRdmMemberService.updateMemberAfter(m, glMember);
+
+                // <2.4> 发送事件
+                if (isExists) {
+                    iRdmMemberService.publishMemberEvent(m, MemberEvent.EventType.UPDATE_MEMBER);
+                } else {
+                    iRdmMemberService.publishMemberEvent(m, MemberEvent.EventType.ADD_MEMBER);
+                }
+            } catch (Exception e) {
+                // 回写数据库错误消息
+                logger.error(e.getMessage(), e);
+                m.setSyncGitlabErrorMsg(e.getMessage());
+                rdmMemberRepository.updateOptional(m, RdmMember.FIELD_SYNC_GITLAB_ERROR_MSG);
+            }
+        });
+    }
+
 
     /**
      * 处理项目层的团队成员角色变更
@@ -218,7 +274,7 @@ public class RdmMemberChangeSagaHandler {
                 return RoleLabelEnum.PROJECT_ADMIN.value();
             } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value())) {
                 return RoleLabelEnum.PROJECT_MEMBER.value();
-            } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_OWNER.value())){
+            } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_OWNER.value())) {
                 return RoleLabelEnum.PROJECT_ADMIN.value();
             } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_DEVELOPER.value())) {
                 return RoleLabelEnum.PROJECT_MEMBER.value();

@@ -35,6 +35,8 @@ public class SagaTaskCodeConstants {
      */
     public static final String CODE_REPO_VALID_PRIVILEGE = "codeRepoValidPrivilege";
 
+    public static final String BATCH_ADD_GITLAB_MEMBER = "batchAddOrUpdateMembers";
+
     private SagaTaskCodeConstants() {
     }
 }

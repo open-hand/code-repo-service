@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.choerodon.asgard.saga.annotation.Saga;
 import io.choerodon.asgard.saga.producer.StartSagaBuilder;
 import io.choerodon.asgard.saga.producer.TransactionalProducer;
@@ -9,11 +10,13 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.domain.AuditDomain;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.api.controller.dto.*;
 import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
 import org.hrds.rducm.gitlab.app.assembler.RdmMemberAssembler;
 import org.hrds.rducm.gitlab.app.async.RdmMemberQueryHelper;
+import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
@@ -33,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -113,7 +117,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         Condition condition = Condition.builder(RdmMember.class)
                 .where(Sqls.custom()
                         .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
-                        .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, syncGitlabFlag,true )
+                        .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, syncGitlabFlag, true)
                         .andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIds, true))
                 .build();
         // TODO 可使用多线程优化
@@ -237,6 +241,8 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @Saga(code = SagaTopicCodeConstants.BATCH_ADD_GITLAB_MEMBER,
+            description = "批量添加用户的应用服务权限", inputSchema = "{}")
     public void batchAddOrUpdateMembers(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
         // <0> 校验入参 + 转换
         List<RdmMember> rdmMembers = rdmMemberAssembler.rdmMemberBatchDTOToRdmMembers(organizationId, projectId, rdmMemberBatchDTO);
@@ -246,37 +252,21 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         self().batchAddOrUpdateMembersBeforeRequestsNew(rdmMembers);
 
         // <2> 调用gitlab api添加成员
-        rdmMembers.forEach((m) -> {
-            // <2.1> 判断新增或更新
-            boolean isExists;
-            if (m.get_status().equals(AuditDomain.RecordStatus.create)) {
-                isExists = false;
-            } else if (m.get_status().equals(AuditDomain.RecordStatus.update)) {
-                isExists = true;
-            } else {
-                throw new IllegalArgumentException("record status is invalid");
-            }
+        producer.applyAndReturn(
+                StartSagaBuilder
+                        .newBuilder()
+                        .withLevel(ResourceLevel.PROJECT)
+                        .withRefType("batchAddOrUpdateMembers")
+                        .withSagaCode(SagaTopicCodeConstants.BATCH_ADD_GITLAB_MEMBER),
+                builder -> {
+                    builder
+                            .withPayloadAndSerialize(rdmMembers)
+                            .withRefId(String.valueOf(projectId))
+                            .withSourceId(projectId);
+                    return rdmMembers;
+                });
 
-            // <2.2> 新增或更新成员至gitlab
-            try {
-                Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
 
-                // <2.3> 回写数据库
-                iRdmMemberService.updateMemberAfter(m, glMember);
-
-                // <2.4> 发送事件
-                if (isExists) {
-                    iRdmMemberService.publishMemberEvent(m, MemberEvent.EventType.UPDATE_MEMBER);
-                } else {
-                    iRdmMemberService.publishMemberEvent(m, MemberEvent.EventType.ADD_MEMBER);
-                }
-            } catch (Exception e) {
-                // 回写数据库错误消息
-                logger.error(e.getMessage(), e);
-                m.setSyncGitlabErrorMsg(e.getMessage());
-                rdmMemberRepository.updateOptional(m, RdmMember.FIELD_SYNC_GITLAB_ERROR_MSG);
-            }
-        });
     }
 
     @Override
@@ -290,7 +280,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                 .build());
         // <1> 数据库更新成员, 预删除, 发起新事务
         self().batchUpdateMemberBeforeRequestsNew(rdmMembers);
-        rdmMembers.forEach( m -> {
+        rdmMembers.forEach(m -> {
             // <2> 调用gitlab api删除成员
             iRdmMemberService.tryRemoveMemberToGitlab(m.getGlProjectId(), m.getGlUserId());
 
@@ -507,7 +497,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             member.setSyncGitlabDate(new Date());
         }
         rdmMemberRepository.batchUpdateByPrimaryKey(rdmMemberList);
-        return  rdmMemberList;
+        return rdmMemberList;
     }
 
     /**
