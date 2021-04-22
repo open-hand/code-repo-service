@@ -10,6 +10,7 @@ import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hzero.boot.message.MessageClient;
+import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,15 @@ import java.util.stream.Collectors;
 public class MessageClientFacadeImpl implements MessageClientFacade {
     public static final String APPLICANT_TEMPLATE_CODE = "RDUCM.MEMBER_APPLICANT.WEB";
     public static final String MEMBER_EXPIRE_NOTICE_TEMPLATE_CODE = "RDUCM.MEMBER_EXPIRE_NOTICE.WEB";
+
+    /**
+     * 代码库权限申请消息
+     */
+    public static final String RDUCM_MEMBER_APPLICANT = "RDUCM.MEMBER_APPLICANT";
+    /**
+     * 代码库成员过期提醒消息
+     */
+    public static final String RDUCM_MEMBER_EXPIRE_NOTICE = "RDUCM.MEMBER_EXPIRE_NOTICE";
     private static final String URL = "/#/rducm/code-lib-management/approve?type=project&id=%s&name=%s&organizationId=%s";
 
 
@@ -75,8 +85,11 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
         logger.info("tenantId:[{}], receivers:[{}]", tenantId, receivers);
 
         // 异步发送站内消息
-        messageClient.async().sendWebMessage(tenantId, APPLICANT_TEMPLATE_CODE, lang, receivers, args);
+        MessageSender messageSender = constructMessageSender(RDUCM_MEMBER_APPLICANT, receivers, null, args, null, projectId);
+        messageClient.async().sendMessage(messageSender);
     }
+
+
 
 
     @Override
@@ -125,8 +138,23 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
         logger.info("tenantId:[{}], receivers:[{}]", organizationId, receivers);
 
         // 异步发送站内消息
-        messageClient.async().sendWebMessage(organizationId, MEMBER_EXPIRE_NOTICE_TEMPLATE_CODE, lang, receivers, args);
+        MessageSender messageSender = constructMessageSender(RDUCM_MEMBER_EXPIRE_NOTICE, receivers, null, args, null, projectId);
+        messageClient.async().sendMessage(messageSender);
     }
 
+    private static MessageSender constructMessageSender(String sendSettingCode, List<Receiver> targetUsers, String receiveType, Map<String, String> params, Map<String, Object> addition, Long projectId) {
+        MessageSender messageSender = new MessageSender();
+        messageSender.setTenantId(0L);
+        messageSender.setReceiverAddressList(targetUsers);
+        messageSender.setReceiverTypeCode(receiveType);
+        messageSender.setArgs(params);
+        messageSender.setMessageCode(sendSettingCode);
+        if (addition == null) {
+            addition = new HashMap<>();
+        }
+        addition.putIfAbsent("projectId", Objects.requireNonNull(projectId));
+        messageSender.setAdditionalInformation(addition);
+        return messageSender;
+    }
 
 }
