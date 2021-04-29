@@ -50,6 +50,8 @@ public class SagaTopicCodeConstants {
      */
     public static final String DEVOPS_APP_SYNC_STATUS = "devops-app-sync-status";
 
+    public static final String BATCH_ADD_GITLAB_MEMBER = "batch-add-gitlab-member";
+
     private SagaTopicCodeConstants() {
     }
 }
