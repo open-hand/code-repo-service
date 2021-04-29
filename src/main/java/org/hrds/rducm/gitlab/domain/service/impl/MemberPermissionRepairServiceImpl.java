@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
@@ -37,19 +38,27 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
     public void repairMemberPermission(Long organizationId) {
         List<RdmMemberAuditRecord> records = rdmMemberAuditRecordRepository
                 .selectByCondition(Condition.builder(RdmMemberAuditRecord.class)
-                .andWhere(Sqls.custom()
-                        .andEqualTo(RdmMemberAuditRecord.FIELD_ORGANIZATION_ID, organizationId)
-                ).build());
+                        .andWhere(Sqls.custom()
+                                .andEqualTo(RdmMemberAuditRecord.FIELD_ORGANIZATION_ID, organizationId)
+                        ).build());
         if (CollectionUtils.isEmpty(records)) {
             return;
         }
 
         Set<Long> projectIds = c7NBaseServiceFacade.listProjectIds(organizationId);
+        if (CollectionUtils.isEmpty(projectIds)) {
+            return;
+        }
         Map<Long, List<RdmMemberAuditRecord>> group = records.stream().collect(Collectors.groupingBy(RdmMemberAuditRecord::getProjectId));
-
+        if (MapUtils.isEmpty(group)) {
+            return;
+        }
         projectIds.forEach((projectId) -> {
             List<RdmMemberAuditRecord> list = group.get(projectId);
-            for(RdmMemberAuditRecord record : list) {
+            if (CollectionUtils.isEmpty(list)) {
+                return;
+            }
+            for (RdmMemberAuditRecord record : list) {
                 rdmMemberAuditAppService.auditFix(record.getOrganizationId(), record.getProjectId(), record.getRepositoryId(), record.getId());
             }
         });
