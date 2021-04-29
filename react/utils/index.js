@@ -310,10 +310,18 @@ function removeEndsChar(str, char) {
 }
 
 async function checkPermission({ projectId, organizationId, resourceType, code }) {
-  const params = resourceType === 'project' ? `?projectId=${projectId}` : '';
-  try {
-    const res = await axios.post(`/iam/choerodon/v1/permissions/menus/check-permissions${params}`, JSON.stringify(code));
+  const params = { tenantId: resourceType === 'site' ? 0: organizationId };
+  if (resourceType === 'project') {
+    params.projectId = projectId;
+  }
 
+  try {
+    const res = await axios({
+      method: 'post',
+      url: '/iam/choerodon/v1/permissions/menus/check-permissions',
+      data: code,
+      params,
+    });
     if (res && res.failed) {
       return false;
     } else if (res && res.length) {
