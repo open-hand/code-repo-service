@@ -206,7 +206,7 @@ const userInfo = {
   'user.changepwd.newpassword.require.msg': '请输入新密码',
   'user.changepwd.confirmpassword.require.msg': '请确认密码',
   'user.changepwd.confirmpassword': '确认密码',
-  'infra.personal.model.glWebUrl': 'GitLab仓库地址',
+  'infra.personal.model.glWebUrl': 'GitLab个人主页',
   'infra.personal.model.createdAt': '创建时间',
   'infra.personal.model.initPassword': '初始密码',
   'infra.personal.message.modifyGitlabPassword': '修改仓库密码',
