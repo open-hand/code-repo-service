@@ -86,7 +86,7 @@ export default observer(() => {
             onOption={getClusterOptionProp}
             optionsFilter={levelOptionsFilter}
           />
-          <DatePicker name="glExpiresAt" min={moment().add(1, 'days').format('YYYY-MM-DD')} colSpan={4} />
+          <DatePicker popupCls="code-lib-management-add-member-dayPicker" name="glExpiresAt" min={moment().add(1, 'days').format('YYYY-MM-DD')} colSpan={4} />
           {pathListDs.length > 1 ? (
             <Button
               funcType="flat"

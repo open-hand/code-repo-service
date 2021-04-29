@@ -354,7 +354,7 @@ const codeManagement = {
   'infra.codeManage.tag.protected.set': '保护标记设置',
   'infra.codeManage.isAllow.merge': '是否允许合并',
   'infra.codeManage.isAllow.push': '是否允许推送',
-  'infra.codeManage.isAllow.create': '是否允许创建',
+  'infra.codeManage.isAllow.create': '是否允许创建或更新',
   'infra.codeManage.branch.protected': '受保护的分支',
   'infra.codeManage.tag.protected': '受保护的标记',
   'infra.codeManage.allow.merge': '允许合并',

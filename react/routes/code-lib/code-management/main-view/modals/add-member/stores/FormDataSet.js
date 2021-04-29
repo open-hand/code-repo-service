@@ -38,8 +38,4 @@ export default ({ formatMessage, intlPrefix, pathListDs, organizationId, project
       options: branchServiceDs,
     },
   ],
-  // events: {
-  //   load: handleLoad,
-  //   update: handleUpdate,
-  // },
 });

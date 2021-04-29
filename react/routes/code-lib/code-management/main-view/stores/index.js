@@ -44,7 +44,7 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
 
 
   const intlPrefix = 'infra';
-  const branchServiceDs = useMemo(() => new DataSet(BranchServiceDs(formatMessage)), [projectId]); // 分支/标签的应用服务下拉框数据
+  const branchServiceDs = useMemo(() => new DataSet(BranchServiceDs({formatMessage, organizationId, projectId, setBranchApp })), [projectId, organizationId]); // 分支/标签的应用服务下拉框数据
   const psSetDs = useMemo(() => new DataSet(PsSetDataSet(intlPrefix, formatMessage, organizationId, projectId, branchServiceDs, appServiceIds)), [formatMessage, projectId, branchServiceDs, appServiceIds]);
   const branchDs = useMemo(() => new DataSet(BranchDataSet(formatMessage, projectId, branchAppId)), [formatMessage, projectId, branchAppId]);
   const tagDs = useMemo(() => new DataSet(TagDataSet(formatMessage, projectId, branchAppId)), [formatMessage, projectId, branchAppId]);
@@ -58,17 +58,6 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
   const psAuditDs = useMemo(() => new DataSet(PsAuditDS(intlPrefix, formatMessage, organizationId, projectId, branchServiceDs)), [formatMessage, projectId, branchServiceDs]);
   const securityAuditDs = useMemo(() => new DataSet(SecurityAuditDS(intlPrefix, formatMessage, organizationId, projectId)), [formatMessage, projectId]);
   const applyViewDs = useMemo(() => new DataSet(ApplyViewDS(intlPrefix, formatMessage, organizationId, projectId, branchServiceDs)), [formatMessage, projectId, branchServiceDs]);
-
-  useEffect(() => {
-    branchServiceDs.transport.read = {
-      url: `/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/list-by-active`,
-      method: 'get',
-    };
-    branchServiceDs.query().then((res) => {
-      branchServiceDs.current.set('repositoryIds', res[0].repositoryId);
-      setBranchApp(res[0].repositoryId);
-    });
-  }, [projectId]);
 
 
   const value = {

@@ -157,7 +157,7 @@ const PsSet = observer(() => {
     if (record.get('syncGitlabFlag')) {
       return (
         (record.get('glAccessLevel') && Number(record.get('glAccessLevel').substring(1)) < 50 && hasPermission) ? (
-          <React.Fragment>{avatar}<span onClick={() => openModal('modify')} className="c7n-infra-code-management-table-name">{record.get('user').realName}</span></React.Fragment>
+          <React.Fragment>{avatar}<a onClick={() => openModal('modify')} className="c7n-infra-code-management-table-name">{record.get('user').realName}</a></React.Fragment>
         ) : avatar2
       );
     } else {
