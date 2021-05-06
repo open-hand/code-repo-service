@@ -121,6 +121,28 @@ public class RdmRepositorySagaHandler {
     }
 
     /**
+     * 应用市场导入应用服务
+     * @param data
+     * @return
+     */
+    @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_INIT_PRIVILEGE,
+            description = "devops导入内部应用服务",
+            sagaCode = SagaTopicCodeConstants.DEVOPS_IMPORT_MARKET_APPLICATION_SERVICE,
+            maxRetryCount = 3,
+            seq = 2)
+    public String initPrivilegeWhenImportMarket(String data) {
+        AppServiceImportPayload appServiceImportPayload = gson.fromJson(data, AppServiceImportPayload.class);
+
+        Long projectId = appServiceImportPayload.getProjectId();
+        Long organizationId = c7nBaseServiceFacade.getOrganizationId(projectId);
+        Long repositoryId = appServiceImportPayload.getAppServiceId();
+
+        initPrivilege(organizationId, projectId, repositoryId);
+
+        return data;
+    }
+
+    /**
      * Devops删除应用服务
      *
      * @param data
