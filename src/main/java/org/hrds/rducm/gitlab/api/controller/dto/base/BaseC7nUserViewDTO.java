@@ -37,6 +37,9 @@ public class BaseC7nUserViewDTO {
 
     @ApiModelProperty(value = "是否为项目成员")
     private Boolean projectMember;
+    @ApiModelProperty(value = "ladp")
+    private Boolean ldap;
+
 
     //
     // 工具方法
@@ -50,7 +53,8 @@ public class BaseC7nUserViewDTO {
                 .setImageUrl(c7nUserVO.getImageUrl())
                 .setEmail(c7nUserVO.getEmail())
                 .setEnabled(c7nUserVO.getEnabled())
-                .setProjectMember(c7nUserVO.getProjectMember());
+                .setProjectMember(c7nUserVO.getProjectMember())
+                .setLdap(c7nUserVO.getLdap());
     }
 
     public Long getUserId() {
@@ -122,6 +126,15 @@ public class BaseC7nUserViewDTO {
 
     public BaseC7nUserViewDTO setProjectMember(Boolean projectMember) {
         this.projectMember = projectMember;
+        return this;
+    }
+
+    public Boolean getLdap() {
+        return ldap;
+    }
+
+    public BaseC7nUserViewDTO setLdap(Boolean ldap) {
+        this.ldap = ldap;
         return this;
     }
 }
