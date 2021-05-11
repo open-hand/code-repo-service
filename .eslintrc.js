@@ -1,3 +1,3 @@
 module.exports = {
-  presets: ['c7n'],
+  extends: 'c7n-app',
 };

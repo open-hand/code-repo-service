@@ -7,6 +7,7 @@ stages:
 build front:
   stage: build
   script:
+    - echo "//${NPM_INSTALL_REGISTRY}:_authToken=${NPM_TOKEN}">.npmrc
     - npm install --registry ${NPM_REPO} --sass-binary-site=http://npm.taobao.org/mirrors/node-sass
     - chmod -R 755 node_modules
     - npm run compile

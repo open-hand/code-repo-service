@@ -1,7 +1,7 @@
 {
   "name": "@choerodon/code-repo",
   "routeName": "rducm",
-  "version": "0.25.1",
+  "version": "0.26.0",
   "description": "",
   "main": "./lib/index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "lint-staged": "lint-staged",
     "lint-staged:es": "eslint",
     "compile": "choerodon-front-boot compile",
-    "clean-install": "rm -rf node_modules && rm package-lock.json && npm i --registry https://nexus.choerodon.com.cn/repository/choerodon-npm"
+    "clean": "rm -rf node_modules && rm package-lock.json"
   },
   "contributors": [
     "choerodon"
@@ -44,18 +44,13 @@
     "react-dom": "16.14.0"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-decorators": "^7.12.1",
-    "@babel/plugin-proposal-export-default-from": "^7.12.1",
-    "@babel/preset-react": "^7.12.10",
-    "@choerodon/boot": "0.22.0",
-    "@choerodon/master": "0.24.0",
-    "babel-eslint": "^8.1.2",
-    "babel-plugin-module-resolver": "^3.2.0",
-    "babel-preset-c7n-app": "^0.0.1",
-    "babel-preset-env": "^1.7.0",
-    "choerodon-ui": "0.8.x",
+    "@choerodon/boot": "0.23.1",
+    "@choerodon/master": "0.26.0",
+    "babel-eslint": "8.2.6",
+    "babel-preset-c7n": "^0.0.2",
     "eslint": "^4.14.0",
     "eslint-config-airbnb": "^16.1.0",
+    "eslint-config-c7n-app": "^0.0.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-babel": "^4.1.2",
     "eslint-plugin-compat": "^2.1.0",
@@ -64,10 +59,6 @@
     "eslint-plugin-markdown": "^1.0.0-beta.6",
     "eslint-plugin-react": "^7.1.0",
     "eslint-plugin-react-hooks": "^2.3.0",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^7.0.1",
-    "lodash": "latest",
-    "through2": "^2.0.3",
-    "webpack-filter-warnings-plugin": "^1.2.1"
+    "lodash": "latest"
   }
 }
