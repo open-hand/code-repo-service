@@ -226,4 +226,6 @@ public interface C7nBaseServiceFacade {
      * @return
      */
     Long getOrganizationId(Long projectId);
+
+    List<C7nUserVO> listCustomGitlabOwnerLableUser(Long projectId, String roleLabel);
 }

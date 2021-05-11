@@ -2,12 +2,14 @@ package org.hrds.rducm.gitlab.api.controller.v1;
 
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.swagger.annotation.Permission;
+
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
@@ -31,6 +33,8 @@ import java.util.stream.Collectors;
 @RestController("projectController.v1")
 @RequestMapping("/v1/{organizationId}/projects/{projectId}")
 public class ProjectController extends BaseController {
+    private static final String GITLAB_ROLE_LABEL = "GITLAB_OWNER";
+
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
 
@@ -54,11 +58,18 @@ public class ProjectController extends BaseController {
                 .orElse(Collections.emptyList());
         Set<Long> orgAdmins = orgAdministrators.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
 
+        //获取自定义角色有gitlab owner标签的用户
+        List<C7nUserVO> gitlabOwnerUser = Optional.ofNullable(c7NBaseServiceFacade.listCustomGitlabOwnerLableUser(projectId, GITLAB_ROLE_LABEL))
+                .orElse(Collections.emptyList());
+        Set<Long> gitlabUserIds = gitlabOwnerUser.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
+
         List<BaseC7nUserViewDTO> baseC7NUserViewDTOS = c7nUserVOS.stream()
                 // 过滤“项目所有者”角色的用户
                 .filter(u -> u.getRoles().stream().noneMatch(r -> r.getCode().equals(IamRoleCodeEnum.PROJECT_OWNER.getCode())))
                 // 过滤掉"组织管理员"角色的用户
                 .filter(u -> !orgAdmins.contains(u.getId()))
+                //过滤自定义项目层角色拥有gitlab owner的用户
+                .filter(u -> !gitlabUserIds.contains(u.getId()))
                 .map(u -> {
                     BaseC7nUserViewDTO baseC7NUserViewDTO = new BaseC7nUserViewDTO();
                     baseC7NUserViewDTO.setUserId(u.getId())
@@ -73,6 +84,13 @@ public class ProjectController extends BaseController {
                 }).collect(Collectors.toList());
         return Results.success(baseC7NUserViewDTOS);
 
+    }
+
+    private boolean isGitlabOwnerLabel(C7nUserVO c7nUserVO) {
+        List<C7nRoleVO> roles = c7nUserVO.getRoles();
+        //根据roleCoe查询标签
+        List<String> roleCodes = roles.stream().map(C7nRoleVO::getCode).collect(Collectors.toList());
+        return true;
     }
 
     @ApiOperation(value = "查询非项目成员")
