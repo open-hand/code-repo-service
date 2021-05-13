@@ -8,10 +8,12 @@ import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.app.service.RdmMemberApplicantAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
+import org.hrds.rducm.gitlab.domain.facade.MessageClientFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberApplicantRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberApplicantService;
 import org.hrds.rducm.gitlab.infra.enums.ApplicantTypeEnum;
+import org.hrds.rducm.gitlab.infra.mapper.MemberApprovalMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,10 @@ import java.util.Date;
  */
 @Service
 public class RdmMemberApplicantAppServiceImpl implements RdmMemberApplicantAppService {
+
+    private static final String PERMISSION_REJECTED = "RDUCM.PERMISSION.REJECTED";
+    private static final String PERMISSION_APPROVED = "RDUCM.PERMISSION.APPROVED";
+
     @Autowired
     private IRdmMemberApplicantService iRdmMemberApplicantService;
     @Autowired
@@ -35,6 +41,9 @@ public class RdmMemberApplicantAppServiceImpl implements RdmMemberApplicantAppSe
     private RdmMemberRepository rdmMemberRepository;
     @Autowired
     private RdmMemberApplicantValidator rdmMemberApplicantValidator;
+    @Autowired
+    private MessageClientFacade messageClientFacade;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -75,6 +84,9 @@ public class RdmMemberApplicantAppServiceImpl implements RdmMemberApplicantAppSe
 
         // <3> 审批通过
         iRdmMemberApplicantService.pass(id, objectVersionNumber);
+
+        //审批拒绝发送站内信给申请人
+        messageClientFacade.sendApprovalNotice(id, PERMISSION_APPROVED);
     }
 
     @Override
@@ -85,5 +97,9 @@ public class RdmMemberApplicantAppServiceImpl implements RdmMemberApplicantAppSe
 
         // <1> 审批拒绝
         iRdmMemberApplicantService.refuse(id, objectVersionNumber, approvalMessage);
+
+        //审批拒绝发送站内信给申请人
+        messageClientFacade.sendApprovalNotice(id, PERMISSION_REJECTED);
+
     }
 }

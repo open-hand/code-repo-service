@@ -27,4 +27,7 @@ public interface MessageClientFacade {
      * @param members
      */
     void sendMemberExpireNotification(Long organizationId, Long projectId, List<RdmMember> members);
+
+    void sendApprovalNotice(Long applicationId,String messageCode);
+
 }
