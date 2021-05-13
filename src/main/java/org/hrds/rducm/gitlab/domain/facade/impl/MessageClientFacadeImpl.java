@@ -4,17 +4,23 @@ import io.choerodon.core.oauth.DetailsHelper;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.hrds.rducm.gitlab.domain.entity.RdmMemberApplicant;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.MessageClientFacade;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
+import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.hrds.rducm.gitlab.infra.mapper.MemberApprovalMapper;
 import org.hzero.boot.message.MessageClient;
 import org.hzero.boot.message.entity.MessageSender;
 import org.hzero.boot.message.entity.Receiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -41,8 +47,9 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
      * 代码库成员过期提醒消息
      */
     public static final String RDUCM_MEMBER_EXPIRE_NOTICE = "RDUCM.MEMBER_EXPIRE_NOTICE";
-    private static final String URL = "/#/rducm/code-lib-management/approve?type=project&id=%s&name=%s&organizationId=%s";
 
+    private static final String URL = "/#/rducm/code-lib-management/approve?type=project&id=%s&name=%s&organizationId=%s";
+    private static final String APPLY_URL = "/#/rducm/code-lib-management/apply?type=project&id=%s&name=%s&organizationId=%s";
 
     private static final Logger logger = LoggerFactory.getLogger(MessageClientFacadeImpl.class);
 
@@ -50,6 +57,10 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
     private MessageClient messageClient;
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
+    @Autowired
+    private MemberApprovalMapper memberApprovalMapper;
+    @Autowired
+    private C7nDevOpsServiceFacade c7nDevOpsServiceFacade;
 
     @Override
     public void sendApprovalMessage(Long projectId) {
@@ -88,8 +99,6 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
         MessageSender messageSender = constructMessageSender(RDUCM_MEMBER_APPLICANT, receivers, null, args, null, projectId);
         messageClient.async().sendMessage(messageSender);
     }
-
-
 
 
     @Override
@@ -140,6 +149,46 @@ public class MessageClientFacadeImpl implements MessageClientFacade {
         // 异步发送站内消息
         MessageSender messageSender = constructMessageSender(RDUCM_MEMBER_EXPIRE_NOTICE, receivers, null, args, null, projectId);
         messageClient.async().sendMessage(messageSender);
+    }
+
+
+    @Override
+    @Async
+    public void sendApprovalNotice(Long applicationId,String messageCode) {
+        RdmMemberApplicant rdmMemberApplicant = memberApprovalMapper.selectByPrimaryKey(applicationId);
+        if (Objects.isNull(rdmMemberApplicant)) {
+            logger.info(">>>>Approval information does not exist!>>>>");
+            return;
+        }
+        //您在项目"XXX"下应用服务"XXX"中申请"Reporter（此处需看具体的角色）"角色权限审批已通过。查看详情
+        C7nProjectVO c7nProjectVO = c7NBaseServiceFacade.detailC7nProject(rdmMemberApplicant.getProjectId());
+        C7nAppServiceVO c7nAppServiceVO = c7nDevOpsServiceFacade.detailC7nAppService(rdmMemberApplicant.getRepositoryId());
+
+        Map<String, String> args = new HashMap<>(16);
+        constructParams(rdmMemberApplicant, c7nProjectVO, c7nAppServiceVO, args);
+
+        C7nUserVO c7nUserVO = c7NBaseServiceFacade.detailC7nUser(rdmMemberApplicant.getApplicantUserId());
+        List<Receiver> receivers = getReceivers(c7nUserVO);
+
+        MessageSender messageSender = constructMessageSender(messageCode, receivers, null, args, null, c7nProjectVO.getId());
+        messageClient.async().sendMessage(messageSender);
+    }
+
+
+    private List<Receiver> getReceivers(C7nUserVO c7nUserVO) {
+        List<Receiver> receivers = new ArrayList<>();
+        Receiver receiver = new Receiver()
+                .setUserId(c7nUserVO.getId())
+                .setTargetUserTenantId(c7nUserVO.getOrganizationId());
+        receivers.add(receiver);
+        return receivers;
+    }
+
+    private void constructParams(RdmMemberApplicant rdmMemberApplicant, C7nProjectVO c7nProjectVO, C7nAppServiceVO c7nAppServiceVO, Map<String, String> args) {
+        args.put("projectName", c7nProjectVO.getName());
+        args.put("appServiceName", c7nAppServiceVO.getName());
+        args.put("roleName", RdmAccessLevel.forValue(rdmMemberApplicant.getAccessLevel()).desc);
+        args.put("url", String.format(APPLY_URL, c7nProjectVO.getId(), c7nProjectVO.getName(), c7nProjectVO.getOrganizationId()));
     }
 
     private static MessageSender constructMessageSender(String sendSettingCode, List<Receiver> targetUsers, String receiveType, Map<String, String> params, Map<String, Object> addition, Long projectId) {
