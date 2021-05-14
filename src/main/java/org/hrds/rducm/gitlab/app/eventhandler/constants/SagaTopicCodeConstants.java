@@ -37,6 +37,11 @@ public class SagaTopicCodeConstants {
      */
     public static final String DEVOPS_IMPORT_INTERNAL_APPLICATION_SERVICE = "devops-import-internal-application-service";
 
+    /**
+     * 从应用市场导入应用服务
+     */
+    public static final String DEVOPS_IMPORT_MARKET_APPLICATION_SERVICE = "devops-import-market-application-service";
+
 
     /* Devops删除应用服务 */
 

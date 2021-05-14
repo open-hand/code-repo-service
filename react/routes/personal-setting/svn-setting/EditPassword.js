@@ -45,7 +45,7 @@ function EditPassword(props) {
     setConfirmDirty(confirmDirty || !!value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (callback) => {
     props.form.validateFields((err, values) => {
       if (!err) {
         const params = {
@@ -61,6 +61,7 @@ function EditPassword(props) {
               form.resetFields();
               setEnablePwd(res);
               Choerodon.prompt(intl.formatMessage({ id: 'modify.success' }));
+              callback();
               props.modal.close();
             }
           })

@@ -1,7 +1,9 @@
 package org.hrds.rducm.gitlab.domain.facade.impl;
 
 import com.google.common.collect.Sets;
+
 import io.choerodon.core.domain.Page;
+
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nOrgAdministratorVO;
@@ -310,5 +312,12 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
         Long organizationId = Optional.ofNullable(c7nProjectVO).map(C7nProjectVO::getOrganizationId).orElse(null);
         AssertUtils.notNull(organizationId, "organizationId cannot null");
         return organizationId;
+    }
+
+    @Override
+    public List<C7nUserVO> listCustomGitlabOwnerLableUser(Long projectId, String roleLabel) {
+        ResponseEntity<List<C7nUserVO>> responseEntity = baseServiceFeignClient.listProjectUsersByProjectIdAndRoleLable(projectId, roleLabel);
+        List<C7nUserVO> c7nUserVOS = FeignUtils.handleResponseEntity(responseEntity);
+        return c7nUserVOS;
     }
 }

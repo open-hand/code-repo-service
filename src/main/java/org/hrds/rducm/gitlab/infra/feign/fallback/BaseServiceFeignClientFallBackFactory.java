@@ -94,6 +94,11 @@ public class BaseServiceFeignClientFallBackFactory implements FallbackFactory<Ba
             public ResponseEntity<List<C7nProjectVO>> listProjectsByIds(Set<Long> ids) {
                 throw new CommonException("error.feign.fallback");
             }
+
+            @Override
+            public ResponseEntity<List<C7nUserVO>> listProjectUsersByProjectIdAndRoleLable(Long projectId, String roleLable) {
+                throw new CommonException("error.feign.fallback");
+            }
         };
     }
 }

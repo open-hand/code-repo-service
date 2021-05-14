@@ -1,7 +1,9 @@
 package org.hrds.rducm.gitlab.infra.feign;
 
 import io.choerodon.core.domain.Page;
+
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.hrds.rducm.gitlab.infra.feign.fallback.BaseServiceFeignClientFallBackFactory;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nOrgAdministratorVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
@@ -98,7 +100,7 @@ public interface BaseServiceFeignClient {
      * 根据用户名/登录名精确查询启用的用户
      *
      * @param projectId
-     * @param userName 用户名/登录名
+     * @param userName  用户名/登录名
      * @return
      */
     @GetMapping("/v1/projects/{project_id}/enableUsers")
@@ -235,9 +237,9 @@ public interface BaseServiceFeignClient {
     /**
      * 查询所有组织基本信息
      *
-     * @return
      * @param page
      * @param size
+     * @return
      */
     @ApiOperation(value = "分页查询所有组织基本信息")
     @GetMapping(value = "/v1/organizations/all")
@@ -246,4 +248,11 @@ public interface BaseServiceFeignClient {
 
     /* 其他 */
     // -------------------------------
+    @ApiOperation(value = "查询项目下指定角色的用户列表")
+    @GetMapping(value = "/v1/projects/{project_id}/users/{role_lable}")
+    ResponseEntity<List<C7nUserVO>> listProjectUsersByProjectIdAndRoleLable(
+            @PathVariable("project_id") Long projectId,
+            @ApiParam(value = "角色标签", required = true)
+            @PathVariable("role_lable") String roleLable);
+
 }

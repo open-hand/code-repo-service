@@ -19,23 +19,12 @@ function BaseInfo() {
   const [enablePwd, setEnablePwd] = useState({});
   const [noContentFlag, setNoContentFlag] = useState(true);
   const { name, userName, creationDate, userPassword } = enablePwd;
-  // const [avatar, setAvatar] = useState('');
   const modalRef = React.createRef();
-  // const loadUserInfo = () => {
-  //   setLoading(true);
-  //   AppState.loadUserInfo().then(data => {
-  //     AppState.setUserInfo(data);
-  //     SvnInfoStore.setUserInfo(AppState.getUserInfo);
-  //     setLoading(false);
-  //     // setAvatar(SvnInfoStore.getAvatar);
-  //   });
-  // };
 
-  const loadEnablePwd = () => {
+  const loadEnablePwd = async () => {
     setLoading(true);
     // TODO
-    axios.get(`/rdudm/v1/doc-users/selectDefaultPwd/${loginName}`)
-      // axios.get(`/rdudm/v1/${organizationId}/doc-users/selectDefaultPwd/4`)
+    await axios.get(`/rdudm/v1/doc-users/selectDefaultPwd/${loginName}`)
       .then((response) => {
         setEnablePwd(response);
         setLoading(false);
@@ -48,9 +37,6 @@ function BaseInfo() {
         Choerodon.handleResponseError(error);
         setLoading(false);
       });
-    // .then((response) => {
-    //   setEnablePwd(response);
-    // });
   };
 
   function renderAvatar() {
@@ -70,18 +56,8 @@ function BaseInfo() {
   }
 
   function renderUserInfo() {
-    // const { status, webUrl, creationDate, userPassword } = user;
     return (
       <React.Fragment>
-        {/* <div className={`${prefixCls}-top-container`}>
-          <div className={`${prefixCls}-avatar-wrap-container`}>
-            {renderAvatar(user)}
-          </div>
-          <div className={`${prefixCls}-login-info`}>
-            <div>{name}</div>
-            <div style={{ fontSize: 13, fontWeight: 'bold' }}>{intl.formatMessage({ id: 'userName' })}：{userName}</div>
-          </div>
-        </div> */}
         <div className={`${prefixCls}-top-container`}>
           <div className={`${prefixCls}-avatar-wrap-container`}>
             {renderAvatar(imageUrl)}
@@ -95,10 +71,6 @@ function BaseInfo() {
 
           <div className={`${prefixCls}-info-container-account`}>
             <div>
-              {/* <div>
-                <span className={`${prefixCls}-info-container-account-title`}>SVN地址</span>
-                <span href={svnUrl} rel="nofollow me noopener noreferrer" target="_blank" className={`${prefixCls}-info-container-account-content`}>{svnUrl}</span>
-              </div> */}
               <div>
                 <span className={`${prefixCls}-info-container-account-title`}>{intl.formatMessage({ id: 'infra.personal.model.createdAt' })}</span>
                 <span className={`${prefixCls}-info-container-account-content`}>{creationDate}</span>
@@ -116,9 +88,17 @@ function BaseInfo() {
     );
   }
 
+  async function handlePasswordChange() {
+    try {
+      await modalRef.current.handleSubmit(loadEnablePwd);
+      return false;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
 
   function handleUpdatePassword() {
-    // const user = SvnInfoStore.getUserInfo;
     Modal.open({
       key: createKey,
       title: intl.formatMessage({ id: 'user.changepwd.header.title' }),
@@ -139,10 +119,7 @@ function BaseInfo() {
         />
       ),
       okText: intl.formatMessage({ id: 'save' }),
-      onOk: () => {
-        modalRef.current.handleSubmit();
-        return false;
-      },
+      onOk: handlePasswordChange,
       footer: (okBtn, cancelBtn) => (
         <div>
           {okBtn}
