@@ -66,11 +66,10 @@ const PsSet = observer(() => {
         if (res.failed) {
           Choerodon.prompt(res.message);
           return false;
-        } else {
-          Choerodon.prompt(formatMessage({ id: `${intlPrefix2}.message.asyncSuccess` }));
-          psSetDs.query();
-          return true;
         }
+        Choerodon.prompt(formatMessage({ id: `${intlPrefix2}.message.asyncSuccess` }));
+        psSetDs.query();
+        return true;
       })
       .catch((error) => {
         Choerodon.handleResponseError(error);
@@ -157,40 +156,38 @@ const PsSet = observer(() => {
     if (record.get('syncGitlabFlag')) {
       return (
         (record.get('glAccessLevel') && Number(record.get('glAccessLevel').substring(1)) < 50 && hasPermission) ? (
-          <React.Fragment>{avatar}<a onClick={() => openModal('modify')} className="c7n-infra-code-management-table-name">{record.get('user').realName}</a></React.Fragment>
+          <React.Fragment>{avatar}<span onClick={() => openModal('modify')} className="c7n-infra-code-management-table-name">{record.get('user').realName}</span></React.Fragment>
         ) : avatar2
       );
-    } else {
-      return (
-        <div style={{ display: 'inline-flex' }}>
-          <UserAvatar
-            user={{
+    }
+    return (
+      <div style={{ display: 'inline-flex' }}>
+        <UserAvatar
+          user={{
               id: record.get('user').userId,
               loginName: record.get('user').loginName,
               realName: record.get('user').realName,
               imageUrl: record.get('user').imageUrl,
               email: record.get('user').email,
             }}
-          />
-          <div className="assign-member-external-user">
-            <span className="assign-member-external-user-text">
-              未同步
-            </span>
-          </div>
+        />
+        <div className="assign-member-external-user">
+          <span className="assign-member-external-user-text">
+            未同步
+          </span>
         </div>
-      );
-    }
+      </div>
+    );
   }
   function renderLevel({ text, record }) {
     if (record.get('syncGitlabFlag') && record.get('glAccessLevel') && Number(record.get('glAccessLevel').substring(1)) < 50 && hasPermission) {
       return (
         <span onClick={() => openModal('modify')} className="c7n-infra-code-management-table-name">{text}</span>
       );
-    } else {
-      return (
-        <span>{text}</span>
-      );
     }
+    return (
+      <span>{text}</span>
+    );
   }
 
   function renderRole({ value }) {
@@ -199,6 +196,12 @@ const PsSet = observer(() => {
   const renderServiceName = ({ text }) => (
     <Tooltip title={text} >{text}</Tooltip>
   );
+
+  const renderLoginName = ({ value, record }) => {
+    const isLdap = record.get('ldap');
+    const email = record.get('email');
+    return isLdap ? value : email;
+  };
 
   return (
     <Page
@@ -216,7 +219,7 @@ const PsSet = observer(() => {
       >
         <Column name="realName" renderer={renderName} width={200} />
         <Column renderer={renderAction} width={70} />
-        <Column name="loginName" />
+        <Column name="loginName" renderer={renderLoginName} />
         <Column name="repositoryName" renderer={renderServiceName} />
         <Column name="roleNames" renderer={renderRole} />
         <Column name="glAccessLevelList" renderer={renderLevel} />

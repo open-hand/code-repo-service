@@ -31,6 +31,8 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
               glAccessLevelList: item.glAccessLevel ? `L${item.glAccessLevel}` : '',
               loginName: item.user ? item.user.loginName : undefined,
               realName: item.user ? item.user.realName : undefined,
+              ldap: item.user ? item.user?.ldap : true,
+              email: item.user ? item.user?.email : undefined,
             }));
             return {
               ...others,
