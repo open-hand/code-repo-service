@@ -5,7 +5,7 @@
  * @copyright 2020 ® HAND
  */
 import React from 'react';
-import { PageWrap, PageTab, Page } from '@choerodon/boot';
+import { PageWrap, PageTab, Page, Content } from '@choerodon/boot';
 import { observer } from 'mobx-react-lite';
 import Tips from '@/components/new-tips';
 import { usPsManagerStore } from './stores';

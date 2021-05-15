@@ -3,8 +3,7 @@ import { observer } from 'mobx-react-lite';
 import moment from 'moment';
 import { message } from 'choerodon-ui';
 import { Modal } from 'choerodon-ui/pro';
-import { Header, Choerodon, axios } from '@choerodon/boot';
-import HeaderButtons from '@/components/header-buttons';
+import { Header, Choerodon, axios, HeaderButtons } from '@choerodon/boot';
 import AddMember from './add-member';
 import AddOutsideMember from './add-outside-member';
 // import ImportMember from './import-member';
@@ -48,11 +47,10 @@ const EnvModals = observer((props) => {
         if (res.failed) {
           Choerodon.prompt(res.message);
           return false;
-        } else {
-          const dataStr = res.auditEndDate ? moment(res.auditEndDate).format('YYYY-MM-DD HH:mm:ss') : undefined;
-          setExecutionDate(dataStr);
-          return true;
         }
+        const dataStr = res.auditEndDate ? moment(res.auditEndDate).format('YYYY-MM-DD HH:mm:ss') : undefined;
+        setExecutionDate(dataStr);
+        return true;
       })
       .catch((error) => {
         Choerodon.handleResponseError(error);
@@ -212,6 +210,7 @@ const EnvModals = observer((props) => {
     const buttonData = [{
       name: formatMessage({ id: 'refresh' }),
       icon: 'refresh',
+      iconOnly: true,
       handler: refresh,
       display: true,
       group: 1,

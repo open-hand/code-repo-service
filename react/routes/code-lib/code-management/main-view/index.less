@@ -13,16 +13,21 @@
     color: rgba(0, 0, 0, 0.65);
   }
   &-tab-list {
+    .c7n-tabs-bar {
+      left: -8px;
+      width: calc(100% - 32px);
+    }
     height: 100%;
     .page-container {
       height: ~"calc(100% - 130px)";
       position: absolute;
-      top: 1.26rem;
-      padding-left: 0.2rem;
+      top: 0.5rem;
+      //padding-left: 0.2rem;
       overflow: auto;
       padding-bottom: 0.3rem;
       padding-right: 0.2rem;
       margin-top: .12rem;
+      background: white;
     }
   }
   .c7n-infra-code-management-table-name {

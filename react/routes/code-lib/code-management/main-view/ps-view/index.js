@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { TabPage } from '@choerodon/boot';
+import { TabPage, Content } from '@choerodon/boot';
 import CodeManagerHeader from '../../header';
 // import SelectApp from '../tool-bar';
 import PsOverView from './PsOverView';
@@ -13,7 +13,9 @@ const CodeManagerBranch = observer(() => (
     <Modals type="psView" />
     <CodeManagerHeader />
     {/* <SelectApp /> */}
-    <PsOverView />
+    <Content>
+      <PsOverView />
+    </Content>
   </TabPage>));
 
 export default CodeManagerBranch;
