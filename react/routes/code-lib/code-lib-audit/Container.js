@@ -5,7 +5,7 @@
  * @copyright 2020 ® HAND
  */
 import React, { useEffect, useMemo, useState } from 'react';
-import { Page, Content, Header, Breadcrumb } from '@choerodon/boot';
+import { Page, Content, Header, Breadcrumb, HeaderButtons } from '@choerodon/boot';
 import { Tabs, Button } from 'choerodon-ui';
 import { observer } from 'mobx-react-lite';
 import Tips from '@/components/new-tips';
@@ -51,26 +51,37 @@ const Container = () => {
     setActiveProject(oProject);
   };
 
-  const projectListProps = useMemo(() => ({ formatMessage, projectListDs, activeProject, onClickProject }), [formatMessage, projectListDs, activeProject]);
-  const psViewProps = useMemo(() => ({ psViewDs, activeProject, formatMessage, activeTabKey }), [activeProject, psViewDs, formatMessage, activeTabKey]);
-  const optLogProps = useMemo(() => ({ formatMessage, optLogDs, timeLineStore, activeProject, activeTabKey }), [activeProject, optLogDs, timeLineStore, activeTabKey]);
-  const exportAuthorityProps = useMemo(() => ({ formatMessage, exportModalVisible, setExportModalVisible, activeProject, psViewDs }), [exportModalVisible, activeProject, psViewDs]);
-  const psAuditProps = useMemo(() => ({ psAuditDs, activeProject, formatMessage, activeTabKey, organizationId }), [activeProject, psAuditDs, formatMessage, activeTabKey, organizationId]);
+  const projectListProps = useMemo(() => ({
+    formatMessage, projectListDs, activeProject, onClickProject,
+  }), [formatMessage, projectListDs, activeProject]);
+  const psViewProps = useMemo(() => ({
+    psViewDs, activeProject, formatMessage, activeTabKey,
+  }), [activeProject, psViewDs, formatMessage, activeTabKey]);
+  const optLogProps = useMemo(() => ({
+    formatMessage, optLogDs, timeLineStore, activeProject, activeTabKey,
+  }), [activeProject, optLogDs, timeLineStore, activeTabKey]);
+  const exportAuthorityProps = useMemo(() => ({
+    formatMessage, exportModalVisible, setExportModalVisible, activeProject, psViewDs,
+  }), [exportModalVisible, activeProject, psViewDs]);
+  const psAuditProps = useMemo(() => ({
+    psAuditDs, activeProject, formatMessage, activeTabKey, organizationId,
+  }), [activeProject, psAuditDs, formatMessage, activeTabKey, organizationId]);
 
   return (
     <Page
       service={['choerodon.code.organization.infra.code-lib-management.ps.project-owner']}
       className="code-lib-audit"
     >
-      <Header >
-        <Button
-          className="leftBtn"
-          icon="get_app"
-          funcType="flat"
-          onClick={() => setExportModalVisible(true)}
-        >
-          {formatMessage({ id: 'exportAuth', defaultMessage: '导出权限' })}
-        </Button>
+      <Header>
+        <HeaderButtons
+          showClassName={false}
+          items={([{
+            name: formatMessage({ id: 'exportAuth', defaultMessage: '导出权限' }),
+            icon: 'get_app',
+            display: true,
+            handler: () => setExportModalVisible(true),
+          }])}
+        />
       </Header>
       <Breadcrumb />
       <Content>
