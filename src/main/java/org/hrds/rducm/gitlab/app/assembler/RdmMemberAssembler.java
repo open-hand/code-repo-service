@@ -183,7 +183,7 @@ public class RdmMemberAssembler {
 
         //按照跟新时间倒序排序表
         if (!Objects.isNull(rdmMemberViewDTOS.getContent())) {
-            rdmMemberViewDTOS.getContent().stream().sorted(Comparator.comparing(RdmMemberViewDTO::getLastUpdateDate)).collect(Collectors.toList());
+            rdmMemberViewDTOS.setContent(rdmMemberViewDTOS.getContent().stream().sorted(Comparator.comparing(RdmMemberViewDTO::getLastUpdateDate).reversed()).collect(Collectors.toList()));
         }
         return rdmMemberViewDTOS;
     }
