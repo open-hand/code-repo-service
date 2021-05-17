@@ -3,9 +3,11 @@ package org.hrds.rducm.gitlab.app.assembler;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
+
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberCreateDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
@@ -179,6 +181,10 @@ public class RdmMemberAssembler {
             viewDTO.setRepositoryName(c7nAppServiceVO.getName());
         }
 
+        //按照跟新时间倒序排序表
+        if (!Objects.isNull(rdmMemberViewDTOS.getContent())) {
+            rdmMemberViewDTOS.getContent().stream().sorted(Comparator.comparing(RdmMemberViewDTO::getLastUpdateDate).reversed()).collect(Collectors.toList());
+        }
         return rdmMemberViewDTOS;
     }
 
