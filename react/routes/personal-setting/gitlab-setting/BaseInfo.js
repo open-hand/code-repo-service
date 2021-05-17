@@ -1,9 +1,10 @@
+/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Button, Form, Modal as OldModal, Badge, Spin, Icon } from 'choerodon-ui';
 import { Modal } from 'choerodon-ui/pro';
-import { Content, Header, TabPage, axios, Choerodon, Breadcrumb } from '@choerodon/boot';
+import { Content, Header, TabPage, axios, Choerodon, Breadcrumb, HeaderButtons, Page } from '@choerodon/boot';
 import './BaseInfo.less';
 import { usPsManagerStore } from '../stores';
 
@@ -16,7 +17,9 @@ function BaseInfo() {
   const [gitLabInfo, setGitLabInfo] = useState({});
   // const [isFailed, setFileFlag] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { glAvatarUrl, glUsername, glName, glState, glWebUrl, userId } = gitLabInfo;
+  const {
+    glAvatarUrl, glUsername, glName, glState, glWebUrl, userId,
+  } = gitLabInfo;
 
   const loadGitLabInfo = () => {
     setLoading(true);
@@ -216,36 +219,28 @@ function BaseInfo() {
   const render = () => {
     const user = UserInfoStore.getUserInfo;
     return (
-      <TabPage>
-        <Spin spinning={loading || false} >
-          <Header className={`${prefixCls}-header`}>
-            <Button
-              className="gitlab-user-info-header-btn"
-              onClick={handleUpdateStore.bind(this)}
-              icon="mode_edit"
-              style={{
-                textTransform: 'none',
-              }}
-            >
-              {intl.formatMessage({ id: 'infra.personal.operate.updatePassword' })}
-            </Button>
-            <Button
-              onClick={openResetGitlab}
-              icon="swap_horiz"
-              className="gitlab-user-info-header-btn"
-              style={{
-                textTransform: 'none',
-              }}
-            >
-              {intl.formatMessage({ id: 'infra.personal.operate.resetPassword' })}
-            </Button>
-          </Header>
-          <Breadcrumb />
-          <Content className={`${prefixCls}-container`}>
-            {renderUserInfo(user)}
-          </Content>
-        </Spin>
-      </TabPage>
+      <Page>
+        <Header className={`${prefixCls}-header`}>
+          <HeaderButtons
+            showClassName={false}
+            items={([{
+              name: intl.formatMessage({ id: 'infra.personal.operate.updatePassword' }),
+              icon: 'mode_edit',
+              display: true,
+              handler: handleUpdateStore.bind(this),
+            }, {
+              name: intl.formatMessage({ id: 'infra.personal.operate.resetPassword' }),
+              icon: 'swap_horiz',
+              display: true,
+              handler: openResetGitlab,
+            }])}
+          />
+        </Header>
+        <Breadcrumb />
+        <Content className={`${prefixCls}-container`}>
+          {renderUserInfo(user)}
+        </Content>
+      </Page>
     );
   };
   return render();

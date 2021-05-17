@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Button, Form, Spin } from 'choerodon-ui';
 import { Modal, Password } from 'choerodon-ui/pro';
-import { Content, Header, TabPage, Choerodon, axios, Breadcrumb } from '@choerodon/boot';
+import { Content, Header, TabPage, Choerodon, axios, Breadcrumb, HeaderButtons } from '@choerodon/boot';
 import Empty from '@/components/empty';
 import empty from '@/assets/empty.png';
 import './BaseInfo.less';
@@ -13,12 +13,16 @@ import EditPassword from './EditPassword';
 const createKey = Modal.key();
 function BaseInfo() {
   const context = usPsManagerStore();
-  const { SvnInfoStore, intl, intlPrefix, prefixCls, AppState } = context;
+  const {
+    SvnInfoStore, intl, intlPrefix, prefixCls, AppState,
+  } = context;
   const { organizationId, imageUrl, loginName } = AppState.userInfo;
   const [loading, setLoading] = useState(false);
   const [enablePwd, setEnablePwd] = useState({});
   const [noContentFlag, setNoContentFlag] = useState(true);
-  const { name, userName, creationDate, userPassword } = enablePwd;
+  const {
+    name, userName, creationDate, userPassword,
+  } = enablePwd;
   const modalRef = React.createRef();
 
   const loadEnablePwd = async () => {
@@ -139,33 +143,33 @@ function BaseInfo() {
     const user = SvnInfoStore.getUserInfo;
     return (
       <TabPage>
-        <Spin spinning={loading || false} >
-          <Header className={`${prefixCls}-header`}>
-            <Button
-              className="svg-setting-header-btn"
-              onClick={handleUpdatePassword.bind(this)}
-              icon="mode_edit"
-              disabled={noContentFlag}
-            >
-              {intl.formatMessage({ id: 'user.changepwd.header.title' })}
-            </Button>
-          </Header>
-          <Breadcrumb />
-          {noContentFlag ? (
-            <Content>
-              <Empty
-                // loading={getLoading}
-                pic={empty}
-                title={intl.formatMessage({ id: 'infra.changepwd.message.svn.noContent.title' })}
-                description={intl.formatMessage({ id: 'infra.changepwd.message.svn.noContent.desc' })}
-              />
-            </Content>
-          ) :
-            <Content className={`${prefixCls}-container`}>
-              {renderUserInfo(user)}
-            </Content>
-          }
-        </Spin>
+        <Header className={`${prefixCls}-header`}>
+          <HeaderButtons
+            showClassName={false}
+            items={([{
+              name: intl.formatMessage({ id: 'user.changepwd.header.title' }),
+              icon: 'mode_edit',
+              display: true,
+              handler: handleUpdatePassword.bind(this),
+              disabled: noContentFlag,
+            }])}
+          />
+        </Header>
+        <Breadcrumb />
+        {noContentFlag ? (
+          <Content>
+            <Empty
+              // loading={getLoading}
+              pic={empty}
+              title={intl.formatMessage({ id: 'infra.changepwd.message.svn.noContent.title' })}
+              description={intl.formatMessage({ id: 'infra.changepwd.message.svn.noContent.desc' })}
+            />
+          </Content>
+        ) :
+          <Content className={`${prefixCls}-container`}>
+            {renderUserInfo(user)}
+          </Content>
+        }
       </TabPage>
     );
   };
