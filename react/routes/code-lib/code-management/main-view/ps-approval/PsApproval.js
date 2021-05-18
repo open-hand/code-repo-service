@@ -6,9 +6,9 @@
  */
 import React, { useEffect } from 'react';
 import { Page, Action } from '@choerodon/boot';
-import { Table, Modal } from 'choerodon-ui/pro';
+import { Table, Modal, Icon, Tooltip } from 'choerodon-ui/pro';
 import { observer } from 'mobx-react-lite';
-import StatusTag from '@/components/status-tag';
+import { StatusTag } from '@choerodon/components';
 import UserAvatar from '@/components/user-avatar';
 import { usPsManagerStore } from '../stores';
 import Sider from '../modals/ps-approval';
@@ -118,8 +118,19 @@ const PsApproval = observer(() => {
 
   function renderStatus(record) {
     const res = record.value.toLowerCase();
+    const approvalMessage = record.record.get('approvalMessage');
     return (
-      <StatusTag colorCode={record.value.toUpperCase()} name={formatMessage({ id: `infra.approval.${res}` })} style={{ lineHeight: '16px', width: '42px' }} />
+      <React.Fragment>
+        <StatusTag colorCode={record.value.toUpperCase()} name={formatMessage({ id: `infra.approval.${res}` })} />
+        {
+          approvalMessage && <Tooltip title={approvalMessage}>
+            <Icon style={{
+            marginLeft: '5px',
+            color: '#F76776',
+            }} />
+          </Tooltip>
+        }
+      </React.Fragment>
     );
   }
 
