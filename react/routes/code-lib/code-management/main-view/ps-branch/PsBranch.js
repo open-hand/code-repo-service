@@ -164,7 +164,7 @@ const PsBranch = observer(() => {
       ]}
     >
       <div style={{ paddingTop: '.08rem', display: 'flex', alignItems: 'center' }}>
-        <Form columns={3} style={{ width: '3.4rem', maxWidth: '3.8rem', height: '.38rem' }}>
+        <Form columns={3} style={{ width: '3.4rem', maxWidth: '3.8rem' }}>
           <Select
             style={{ width: '100%' }}
             searchable
