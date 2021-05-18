@@ -1,6 +1,8 @@
 package org.hrds.rducm.gitlab.app.service;
 
 import java.util.Date;
+import java.util.List;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantPassVO;
 
 /**
  * 成员申请表应用服务
@@ -26,4 +28,8 @@ public interface RdmMemberApplicantAppService {
      * @param approvalMessage
      */
     void refuse(Long id, Long objectVersionNumber, String approvalMessage);
+
+    void batchPassAndHandleMember(List<RdmMemberApplicantPassVO> rdmMemberApplicantPassVOS, Date expiresAt);
+
+    void batchRefuse(List<RdmMemberApplicantPassVO> rdmMemberApplicantPassVOS, String approvalMessage);
 }

@@ -6,11 +6,14 @@ import io.choerodon.mybatis.pagehelper.annotation.SortDefault;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.mybatis.pagehelper.domain.Sort;
 import io.choerodon.swagger.annotation.Permission;
+
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import java.util.List;
 import org.hrds.rducm.gitlab.api.controller.dto.DetectApplicantTypeDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantPassDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantPassVO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.member.MemberApplicantCreateDTO;
 import org.hrds.rducm.gitlab.api.controller.validator.RdmMemberApplicantValidator;
@@ -113,30 +116,55 @@ public class RdmMemberApplicantProjController extends BaseController {
         return Results.success();
     }
 
-    @ApiOperation(value = "成员权限申请-审批通过")
+//    @ApiOperation(value = "成员权限申请-审批通过")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "id", value = "主键", paramType = "path", required = true),
+//            @ApiImplicitParam(name = "objectVersionNumber", value = "版本号", paramType = "query", required = true),
+//            @ApiImplicitParam(name = "expiresAt", value = "过期时间", paramType = "query")
+//    })
+//    @Permission(level = ResourceLevel.ORGANIZATION)
+//    @PostMapping("/{id}/pass")
+//    public ResponseEntity<?> passAndHandleMember(@Encrypt @PathVariable Long id,
+//                                                 @RequestParam Long objectVersionNumber,
+//                                                 RdmMemberApplicantPassDTO passDTO) {
+//        validObject(passDTO);
+//
+//        rdmMemberApplicantAppService.passAndHandleMember(id, objectVersionNumber, passDTO.getExpiresAt());
+//        return Results.success();
+//    }
+//
+//    @ApiOperation(value = "成员权限申请-审批拒绝")
+//    @Permission(level = ResourceLevel.ORGANIZATION)
+//    @PostMapping("/{id}/refuse")
+//    public ResponseEntity<?> refuse(@Encrypt @PathVariable Long id,
+//                                    @RequestParam Long objectVersionNumber,
+//                                    @RequestBody String approvalMessage) {
+//        rdmMemberApplicantAppService.refuse(id, objectVersionNumber, approvalMessage);
+//        return Results.success();
+//    }
+
+
+    @ApiOperation(value = "成员权限批量申请-审批通过")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "主键", paramType = "path", required = true),
-            @ApiImplicitParam(name = "objectVersionNumber", value = "版本号", paramType = "query", required = true),
+            @ApiImplicitParam(name = "rdmMemberApplicantPassVOS", value = "rdmMemberApplicantPassVOS", paramType = "query", required = true),
             @ApiImplicitParam(name = "expiresAt", value = "过期时间", paramType = "query")
     })
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @PostMapping("/{id}/pass")
-    public ResponseEntity<?> passAndHandleMember(@Encrypt @PathVariable Long id,
-                                                 @RequestParam Long objectVersionNumber,
-                                                 RdmMemberApplicantPassDTO passDTO) {
+    @PostMapping("/batch/pass")
+    public ResponseEntity<?> batchPassAndHandleMember(@RequestBody List<RdmMemberApplicantPassVO> rdmMemberApplicantPassVOS,
+                                                      RdmMemberApplicantPassDTO passDTO) {
         validObject(passDTO);
-
-        rdmMemberApplicantAppService.passAndHandleMember(id, objectVersionNumber, passDTO.getExpiresAt());
+        rdmMemberApplicantAppService.batchPassAndHandleMember(rdmMemberApplicantPassVOS, passDTO.getExpiresAt());
         return Results.success();
     }
 
-    @ApiOperation(value = "成员权限申请-审批拒绝")
+    @ApiOperation(value = "成员权限批量申请-审批拒绝")
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @PostMapping("/{id}/refuse")
-    public ResponseEntity<?> refuse(@Encrypt @PathVariable Long id,
-                                    @RequestParam Long objectVersionNumber,
-                                    @RequestBody String approvalMessage) {
-        rdmMemberApplicantAppService.refuse(id, objectVersionNumber, approvalMessage);
+    @PostMapping("/batch/refuse")
+    public ResponseEntity<?> batchRefuse(@RequestBody List<RdmMemberApplicantPassVO> rdmMemberApplicantPassVOS,
+                                         @RequestParam String approvalMessage) {
+        rdmMemberApplicantAppService.batchRefuse(rdmMemberApplicantPassVOS, approvalMessage);
         return Results.success();
     }
+
 }

@@ -1,6 +1,8 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
+import java.util.List;
 import org.apache.commons.lang3.EnumUtils;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantPassVO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberCreateDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
 import org.hrds.rducm.gitlab.api.controller.validator.RdmMemberApplicantValidator;
@@ -101,5 +103,21 @@ public class RdmMemberApplicantAppServiceImpl implements RdmMemberApplicantAppSe
         //审批拒绝发送站内信给申请人
         messageClientFacade.sendApprovalNotice(id, PERMISSION_REJECTED);
 
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchPassAndHandleMember(List<RdmMemberApplicantPassVO> rdmMemberApplicantPassVOS, Date expiresAt) {
+        rdmMemberApplicantPassVOS.forEach(rdmMemberApplicantPassVO -> {
+            passAndHandleMember(rdmMemberApplicantPassVO.getId(), rdmMemberApplicantPassVO.getObjectVersionNumber(), expiresAt);
+        });
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchRefuse(List<RdmMemberApplicantPassVO> rdmMemberApplicantPassVOS, String approvalMessage) {
+        rdmMemberApplicantPassVOS.forEach(rdmMemberApplicantPassVO -> {
+            refuse(rdmMemberApplicantPassVO.getId(), rdmMemberApplicantPassVO.getObjectVersionNumber(), approvalMessage);
+        });
     }
 }
