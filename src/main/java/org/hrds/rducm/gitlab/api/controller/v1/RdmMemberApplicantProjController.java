@@ -145,10 +145,6 @@ public class RdmMemberApplicantProjController extends BaseController {
 
 
     @ApiOperation(value = "成员权限批量申请-审批通过")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "rdmMemberApplicantPassVOS", value = "rdmMemberApplicantPassVOS", paramType = "query", required = true),
-            @ApiImplicitParam(name = "expiresAt", value = "过期时间", paramType = "query")
-    })
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/batch/pass")
     public ResponseEntity<?> batchPassAndHandleMember(@RequestBody List<RdmMemberApplicantPassVO> rdmMemberApplicantPassVOS,
