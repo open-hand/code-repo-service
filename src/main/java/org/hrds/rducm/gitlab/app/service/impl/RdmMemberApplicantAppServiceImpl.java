@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
 import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.EnumUtils;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantPassVO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberCreateDTO;
@@ -15,12 +16,14 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberApplicantRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberApplicantService;
 import org.hrds.rducm.gitlab.infra.enums.ApplicantTypeEnum;
-import org.hrds.rducm.gitlab.infra.mapper.MemberApprovalMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+
+import io.choerodon.core.exception.CommonException;
 
 /**
  * 成员申请表应用服务默认实现
@@ -108,6 +111,13 @@ public class RdmMemberApplicantAppServiceImpl implements RdmMemberApplicantAppSe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchPassAndHandleMember(List<RdmMemberApplicantPassVO> rdmMemberApplicantPassVOS, Date expiresAt) {
+        //校验时间
+        if (Objects.isNull(expiresAt)) {
+            throw new CommonException("error.expire.time.is.null");
+        }
+        if (expiresAt.getTime() < new Date().getTime()) {
+            throw new CommonException("error.please.enter.future.time");
+        }
         rdmMemberApplicantPassVOS.forEach(rdmMemberApplicantPassVO -> {
             passAndHandleMember(rdmMemberApplicantPassVO.getId(), rdmMemberApplicantPassVO.getObjectVersionNumber(), expiresAt);
         });
