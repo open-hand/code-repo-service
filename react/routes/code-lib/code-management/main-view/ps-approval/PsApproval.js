@@ -120,17 +120,14 @@ const PsApproval = observer(() => {
     const res = record.value.toLowerCase();
     const approvalMessage = record.record.get('approvalMessage');
     return (
-      <React.Fragment>
+      <>
         <StatusTag colorCode={record.value.toUpperCase()} name={formatMessage({ id: `infra.approval.${res}` })} />
         {
           approvalMessage && <Tooltip title={approvalMessage}>
-            <Icon style={{
-            marginLeft: '5px',
-            color: '#F76776',
-            }} />
+            <Icon type="info" style={{ marginLeft: '5px', color: '#F76776' }} />
           </Tooltip>
         }
-      </React.Fragment>
+      </>
     );
   }
 

@@ -61,7 +61,9 @@ const OperationLogTab = () => {
     isMore, opEventTypeLookupData, loadData, listViewDs,
   }), [isMore, opEventTypeLookupData, loadData, listViewDs]);
   return (
-    <TabPage>
+    <div style={{
+      height: '100%',
+    }}>
       <Header>
         <HeaderButtons
           showClassName={false}
@@ -74,29 +76,10 @@ const OperationLogTab = () => {
         />
       </Header>
       <CodeManagerHeader />
-      {/* <div style={{ paddingLeft: 24, display: 'flex', alignItems: 'center' }}>
-        <Form columns={2} style={{ maxWidth: '3.5rem' }} >
-          <Select
-            onChange={val => handleSearch({ repositoryId: val })}
-            // eslint-disable-next-line
-            clearButton={true}
-            style={{ maxWidth: '3.5rem' }}
-          >
-            {
-              branchServiceDs.toData().map(o => (
-                <Option key={o.repositoryId} value={o.repositoryId}>{o.repositoryName}</Option>
-              ))
-            }
-          </Select>
-        </Form>
-      </div> */}
-      {/* <Page */}
-      {/*  service={[ */}
-      {/*    'choerodon.code.project.infra.code-lib-management.ps.project-owner', */}
-      {/*  ]} */}
-      {/*  className="code-lib-opreation-log-page" */}
-      {/* > */}
-      <Content>
+      <Content style={{
+        height: 'calc(100% - 64px)',
+        overflow: 'scroll',
+      }}>
         <div className="code-lib-opreation-log-search">
           <Select
             placeholder={formatMessage({ id: 'infra.codelib.audit.model.service' })}
@@ -124,7 +107,7 @@ const OperationLogTab = () => {
         <TimeLine {...timeLineProps} />
       </Content>
       {/* </Page> */}
-    </TabPage>
+    </div>
   );
 };
 
