@@ -1,6 +1,8 @@
 package org.hrds.rducm.gitlab.api.controller.dto;
 
 import io.swagger.annotations.ApiModelProperty;
+import java.util.Date;
+import javax.validation.constraints.Future;
 import org.hzero.starter.keyencrypt.core.Encrypt;
 
 /**
@@ -12,6 +14,8 @@ public class RdmMemberApplicantPassVO {
     private Long id;
     @ApiModelProperty("obj")
     private Long objectVersionNumber;
+
+
 
     public Long getId() {
         return id;
