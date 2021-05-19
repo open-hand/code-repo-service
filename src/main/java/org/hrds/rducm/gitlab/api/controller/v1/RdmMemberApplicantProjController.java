@@ -148,7 +148,7 @@ public class RdmMemberApplicantProjController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/batch/pass")
     public ResponseEntity<?> batchPassAndHandleMember(@RequestBody List<RdmMemberApplicantPassVO> rdmMemberApplicantPassVOS,
-                                                      RdmMemberApplicantPassDTO passDTO) {
+                                                      @RequestParam RdmMemberApplicantPassDTO passDTO) {
         validObject(passDTO);
         rdmMemberApplicantAppService.batchPassAndHandleMember(rdmMemberApplicantPassVOS, passDTO.getExpiresAt());
         return Results.success();
