@@ -3,7 +3,7 @@ import { map } from 'lodash';
 
 export default ((intlPrefix, formatMessage, organizationId, projectId, branchServiceDs) => ({
   autoQuery: false,
-  selection: false,
+  selection: 'multiple',
   pageSize: 10,
   transport: {
     read: () => ({
@@ -14,19 +14,18 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
           const data = JSON.parse(resp);
           if (data && data.failed) {
             return data;
-          } else {
-            const { list, content, ...others } = data;
-            const tempList = map(data.list || data.content || [], item => ({
-              ...item,
-              oldAccessLevel: item.oldAccessLevel ? `L${item.oldAccessLevel}` : '',
-              accessLevel: item.accessLevel ? `L${item.accessLevel}` : '',
-            }));
-            return {
-              ...others,
-              list: tempList,
-              content: tempList,
-            };
           }
+          const { list, content, ...others } = data;
+          const tempList = map(data.list || data.content || [], item => ({
+            ...item,
+            oldAccessLevel: item.oldAccessLevel ? `L${item.oldAccessLevel}` : '',
+            accessLevel: item.accessLevel ? `L${item.accessLevel}` : '',
+          }));
+          return {
+            ...others,
+            list: tempList,
+            content: tempList,
+          };
         } catch (e) {
           return resp;
         }
@@ -34,7 +33,9 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
     }),
   },
   fields: [
-    { name: 'language', defaultValue: 'zh-CN', type: 'string', label: '语言' },
+    {
+      name: 'language', defaultValue: 'zh-CN', type: 'string', label: '语言',
+    },
     {
       name: 'applicantUser',
       type: 'object',
@@ -125,7 +126,19 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
       textField: 'repositoryName',
       valueField: 'repositoryId',
       options: branchServiceDs,
-      // lookupUrl: `/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/list-by-active`,
     },
   ],
+  events: {
+    load: ({ dataSet }) => {
+      dataSet.records.forEach((record) => {
+        if (record.get('approvalState') === 'PENDING') {
+          // eslint-disable-next-line no-param-reassign
+          record.selectable = true;
+        } else {
+          // eslint-disable-next-line no-param-reassign
+          record.selectable = false;
+        }
+      });
+    },
+  },
 }));

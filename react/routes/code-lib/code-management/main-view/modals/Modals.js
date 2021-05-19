@@ -4,6 +4,7 @@ import moment from 'moment';
 import { message } from 'choerodon-ui';
 import { Modal } from 'choerodon-ui/pro';
 import { Header, Choerodon, axios, HeaderButtons } from '@choerodon/boot';
+import BatchApprove from '../ps-approval/BatchApprove';
 import AddMember from './add-member';
 import AddOutsideMember from './add-outside-member';
 // import ImportMember from './import-member';
@@ -206,6 +207,23 @@ const EnvModals = observer((props) => {
       });
   }
 
+  /**
+   * 批量审批
+   */
+  function handlerBatchApprove(ds, func) {
+    console.log(ds.selected);
+    Modal.open({
+      okText: '保存',
+      key: Modal.key(),
+      title: '权限批量审批',
+      drawer: true,
+      children: <BatchApprove selects={ds.selected} func={func} />,
+      style: {
+        width: 380,
+      },
+    });
+  }
+
   function getButtons() {
     const buttonData = [{
       name: formatMessage({ id: 'refresh' }),
@@ -215,7 +233,21 @@ const EnvModals = observer((props) => {
       display: true,
       group: 1,
     }];
+    const disabled = !(psApprovalDs.selected && psApprovalDs.selected.length > 0);
     switch (type) {
+      case 'psApproval':
+        buttonData.unshift({
+          name: '批量审批',
+          icon: 'playlist_add',
+          handler: () => handlerBatchApprove(psApprovalDs, refresh),
+          display: true,
+          disabled,
+          tooltipsConfig: {
+            placement: 'bottom',
+            title: disabled ? '请在下方列表中选择【待审批】状态的申请' : '',
+          },
+        });
+        break;
       case 'psSet':
         buttonData.unshift(
           {
