@@ -10,6 +10,7 @@ import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import java.util.Date;
 import java.util.List;
 import org.hrds.rducm.gitlab.api.controller.dto.DetectApplicantTypeDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantPassDTO;
@@ -26,6 +27,7 @@ import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.hzero.starter.keyencrypt.core.Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -148,9 +150,9 @@ public class RdmMemberApplicantProjController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/batch/pass")
     public ResponseEntity<?> batchPassAndHandleMember(@RequestBody List<RdmMemberApplicantPassVO> rdmMemberApplicantPassVOS,
-                                                      @RequestParam RdmMemberApplicantPassDTO passDTO) {
-        validObject(passDTO);
-        rdmMemberApplicantAppService.batchPassAndHandleMember(rdmMemberApplicantPassVOS, passDTO.getExpiresAt());
+                                                      @RequestParam("expiresAt")  Date expiresAt) {
+//        validObject(passDTO);
+        rdmMemberApplicantAppService.batchPassAndHandleMember(rdmMemberApplicantPassVOS, expiresAt);
         return Results.success();
     }
 
