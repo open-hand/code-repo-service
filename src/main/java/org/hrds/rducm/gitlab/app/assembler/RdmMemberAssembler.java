@@ -181,10 +181,10 @@ public class RdmMemberAssembler {
             viewDTO.setRepositoryName(c7nAppServiceVO.getName());
         }
 
-        //按照跟新时间倒序排序表
-        if (!Objects.isNull(rdmMemberViewDTOS.getContent())) {
-            rdmMemberViewDTOS.setContent(rdmMemberViewDTOS.getContent().stream().sorted(Comparator.comparing(RdmMemberViewDTO::getLastUpdateDate).reversed()).collect(Collectors.toList()));
-        }
+//        //按照跟新时间倒序排序表
+//        if (!Objects.isNull(rdmMemberViewDTOS.getContent())) {
+//            rdmMemberViewDTOS.setContent(rdmMemberViewDTOS.getContent().stream().sorted(Comparator.comparing(RdmMemberViewDTO::getLastUpdateDate).reversed()).collect(Collectors.toList()));
+//        }
         return rdmMemberViewDTOS;
     }
 
