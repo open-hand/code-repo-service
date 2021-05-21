@@ -14,6 +14,8 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.service.IMemberPermissionRepairService;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepairService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MemberPermissionRepairServiceImpl.class);
+
     @Autowired
     private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
     @Autowired
@@ -36,6 +40,7 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void repairMemberPermission(Long organizationId) {
+        LOGGER.info(">>>>>>>>>>>>>>>>>>>>>start repair member permission>>>>>>>>>>>>>>>>>>>>>>>>>");
         List<RdmMemberAuditRecord> records = rdmMemberAuditRecordRepository
                 .selectByCondition(Condition.builder(RdmMemberAuditRecord.class)
                         .andWhere(Sqls.custom()
@@ -62,5 +67,7 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
                 rdmMemberAuditAppService.auditFix(record.getOrganizationId(), record.getProjectId(), record.getRepositoryId(), record.getId());
             }
         });
+
+        LOGGER.info(">>>>>>>>>>>>>>>>>>end repair member permission>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     }
 }
