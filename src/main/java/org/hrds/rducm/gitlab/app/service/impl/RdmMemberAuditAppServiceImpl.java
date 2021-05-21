@@ -99,6 +99,10 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
         AssertExtensionUtils.notNull(dbRecord, "该记录不存在");
 
         Long userId = dbRecord.getUserId();
+        //如果userId为null 猪齿鱼导入用户失败，导致猪齿鱼里没有这个用户
+        if (Objects.isNull(userId)) {
+            return;
+        }
         // 若glUserId为null, 获取glUserId
         Integer glUserId = dbRecord.getGlUserId() != null ? dbRecord.getGlUserId() : c7NBaseServiceFacade.userIdToGlUserId(userId);
         Integer glProjectId = dbRecord.getGlProjectId();
@@ -109,13 +113,13 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
         RdmMember dbMember = rdmMemberRepository.selectOneByUk(projectId, repositoryId, userId);
         // 查询gitlab权限
         Member projectGlMember = gitlabProjectApi.getMember(glProjectId, glUserId);
-        if (Objects.nonNull(projectGlMember)){
+        if (Objects.nonNull(projectGlMember)) {
             logger.info("Gl项目[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]", glProjectId, projectGlMember.getId(), projectGlMember.getName(), projectGlMember.getAccessLevel());
         }
 
         Member groupGlMember = gitlabGroupApi.getMember(glGroupId, glUserId);
         if (Objects.nonNull(groupGlMember)) {
-            logger.info("Gl组[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]",glGroupId, groupGlMember.getId(), groupGlMember.getName(), groupGlMember.getAccessLevel());
+            logger.info("Gl组[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]", glGroupId, groupGlMember.getId(), groupGlMember.getName(), groupGlMember.getAccessLevel());
         }
 
         // 判断是否是组织管理员
