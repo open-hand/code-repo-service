@@ -99,6 +99,10 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
         AssertExtensionUtils.notNull(dbRecord, "该记录不存在");
 
         Long userId = dbRecord.getUserId();
+        //如果userId为null 猪齿鱼导入用户失败，导致猪齿鱼里没有这个用户
+        if (Objects.isNull(userId)){
+            return;
+        }
         // 若glUserId为null, 获取glUserId
         Integer glUserId = dbRecord.getGlUserId() != null ? dbRecord.getGlUserId() : c7NBaseServiceFacade.userIdToGlUserId(userId);
         Integer glProjectId = dbRecord.getGlProjectId();
