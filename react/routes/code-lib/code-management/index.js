@@ -5,11 +5,9 @@ import { StoreProvider } from './stores';
 
 const TabPage = asyncRouter(() => import('./Management'));
 
-const Index = (props) => (
+const Index = props => (
   <StoreProvider {...props}>
-    <Switch>
-      <Route component={TabPage} path={props.match.url} />
-    </Switch>
+    <TabPage />
   </StoreProvider>
 );
 

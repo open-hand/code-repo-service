@@ -189,7 +189,7 @@ function getRequest(url) {
 
 /**
  * 获取文件名后缀
- * @param {string} fileName 
+ * @param {string} fileName
  */
 function getFileSuffix(fileName) {
   return fileName.replace(/.+\./, '').toLowerCase();
@@ -334,17 +334,23 @@ async function checkPermission({ projectId, organizationId, resourceType, code }
   }
 }
 
-function useCheckPermission(code) {
-  const [hasPermission, setHasPermission] = React.useState(false);
-  React.useEffect(() => {
-    async function fetchPermission() {
-      const { projectId, type: resourceType } = stores.AppState.currentMenuType;
-      const res = await checkPermission({ projectId, code, resourceType });
-      setHasPermission(res);
-    }
-    fetchPermission();
-  }, [...code, code.length])
-  return hasPermission;
+async function useCheckPermission(code, onlyResult = false) {
+  if (onlyResult) {
+    const { projectId, type: resourceType } = stores.AppState.currentMenuType;
+    const res = await checkPermission({ projectId, code, resourceType });
+    return res;
+  } else {
+    const [hasPermission, setHasPermission] = React.useState(false);
+    React.useEffect(() => {
+      async function fetchPermission() {
+        const { projectId, type: resourceType } = stores.AppState.currentMenuType;
+        const res = await checkPermission({ projectId, code, resourceType });
+        setHasPermission(res);
+      }
+      fetchPermission();
+    }, [...code, code.length])
+    return hasPermission;
+  }
 }
 
 /**
@@ -397,7 +403,7 @@ export default function (data) {
 
 /**
  * 返回字符串的首字
- * @param {string} str 
+ * @param {string} str
  */
 function getFirstWord(str) {
   if (!str) {

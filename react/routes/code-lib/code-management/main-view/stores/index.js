@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { createContext, useContext, useMemo, useEffect, useState } from 'react';
 import { inject } from 'mobx-react';
 import { injectIntl } from 'react-intl';
@@ -26,7 +27,6 @@ export function usPsManagerStore() {
   return useContext(Store);
 }
 
-
 export const StoreProvider = injectIntl(inject('AppState')((props) => {
   const {
     AppState: { currentMenuType: { projectId, organizationId } },
@@ -39,12 +39,13 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
   const [appId, setApp] = useState(undefined);
   const [branchAppId, setBranchApp] = useState(undefined);
 
-  const hasPermission = useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-owner']);
-  const hasMemberPermission = useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-member']);
-
+  const hasMemberPermission = useMemo(() => useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-member'], true), []);
+  const hasPermission = useMemo(() => useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-owner'], true), []);
 
   const intlPrefix = 'infra';
-  const branchServiceDs = useMemo(() => new DataSet(BranchServiceDs({formatMessage, organizationId, projectId, setBranchApp })), [projectId, organizationId]); // 分支/标签的应用服务下拉框数据
+  const branchServiceDs = useMemo(() => new DataSet(BranchServiceDs({
+    formatMessage, organizationId, projectId, setBranchApp,
+  })), [projectId, organizationId]); // 分支/标签的应用服务下拉框数据
   const psSetDs = useMemo(() => new DataSet(PsSetDataSet(intlPrefix, formatMessage, organizationId, projectId, branchServiceDs, appServiceIds)), [formatMessage, projectId, branchServiceDs, appServiceIds]);
   const branchDs = useMemo(() => new DataSet(BranchDataSet(formatMessage, projectId, branchAppId)), [formatMessage, projectId, branchAppId]);
   const tagDs = useMemo(() => new DataSet(TagDataSet(formatMessage, projectId, branchAppId)), [formatMessage, projectId, branchAppId]);
