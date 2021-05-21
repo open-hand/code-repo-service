@@ -119,7 +119,9 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                         .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
                         .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, syncGitlabFlag, true)
                         .andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIds, true))
+                .orderByDesc(RdmMember.FIELD_LAST_UPDATE_DATE)
                 .build();
+
         // TODO 可使用多线程优化
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
