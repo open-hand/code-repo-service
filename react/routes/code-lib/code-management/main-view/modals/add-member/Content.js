@@ -91,6 +91,9 @@ export default observer(() => {
             <Button
               funcType="flat"
               icon="delete"
+              style={{
+                marginTop: '8px'
+              }}
               onClick={() => handleRemovePath(pathRecord)}
             />
           ) : <span />}
