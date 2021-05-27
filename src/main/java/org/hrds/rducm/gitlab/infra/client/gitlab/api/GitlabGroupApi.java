@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.infra.client.gitlab.api;
 
 import org.gitlab4j.api.GitLabApiException;
+import org.gitlab4j.api.models.Group;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
@@ -65,6 +66,21 @@ public class GitlabGroupApi {
                     .getGroupApi()
                     .removeMember(glGroupId, glUserId);
         } catch (GitLabApiException e) {
+            throw new GitlabClientException(e, e.getMessage());
+        }
+    }
+
+    public Group getGroup(Integer glGroupId) {
+        try {
+            Group group = gitlab4jClient.getGitLabApi()
+                    .getGroupApi()
+                    .getGroup(glGroupId);
+            return group;
+        } catch (GitLabApiException e) {
+            // Gitlab查询到不存在的资源会返回404
+            if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                return null;
+            }
             throw new GitlabClientException(e, e.getMessage());
         }
     }
