@@ -82,7 +82,10 @@ const MainView = observer(() => {
           alwaysShow
         />,
         <PageTab
-          title={formatMessage({ id: 'infra.codeManage.ps.message.securityAudit' })}
+          title={<Tips
+            helpText={formatMessage({ id: 'infra.codeManage.ps.message.securityAudit' })}
+            title="安全审计功能用于展示成员被授权的服务的情况，当权限占比超过50%后，将以橙色预警的样式展示。"
+          />}
           tabKey="securityAudit"
           route="/rducm/code-lib-management/security"
           component={SecurityAudit}
@@ -146,7 +149,10 @@ const MainView = observer(() => {
           alwaysShow
         />,
         <PageTab
-          title={formatMessage({ id: 'infra.codeManage.ps.message.securityAudit' })}
+          title={<Tips
+            title={formatMessage({ id: 'infra.codeManage.ps.message.securityAudit' })}
+            helpText="安全审计功能用于展示成员被授权的服务的情况，当权限占比超过50%后，将以橙色预警的样式展示。"
+          />}
           tabKey="securityAudit"
           route="/rducm/code-lib-management/security"
           component={SecurityAudit}

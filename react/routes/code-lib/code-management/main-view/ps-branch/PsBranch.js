@@ -190,7 +190,7 @@ const PsBranch = observer(() => {
       <div>
         <div className="ps-branch-tips-title">{formatMessage({ id: `${intlPrefix}.branch.protected.set` })}</div>
         <Table dataSet={branchDs} queryBar="none" filter={handleTableFilter} pagination={false}>
-          <Column name="name" renderer={renderBranchName} width={315} />
+          <Column name="name" renderer={renderBranchName} width={315} help="受保护的分支可以设置允许往此分支上合并或推送代码的特定角色" />
           <Column renderer={() => renderAction('branch')} width={50} />
           <Column name="mergeAccessLevel" />
           <Column label="" name="pushAccessLevel" />
@@ -199,7 +199,7 @@ const PsBranch = observer(() => {
       <div>
         <div className="ps-branch-tips-title" style={{ marginTop: '0.16rem' }}>{formatMessage({ id: `${intlPrefix}.tag.protected.set` })}</div>
         <Table dataSet={tagDs} queryBar="none" filter={handleTableFilter} pagination={false} >
-          <Column name="name" renderer={renderTagName} width={315} />
+          <Column name="name" renderer={renderTagName} width={315} help="受保护的标记可以设置允许创建或更新此标记的特定角色" />
           <Column renderer={() => renderAction('tag')} width={50} />
           <Column name="createAccessLevel" />
         </Table>
