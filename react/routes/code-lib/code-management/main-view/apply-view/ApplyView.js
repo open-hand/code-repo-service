@@ -6,9 +6,9 @@
  */
 import React, { useEffect } from 'react';
 import { Page, Action } from '@choerodon/boot';
-import { Table, Modal } from 'choerodon-ui/pro';
+import { Table, Modal, Icon, Tooltip } from 'choerodon-ui/pro';
 import { observer } from 'mobx-react-lite';
-import StatusTag from '@/components/status-tag';
+import { StatusTag } from '@choerodon/components';
 import { usPsManagerStore } from '../stores';
 import ApplyDetail from '../modals/apply-detail';
 
@@ -35,8 +35,20 @@ const ApplyView = observer(() => {
 
   function renderStatus(record) {
     const res = record.value.toLowerCase();
+    const error = record.record.get('approvalMessage');
     return (
-      <StatusTag colorCode={record.value.toUpperCase()} name={formatMessage({ id: `infra.approval.${res}` })} style={{ lineHeight: '16px', width: '42px' }} />
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <StatusTag colorCode={record.value.toUpperCase()} name={formatMessage({ id: `infra.approval.${res}` })} style={{ lineHeight: '16px', width: '42px' }} />
+        {error && <Tooltip title={error}>
+          <Icon
+            style={{
+            color: 'rgb(247, 103, 118)',
+            marginLeft: '3px',
+            }}
+            type="info"
+          />
+        </Tooltip>}
+      </div>
     );
   }
 
