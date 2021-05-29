@@ -62,22 +62,24 @@ const PsView = ({ psViewDs, activeProject, activeTabKey }) => {
           {text}
         </Tooltip>
       );
-    } else {
-      return (
-        <Tooltip title={text}>
-          <div style={{ display: 'flex' }}>
-            <div style={{ display: 'inline-block', maxWidth: '1.2rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {text}
-            </div>
-            <div className="assign-member-external-user">
-              <span className="assign-member-external-user-text">
-                未同步
-              </span>
-            </div>
-          </div>
-        </Tooltip>
-      );
     }
+    return (
+      <Tooltip title={text}>
+        <div style={{ display: 'flex' }}>
+          <div style={{
+ display: 'inline-block', maxWidth: '1.2rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+}}
+          >
+            {text}
+          </div>
+          <div className="assign-member-external-user">
+            <span className="assign-member-external-user-text">
+              未同步
+            </span>
+          </div>
+        </div>
+      </Tooltip>
+    );
   }
 
   function renderRole({ value }) {
@@ -110,7 +112,7 @@ const PsView = ({ psViewDs, activeProject, activeTabKey }) => {
   }, []);
 
   return (
-    <Content style={{ paddingTop: 0, height: 'calc(100% - 95px)' }}>
+    <Content style={{ paddingTop: 0, height: 'calc(100% - 95px)', marginTop: 0 }}>
       <Table
         className="no-border-top-table"
         dataSet={psViewDs}

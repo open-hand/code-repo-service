@@ -4,6 +4,7 @@
 * @creationDate 2020/4/3
 * @copyright 2020 ® HAND
 */
+/* eslint-disable */
 import React, { useEffect, useState } from 'react';
 import { Content, axios, Choerodon } from '@choerodon/boot';
 import { Table } from 'choerodon-ui/pro';
@@ -126,7 +127,7 @@ const PsAudit = ({ psAuditDs, formatMessage, activeProject, activeTabKey, organi
   }
 
   return (
-    <Content style={{ paddingTop: 0, height: 'calc(100% - 95px)' }} className="c7n-infra-code-management-org" >
+    <Content style={{ paddingTop: 0, height: 'calc(100% - 95px)', marginTop: 0 }} className="c7n-infra-code-management-org" >
       <div >
         <Row className="c7n-infra-code-management-org-tip-text">
           <Col span={8}>
