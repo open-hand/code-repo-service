@@ -98,6 +98,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     @Override
     public void auditFix(Long organizationId, Long projectId, Long repositoryId, Long id) {
         logger.info(">>>>{}>>>{}>>>>{}>>>>{}>", organizationId, projectId, repositoryId, id);
+//         >>>>7>>>2048>>>>6227>>>>132805
 
         RdmMemberAuditRecord dbRecord = rdmMemberAuditRecordRepository.selectByUk(organizationId, projectId, repositoryId, id);
         AssertExtensionUtils.notNull(dbRecord, "该记录不存在");
@@ -115,12 +116,12 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
         // 查询权限
         RdmMember dbMember = rdmMemberRepository.selectOneByUk(projectId, repositoryId, userId);
-        // 查询gitlab权限
+        // 查询用户在gitlab中project的权限
         Member projectGlMember = gitlabProjectApi.getMember(glProjectId, glUserId);
         if (Objects.nonNull(projectGlMember)) {
             logger.debug("Gl项目[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]", glProjectId, projectGlMember.getId(), projectGlMember.getName(), projectGlMember.getAccessLevel());
         }
-
+        // 查询用户在gitlab中group的权限
         Member groupGlMember = gitlabGroupApi.getMember(glGroupId, glUserId);
         if (Objects.nonNull(groupGlMember)) {
             logger.debug("Gl组[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]", glGroupId, groupGlMember.getId(), groupGlMember.getName(), groupGlMember.getAccessLevel());
@@ -137,13 +138,16 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
         // <> 按gitlab group和project两类情况讨论
         // 是否为组织管理员
+        //必须确保组和项目是否存在
         Group group = gitlabGroupApi.getGroup(glGroupId);
         Project project = gitlabProjectApi.getProject(glProjectId);
+        Boolean isExistsGroup = Objects.isNull(group) ? Boolean.FALSE : Boolean.TRUE;
+        Boolean isExistsProject = Objects.isNull(project) ? Boolean.FALSE : Boolean.TRUE;
+
         if (isOrgAdmin) {
             // 修复为group Owner权限
             logger.debug("修复用户[{}]为组织管理员权限", userId);
-            //如果group在gitlab上不存在
-            if (!Objects.isNull(group)) {
+            if (isExistsGroup) {
                 updateGitlabGroupMemberWithOwner(groupGlMember, glGroupId, glUserId);
             }
         } else {
@@ -153,98 +157,16 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                 // 是否是项目管理员
                 Boolean isProjectAdmin = c7nUserVO.isProjectAdmin();
                 if (isProjectAdmin) {
-                    // 修复为group Owner权限
+                    // 如果是项目管理员 修复为group Owner权限
                     logger.debug("修复用户[{}]为项目管理员权限", userId);
-                    //如果group在gitlab上不存在，则清理在choerodon上的权限记录
-                    if (!Objects.isNull(group)) {
+                    if (isExistsGroup) {
                         updateGitlabGroupMemberWithOwner(groupGlMember, glGroupId, glUserId);
                     }
                 } else {
-                    // 修复为该用户当前的代码库权限
-                    if (dbMember == null || !dbMember.getSyncGitlabFlag()) {
-                        // 移除gitlab权限
-                        logger.debug("用户[{}]为项目成员，但没有代码库权限，移除Gl权限", userId);
-//                        removeGitlabMemberGP(groupGlMember, projectGlMember, glGroupId, glProjectId, glUserId);
-                        if (groupGlMember != null) {
-                            if (!Objects.isNull(group)) {
-                                gitlabGroupApi.removeMember(glGroupId, glUserId);
-                            }
-                        } else if (projectGlMember != null) {
-                            if (!Objects.isNull(project)) {
-                                gitlabProjectApi.removeMember(glProjectId, glUserId);
-                            }
-                        }
-                    } else {
-                        // 修改gitlab权限
-                        logger.debug("用户[{}]为项目成员，有代码库权限，修复Gl权限", userId);
-                        if (groupGlMember != null) {
-                            if (!Objects.isNull(group)) {
-                                gitlabGroupApi.removeMember(glGroupId, glUserId);
-                            }
-                            if (!Objects.isNull(project)) {
-                                gitlabProjectApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-                            }
-                        } else {
-                            if (projectGlMember != null) {
-                                // 2
-                                if (!Objects.isNull(project)) {
-                                    gitlabProjectApi.updateMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-                                }
-                            } else {
-                                // 3
-                                if (!Objects.isNull(project)) {
-                                    gitlabProjectApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-                                }
-                            }
-                        }
-//                        Project project = gitlabProjectApi.getProject(dbMember.getGlProjectId());
-//                        if (Objects.isNull(project)) {
-//                            rdmMemberRepository.deleteByPrimaryKey(dbMember.getId());
-//                        } else {
-//                            updateGitlabMemberP(dbMember, groupGlMember, projectGlMember, glGroupId, glProjectId, glUserId);
-//                        }
-                    }
+                    handProjectMember(userId, glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember, isExistsGroup, isExistsProject);
                 }
             } else {
-                if (Objects.isNull(dbMember)) {
-                    // 如果不是团队成员,也不是赋予权限的项目外成员 移除gitlab权限
-                    logger.debug("用户[{}]是项目成员也不是外部成员，没有代码库权限，移除", userId);
-                    if (groupGlMember != null) {
-                        if (!Objects.isNull(group)) {
-                            gitlabGroupApi.removeMember(glGroupId, glUserId);
-                        }
-                    } else if (projectGlMember != null) {
-                        if (!Objects.isNull(project)) {
-                            gitlabProjectApi.removeMember(glProjectId, glUserId);
-                        }
-                    }
-
-//                        removeGitlabMemberGP(groupGlMember, projectGlMember, glGroupId, glProjectId, glUserId);
-
-                } else {
-                    logger.debug("用户[{}]是外部成员，有代码库权限，修复GL权限", userId);
-                    if (groupGlMember != null) {
-                        if (!Objects.isNull(group)) {
-                            gitlabGroupApi.removeMember(glGroupId, glUserId);
-                        }
-                        if (!Objects.isNull(project)) {
-                            gitlabProjectApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-                        }
-                    } else {
-                        if (projectGlMember != null) {
-                            // 2
-                            if (!Objects.isNull(project)) {
-                                gitlabProjectApi.updateMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-                            }
-                        } else {
-                            // 3
-                            if (!Objects.isNull(project)) {
-                                gitlabProjectApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-                            }
-                        }
-                    }
-//                    updateGitlabMemberP(dbMember, groupGlMember, projectGlMember, glGroupId, glProjectId, glUserId);
-                }
+                handNonProjectMember(userId, glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember, isExistsGroup, isExistsProject);
             }
         }
 
@@ -252,18 +174,89 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
         rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
     }
 
+    private void handNonProjectMember(Long userId, Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember, Boolean isExistsGroup, Boolean isExistsProject) {
+        if (Objects.isNull(dbMember)) {
+            // 如果不是团队成员,也不是赋予权限的项目外成员 移除gitlab权限
+            logger.debug("用户[{}]是项目成员也不是外部成员，没有代码库权限，移除", userId);
+            if (groupGlMember != null && isExistsGroup) {
+                gitlabGroupApi.removeMember(glGroupId, glUserId);
+            } else if (projectGlMember != null && isExistsProject) {
+                gitlabProjectApi.removeMember(glProjectId, glUserId);
+            }
+        } else {
+            logger.debug("用户[{}]是外部成员，有代码库权限，修复GL权限", userId);
+            updateGitLabPermission(glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember, isExistsGroup, isExistsProject);
+        }
+    }
+
+    private void handProjectMember(Long userId, Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember, Boolean isExistsGroup, Boolean isExistsProject) {
+        //如果不是项目管理员，修复为该用户当前的代码库数据库的权限
+        if (dbMember == null || !dbMember.getSyncGitlabFlag()) {
+            // 移除gitlab权限
+            logger.debug("用户[{}]为项目成员，但没有代码库权限，移除Gl权限", userId);
+            removeGitlabMemberGP(glUserId, glProjectId, glGroupId, projectGlMember, groupGlMember, isExistsGroup, isExistsProject);
+        } else {
+            // 修改gitlab权限
+            logger.debug("用户[{}]为项目成员，有代码库权限，修复Gl权限", userId);
+            updateGitLabPermission(glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember, isExistsGroup, isExistsProject);
+        }
+    }
+
+    private void updateGitLabPermission(Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember, Boolean isExistsGroup, Boolean isExistsProject) {
+        if (groupGlMember != null) {
+            if (isExistsGroup) {
+                gitlabGroupApi.removeMember(glGroupId, glUserId);
+            }
+            if (isExistsProject) {
+                gitlabProjectApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
+            }
+        } else {
+            if (projectGlMember != null) {
+                // 2
+                if (isExistsProject) {
+                    //这里为项目变更权限的时候需要注意，如果数据库的用户的权限是50，这里按照gitlab的权限来修复。
+                    if (dbMember.getGlAccessLevel() < 50) {
+                        gitlabProjectApi.updateMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
+                    } else {
+                        dbMember.setGlAccessLevel(projectGlMember.getAccessLevel().value);
+                        rdmMemberRepository.updateByPrimaryKey(dbMember);
+                    }
+                }
+            } else {
+                // 3
+                if (isExistsProject) {
+                    //这里为项目变更权限的时候需要注意，如果数据库的用户的权限是50，这里按照gitlab的权限来修复。
+                    if (dbMember.getGlAccessLevel() < 50) {
+                        gitlabProjectApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
+                    } else {
+                        dbMember.setGlAccessLevel(projectGlMember.getAccessLevel().value);
+                        rdmMemberRepository.updateByPrimaryKey(dbMember);
+                    }
+                }
+            }
+        }
+    }
+
+    private void removeGitlabMemberGP(Integer glUserId, Integer glProjectId, Integer glGroupId, Member projectGlMember, Member groupGlMember, Boolean isExistsGroup, Boolean isExistsProject) {
+        if (groupGlMember != null && isExistsGroup) {
+            gitlabGroupApi.removeMember(glGroupId, glUserId);
+        } else if (projectGlMember != null && isExistsProject) {
+            gitlabProjectApi.removeMember(glProjectId, glUserId);
+        }
+    }
+
     /**
      * 移除gitlab权限, 分两步
      * 1. 如果group有权限, 直接移除group的权限(移除group权限会将project权限也移除); 否则,进入2
      * 2. 如果project有权限, 移除project的权限
      */
-    private void removeGitlabMemberGP(Member groupGlMember, Member projectGlMember, Integer glGroupId, Integer glProjectId, Integer glUserId) {
-        if (groupGlMember != null) {
-            gitlabGroupApi.removeMember(glGroupId, glUserId);
-        } else if (projectGlMember != null) {
-            gitlabProjectApi.removeMember(glProjectId, glUserId);
-        }
-    }
+//    private void removeGitlabMemberGP(Member groupGlMember, Member projectGlMember, Integer glGroupId, Integer glProjectId, Integer glUserId) {
+//        if (groupGlMember != null) {
+//            gitlabGroupApi.removeMember(glGroupId, glUserId);
+//        } else if (projectGlMember != null) {
+//            gitlabProjectApi.removeMember(glProjectId, glUserId);
+//        }
+//    }
 
     /**
      * 更新gitlab权限, 分两步
@@ -271,22 +264,22 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
      * 2. 如果project有权限, 更新project的权限; 否则, 进入3
      * 3. 如果project无权限, 新增project的权限
      */
-    private void updateGitlabMemberP(RdmMember dbMember, Member groupGlMember, Member projectGlMember, Integer glGroupId, Integer glProjectId, Integer glUserId) {
-        // 1
-        if (groupGlMember != null) {
-            gitlabGroupApi.removeMember(glGroupId, glUserId);
-
-            gitlabProjectApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-        } else {
-            if (projectGlMember != null) {
-                // 2
-                gitlabProjectApi.updateMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-            } else {
-                // 3
-                gitlabProjectApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-            }
-        }
-    }
+//    private void updateGitlabMemberP(RdmMember dbMember, Member groupGlMember, Member projectGlMember, Integer glGroupId, Integer glProjectId, Integer glUserId) {
+//        // 1
+//        if (groupGlMember != null) {
+//            gitlabGroupApi.removeMember(glGroupId, glUserId);
+//
+//            gitlabProjectApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
+//        } else {
+//            if (projectGlMember != null) {
+//                // 2
+//                gitlabProjectApi.updateMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
+//            } else {
+//                // 3
+//                gitlabProjectApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
+//            }
+//        }
+//    }
 
     /**
      * 修改Gitlab group权限为Owner, 分2步
