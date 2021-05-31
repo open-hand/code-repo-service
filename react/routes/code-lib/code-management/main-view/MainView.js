@@ -4,9 +4,10 @@
  * @creationDate 2020/02/21
  * @copyright 2020 ® HAND
  */
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { PageWrap, PageTab, Page, Content } from '@choerodon/boot';
 import { observer } from 'mobx-react-lite';
+import { useCheckPermission } from '@/utils';
 import Tips from '@/components/new-tips';
 import { usPsManagerStore } from './stores';
 import PsSet from './ps-set';
@@ -23,9 +24,17 @@ const MainView = observer(() => {
   const {
     intlPrefix,
     intl: { formatMessage },
-    hasPermission,
-    hasMemberPermission,
   } = usPsManagerStore();
+
+  const [hasMemberPermission, setHasMemberPermission] = useState(false);
+  const [hasPermission, setHasPermission] = useState(false);
+
+  useEffect(async () => {
+    const hasMemberPermission1 = await useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-member'], true);
+    const hasPermission1 = await useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-owner'], true);
+    setHasMemberPermission(hasMemberPermission1);
+    setHasPermission(hasMemberPermission1);
+  }, []);
 
   const renderPageWrap = useMemo(() => {
     let pageWrap = (
