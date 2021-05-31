@@ -9,6 +9,7 @@ import io.choerodon.asgard.saga.annotation.SagaTask;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.domain.AuditDomain;
 
+import java.util.*;
 import org.apache.commons.lang3.EnumUtils;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTaskCodeConstants;
@@ -20,6 +21,7 @@ import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.enums.RoleLabelEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
@@ -32,11 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * 处理用户角色变更的Saga
@@ -61,6 +58,9 @@ public class RdmMemberChangeSagaHandler {
     private C7nBaseServiceFacade c7nBaseServiceFacade;
     @Autowired
     private IRdmMemberService iRdmMemberService;
+    @Autowired
+    private GitlabProjectApi gitlabProjectApi;
+
 
     /**
      * 角色同步事件
@@ -106,6 +106,25 @@ public class RdmMemberChangeSagaHandler {
 
                     // 删除团队成员, 删除权限
                     handleRemoveMemberOnProjectLevel(organizationId, projectId, userId);
+                    //删除项目成员的话要删除代码库的权限  如果是组织管理员，则是group的owner 这里跟他是不是组织管理员没有关系，我只去他项目的权限
+                    C7nUserVO c7nUserVO = c7nBaseServiceFacade.detailC7nUserOnProjectLevel(projectId, userId);
+//                    Boolean isOrgAdmin = c7nBaseServiceFacade.checkIsOrgAdmin(organizationId, userId);
+                    if (Objects.isNull(c7nUserVO)) {
+                        //在这个项目下没有角色了，并且又不是组织管理员，删除应用服务的权限
+                        //查询这个项目下面所有的应用服务
+                        List<C7nAppServiceVO> c7nAppServiceVOS = c7nDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId);
+                        if (CollectionUtils.isEmpty(c7nAppServiceVOS)) {
+                            return;
+                        }
+                        c7nAppServiceVOS.forEach(c7nAppServiceVO -> {
+                            Long gitlabUserId = c7nUserVO.getGitlabUserId();
+                            Member projectGlMember = gitlabProjectApi.getMember(c7nAppServiceVO.getGitlabProjectId().intValue(), c7nUserVO.getGitlabUserId().intValue());
+                            if (Objects.isNull(projectGlMember)) {
+                                return;
+                            }
+                            gitlabProjectApi.removeMember(c7nAppServiceVO.getGitlabProjectId().intValue(), c7nUserVO.getGitlabUserId().intValue());
+                        });
+                    }
                 });
 
         // 组织层

@@ -229,8 +229,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                     if (dbMember.getGlAccessLevel() < 50) {
                         gitlabProjectApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
                     } else {
-                        dbMember.setGlAccessLevel(projectGlMember.getAccessLevel().value);
-                        rdmMemberRepository.updateByPrimaryKey(dbMember);
+                        rdmMemberRepository.deleteByPrimaryKey(dbMember);
                     }
                 }
             }
