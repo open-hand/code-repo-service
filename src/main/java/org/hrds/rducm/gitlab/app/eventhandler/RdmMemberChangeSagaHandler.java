@@ -103,28 +103,22 @@ public class RdmMemberChangeSagaHandler {
                     Long projectId = gitlabGroupMemberVO.getResourceId();
                     Long userId = gitlabGroupMemberVO.getUserId();
                     Long organizationId = c7nBaseServiceFacade.getOrganizationId(projectId);
-
-                    // 删除团队成员, 删除权限
-                    handleRemoveMemberOnProjectLevel(organizationId, projectId, userId);
-                    //删除项目成员的话要删除代码库的权限  如果是组织管理员，则是group的owner 这里跟他是不是组织管理员没有关系，我只去他项目的权限
                     C7nUserVO c7nUserVO = c7nBaseServiceFacade.detailC7nUserOnProjectLevel(projectId, userId);
 //                    Boolean isOrgAdmin = c7nBaseServiceFacade.checkIsOrgAdmin(organizationId, userId);
                     if (Objects.isNull(c7nUserVO)) {
                         //在这个项目下没有角色了，并且又不是组织管理员，删除应用服务的权限
                         //查询这个项目下面所有的应用服务
-                        List<C7nAppServiceVO> c7nAppServiceVOS = c7nDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId);
-                        if (CollectionUtils.isEmpty(c7nAppServiceVOS)) {
-                            return;
-                        }
-                        c7nAppServiceVOS.forEach(c7nAppServiceVO -> {
-                            Long gitlabUserId = c7nUserVO.getGitlabUserId();
-                            Member projectGlMember = gitlabProjectApi.getMember(c7nAppServiceVO.getGitlabProjectId().intValue(), c7nUserVO.getGitlabUserId().intValue());
-                            if (Objects.isNull(projectGlMember)) {
-                                return;
-                            }
-                            gitlabProjectApi.removeMember(c7nAppServiceVO.getGitlabProjectId().intValue(), c7nUserVO.getGitlabUserId().intValue());
+                        //删除项目成员的话要删除代码库的权限  如果是组织管理员，则是group的owner 这里跟他是不是组织管理员没有关系，我只去他项目的权限
+                        RdmMember rdmMember = new RdmMember();
+                        rdmMember.setUserId(userId);
+                        rdmMember.setProjectId(projectId);
+                        List<RdmMember> rdmMembers = rdmMemberRepository.select(rdmMember);
+                        rdmMembers.forEach(rdmMember1 -> {
+                            gitlabProjectApi.removeMember(rdmMember1.getGlProjectId(), rdmMember1.getGlUserId());
                         });
                     }
+                    // 删除团队成员, 删除权限
+                    handleRemoveMemberOnProjectLevel(organizationId, projectId, userId);
                 });
 
         // 组织层
