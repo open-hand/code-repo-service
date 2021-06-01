@@ -9,6 +9,7 @@ import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.ibatis.annotations.Param;
 import org.hrds.rducm.gitlab.api.controller.dto.*;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseUserQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
@@ -131,6 +132,7 @@ public class RdmMemberProjController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "realName", value = "用户名(模糊)", paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "loginName", value = "登录名(模糊)", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "params", value = "通用查询参数(模糊)", paramType = "query", dataType = "String"),
     })
     public ResponseEntity<Page<MemberAuthDetailViewDTO>> pageSecurityAudit(@PathVariable Long organizationId,
                                                                            @PathVariable Long projectId,
