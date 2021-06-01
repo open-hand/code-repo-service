@@ -41,19 +41,9 @@ export default ((intlPrefix, formatMessage, organizationId, projectId) => ({
       name: 'authorizedRate',
       type: 'string',
       // eslint-disable-next-line react/react-in-jsx-scope
-      label: <Tips title={formatMessage({ id: `${intlPrefix}.authorizedRate` })} helpText={formatMessage({ id: `${intlPrefix}.authorizedRateTips` })} />,
-
     }],
   queryFields: [
     { name: 'realName', type: 'string', label: formatMessage({ id: 'userName' }) },
     { name: 'loginName', type: 'string', label: formatMessage({ id: 'loginName' }) },
-    // {
-    //   name: 'repositoryIds',
-    //   type: 'string',
-    //   label: formatMessage({ id: `${intlPrefix}.service` }),
-    //   textField: 'repositoryName',
-    //   valueField: 'repositoryId',
-    //   lookupUrl: `/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/list-by-active`,
-    // },
   ],
 }));

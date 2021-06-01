@@ -4,6 +4,7 @@
  * @creationDate 2020/04/01
  * @copyright 2020 ® HAND
  */
+/* eslint-disable */
 import React, { useEffect } from 'react';
 import { Page } from '@choerodon/boot';
 import { Table, Modal, DataSet } from 'choerodon-ui/pro';
@@ -11,6 +12,7 @@ import { Slider } from 'choerodon-ui';
 import { observer } from 'mobx-react-lite';
 import { isNil } from 'lodash';
 import UserAvatar from '@/components/user-avatar';
+import Tips from '@/components/new-tips';
 import { usPsManagerStore } from '../stores';
 import SecurityDetailDS from '../stores/SecurityDetailDS';
 import DetailTable from './DetailTable';
@@ -45,7 +47,9 @@ const PsSet = observer(() => {
   }
 
   function openDetail(record) {
-    const securityDetailDs = new DataSet(SecurityDetailDS({ formatMessage, intlPrefix, userId: record.get('user').userId, projectId, organizationId }));
+    const securityDetailDs = new DataSet(SecurityDetailDS({
+      formatMessage, intlPrefix, userId: record.get('user').userId, projectId, organizationId,
+    }));
     Modal.open({
       key: modalKey,
       drawer: true,
@@ -54,7 +58,7 @@ const PsSet = observer(() => {
         width: '7.4rem',
       },
       children: <DetailTable dataSet={securityDetailDs} />,
-      footer: (okBtn) => okBtn,
+      footer: okBtn => okBtn,
       okText: formatMessage({ id: 'close' }),
     });
   }
@@ -132,7 +136,7 @@ const PsSet = observer(() => {
         <Column name="roleNames" renderer={renderRole} />
         <Column name="authorizedRepositoryCount" />
         <Column name="allRepositoryCount" />
-        <Column name="authorizedRate" renderer={renderLevel} width={150} />
+        <Column header={<Tips title={formatMessage({ id: `${intlPrefix}.authorizedRate` })} helpText={formatMessage({ id: `${intlPrefix}.authorizedRateTips` })} />} name="authorizedRate" renderer={renderLevel} width={150} />
       </Table>
     </Page>
   );

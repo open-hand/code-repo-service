@@ -39,8 +39,8 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
   const [appId, setApp] = useState(undefined);
   const [branchAppId, setBranchApp] = useState(undefined);
 
-  const hasMemberPermission = useMemo(() => useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-member'], true), []);
-  const hasPermission = useMemo(() => useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-owner'], true), []);
+  const hasMemberPermission = useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-member'], true);
+  const hasPermission = useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-owner'], true);
 
   const intlPrefix = 'infra';
   const branchServiceDs = useMemo(() => new DataSet(BranchServiceDs({
