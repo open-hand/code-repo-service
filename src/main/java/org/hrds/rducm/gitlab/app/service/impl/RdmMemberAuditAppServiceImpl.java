@@ -110,6 +110,8 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
         Long userId = dbRecord.getUserId();
         //如果userId为null 猪齿鱼导入用户失败，导致猪齿鱼里没有这个用户
         if (Objects.isNull(userId)) {
+            //如果userId不存在，这个数据就是异常的数据，那么就删除
+            rdmMemberAuditRecordRepository.deleteByPrimaryKey(dbRecord.getId());
             return;
         }
         // 若glUserId为null, 获取glUserId
