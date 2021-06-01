@@ -1,12 +1,14 @@
 package org.hrds.rducm.gitlab.domain.service.impl;
 
 import com.google.common.collect.Sets;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.oauth.DetailsHelper;
 import io.choerodon.mybatis.domain.AuditDomain;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+
 import org.gitlab4j.api.models.AccessLevel;
 import org.gitlab4j.api.models.Member;
 import org.gitlab4j.api.models.Project;
@@ -46,6 +48,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import org.springframework.util.StringUtils;
 
 /**
  * 成员管理领域服务类
@@ -72,14 +75,28 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         // 封装查询条件
         String realName = queryDTO.getRealName();
         String loginName = queryDTO.getLoginName();
+        String params = queryDTO.getParams();
 
         // 调用外部接口模糊查询 用户名或登录名
         Set<Long> userIdsSet = QueryConditionHelper.queryByNameConditionOnProj(projectId, realName, loginName);
-        if (userIdsSet != null && userIdsSet.isEmpty()) {
+
+        // 根据params多条件查询
+        if (!StringUtils.isEmpty(queryDTO.getParams())) {
+            Set<Long> userIdsSet1 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevelAndEnabled(projectId, params, null, null);
+            Set<Long> userIdsSet2 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevelAndEnabled(projectId, null, params, null);
+            if (Objects.isNull(userIdsSet)) {
+                userIdsSet = new HashSet<>();
+            }
+            userIdsSet.addAll(userIdsSet1);
+            userIdsSet.addAll(userIdsSet2);
+        }
+
+        if (userIdsSet == null || userIdsSet.isEmpty()) {
             return new Page<>();
         }
 
-        Page<MemberAuthDetailAgg> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectMembersRepositoryAuthorized(organizationId, projectId, userIdsSet));
+        Set<Long> finalUserIdsSet = userIdsSet;
+        Page<MemberAuthDetailAgg> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectMembersRepositoryAuthorized(organizationId, projectId, finalUserIdsSet));
 
         // 查询应用服务总数
         int allRepositoryCount = c7NDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId).size();

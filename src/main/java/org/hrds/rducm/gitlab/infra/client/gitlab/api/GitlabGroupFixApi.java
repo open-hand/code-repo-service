@@ -1,20 +1,22 @@
 package org.hrds.rducm.gitlab.infra.client.gitlab.api;
 
+import java.util.Date;
 import org.gitlab4j.api.GitLabApiException;
-import org.gitlab4j.api.models.Group;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
-
+/**
+ * Created by wangxiang on 2021/5/31
+ */
 @Repository
-public class GitlabGroupApi {
+public class GitlabGroupFixApi {
+
     private final Gitlab4jClientWrapper gitlab4jClient;
 
-    public GitlabGroupApi(Gitlab4jClientWrapper gitlab4jClient) {
+    public GitlabGroupFixApi(Gitlab4jClientWrapper gitlab4jClient) {
         this.gitlab4jClient = gitlab4jClient;
     }
 
@@ -39,7 +41,12 @@ public class GitlabGroupApi {
                     .getGroupApi()
                     .addMember(groupIdOrPath, userId, accessLevel, expiresAt);
         } catch (GitLabApiException e) {
-            throw new GitlabClientException(e, e.getMessage());
+            if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                return null;
+            } else {
+                throw new GitlabClientException(e, e.getMessage());
+
+            }
         }
     }
 
@@ -56,7 +63,11 @@ public class GitlabGroupApi {
             }
 
         } catch (GitLabApiException e) {
-            throw new GitlabClientException(e, e.getMessage());
+            if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                return null;
+            } else {
+                throw new GitlabClientException(e, e.getMessage());
+            }
         }
     }
 
@@ -66,22 +77,12 @@ public class GitlabGroupApi {
                     .getGroupApi()
                     .removeMember(glGroupId, glUserId);
         } catch (GitLabApiException e) {
-            throw new GitlabClientException(e, e.getMessage());
+            if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                return;
+            } else {
+                throw new GitlabClientException(e, e.getMessage());
+            }
         }
     }
 
-    public Group getGroup(Integer glGroupId) {
-        try {
-            Group group = gitlab4jClient.getGitLabApi()
-                    .getGroupApi()
-                    .getGroup(glGroupId);
-            return group;
-        } catch (GitLabApiException e) {
-            // Gitlab查询到不存在的资源会返回404
-            if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
-                return null;
-            }
-            throw new GitlabClientException(e, e.getMessage());
-        }
-    }
 }

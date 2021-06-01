@@ -11,6 +11,16 @@ public class BaseUserQueryDTO {
     private String realName;
     @ApiModelProperty(value = "登录名")
     private String loginName;
+    @ApiModelProperty(value = "通用参数")
+    private String params;
+
+    public String getParams() {
+        return params;
+    }
+
+    public void setParams(String params) {
+        this.params = params;
+    }
 
     public String getRealName() {
         return realName;
