@@ -1,4 +1,4 @@
-@import '~choerodon-ui/lib/style/themes/default';
+@import "~choerodon-ui/lib/style/themes/default";
 
 .c7n-infra-code-management {
   .c7n-tabs-bar {
@@ -34,8 +34,8 @@
     }
   }
   .c7n-infra-code-management-table-name {
-    color: #5365EA;
-    line-height: .20rem;
+    color: var(--table-click-color);
+    line-height: 0.2rem;
     // margin-left: .08rem;
 
     &:hover {
@@ -51,7 +51,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    line-height: .20rem;
+    line-height: 0.2rem;
     color: rgba(0, 0, 0, 0.65);
   }
 
@@ -142,10 +142,10 @@
   .assign-member-external-user {
     display: inline-block;
     background: rgba(244, 133, 144, 0.1);
-    border: 0.01rem solid #F48590;
+    border: 0.01rem solid #f48590;
     border-radius: 0.02rem;
-    font-size: 0.10rem;
-    color: #F48590;
+    font-size: 0.1rem;
+    color: #f48590;
     text-align: left;
     line-height: 0.18rem;
     margin: 0 0.06rem;
