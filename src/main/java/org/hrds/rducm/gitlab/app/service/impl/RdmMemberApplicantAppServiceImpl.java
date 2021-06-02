@@ -3,6 +3,7 @@ package org.hrds.rducm.gitlab.app.service.impl;
 import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberApplicantPassVO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberCreateDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
@@ -126,6 +127,9 @@ public class RdmMemberApplicantAppServiceImpl implements RdmMemberApplicantAppSe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchRefuse(List<RdmMemberApplicantPassVO> rdmMemberApplicantPassVOS, String approvalMessage) {
+        if (StringUtils.isNotBlank(approvalMessage) && approvalMessage.length() > 200) {
+            throw new CommonException("error.words.limit.rejection.reasons");
+        }
         rdmMemberApplicantPassVOS.forEach(rdmMemberApplicantPassVO -> {
             refuse(rdmMemberApplicantPassVO.getId(), rdmMemberApplicantPassVO.getObjectVersionNumber(), approvalMessage);
         });
