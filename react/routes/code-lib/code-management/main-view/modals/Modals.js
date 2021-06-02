@@ -135,7 +135,7 @@ const EnvModals = observer((props) => {
       drawer: true,
       title: formatMessage({ id: 'infra.permission.request' }),
       children: <PsApply
-        // refresh={refreshApproval}
+        refresh={refresh}
         intlPrefix={intlPrefix}
         prefixCls={prefixCls}
         branchServiceDs={branchServiceDs}

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { Form, Select, TextField } from 'choerodon-ui/pro';
@@ -9,7 +10,7 @@ export default observer(() => {
   const {
     formDs,
     modal,
-    // refresh,
+    refresh,
     projectId,
     organizationId,
   } = useAddMemberStore();
@@ -20,11 +21,10 @@ export default observer(() => {
   modal.handleOk(async () => {
     try {
       if (await formDs.submit() !== false) {
-        // refresh();
+        refresh();
         return true;
-      } else {
-        return false;
       }
+      return false;
     } catch (e) {
       Choerodon.handleResponseError(e);
       return false;

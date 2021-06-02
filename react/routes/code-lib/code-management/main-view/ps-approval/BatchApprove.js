@@ -39,6 +39,8 @@ export default inject('AppState')(observer(({
         try {
           await BatchApproveServices
             .axiosPostBatchReject(organizationId, projectId, approvalMessage, list);
+          func();
+          return true;
         } catch (e) {
           return false;
         }
