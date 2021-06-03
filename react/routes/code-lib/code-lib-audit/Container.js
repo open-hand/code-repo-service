@@ -77,7 +77,7 @@ const Container = () => {
           showClassName={false}
           items={([{
             name: formatMessage({ id: 'exportAuth', defaultMessage: '导出权限' }),
-            icon: 'get_app',
+            icon: 'get_app-o',
             display: true,
             handler: () => setExportModalVisible(true),
           }])}

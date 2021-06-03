@@ -149,7 +149,7 @@ export default observer(() => {
         <h3>下载模板</h3>
         <p>您必须使用模版文件，录入组织用户信息</p>
         
-        <Button onClick={handleDownLoad} type="primary" funcType="flat" icon="get_app">
+        <Button onClick={handleDownLoad} type="primary" funcType="flat" icon="-o">
           下载模板
           <a label=" " style={{ display: 'none' }} id="c7n-user-download-template" href="a" onClick={(event) => { event.stopPropagation(); }} download="roleAssignment.xlsx" />
         </Button>

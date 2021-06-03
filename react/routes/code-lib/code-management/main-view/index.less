@@ -14,7 +14,7 @@
     color: @primary-color;
   }
   .@{c7n-pro-prefix}-table-tbody {
-    color: rgba(0, 0, 0, 0.65);
+    color: var(--text-color3);
   }
   &-tab-list {
     height: 100%;
@@ -36,8 +36,6 @@
   .c7n-infra-code-management-table-name {
     color: var(--table-click-color);
     line-height: 0.2rem;
-    // margin-left: .08rem;
-
     &:hover {
       color: @primary-color;
       text-decoration: underline;
@@ -52,7 +50,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     line-height: 0.2rem;
-    color: rgba(0, 0, 0, 0.65);
+    color: var(--text-color3);
   }
 
   &-table {
@@ -71,7 +69,7 @@
         cursor: pointer;
       }
     }
-    color: rgba(0, 0, 0, 0.65);
+    color: var(--text-color3);
     .@{c7n-pro-prefix}-table-filter-select {
       border-top: none !important;
     }
