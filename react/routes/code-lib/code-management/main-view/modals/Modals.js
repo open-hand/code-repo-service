@@ -252,7 +252,7 @@ const EnvModals = observer((props) => {
         buttonData.unshift(
           {
             name: formatMessage({ id: 'infra.add.member' }),
-            icon: 'person_add',
+            icon: 'person_add-o',
             handler: openAdd,
             display: true,
             group: 1,
@@ -260,23 +260,15 @@ const EnvModals = observer((props) => {
           },
           {
             name: formatMessage({ id: 'infra.add.outsideMember' }),
-            icon: 'person_add',
+            icon: 'person_add-o',
             handler: openAddOutside,
             display: true,
             group: 1,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
           },
-          // {
-          //   name: formatMessage({ id: 'infra.button.import-user' }),
-          //   icon: 'archive',
-          //   handler: openImport,
-          //   display: true,
-          //   group: 1,
-          //   permissions: permissions,
-          // },
           {
             name: formatMessage({ id: 'infra.operate.export.permission' }),
-            icon: 'get_app',
+            icon: 'get_app-o',
             handler: () => setExportModalVisible(true),
             display: true,
             group: 1,
@@ -296,7 +288,7 @@ const EnvModals = observer((props) => {
       case 'applyView':
         buttonData.unshift({
           name: formatMessage({ id: 'infra.permission.request' }),
-          icon: 'person_add',
+          icon: 'person_add-o',
           handler: openRequest,
           display: true,
           group: 1,
