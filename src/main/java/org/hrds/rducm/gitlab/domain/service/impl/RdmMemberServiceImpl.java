@@ -91,7 +91,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             userIdsSet.addAll(userIdsSet2);
         }
 
-        if (userIdsSet == null || userIdsSet.isEmpty()) {
+        if (userIdsSet != null && userIdsSet.isEmpty()) {
             return new Page<>();
         }
 
