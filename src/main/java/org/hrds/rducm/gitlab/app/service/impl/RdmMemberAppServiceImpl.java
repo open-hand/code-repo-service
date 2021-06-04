@@ -198,6 +198,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         String repositoryName = query.getRepositoryName();
         String realName = query.getRealName();
         String loginName = query.getLoginName();
+        String params = query.getParams();
         Set<Long> projectIds = query.getProjectIds();
         Set<Long> repositoryIds = query.getRepositoryIds();
 
@@ -208,10 +209,20 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                         .andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIds, true))
                 .build();
 
+        Set<Long> userIdsSet = new HashSet<>();
+
+        // 根据params多条件查询
+        if (!StringUtils.isEmpty(params)) {
+            Set<Long> userIdsSet1 = c7NBaseServiceFacade.listC7nUserIdsByNameOnOrgLevel(organizationId, params, null);
+            Set<Long> userIdsSet2 = c7NBaseServiceFacade.listC7nUserIdsByNameOnOrgLevel(organizationId, null, params);
+            userIdsSet.addAll(userIdsSet1);
+            userIdsSet.addAll(userIdsSet2);
+        }
+
         // 调用外部接口模糊查询 用户名或登录名
         if (!StringUtils.isEmpty(realName) || !StringUtils.isEmpty(loginName)) {
-            Set<Long> userIdsSet = c7NBaseServiceFacade.listProjectsC7nUserIdsByNameOnOrgLevel(organizationId, realName, loginName);
-
+            Set<Long> userIdsSet3 = c7NBaseServiceFacade.listProjectsC7nUserIdsByNameOnOrgLevel(organizationId, realName, loginName);
+            userIdsSet.addAll(userIdsSet3);
             if (userIdsSet.isEmpty()) {
                 return new Page<>();
             }

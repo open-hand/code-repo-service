@@ -44,6 +44,7 @@ public class RdmMemberOrgController extends BaseController {
             @ApiImplicitParam(name = "repositoryName", value = "应用服务名称(模糊)", paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "realName", value = "用户名(模糊)", paramType = "query", dataType = "String"),
             @ApiImplicitParam(name = "loginName", value = "登录名(模糊)", paramType = "query", dataType = "String"),
+            @ApiImplicitParam(name = "params", value = "通用查询参数(模糊)", paramType = "query", dataType = "String"),
     })
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping
