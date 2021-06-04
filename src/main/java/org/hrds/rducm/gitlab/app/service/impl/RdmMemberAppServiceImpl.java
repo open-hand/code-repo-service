@@ -227,6 +227,8 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                 return new Page<>();
             }
 
+        }
+        if (!CollectionUtils.isEmpty(userIdsSet)) {
             condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
         }
 
