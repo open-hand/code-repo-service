@@ -126,6 +126,9 @@ export default observer(({
               disabled={(record[0].get(name[0]) || []).length <= 1}
               onClick={() => handleDeleteItem(index)}
               icon="delete"
+              style={{
+                marginTop: '8px',
+              }}
             />,
           ];
         })}
@@ -133,7 +136,6 @@ export default observer(({
       </Form>
       <Button
         colSpan={12}
-        color="blue"
         onClick={handleCreatOther}
         style={{ textAlign: 'left', marginTop: '-0.04rem' }}
         icon="add"

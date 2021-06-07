@@ -2,15 +2,11 @@ import React, { Component } from 'react';
 import { stores, axios, Choerodon } from '@choerodon/boot';
 import { observer } from 'mobx-react';
 import { Modal } from 'choerodon-ui';
+import { Button } from 'choerodon-ui/pro';
 import FileSaver from 'file-saver';
+import './index.less';
 
-// const RadioGroup = Radio.Group;
 const { AppState } = stores;
-// const radioStyle = {
-//   display: 'block',
-//   height: '30px',
-//   lineHeight: '30px',
-// };
 @observer
 class ExportAuthority extends Component {
   constructor(props) {
@@ -38,7 +34,6 @@ class ExportAuthority extends Component {
         responseType: 'blob',
         params: {
           exportType: 'DATA',
-          // repositoryIds: appServiceDs.toData()[0].repositoryIds.map(o => o.repositoryId).join(','),
           ...psSetDs.queryDataSet.toData()[0],
         },
       },
@@ -46,17 +41,6 @@ class ExportAuthority extends Component {
       .then((blob) => {
         const fileName = '权限记录.xlsx';
         FileSaver.saveAs(blob, fileName);
-
-        // const tempUrl = URL.createObjectURL(data);
-        // const a = document.createElement('a');
-        // a.href = tempUrl;
-        // a.download = '权限记录.xlsx';
-        // a.style.position = 'absolute';
-        // a.style.opacity = 0;
-        // document.body.appendChild(a);
-        // a.click();
-        // document.body.removeChild(a);
-
         Choerodon.prompt(formatMessage({ id: 'success.export', defaultMessage: '导出成功' }));
         setExportModalVisible(false);
       }).finally(() => {
@@ -75,8 +59,19 @@ class ExportAuthority extends Component {
         title={formatMessage({ id: 'exportModal.confirm.title', defaultMessage: '权限导出确认' })}
         visible={exportModalVisible}
         onOk={this.exportExcel}
-        onCancel={() => setExportModalVisible(false)}
         confirmLoading={loading}
+        closable={false}
+        className="c7ncd-exportModal"
+        footer={(
+          <>
+            <Button onClick={this.exportExcel} color="primary" funcType="raised">
+              确定
+            </Button>
+            <Button onClick={() => setExportModalVisible(false)}>
+              取消
+            </Button>
+          </>
+        )}
       >
         <div style={{ margin: '10px 0' }}>
           {formatMessage({ id: 'infra.docManage.message.confirm.export' })}
@@ -85,10 +80,6 @@ class ExportAuthority extends Component {
           {' '}
           {formatMessage({ id: 'dir.path.permission' }, { dirData: '' })}
         </div>
-        {/* <RadioGroup onChange={this.handleExportChange} value={mode}>
-          <Radio style={radioStyle} value="show">当前页面显示字段</Radio>
-          <Radio style={radioStyle} value="all">全部字段</Radio>
-        </RadioGroup> */}
       </Modal>
     );
   }
