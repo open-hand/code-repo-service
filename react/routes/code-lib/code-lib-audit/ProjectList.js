@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
-import { Input, Icon } from 'choerodon-ui';
+import { Icon } from 'choerodon-ui';
 import { observer } from 'mobx-react-lite';
-import { Spin } from 'choerodon-ui/pro';
+import { Spin, TextField } from 'choerodon-ui/pro';
 import { intlPrefix } from './stores';
 
 const imgStyle = {
@@ -68,11 +68,11 @@ const ProjectList = ({ formatMessage, projectListDs, activeProject, onClickProje
   return (
     <div className="code-lib-audit-project-list">
       <div className="code-lib-audit-project-list-top">
-        <Input
+        <TextField
           style={{ width: '200px' }}
           prefix={<Icon type="search" style={{ color: 'black' }} />}
           placeholder={formatMessage({ id: 'infra.filter' })}
-          onPressEnter={handleSearch}
+          onKeyUp={handleSearch}
         />
       </div>
       <Spin dataSet={projectListDs}>

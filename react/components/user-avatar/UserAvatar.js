@@ -150,7 +150,7 @@ const UserAvatar = memo(({
               whiteSpace: 'nowrap',
               // fontSize: '13px',
               lineHeight: iconSize,
-              color: color || 'var(--text-color3)',
+              color: 'var(--text-color2)',
             }}
           >
             {`${realName || loginName}`}
