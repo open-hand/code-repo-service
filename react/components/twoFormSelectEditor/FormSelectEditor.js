@@ -123,6 +123,7 @@ export default observer(({
             <Button
               // colSpan={1}
               className="two-form-select-editor-button"
+              funcType="flat"
               disabled={(record[0].get(name[0]) || []).length <= 1}
               onClick={() => handleDeleteItem(index)}
               icon="delete"
@@ -139,6 +140,7 @@ export default observer(({
         onClick={handleCreatOther}
         style={{ textAlign: 'left', marginTop: '-0.04rem' }}
         icon="add"
+        funcType="flat"
       >
         {addButton || '添加'}
       </Button>
