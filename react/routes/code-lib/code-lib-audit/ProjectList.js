@@ -70,7 +70,7 @@ const ProjectList = ({ formatMessage, projectListDs, activeProject, onClickProje
       <div className="code-lib-audit-project-list-top">
         <TextField
           style={{ width: '200px' }}
-          prefix={<Icon type="search" style={{ color: 'black' }} />}
+          prefix={<Icon type="search" style={{ fontSize: '0.2rem' }} />}
           placeholder={formatMessage({ id: 'infra.filter' })}
           onKeyUp={handleSearch}
         />
