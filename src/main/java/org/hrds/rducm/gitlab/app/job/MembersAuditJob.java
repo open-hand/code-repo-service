@@ -71,17 +71,13 @@ public class MembersAuditJob {
     @JobTask(maxRetryCount = 3,
             code = "membersAuditNewJob",
             description = "平台内代码库成员审计任务")
-    public void membersAuditNewJob() {
+    public void membersAuditNewJob(Map<String, Object> map) {
         // <> 获取组织
-//        long auditOrganizationId = 0L;
-//        if (param.containsKey("auditOrganizationId") && Objects.nonNull(param.get("auditOrganizationId"))) {
-//            auditOrganizationId = Long.parseLong(param.get("auditOrganizationId").toString());
-//        }
         logger.info("开始审计");
         //查询所有的组织
         List<C7nTenantVO> c7nTenantVOS = c7nBaseServiceFacade.listAllOrgs();
         if (CollectionUtils.isEmpty(c7nTenantVOS)){
-            logger.info("组织不存在");
+            logger.info("平台内无组织");
             return;
         }
         StopWatch stopWatch = new StopWatch();
