@@ -5,11 +5,16 @@ import io.choerodon.asgard.schedule.annotation.JobTask;
 import io.choerodon.asgard.schedule.annotation.TaskParam;
 import io.choerodon.asgard.schedule.annotation.TimedTask;
 import io.choerodon.asgard.schedule.enums.TriggerTypeEnum;
+
+import java.util.List;
+import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.service.IMemberAuditService;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nTenantVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StopWatch;
 
 import java.util.Map;
@@ -27,6 +32,8 @@ public class MembersAuditJob {
 
     @Autowired
     private IMemberAuditService iMemberAuditService;
+    @Autowired
+    private C7nBaseServiceFacade c7nBaseServiceFacade;
 
     /**
      * 成员审计任务
@@ -54,6 +61,37 @@ public class MembersAuditJob {
         stopWatch.stop();
         logger.info("审计组织[{}]的数据结束, 耗时[{}]ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
 
+        logger.info("结束审计, 耗时[{}]s, \n{}", stopWatch.getTotalTimeSeconds(), stopWatch.prettyPrint());
+    }
+
+
+    /**
+     * 平台内成员审计任务
+     */
+    @JobTask(maxRetryCount = 3,
+            code = "membersAuditNewJob",
+            description = "平台内代码库成员审计任务")
+    public void membersAuditNewJob() {
+        // <> 获取组织
+//        long auditOrganizationId = 0L;
+//        if (param.containsKey("auditOrganizationId") && Objects.nonNull(param.get("auditOrganizationId"))) {
+//            auditOrganizationId = Long.parseLong(param.get("auditOrganizationId").toString());
+//        }
+        logger.info("开始审计");
+        //查询所有的组织
+        List<C7nTenantVO> c7nTenantVOS = c7nBaseServiceFacade.listAllOrgs();
+        if (CollectionUtils.isEmpty(c7nTenantVOS)){
+            logger.info("组织不存在");
+            return;
+        }
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("membersAuditNewJob");
+        c7nTenantVOS.forEach(c7nTenantVO -> {
+            logger.debug("参数组织id为[{}]", c7nTenantVO.getTenantId());
+            logger.info("开始审计组织[{}]的数据", c7nTenantVO.getTenantId());
+            iMemberAuditService.auditMembersByOrganizationId(c7nTenantVO.getTenantId());
+        });
+        stopWatch.stop();
         logger.info("结束审计, 耗时[{}]s, \n{}", stopWatch.getTotalTimeSeconds(), stopWatch.prettyPrint());
     }
 
