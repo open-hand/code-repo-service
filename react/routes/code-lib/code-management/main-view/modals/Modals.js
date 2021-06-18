@@ -231,7 +231,6 @@ const EnvModals = observer((props) => {
       iconOnly: true,
       handler: refresh,
       display: true,
-      group: 1,
     }];
     const disabled = !(psApprovalDs.selected && psApprovalDs.selected.length > 0);
     switch (type) {
