@@ -101,8 +101,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
     @Override
     public void auditFix(Long organizationId, Long projectId, Long repositoryId, Long id) {
-        logger.info(">>>>{}>>>{}>>>>{}>>>>{}>", organizationId, projectId, repositoryId, id);
-//         >>>>7>>>2048>>>>6227>>>>132805
+        logger.debug(">>>>{}>>>{}>>>>{}>>>>{}>", organizationId, projectId, repositoryId, id);
 
         RdmMemberAuditRecord dbRecord = rdmMemberAuditRecordRepository.selectByUk(organizationId, projectId, repositoryId, id);
         AssertExtensionUtils.notNull(dbRecord, "该记录不存在");

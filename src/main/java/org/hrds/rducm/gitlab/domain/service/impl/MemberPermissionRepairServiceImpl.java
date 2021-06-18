@@ -40,7 +40,6 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void repairMemberPermission(Long organizationId) {
-        LOGGER.info(">>>>>>>>>>>>>>>>>>>>>start repair member permission>>>>>>>>>>>>>>>>>>>>>>>>>");
         List<RdmMemberAuditRecord> records = rdmMemberAuditRecordRepository
                 .selectByCondition(Condition.builder(RdmMemberAuditRecord.class)
                         .andWhere(Sqls.custom()
@@ -67,7 +66,5 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
                 rdmMemberAuditAppService.auditFix(record.getOrganizationId(), record.getProjectId(), record.getRepositoryId(), record.getId());
             }
         });
-
-        LOGGER.info(">>>>>>>>>>>>>>>>>>end repair member permission>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     }
 }

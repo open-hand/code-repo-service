@@ -44,7 +44,7 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
 
         if (!CollectionUtils.isEmpty(entity.getBody())) {
             Long gitlabUserId = entity.getBody().get(0).getGitlabUserId();
-            logger.info("{}用户获取到的GitlabUserId为{}", userId, gitlabUserId);
+            logger.debug("{}用户获取到的GitlabUserId为{}", userId, gitlabUserId);
             return gitlabUserId == null ? null : Math.toIntExact(gitlabUserId);
         } else {
             return null;
