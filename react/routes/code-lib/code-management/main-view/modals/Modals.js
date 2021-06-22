@@ -4,10 +4,9 @@ import moment from 'moment';
 import { message } from 'choerodon-ui';
 import { Modal } from 'choerodon-ui/pro';
 import { Header, Choerodon, axios, HeaderButtons } from '@choerodon/boot';
-import BatchApprove from '../ps-approval/BatchApprove';
+import BatchApprove from './batch-approval';
 import AddMember from './add-member';
 import AddOutsideMember from './add-outside-member';
-// import ImportMember from './import-member';
 import AddBranch from './add-branch';
 import AddTag from './add-tag';
 import PsApply from './ps-apply';
@@ -94,9 +93,6 @@ const EnvModals = observer((props) => {
   function refreshTag() {
     tagDs.query();
   }
-  // function refreshApproval() {
-  //   psApprovalDs.query();
-  // }
 
   function openAdd() {
     Modal.open({
@@ -143,20 +139,6 @@ const EnvModals = observer((props) => {
       okText: formatMessage({ id: 'add' }),
     });
   }
-  // function openImport() {
-  //   Modal.open({
-  //     children: <ImportMember onOk={refresh} />,
-  //     key: modalKey,
-  //     drawer: true,
-  //     style: { width: 380 },
-  //     fullScreen: true,
-  //     destroyOnClose: true,
-  //     className: 'base-site-user-sider',
-  //     okText: '返回',
-  //     okCancel: false,
-  //     title: '导入成员',
-  //   });
-  // }
   function openBranch() {
     Modal.open({
       title: formatMessage({ id: 'infra.add.branch' }),

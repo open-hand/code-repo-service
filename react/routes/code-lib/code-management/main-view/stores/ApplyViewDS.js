@@ -1,31 +1,32 @@
+/* eslint-disable import/no-anonymous-default-export */
 import { map } from 'lodash';
+import CodeManagerApis from '../../apis';
 
-export default ((intlPrefix, formatMessage, organizationId, projectId, branchServiceDs) => ({
-  autoQuery: false,
+export default ((intlPrefix, formatMessage, organizationId, projectId, branchAppId) => ({
+  autoQuery: true,
   selection: false,
   pageSize: 10,
   transport: {
     read: () => ({
-      url: `/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/member-applicants/self`,
+      url: CodeManagerApis.getPsApplyUrl(organizationId, projectId, branchAppId),
       method: 'get',
       transformResponse: (resp) => {
         try {
           const data = JSON.parse(resp);
           if (data && data.failed) {
             return data;
-          } else {
-            const { list, content, ...others } = data;
-            const tempList = map(data.list || data.content || [], item => ({
-              ...item,
-              oldAccessLevel: item.oldAccessLevel ? `L${item.oldAccessLevel}` : '',
-              accessLevel: item.accessLevel ? `L${item.accessLevel}` : '',
-            }));
-            return {
-              ...others,
-              list: tempList,
-              content: tempList,
-            };
           }
+          const { list, content, ...others } = data;
+          const tempList = map(data.list || data.content || [], item => ({
+            ...item,
+            oldAccessLevel: item.oldAccessLevel ? `L${item.oldAccessLevel}` : '',
+            accessLevel: item.accessLevel ? `L${item.accessLevel}` : '',
+          }));
+          return {
+            ...others,
+            list: tempList,
+            content: tempList,
+          };
         } catch (e) {
           return resp;
         }
@@ -100,14 +101,6 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
       lookupCode: 'RDUCM.APPROVAL_STATE',
       textField: 'meaning',
       valueField: 'value',
-    },
-    {
-      name: 'repositoryIds',
-      type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.service` }),
-      textField: 'repositoryName',
-      valueField: 'repositoryId',
-      options: branchServiceDs,
     },
   ],
 }));

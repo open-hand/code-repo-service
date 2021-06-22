@@ -1,7 +1,10 @@
+/* eslint-disable max-len */
+/* eslint-disable import/no-anonymous-default-export */
 import React from 'react';
 import moment from 'moment';
 import { map } from 'lodash';
 import Tips from '@/components/new-tips';
+import CodeManagerApis from '../../apis';
 
 function handleLoad({ dataSet }) {
   dataSet.forEach((record) => {
@@ -9,37 +12,35 @@ function handleLoad({ dataSet }) {
     record.selectable = !(record.get('glAccessLevel') && Number(record.get('glAccessLevel').substring(1)) >= 50);// record.get('deleteFlag');
   });
 }
-
-export default ((intlPrefix, formatMessage, organizationId, projectId, branchServiceDs, repositoryIds) => ({
-  autoQuery: false,
+export default ((intlPrefix, formatMessage, organizationId, projectId, repositoryIds) => ({
+  autoQuery: true,
   selection: 'multiple',
   pageSize: 10,
   transport: {
     read: () => ({
-      url: `/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members`,
+      url: CodeManagerApis.getPsSetListsUrl(organizationId, projectId, repositoryIds),
       method: 'get',
       transformResponse: (resp) => {
         try {
           const data = JSON.parse(resp);
           if (data && data.failed) {
             return data;
-          } else {
-            const { list, content, ...others } = data;
-            const tempList = map(data.list || data.content || [], item => ({
-              ...item,
-              glAccessLevel: item.glAccessLevel ? `L${item.glAccessLevel}` : '',
-              glAccessLevelList: item.glAccessLevel ? `L${item.glAccessLevel}` : '',
-              loginName: item.user ? item.user.loginName : undefined,
-              realName: item.user ? item.user.realName : undefined,
-              ldap: item.user ? item.user?.ldap : true,
-              email: item.user ? item.user?.email : undefined,
-            }));
-            return {
-              ...others,
-              list: tempList,
-              content: tempList,
-            };
           }
+          const { list, content, ...others } = data;
+          const tempList = map(data.list || data.content || [], item => ({
+            ...item,
+            glAccessLevel: item.glAccessLevel ? `L${item.glAccessLevel}` : '',
+            glAccessLevelList: item.glAccessLevel ? `L${item.glAccessLevel}` : '',
+            loginName: item.user ? item.user.loginName : undefined,
+            realName: item.user ? item.user.realName : undefined,
+            ldap: item.user ? item.user?.ldap : true,
+            email: item.user ? item.user?.email : undefined,
+          }));
+          return {
+            ...others,
+            list: tempList,
+            content: tempList,
+          };
         } catch (e) {
           return resp;
         }
@@ -142,34 +143,14 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
       type: 'string',
       label: formatMessage({ id: 'loginName' }),
     },
-    {
-      name: 'repositoryIds',
-      type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.service` }),
-      textField: 'repositoryName',
-      valueField: 'repositoryId',
-      defaultValue: repositoryIds,
-      options: branchServiceDs,
-    }, // 服务名称
     // {
-    //   name: 'employeeObject',
-    //   label: '员工',
-    //   type: 'object',
-    //   lovCode: 'TODO.USER',
-    //   textField: 'id',
-    //   ignore: 'always',
-    // },
-    // {
-    //   name: 'employeeId',
-    //   label: '员工ID',
-    //   type: 'number',
-    //   bind: 'employeeObject.id',
-    // },
-    // {
-    //   name: 'employeeName',
-    //   label: '员工姓名',
+    //   name: 'repositoryIds',
     //   type: 'string',
-    //   bind: 'employeeObject.employeeName',
+    //   label: formatMessage({ id: `${intlPrefix}.service` }),
+    //   textField: 'repositoryName',
+    //   valueField: 'repositoryId',
+    //   defaultValue: repositoryIds,
+    //   options: branchServiceDs,
     // },
   ],
   events: {

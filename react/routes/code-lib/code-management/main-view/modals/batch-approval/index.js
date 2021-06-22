@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { inject } from 'mobx-react';
 import moment from 'moment';
 import { DataSet, Form, SelectBox, DatePicker, TextArea } from 'choerodon-ui/pro';
-import BatchApproveServices from '@/routes/code-lib/code-management/main-view/ps-approval/services';
+import BatchApproveServices from '@/routes/code-lib/code-management/apis';
 
 
 export default inject('AppState')(observer(({
@@ -73,6 +73,9 @@ export default inject('AppState')(observer(({
       name: 'overdueTime',
       type: 'date',
       label: '过期时间',
+      dynamicProps: {
+        required: ({ record }) => record.get('result') === 'pass',
+      },
     }, {
       name: 'rejectReason',
       type: 'string',
