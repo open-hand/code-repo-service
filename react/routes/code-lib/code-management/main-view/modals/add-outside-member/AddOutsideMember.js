@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Form, Select, Tooltip, Icon, DatePicker } from 'choerodon-ui/pro';
 import { debounce } from 'lodash';
@@ -10,7 +10,7 @@ import UserOptionDataSet from './stores/UserNoDataSet';
 import { useAddMemberStore } from './stores';
 import './index.less';
 
-export default observer(() => {
+export default observer((props) => {
   const {
     prefixCls,
     intl: { formatMessage },
@@ -22,10 +22,18 @@ export default observer(() => {
     refresh,
     dsStore,
     glAccessLevelDataSet,
+    branchServiceDs,
   } = useAddMemberStore();
+
+  useEffect(()=>{
+    console.log(branchServiceDs);
+    console.log(branchServiceDs.current);
+  }, [branchServiceDs]);
+
   function handleCancel() {
     pathListDs.reset();
   }
+
   modal.handleOk(async () => {
     try {
       formDs.members = pathListDs;
