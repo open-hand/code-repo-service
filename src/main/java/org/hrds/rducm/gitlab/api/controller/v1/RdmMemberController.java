@@ -95,7 +95,6 @@ public class RdmMemberController extends BaseController {
     @PostMapping("/batch/sync")
     public ResponseEntity<?> syncBatchMember(@PathVariable Long organizationId,
                                              @PathVariable Long projectId,
-                                             @Encrypt @PathVariable Long repositoryId,
                                              @Encrypt @RequestBody List<Long> memberIds) {
         rdmMemberAppService.syncBatchMember(memberIds);
         return Results.success();
