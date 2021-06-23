@@ -235,6 +235,7 @@ export default observer(({ record, modal, formatMessage, overStores, organizatio
               onChange={value => handleChangeMes(value)}
               labelLayout="float"
               cols={40}
+              required
             />
           </div>
         </React.Fragment>
