@@ -41,7 +41,7 @@ const MainView = observer(() => {
 
   useEffect(() => {
     init();
-  }, []);
+  }, [init]);
 
   const renderPageWrap = () => {
     const hasMemberPermission = overStores.getHasMemberPermission;
