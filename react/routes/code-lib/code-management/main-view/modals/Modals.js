@@ -237,7 +237,7 @@ const EnvModals = observer((props) => {
       case 'psApproval':
         buttonData.unshift({
           name: '批量审批',
-          icon: 'playlist_add',
+          icon: 'playlist_add_check',
           handler: () => handlerBatchApprove(psApprovalDs, refresh),
           display: true,
           disabled,

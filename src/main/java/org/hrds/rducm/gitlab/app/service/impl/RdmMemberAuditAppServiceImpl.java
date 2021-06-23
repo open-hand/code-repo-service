@@ -208,8 +208,15 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
         } else {
             if (projectGlMember != null) {
-                // 2
+                // 2 如果同步失败的用户或者权限小于50,按照gitlab的权限来修复
                 //这里为项目变更权限的时候需要注意，如果数据库的用户的权限是50，这里按照gitlab的权限来修复。
+                //如果用户是同步失败了的， AccessLevel为null
+                if (!dbMember.getSyncGitlabFlag() || Objects.isNull(dbMember.getGlAccessLevel())) {
+                    dbMember.setGlAccessLevel(projectGlMember.getAccessLevel().value);
+                    dbMember.setSyncGitlabFlag(Boolean.TRUE);
+                    rdmMemberRepository.updateByPrimaryKey(dbMember);
+                    return;
+                }
                 if (dbMember.getGlAccessLevel() < 50) {
                     gitlabProjectFixApi.updateMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
                 } else {
@@ -218,8 +225,14 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                 }
 
             } else {
-                // 3
+                // 3 如果同步失败的用户或者权限小于50,按照gitlab的权限来修复
                 //这里为项目变更权限的时候需要注意，如果数据库的用户的权限是50，这里按照gitlab的权限来修复。
+                if (!dbMember.getSyncGitlabFlag() || Objects.isNull(dbMember.getGlAccessLevel())) {
+                    dbMember.setGlAccessLevel(projectGlMember.getAccessLevel().value);
+                    dbMember.setSyncGitlabFlag(Boolean.TRUE);
+                    rdmMemberRepository.updateByPrimaryKey(dbMember);
+                    return;
+                }
                 if (dbMember.getGlAccessLevel() < 50) {
                     gitlabProjectFixApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
                 } else {

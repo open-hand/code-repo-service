@@ -73,9 +73,6 @@ export default inject('AppState')(observer(({
       name: 'overdueTime',
       type: 'date',
       label: '过期时间',
-      dynamicProps: {
-        required: ({ record }) => record.get('result') === 'pass',
-      },
     }, {
       name: 'rejectReason',
       type: 'string',
