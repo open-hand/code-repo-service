@@ -211,7 +211,6 @@ const EnvModals = observer((props) => {
    * 批量审批
    */
   function handlerBatchApprove(ds, func) {
-    console.log(ds.selected);
     Modal.open({
       okText: '保存',
       key: Modal.key(),
@@ -230,6 +229,7 @@ const EnvModals = observer((props) => {
       icon: 'refresh',
       iconOnly: true,
       handler: refresh,
+      color: 'default',
       display: true,
     }];
     const disabled = !(psApprovalDs.selected && psApprovalDs.selected.length > 0);
@@ -254,7 +254,6 @@ const EnvModals = observer((props) => {
             icon: 'person_add-o',
             handler: openAdd,
             display: true,
-            group: 1,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
           },
           {
@@ -262,23 +261,18 @@ const EnvModals = observer((props) => {
             icon: 'person_add-o',
             handler: openAddOutside,
             display: true,
-            group: 1,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
           },
           {
             name: formatMessage({ id: 'infra.operate.export.permission' }),
             icon: 'get_app-o',
             handler: () => setExportModalVisible(true),
-            display: true,
-            group: 1,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-member'],
           },
           {
             name: formatMessage({ id: 'infra.button.batch.delete' }),
             icon: 'delete',
             handler: handleDelete,
-            display: true,
-            group: 1,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
             disabled: psSetDs.selected.length === 0,
           },
@@ -290,7 +284,6 @@ const EnvModals = observer((props) => {
           icon: 'person_add-o',
           handler: openRequest,
           display: true,
-          group: 1,
           permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-member'],
         });
         break;
@@ -301,7 +294,6 @@ const EnvModals = observer((props) => {
           handler: openBranch,
           display: true,
           disabled: !branchAppId,
-          group: 1,
           permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
         }, {
           name: formatMessage({ id: 'infra.add.tag' }),
@@ -309,7 +301,6 @@ const EnvModals = observer((props) => {
           handler: openTag,
           display: true,
           disabled: !branchAppId,
-          group: 1,
           permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
         });
         break;

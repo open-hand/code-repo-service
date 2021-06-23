@@ -68,9 +68,9 @@ const OperationLogTab = () => {
         <HeaderButtons
           showClassName={false}
           items={([{
+            color: 'default',
             icon: 'refresh',
             iconOnly: true,
-            display: true,
             handler: () => init(),
           }])}
         />

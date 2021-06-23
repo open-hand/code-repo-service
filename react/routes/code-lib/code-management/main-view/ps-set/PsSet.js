@@ -4,6 +4,7 @@
  * @creationDate 2020/02/21
  * @copyright 2020 ® HAND
  */
+/* eslint-disable */
 import React, { useEffect } from 'react';
 import { Page, Action, Choerodon } from '@choerodon/boot';
 import { Table, Modal } from 'choerodon-ui/pro';
@@ -27,7 +28,6 @@ const PsSet = observer(() => {
     psSetDs,
     AppState: { currentMenuType: { id: projectId, organizationId } },
     overStores,
-    hasPermission,
   } = usPsManagerStore();
   const modalProps = {
     modify: {
@@ -35,6 +35,8 @@ const PsSet = observer(() => {
       title: formatMessage({ id: `${intlPrefix2}.message.modifyPs` }),
     },
   };
+
+  const hasPermission = overStores.getHasPermission;
 
   function refresh() {
     psSetDs.query();

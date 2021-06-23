@@ -1,9 +1,35 @@
 import { useLocalStore } from 'mobx-react-lite';
 import { axios } from '@choerodon/boot';
+import { checkPermission } from '@/utils';
 
 export default function useStore() {
   return useLocalStore(() => ({
     oldOptsRecord: [],
+    hasMemberPermission: false,
+    hasPermission: false,
+    get getHasMemberPermission() {
+      return this.hasMemberPermission;
+    },
+
+    setHasMemberPermission(data) {
+      this.hasMemberPermission = data;
+    },
+
+    get getHasPermission() {
+      return this.hasPermission;
+    },
+
+    setHasPermission(data) {
+      this.hasPermission = data;
+    },
+
+    async getPermission(projectId, type) {
+      const hasMemberPermission1 = await checkPermission({ projectId, code: ['choerodon.code.project.infra.code-lib-management.ps.project-member'], resourceType: type });
+      const hasPermission1 = await checkPermission({ projectId, code: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'], resourceType: type });
+      this.setHasMemberPermission(hasMemberPermission1);
+      this.setHasPermission(hasPermission1);
+    },
+
     setOldOptsRecord(data) {
       this.oldOptsRecord = data || [];
     },

@@ -25,22 +25,19 @@ const MainView = observer(() => {
     intlPrefix,
     intl: { formatMessage },
     AppState: { currentMenuType: { projectId, type } },
+    overStores,
   } = usPsManagerStore();
 
-  const [hasMemberPermission, sethasMemberPermission] = useState(false);
-  const [hasPermission, sethasPermission] = useState(false);
-
   useEffect(() => {
-    async function init() {
-      const hasMemberPermission1 = await checkPermission({ projectId, code: ['choerodon.code.project.infra.code-lib-management.ps.project-member'], resourceType: type });
-      const hasPermission1 = await checkPermission({ projectId, code: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'], resourceType: type });
-      sethasMemberPermission(hasMemberPermission1);
-      sethasPermission(hasPermission1);
+    function init() {
+      overStores.getPermission(projectId, type);
     }
     init();
   }, []);
 
   const renderPageWrap = () => {
+    const hasMemberPermission = overStores.getHasMemberPermission;
+    const hasPermission = overStores.getHasPermission;
     let pageWrap = (
       <PageTab
         title={formatMessage({ id: `${intlPrefix}.psSet` })}
