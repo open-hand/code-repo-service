@@ -190,7 +190,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     private void handProjectMember(Long userId, Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember) {
         //如果不是项目管理员，修复为该用户当前的代码库数据库的权限
         if (dbMember == null || !dbMember.getSyncGitlabFlag()) {
-            // 移除gitlab权限
+            // 如果dbMember为null 或者同步失败 移除gitlab权限
             logger.debug("用户[{}]为项目成员，但没有代码库权限，移除Gl权限", userId);
             removeGitlabMemberGP(glUserId, glProjectId, glGroupId, projectGlMember, groupGlMember);
         } else {
@@ -202,12 +202,21 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
     private void updateGitLabPermission(Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember) {
         if (groupGlMember != null) {
+            //如果组的权限存在，先移除组的权限（随之项目的权限也会被移除）
             gitlabGroupFixApi.removeMember(glGroupId, glUserId);
-
-            gitlabProjectFixApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-
+            //然后如果同步成功，按照choerodon来修复，并且choerodon中为其赋予了权限并且同步成功了
+            if (dbMember.getSyncGitlabFlag() && !Objects.isNull(dbMember.getGlAccessLevel())) {
+                gitlabProjectFixApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
+                return;
+            } else {
+                //如果同步失败，直接删掉这条数据
+                rdmMemberRepository.deleteByPrimaryKey(dbMember);
+            }
+            //如果gitlab组的权限存在，且是同步失败的
         } else {
+            //如果gitlab组的权限为null,
             if (projectGlMember != null) {
+                // gitlab项目的权限不为null
                 // 2 如果同步失败的用户或者权限小于50,按照gitlab的权限来修复
                 //这里为项目变更权限的时候需要注意，如果数据库的用户的权限是50，这里按照gitlab的权限来修复。
                 //如果用户是同步失败了的， AccessLevel为null
@@ -217,6 +226,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                     rdmMemberRepository.updateByPrimaryKey(dbMember);
                     return;
                 }
+                //同步成功的 就按照cchoerodon来修数据
                 if (dbMember.getGlAccessLevel() < 50) {
                     gitlabProjectFixApi.updateMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
                 } else {
@@ -225,20 +235,17 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                 }
 
             } else {
-                // 3 如果同步失败的用户或者权限小于50,按照gitlab的权限来修复
-                //这里为项目变更权限的时候需要注意，如果数据库的用户的权限是50，这里按照gitlab的权限来修复。
-                if (!dbMember.getSyncGitlabFlag() || Objects.isNull(dbMember.getGlAccessLevel())) {
-                    dbMember.setGlAccessLevel(projectGlMember.getAccessLevel().value);
-                    dbMember.setSyncGitlabFlag(Boolean.TRUE);
-                    rdmMemberRepository.updateByPrimaryKey(dbMember);
+                // 如果gitlab组的权限为null,gitlab项目的权限也为null
+                // 如果在choerodon是同步成功的 权限小于50，则按照choerodon来修复权限
+                if (dbMember.getSyncGitlabFlag() && dbMember.getGlAccessLevel() < 50) {
+                    gitlabProjectFixApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
                     return;
                 }
-                if (dbMember.getGlAccessLevel() < 50) {
-                    gitlabProjectFixApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-                } else {
+                //如果在gitlab 一个权限也没有，在choerodon又是同步失败的，则直接删除这种数据
+                //如果如果gitlab组的权限为null,gitlab项目的权限也为null，同步成功，且权限>50，这种数据也删除
+                else {
                     rdmMemberRepository.deleteByPrimaryKey(dbMember);
                 }
-
             }
         }
     }
