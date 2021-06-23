@@ -203,7 +203,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     private void updateGitLabPermission(Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember) {
         if (groupGlMember != null) {
             //如果组的权限存在，先移除组的权限（随之项目的权限也会被移除）
-            gitlabGroupFixApi.removeMember(glGroupId, glUserId);
+//            gitlabGroupFixApi.removeMember(glGroupId, glUserId);
             //然后如果同步成功，按照choerodon来修复，并且choerodon中为其赋予了权限并且同步成功了
             if (dbMember.getSyncGitlabFlag() && !Objects.isNull(dbMember.getGlAccessLevel())) {
                 gitlabProjectFixApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
