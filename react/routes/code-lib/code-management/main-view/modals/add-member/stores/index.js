@@ -19,12 +19,13 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
     intl: { formatMessage },
     intlPrefix,
     branchServiceDs,
+    currentBranchAppId,
   } = props;
 
   // 无权限的人员
   const userOptions = useMemo(() => new DataSet(UserNoDataSet({ organizationId, projectId })), [projectId]);
   const pathListDs = useMemo(() => new DataSet(PathListDataSet({ formatMessage, intlPrefix, userOptions })), [projectId]);
-  const formDs = useMemo(() => new DataSet(FormDataSet({ formatMessage, intlPrefix, pathListDs, organizationId, projectId, branchServiceDs })), [organizationId, projectId, branchServiceDs]);
+  const formDs = useMemo(() => new DataSet(FormDataSet({ formatMessage, intlPrefix, pathListDs, organizationId, projectId, branchServiceDs, currentBranchAppId })), [organizationId, projectId, currentBranchAppId, branchServiceDs]);
 
   useEffect(() => {
     formDs.create();

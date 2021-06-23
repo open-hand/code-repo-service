@@ -13,7 +13,6 @@ import PSsetTable from "./components/psSet";
 import PSapply from "./components/psApply";
 import { isNil } from "lodash";
 import TimeAgo from "timeago-react";
-import moment from "moment";
 import PsAudit from "./components/psAudit";
 import "./index.less";
 import PsApproval from "./components/psApproval";
@@ -34,7 +33,7 @@ const PsAll = () => {
     ["psAudit", <PsAudit />],
   ]);
 
-  const { prefixCls, intlPrefix } = usPsManagerStore();
+  const { prefixCls } = usPsManagerStore();
 
   const subPrefixCls = useMemo(() => `${prefixCls}-psAll`, [prefixCls]);
 

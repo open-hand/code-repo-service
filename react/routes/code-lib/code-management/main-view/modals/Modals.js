@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import moment from 'moment';
+import moment, { relativeTimeRounding } from 'moment';
 import { message } from 'choerodon-ui';
 import { Modal } from 'choerodon-ui/pro';
 import { Header, Choerodon, axios, HeaderButtons } from '@choerodon/boot';
@@ -14,6 +14,8 @@ import { usPsManagerStore } from '../stores';
 import ExportAuthority from './export-authority';
 
 const modalKey = Modal.key();
+const SyncKey = Modal.key();
+const deleteKey = Modal.key();
 const modalStyle = {
   width: 740,
 };
@@ -104,6 +106,7 @@ const EnvModals = observer((props) => {
         refresh={refresh}
         intlPrefix={intlPrefix}
         prefixCls={prefixCls}
+        currentBranchAppId={branchAppId}
         branchServiceDs={branchServiceDs}
       />,
       okText: formatMessage({ id: 'add' }),
@@ -119,6 +122,7 @@ const EnvModals = observer((props) => {
         refresh={refresh}
         intlPrefix={intlPrefix}
         prefixCls={prefixCls}
+        currentBranchAppId={branchAppId}
         branchServiceDs={branchServiceDs}
       />,
       okText: formatMessage({ id: 'add' }),
@@ -134,6 +138,7 @@ const EnvModals = observer((props) => {
         refresh={refresh}
         intlPrefix={intlPrefix}
         prefixCls={prefixCls}
+        currentBranchAppId={branchAppId}
         branchServiceDs={branchServiceDs}
       />,
       okText: formatMessage({ id: 'add' }),
@@ -173,6 +178,17 @@ const EnvModals = observer((props) => {
       okText: formatMessage({ id: 'add' }),
     });
   }
+
+  function openDeleteModal() {
+    Modal.open({
+      key: deleteKey,
+      title: formatMessage({ id: 'infra.button.batch.delete' }),
+      children: '确认要删除选中的用户对应的代码库权限吗？',
+      okText: formatMessage({ id: 'delete' }),
+      onOk: handleDelete,
+    });
+  }
+
   async function handleDelete() {
     const deleteData = psSetDs.selected.map(item => item.get('id'));
     await axios.delete(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members/batch-remove`, { params: { memberIds: deleteData.join(',') } })
@@ -189,6 +205,33 @@ const EnvModals = observer((props) => {
       });
   }
 
+  function handleSyncOpenModal() {
+    Modal.open({
+      title: formatMessage({ id: 'infra.button.batch.sync' }),
+      children: '确认要批量将选中的【未同步】状态用户的代码权限与GitLab仓库内用户的权限进行同步吗？',
+      onOk: handleSync,
+      key: SyncKey,
+    });
+  }
+
+  async function handleSync() {
+    const syncData = psSetDs.selected.filter(record => !record.get('syncGitlabFlag')).map(item => item.get('id'));
+    try {
+      const res = await axios.post(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members/batch/sync`, JSON.stringify({
+        memberIds: syncData,
+      }));
+      if (res && res.failed) {
+        message.error('用户同步失败，请检查后重试');
+        return true;
+      }
+      psSetDs.query();
+      return true;
+    } catch (error) {
+      Choerodon.handleResponseError(error);
+      return false;
+    }
+  }
+
   /**
    * 批量审批
    */
@@ -203,6 +246,14 @@ const EnvModals = observer((props) => {
         width: 380,
       },
     });
+  }
+
+  function checkBatchSyncDisabled() {
+    if (!psSetDs.selected.length) {
+      return true;
+    }
+    const arr = psSetDs.selected.filter(record => !record.get('syncGitlabFlag'));
+    return !arr.length;
   }
 
   function getButtons() {
@@ -249,14 +300,30 @@ const EnvModals = observer((props) => {
             name: formatMessage({ id: 'infra.operate.export.permission' }),
             icon: 'get_app-o',
             handler: () => setExportModalVisible(true),
+            display: true,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-member'],
+          },
+          {
+            name: formatMessage({ id: 'infra.button.batch.sync' }),
+            icon: 'delete',
+            handler: handleSyncOpenModal,
+            display: true,
+            permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
+            disabled: checkBatchSyncDisabled(),
+            tooltipsConfig: {
+              title: checkBatchSyncDisabled() ? '请在列表中勾选【未同步】状态的用户' : '',
+            },
           },
           {
             name: formatMessage({ id: 'infra.button.batch.delete' }),
             icon: 'delete',
-            handler: handleDelete,
+            handler: openDeleteModal,
+            display: true,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
             disabled: psSetDs.selected.length === 0,
+            tooltipsConfig:{
+              title: psSetDs.selected.length === 0 ? '请在列表中勾选需要删除的用户' : '',
+            }
           },
         );
         break;

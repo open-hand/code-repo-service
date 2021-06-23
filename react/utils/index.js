@@ -321,7 +321,7 @@ async function checkPermission({ projectId, organizationId, resourceType, code }
       url: '/iam/choerodon/v1/permissions/menus/check-permissions',
       data: code,
       params,
-      enabledCancelCache: false
+      enabledCancelCache: true,
     });
     if (res && res.failed) {
       return false;

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import React, { createContext, useContext, useMemo, useEffect } from 'react';
 import { inject } from 'mobx-react';
 import { injectIntl } from 'react-intl';
@@ -19,11 +20,12 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
     intl: { formatMessage },
     intlPrefix,
     branchServiceDs,
+    currentBranchAppId,
   } = props;
 
   const glAccessLevelDataSet = useMemo(() => new DataSet(GlAccessLevelDataSet()), []);
-  const pathListDs = useMemo(() => new DataSet(PathListDataSet({ formatMessage, intlPrefix })), [projectId]);
-  const formDs = useMemo(() => new DataSet(FormDataSet({ formatMessage, intlPrefix, pathListDs, organizationId, projectId, branchServiceDs })), [organizationId, projectId, branchServiceDs]);
+  const pathListDs = useMemo(() => new DataSet(PathListDataSet({ formatMessage, intlPrefix })), []);
+  const formDs = useMemo(() => new DataSet(FormDataSet({ formatMessage, intlPrefix, pathListDs, organizationId, projectId, branchServiceDs, currentBranchAppId })), [organizationId, projectId, branchServiceDs, currentBranchAppId]);
   const dsStore = [];
 
   useEffect(() => {
@@ -40,6 +42,7 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
     pathListDs,
     dsStore,
     glAccessLevelDataSet,
+    branchServiceDs,
   };
   return (
     <Store.Provider value={value}>

@@ -1,9 +1,10 @@
 /* eslint-disable */
-import React, { createContext, useContext, useMemo, useEffect, useState } from 'react';
+import React, { createContext, useContext, useMemo, useEffect, useState, useCallback } from 'react';
 import { inject } from 'mobx-react';
 import { injectIntl } from 'react-intl';
 import { DataSet } from 'choerodon-ui/pro';
 import { useCheckPermission } from '@/utils/index';
+import { checkPermission } from '@/utils';
 import queryString from 'querystring';
 
 import PsSetDataSet from './PsSetDataSet';
@@ -27,7 +28,7 @@ export function usPsManagerStore() {
 
 export const StoreProvider = injectIntl(inject('AppState')((props) => {
   const {
-    AppState: { currentMenuType: { projectId, organizationId } },
+    AppState: { currentMenuType: { projectId, organizationId, type } },
     intl: { formatMessage },
     children,
   } = props;
@@ -36,8 +37,11 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
 
   const [branchAppId, setBranchApp] = useState(undefined);
 
-  const hasMemberPermission = useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-member'], true);
-  const hasPermission = useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-owner'], true);
+  const [hasMemberPermission, sethasMemberPermission] = useState(false);
+  const [hasPermission, sethasPermission] = useState(false);
+
+  // const hasMemberPermission = useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-member'], true);
+  // const hasPermission = useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-owner'], true);
 
   const intlPrefix = 'infra';
   const branchServiceDs = useMemo(() => new DataSet(BranchServiceDs({
@@ -59,6 +63,18 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
 
   const [executionDate, setExecutionDate] = useState(undefined);
   const securityAuditDs = useMemo(() => new DataSet(SecurityAuditDS(intlPrefix, formatMessage, organizationId, projectId)), [formatMessage, projectId]);
+
+
+  const init = useCallback(async () => {
+    const hasMemberPermission1 = await checkPermission({ projectId, code: ['choerodon.code.project.infra.code-lib-management.ps.project-member'], resourceType: type });
+    const hasPermission1 = await checkPermission({ projectId, code: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'], resourceType: type });
+    sethasMemberPermission(hasMemberPermission1);
+    sethasPermission(hasPermission1);
+  }, [projectId, type]);
+
+  useEffect(() => {
+    init();
+  }, [init]);
 
   const value = {
     ...props,

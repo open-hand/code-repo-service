@@ -1,6 +1,10 @@
+/* eslint-disable max-len */
+/* eslint-disable import/no-anonymous-default-export */
 import omit from 'lodash/omit';
 
-export default ({ formatMessage, intlPrefix, pathListDs, organizationId, projectId, branchServiceDs }) => ({
+export default ({
+  formatMessage, intlPrefix, pathListDs, organizationId, projectId, branchServiceDs, currentBranchAppId,
+}) => ({
   autoCreate: false,
   autoQuery: false,
   selection: false,
@@ -36,6 +40,7 @@ export default ({ formatMessage, intlPrefix, pathListDs, organizationId, project
       textField: 'repositoryName',
       valueField: 'repositoryId',
       options: branchServiceDs,
+      defaultValue: branchServiceDs.find(record => record.get('repositoryId') === currentBranchAppId) ? [branchServiceDs.find(record => record.get('repositoryId') === currentBranchAppId)?.toData()] : [],
     },
   ],
 });

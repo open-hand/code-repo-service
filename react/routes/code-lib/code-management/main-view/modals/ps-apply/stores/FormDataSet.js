@@ -1,6 +1,9 @@
+/* eslint-disable import/no-anonymous-default-export */
 import omit from 'lodash/omit';
 
-export default ({ formatMessage, intlPrefix, organizationId, projectId, userId, realName, branchServiceDs }) => ({
+export default ({
+  formatMessage, intlPrefix, organizationId, projectId, userId, realName, branchServiceDs, currentBranchAppId,
+}) => ({
   autoCreate: false,
   autoQuery: false,
   selection: false,
@@ -38,6 +41,7 @@ export default ({ formatMessage, intlPrefix, organizationId, projectId, userId, 
       textField: 'repositoryName',
       valueField: 'repositoryId',
       options: branchServiceDs,
+      defaultValue: branchServiceDs.find(record => record.get('repositoryId') === currentBranchAppId) ? branchServiceDs.find(record => record.get('repositoryId') === currentBranchAppId)?.toData() : null,
     },
     {
       name: 'applicantType',
@@ -67,8 +71,4 @@ export default ({ formatMessage, intlPrefix, organizationId, projectId, userId, 
     },
 
   ],
-  // events: {
-  //   load: handleLoad,
-  //   update: handleUpdate,
-  // },
 });
