@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
  */
 //@Api(tags = SwaggerTags.RDM_MEMBER)
 @RestController("rdmMemberController.v1")
-@RequestMapping("/v1/organizations/{organizationId}/projects/{projectId}/gitlab/repositories/{repositoryId}/members")
+@RequestMapping("/v1/organizations/{organizationId}/projects/{projectId}/gitlab/repositories")
 public class RdmMemberController extends BaseController {
     private final RdmMemberAppService rdmMemberAppService;
 
@@ -43,7 +43,7 @@ public class RdmMemberController extends BaseController {
             @ApiImplicitParam(name = "rdmMemberUpdateDTO", value = "参数", dataType = "RdmMemberUpdateDTO", required = true),
     })
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @PutMapping("/{memberId}")
+    @PutMapping("/{repositoryId}/members/{memberId}")
     public ResponseEntity<?> updateMember(@PathVariable Long organizationId,
                                           @PathVariable Long projectId,
                                           @Encrypt @PathVariable Long repositoryId,
@@ -61,7 +61,7 @@ public class RdmMemberController extends BaseController {
             @ApiImplicitParam(name = "memberId", value = "成员id", paramType = "path", required = true)
     })
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @DeleteMapping("/{memberId}")
+    @DeleteMapping("/{repositoryId}/members/{memberId}")
     public ResponseEntity<?> removeMember(@PathVariable Long organizationId,
                                           @PathVariable Long projectId,
                                           @Encrypt @PathVariable Long repositoryId,
@@ -77,7 +77,7 @@ public class RdmMemberController extends BaseController {
             @ApiImplicitParam(name = "memberId", value = "成员id", paramType = "path", required = true),
     })
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @PostMapping("/{memberId}/sync")
+    @PostMapping("/{repositoryId}/members/{memberId}/sync")
     public ResponseEntity<?> syncMember(@PathVariable Long organizationId,
                                         @PathVariable Long projectId,
                                         @Encrypt @PathVariable Long repositoryId,
@@ -92,7 +92,7 @@ public class RdmMemberController extends BaseController {
             @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
     })
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @PostMapping("/batch/sync")
+    @PostMapping("/members/batch/sync")
     public ResponseEntity<?> syncBatchMember(@PathVariable Long organizationId,
                                              @PathVariable Long projectId,
                                              @Encrypt @RequestBody List<Long> memberIds) {
