@@ -217,9 +217,7 @@ const EnvModals = observer((props) => {
   async function handleSync() {
     const syncData = psSetDs.selected.filter(record => !record.get('syncGitlabFlag')).map(item => item.get('id'));
     try {
-      const res = await axios.post(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members/batch/sync`, JSON.stringify({
-        memberIds: syncData,
-      }));
+      const res = await axios.post(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members/batch/sync`, JSON.stringify(syncData));
       if (res && res.failed) {
         message.error('用户同步失败，请检查后重试');
         return true;
@@ -321,9 +319,9 @@ const EnvModals = observer((props) => {
             display: true,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
             disabled: psSetDs.selected.length === 0,
-            tooltipsConfig:{
+            tooltipsConfig: {
               title: psSetDs.selected.length === 0 ? '请在列表中勾选需要删除的用户' : '',
-            }
+            },
           },
         );
         break;
