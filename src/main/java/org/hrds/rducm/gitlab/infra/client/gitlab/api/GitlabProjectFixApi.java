@@ -137,6 +137,9 @@ public class GitlabProjectFixApi {
         } catch (GitLabApiException e) {
             if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
                 return;
+            }
+            if (e.getHttpStatus() == HttpStatus.FORBIDDEN.value()) {
+                return;
             } else {
                 throw new GitlabClientException(e, e.getMessage());
             }

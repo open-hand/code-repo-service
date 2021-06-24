@@ -65,6 +65,9 @@ public class GitlabGroupFixApi {
         } catch (GitLabApiException e) {
             if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
                 return null;
+            }
+            if (e.getHttpStatus() == HttpStatus.FORBIDDEN.value()) {
+                return null;
             } else {
                 throw new GitlabClientException(e, e.getMessage());
             }
@@ -78,6 +81,9 @@ public class GitlabGroupFixApi {
                     .removeMember(glGroupId, glUserId);
         } catch (GitLabApiException e) {
             if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                return;
+            }
+            if (e.getHttpStatus() == HttpStatus.FORBIDDEN.value()) {
                 return;
             } else {
                 throw new GitlabClientException(e, e.getMessage());

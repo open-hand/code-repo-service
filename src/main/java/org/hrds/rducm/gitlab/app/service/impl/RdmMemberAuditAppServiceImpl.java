@@ -202,15 +202,29 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
     private void updateGitLabPermission(Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember) {
         if (groupGlMember != null) {
+            //如果组的权限是owner，则不作处理， 组的权限是owner 他在项目的权限也是owner,这个时候需要按照gotlab的权限来修
+            if (groupGlMember.getAccessLevel().value.intValue() == AccessLevel.OWNER.toValue().intValue()) {
+                dbMember.setSyncGitlabFlag(Boolean.TRUE);
+                dbMember.setGlAccessLevel(AccessLevel.OWNER.toValue().intValue());
+                rdmMemberRepository.updateByPrimaryKey(dbMember);
+                return;
+            }
             //如果组的权限存在，先移除组的权限（随之项目的权限也会被移除）
-//            gitlabGroupFixApi.removeMember(glGroupId, glUserId);
+            //remove的时候注意  一个组至少存在一个owner, 如果删除返回403则不处理
+            gitlabGroupFixApi.removeMember(glGroupId, glUserId);
             //然后如果同步成功，按照choerodon来修复，并且choerodon中为其赋予了权限并且同步成功了
             if (dbMember.getSyncGitlabFlag() && !Objects.isNull(dbMember.getGlAccessLevel())) {
+                //上一步删除权限可以没有删掉 这里添加可能会报："should be higher than Owner inherited membership from group
+                //如果上一步删除组的权限没有删掉，这里就不给
                 gitlabProjectFixApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
                 return;
             } else {
-                //如果同步失败，直接删掉这条数据
+                //如果同步失败， 直接删掉这条数据
                 rdmMemberRepository.deleteByPrimaryKey(dbMember);
+                //如果项目成员的角色存在也直接删掉
+                if (!Objects.isNull(projectGlMember)) {
+                    gitlabProjectFixApi.removeMember(glProjectId, glUserId);
+                }
             }
             //如果gitlab组的权限存在，且是同步失败的
         } else {
@@ -226,7 +240,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                     rdmMemberRepository.updateByPrimaryKey(dbMember);
                     return;
                 }
-                //同步成功的 就按照cchoerodon来修数据
+                //同步成功的 组里面没有角色 gitlab的AccessLevel只可能小于50  就按照choerodon来修数据
                 if (dbMember.getGlAccessLevel() < 50) {
                     gitlabProjectFixApi.updateMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
                 } else {
