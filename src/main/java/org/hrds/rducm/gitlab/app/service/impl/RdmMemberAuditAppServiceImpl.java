@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
 import org.gitlab4j.api.models.Member;
+import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Objects;
+import org.springframework.util.StringUtils;
 
 /**
  * 成员权限审计应用服务默认实现
@@ -113,6 +115,14 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
             rdmMemberAuditRecordRepository.deleteByPrimaryKey(dbRecord.getId());
             return;
         }
+        //首先判断项目是不是存在，不存在则不修,没有默认分支就认为它是空库
+        Project project = gitlabProjectFixApi.getProject(repositoryId.intValue());
+        if (StringUtils.isEmpty(project.getDefaultBranch())) {
+            //同步这条记录
+            rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
+            return;
+        }
+
         // 若glUserId为null, 获取glUserId
         Integer glUserId = dbRecord.getGlUserId() != null ? dbRecord.getGlUserId() : c7NBaseServiceFacade.userIdToGlUserId(userId);
         Integer glProjectId = dbRecord.getGlProjectId();
@@ -160,10 +170,10 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                     updateGitlabGroupMemberWithOwner(groupGlMember, glGroupId, glUserId);
 
                 } else {
-                    handProjectMember(userId, glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember);
+                    handProjectMember(userId, glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember, dbRecord);
                 }
             } else {
-                handNonProjectMember(userId, glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember);
+                handNonProjectMember(userId, glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember, dbRecord);
             }
         }
 
@@ -172,7 +182,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     }
 
 
-    private void handNonProjectMember(Long userId, Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember) {
+    private void handNonProjectMember(Long userId, Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember, RdmMemberAuditRecord dbRecord) {
         if (Objects.isNull(dbMember)) {
             // 如果不是团队成员,也不是赋予权限的项目外成员 移除gitlab权限
             logger.debug("用户[{}]是项目成员也不是外部成员，没有代码库权限，移除", userId);
@@ -183,11 +193,11 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
             }
         } else {
             logger.debug("用户[{}]是外部成员，有代码库权限，修复GL权限", userId);
-            updateGitLabPermission(glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember);
+            updateGitLabPermission(glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember, dbRecord);
         }
     }
 
-    private void handProjectMember(Long userId, Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember) {
+    private void handProjectMember(Long userId, Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember, RdmMemberAuditRecord dbRecord) {
         //如果不是项目管理员，修复为该用户当前的代码库数据库的权限
         if (dbMember == null || !dbMember.getSyncGitlabFlag()) {
             // 如果dbMember为null 或者同步失败 移除gitlab权限
@@ -196,17 +206,18 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
         } else {
             // 修改gitlab权限
             logger.debug("用户[{}]为项目成员，有代码库权限，修复Gl权限", userId);
-            updateGitLabPermission(glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember);
+            updateGitLabPermission(glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember, dbRecord);
         }
     }
 
-    private void updateGitLabPermission(Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember) {
+    private void updateGitLabPermission(Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember, RdmMemberAuditRecord dbRecord) {
         if (groupGlMember != null) {
             //如果组的权限是owner，则不作处理， 组的权限是owner 他在项目的权限也是owner,这个时候需要按照gotlab的权限来修
             if (groupGlMember.getAccessLevel().value.intValue() == AccessLevel.OWNER.toValue().intValue()) {
                 dbMember.setSyncGitlabFlag(Boolean.TRUE);
                 dbMember.setGlAccessLevel(AccessLevel.OWNER.toValue().intValue());
                 rdmMemberRepository.updateByPrimaryKey(dbMember);
+                rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
                 return;
             }
             //如果组的权限存在，先移除组的权限（随之项目的权限也会被移除）
@@ -217,6 +228,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                 //上一步删除权限可以没有删掉 这里添加可能会报："should be higher than Owner inherited membership from group
                 //如果上一步删除组的权限没有删掉，这里就不给
                 gitlabProjectFixApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
+                rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
                 return;
             } else {
                 //如果同步失败， 直接删掉这条数据
@@ -238,6 +250,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                     dbMember.setGlAccessLevel(projectGlMember.getAccessLevel().value);
                     dbMember.setSyncGitlabFlag(Boolean.TRUE);
                     rdmMemberRepository.updateByPrimaryKey(dbMember);
+                    rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
                     return;
                 }
                 //同步成功的 组里面没有角色 gitlab的AccessLevel只可能小于50  就按照choerodon来修数据
@@ -253,6 +266,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                 // 如果在choerodon是同步成功的 权限小于50，则按照choerodon来修复权限
                 if (dbMember.getSyncGitlabFlag() && dbMember.getGlAccessLevel() < 50) {
                     gitlabProjectFixApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
+                    rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
                     return;
                 }
                 //如果在gitlab 一个权限也没有，在choerodon又是同步失败的，则直接删除这种数据
