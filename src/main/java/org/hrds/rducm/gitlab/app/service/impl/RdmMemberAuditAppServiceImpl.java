@@ -116,12 +116,12 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
             return;
         }
         //首先判断项目是不是存在，不存在则不修,没有默认分支就认为它是空库
-        Project project = gitlabProjectFixApi.getProject(repositoryId.intValue());
-        if (StringUtils.isEmpty(project.getDefaultBranch())) {
-            //同步这条记录
-            rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
-            return;
-        }
+//        Project project = gitlabProjectFixApi.getProject(repositoryId.intValue());
+//        if (Objects.isNull(project) && StringUtils.isEmpty(project.getDefaultBranch())) {
+//            //同步这条记录
+//            rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
+//            return;
+//        }
 
         // 若glUserId为null, 获取glUserId
         Integer glUserId = dbRecord.getGlUserId() != null ? dbRecord.getGlUserId() : c7NBaseServiceFacade.userIdToGlUserId(userId);
