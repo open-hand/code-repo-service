@@ -26,10 +26,10 @@ const MainView = observer(() => {
   const renderPageWrap = useCallback(() => {
     let pageWrap = (
       <PageTab
-        title={formatMessage({ id: `${intlPrefix}.psSet` })}
-        tabKey="psSet"
-        route="/rducm/code-lib-management/assign"
-        component={PsSet}
+        title={formatMessage({ id: `${intlPrefix}.permission` })}
+        tabKey="permission"
+        route="/rducm/code-lib-management/permission"
+        component={PsAll}
         alwaysShow
       />
     );

@@ -21,11 +21,9 @@ const PsAudit = observer(() => {
   const {
     intl: { formatMessage },
     psAuditDs,
-    appId,
     AppState: {
       currentMenuType: { id: projectId, organizationId },
     },
-    overStores,
     executionDate,
     setExecutionDate,
   } = usPsManagerStore();
@@ -56,7 +54,7 @@ const PsAudit = observer(() => {
   useEffect(() => {
     refresh();
     fetchExecutionDate();
-  }, [appId]);
+  }, []);
 
   async function handleOk(record:any) {
     const params = {
