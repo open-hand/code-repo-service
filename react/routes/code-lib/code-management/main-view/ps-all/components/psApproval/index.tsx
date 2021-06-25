@@ -23,6 +23,10 @@ const PsApproval = observer(() => {
     projectId,
   } = usPsManagerStore();
 
+  useEffect(()=>{
+    psApprovalDs.query();
+  }, []);
+
   function handleTableFilter(record: any) {
     return record.status !== "add";
   }

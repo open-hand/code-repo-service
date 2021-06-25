@@ -3,7 +3,7 @@ import { map } from 'lodash';
 import CodeManagerApis from '../../apis';
 
 export default ((intlPrefix, formatMessage, organizationId, projectId, branchAppId) => ({
-  autoQuery: true,
+  autoQuery: false,
   selection: 'multiple',
   pageSize: 10,
   transport: {
