@@ -103,7 +103,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
     @Override
     public void auditFix(Long organizationId, Long projectId, Long repositoryId, Long id) {
-        logger.info(">>>>{}>>>{}>>>>{}>>>>{}>", organizationId, projectId, repositoryId, id);
+        logger.debug(">>>>{}>>>{}>>>>{}>>>>{}>", organizationId, projectId, repositoryId, id);
 
         RdmMemberAuditRecord dbRecord = rdmMemberAuditRecordRepository.selectByUk(organizationId, projectId, repositoryId, id);
         AssertExtensionUtils.notNull(dbRecord, "该记录不存在");
@@ -125,6 +125,10 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
         // 若glUserId为null, 获取glUserId
         Integer glUserId = dbRecord.getGlUserId() != null ? dbRecord.getGlUserId() : c7NBaseServiceFacade.userIdToGlUserId(userId);
+        if(Objects.isNull(glUserId)){
+            rdmMemberAuditRecordRepository.deleteByPrimaryKey(dbRecord.getId());
+            return;
+        }
         Integer glProjectId = dbRecord.getGlProjectId();
         C7nDevopsProjectVO c7nDevopsProjectVO = c7NDevOpsServiceFacade.detailDevopsProjectById(projectId);
         Integer glGroupId = Math.toIntExact(c7nDevopsProjectVO.getGitlabGroupId());
