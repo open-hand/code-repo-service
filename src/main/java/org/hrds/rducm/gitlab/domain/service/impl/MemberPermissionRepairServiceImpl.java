@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
@@ -36,6 +39,8 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
     private C7nBaseServiceFacade c7NBaseServiceFacade;
     @Autowired
     private RdmMemberAuditAppService rdmMemberAuditAppService;
+    @Autowired
+    private RdmMemberAppService rdmMemberAppService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -65,6 +70,27 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
             for (RdmMemberAuditRecord record : list) {
                 rdmMemberAuditAppService.auditFix(record.getOrganizationId(), record.getProjectId(), record.getRepositoryId(), record.getId());
             }
+        });
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void membersBatchSyncJob(Long tenantId) {
+        Set<Long> projectIds = c7NBaseServiceFacade.listProjectIds(tenantId);
+        if (CollectionUtils.isEmpty(projectIds)) {
+            return;
+        }
+        projectIds.forEach((projectId) -> {
+            //查询项目下未同步的用户
+            RdmMemberQueryDTO rdmMemberQueryDTO = new RdmMemberQueryDTO();
+            rdmMemberQueryDTO.setSyncGitlabFlag(Boolean.FALSE);
+            List<RdmMemberViewDTO> rdmMemberViewDTOS = rdmMemberAppService.listByOptions(projectId, rdmMemberQueryDTO);
+            if (CollectionUtils.isEmpty(rdmMemberViewDTOS)){
+                return;
+            }
+            rdmMemberViewDTOS.forEach(rdmMemberViewDTO -> {
+                rdmMemberAppService.syncMember(rdmMemberViewDTO.getId());
+            });
         });
     }
 }

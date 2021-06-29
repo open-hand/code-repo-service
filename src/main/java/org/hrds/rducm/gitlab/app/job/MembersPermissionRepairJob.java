@@ -86,6 +86,27 @@ public class MembersPermissionRepairJob {
     }
 
 
+    @JobTask(maxRetryCount = 3,
+            code = "membersBatchSyncJob",
+            description = "平台内代码库成员批量同步任务")
+    public void membersBatchSyncJob(Map<String, Object> param) {
+        // <> 获取组织
+        List<C7nTenantVO> c7nTenantVOS = c7nBaseServiceFacade.listAllOrgs();
+        if (CollectionUtils.isEmpty(c7nTenantVOS)) {
+            logger.info("平台内无组织");
+            return;
+        }
+        logger.info("开始修复");
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("membersPermissionRepairNewJob");
+        c7nTenantVOS.forEach(c7nTenantVO -> {
+            iMemberPermissionRepairService.membersBatchSyncJob(c7nTenantVO.getTenantId());
+        });
+        stopWatch.stop();
+        logger.info("结束修复, 耗时[{}]s, \n{}", stopWatch.getTotalTimeSeconds(), stopWatch.prettyPrint());
+    }
+
+
     //    @TimedTask(name = "membersPermissionRepairTimeTask",
 //            description = "代码库成员权限修复定时任务",
 //            params = {@TaskParam(name = "repairOrganizationId", value = "1009")},
