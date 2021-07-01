@@ -148,4 +148,6 @@ public interface RdmMemberAppService {
      * @param repositoryId
      */
     List<RdmMember> batchValidMember(Long organizationId, Long projectId, Long repositoryId);
+
+    void syncBatchMember(List<Long> memberIds);
 }

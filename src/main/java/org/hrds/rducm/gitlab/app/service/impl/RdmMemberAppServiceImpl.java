@@ -515,6 +515,18 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         return rdmMemberList;
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void syncBatchMember(List<Long> memberIds) {
+        if (CollectionUtils.isEmpty(memberIds)) {
+            return;
+        }
+        memberIds.forEach(memberId -> {
+            syncMember(memberId);
+        });
+
+    }
+
     /**
      * 批量预新增或修改, 使用一个新事务
      *

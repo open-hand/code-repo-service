@@ -2,9 +2,11 @@ package org.hrds.rducm.gitlab.api.controller.v1;
 
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.swagger.annotation.Permission;
+
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import java.util.List;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberUpdateDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
  */
 //@Api(tags = SwaggerTags.RDM_MEMBER)
 @RestController("rdmMemberController.v1")
-@RequestMapping("/v1/organizations/{organizationId}/projects/{projectId}/gitlab/repositories/{repositoryId}/members")
+@RequestMapping("/v1/organizations/{organizationId}/projects/{projectId}/gitlab/repositories")
 public class RdmMemberController extends BaseController {
     private final RdmMemberAppService rdmMemberAppService;
 
@@ -41,7 +43,7 @@ public class RdmMemberController extends BaseController {
             @ApiImplicitParam(name = "rdmMemberUpdateDTO", value = "参数", dataType = "RdmMemberUpdateDTO", required = true),
     })
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @PutMapping("/{memberId}")
+    @PutMapping("/{repositoryId}/members/{memberId}")
     public ResponseEntity<?> updateMember(@PathVariable Long organizationId,
                                           @PathVariable Long projectId,
                                           @Encrypt @PathVariable Long repositoryId,
@@ -59,7 +61,7 @@ public class RdmMemberController extends BaseController {
             @ApiImplicitParam(name = "memberId", value = "成员id", paramType = "path", required = true)
     })
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @DeleteMapping("/{memberId}")
+    @DeleteMapping("/{repositoryId}/members/{memberId}")
     public ResponseEntity<?> removeMember(@PathVariable Long organizationId,
                                           @PathVariable Long projectId,
                                           @Encrypt @PathVariable Long repositoryId,
@@ -75,7 +77,7 @@ public class RdmMemberController extends BaseController {
             @ApiImplicitParam(name = "memberId", value = "成员id", paramType = "path", required = true),
     })
     @Permission(level = ResourceLevel.ORGANIZATION)
-    @PostMapping("/{memberId}/sync")
+    @PostMapping("/{repositoryId}/members/{memberId}/sync")
     public ResponseEntity<?> syncMember(@PathVariable Long organizationId,
                                         @PathVariable Long projectId,
                                         @Encrypt @PathVariable Long repositoryId,
@@ -83,4 +85,19 @@ public class RdmMemberController extends BaseController {
         rdmMemberAppService.syncMember(memberId);
         return Results.success();
     }
+
+    @ApiOperation(value = "手动批量同步代码库成员")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
+            @ApiImplicitParam(name = "repositoryId", value = ApiInfoConstants.REPOSITORY_ID, paramType = "path", required = true),
+    })
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @PostMapping("/members/batch/sync")
+    public ResponseEntity<?> syncBatchMember(@PathVariable Long organizationId,
+                                             @PathVariable Long projectId,
+                                             @Encrypt @RequestBody List<Long> memberIds) {
+        rdmMemberAppService.syncBatchMember(memberIds);
+        return Results.success();
+    }
+
 }

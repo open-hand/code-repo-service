@@ -1,7 +1,10 @@
+/* eslint-disable import/no-anonymous-default-export */
 
 import moment from 'moment';
 
-export default ({ formatMessage, intlPrefix, organizationId, projectId, branchServiceDs }) => ({
+export default ({
+  formatMessage, intlPrefix, organizationId, projectId, branchServiceDs, currentBranchAppId,
+}) => ({
   autoCreate: false,
   autoQuery: false,
   selection: false,
@@ -38,10 +41,7 @@ export default ({ formatMessage, intlPrefix, organizationId, projectId, branchSe
       textField: 'repositoryName',
       valueField: 'repositoryId',
       options: branchServiceDs,
+      defaultValue: branchServiceDs.find(record => record.get('repositoryId') === currentBranchAppId) ? [branchServiceDs.find(record => record.get('repositoryId') === currentBranchAppId)?.toData()] : [],
     },
   ],
-  // events: {
-  //   load: handleLoad,
-  //   update: handleUpdate,
-  // },
 });
