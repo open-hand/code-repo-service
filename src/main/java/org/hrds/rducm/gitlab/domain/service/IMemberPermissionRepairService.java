@@ -17,4 +17,5 @@ public interface IMemberPermissionRepairService {
      */
     void repairMemberPermission(Long organizationId);
 
+    void membersBatchSyncJob(Long tenantId);
 }
