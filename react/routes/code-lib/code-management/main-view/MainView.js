@@ -75,12 +75,16 @@ const MainView = observer(() => {
     return pageWrap;
   }, [hasPermission]);
 
+  const getContent = useCallback(() => (
+    <PageWrap noHeader={[]}>
+      {renderPageWrap()}
+    </PageWrap>
+  ), [renderPageWrap]);
+
   return (
     <Page className="c7n-infra-code-management" >
       <div className="c7n-infra-code-management-tab-list">
-        <PageWrap noHeader={[]}>
-          {renderPageWrap()}
-        </PageWrap>
+        {getContent()}
       </div>
     </Page>);
 });

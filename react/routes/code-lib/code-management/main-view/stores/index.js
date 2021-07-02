@@ -32,16 +32,14 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
     intl: { formatMessage },
     children,
   } = props;
-  const { location } = useManagementStore();
+  const { 
+    location,
+    hasPermission,
+    hasMemberPermission,
+  } = useManagementStore();
   const { appServiceIds } = queryString.parse(location.search);
 
   const [branchAppId, setBranchApp] = useState(undefined);
-
-  const [hasMemberPermission, sethasMemberPermission] = useState(false);
-  const [hasPermission, sethasPermission] = useState(false);
-
-  // const hasMemberPermission = useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-member'], true);
-  // const hasPermission = useCheckPermission(['choerodon.code.project.infra.code-lib-management.ps.project-owner'], true);
 
   const intlPrefix = 'infra';
   const branchServiceDs = useMemo(() => new DataSet(BranchServiceDs({
@@ -53,7 +51,6 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
   const psApprovalDs = useMemo(() => new DataSet(PsApprovalDS(intlPrefix, formatMessage, organizationId, projectId, branchAppId)), [formatMessage, projectId, branchAppId]);
   const psAuditDs = useMemo(() => new DataSet(PsAuditDS(intlPrefix, formatMessage, organizationId, projectId, branchAppId)), [formatMessage, projectId, branchAppId]);
 
-
   const branchDs = useMemo(() => new DataSet(BranchDataSet(formatMessage, projectId, branchAppId)), [formatMessage, projectId, branchAppId]);
   const tagDs = useMemo(() => new DataSet(TagDataSet(formatMessage, projectId, branchAppId)), [formatMessage, projectId, branchAppId]);
   const psOverViewDs = useMemo(() => new DataSet(PsOverViewDataSet(formatMessage, organizationId, projectId, branchServiceDs)), [formatMessage, projectId, branchServiceDs]);
@@ -63,18 +60,6 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
 
   const [executionDate, setExecutionDate] = useState(undefined);
   const securityAuditDs = useMemo(() => new DataSet(SecurityAuditDS(intlPrefix, formatMessage, organizationId, projectId)), [formatMessage, projectId]);
-
-
-  const init = useCallback(async () => {
-    const hasMemberPermission1 = await checkPermission({ projectId, code: ['choerodon.code.project.infra.code-lib-management.ps.project-member'], resourceType: type });
-    const hasPermission1 = await checkPermission({ projectId, code: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'], resourceType: type });
-    sethasMemberPermission(hasMemberPermission1);
-    sethasPermission(hasPermission1);
-  }, [projectId, type]);
-
-  useEffect(() => {
-    init();
-  }, [init]);
 
   const value = {
     ...props,
