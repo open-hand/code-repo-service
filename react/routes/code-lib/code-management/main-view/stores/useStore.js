@@ -4,10 +4,6 @@ import { checkPermission } from '@/utils';
 
 export default function useStore() {
   return useLocalStore(() => ({
-    // psSelectedAppService: {},
-    // setPsSelectedAppService(value) {
-    //   this.psSelectedAppService = value;
-    // },
     oldOptsRecord: [],
     hasMemberPermission: false,
     hasPermission: false,
