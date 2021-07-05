@@ -1,14 +1,18 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
+import java.time.Duration;
+import java.util.*;
 import org.gitlab4j.api.models.Member;
-import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
+import org.hrds.rducm.gitlab.domain.entity.MemberAuditLog;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.repository.MemberAuditLogRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupApi;
@@ -25,9 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Objects;
-import org.springframework.util.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 /**
  * 成员权限审计应用服务默认实现
@@ -57,6 +59,10 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     private GitlabGroupFixApi gitlabGroupFixApi;
     @Autowired
     private GitlabProjectFixApi gitlabProjectFixApi;
+    @Autowired
+    private MemberAuditLogRepository memberAuditLogRepository;
+    @Autowired
+    private IRdmMemberAuditRecordService iRdmMemberAuditRecordService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -102,6 +108,38 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchAuditFix(Long organizationId, Long projectId, Set<Long> recordIds, Long repositoryId) {
+        if (CollectionUtils.isEmpty(recordIds)) {
+            return;
+        }
+        recordIds.forEach(recordId -> {
+            auditFix(organizationId, projectId, repositoryId, recordId);
+        });
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void projectAudit(Long organizationId, Long projectId) {
+        // <1> 保存审计记录
+        Date startDate = new Date();
+        List<RdmMemberAuditRecord> records = iRdmMemberAuditRecordService.batchCompareProject(organizationId, projectId);
+        Date endDate = new Date();
+
+        //插入项目的审计日志
+        String auditNo = UUID.randomUUID().toString();
+        MemberAuditLog log = new MemberAuditLog();
+        log.setOrganizationId(organizationId);
+        log.setProjectId(projectId);
+        log.setAuditNo(auditNo);
+        log.setAuditCount(records == null ? 0 : records.size());
+        log.setAuditStartDate(startDate);
+        log.setAuditEndDate(endDate);
+        log.setAuditDuration(Math.toIntExact(Duration.between(startDate.toInstant(), endDate.toInstant()).toMillis()));
+        memberAuditLogRepository.insertSelective(log);
+    }
+
+    @Override
     public void auditFix(Long organizationId, Long projectId, Long repositoryId, Long id) {
         logger.debug(">>>>{}>>>{}>>>>{}>>>>{}>", organizationId, projectId, repositoryId, id);
 
@@ -125,7 +163,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
         // 若glUserId为null, 获取glUserId
         Integer glUserId = dbRecord.getGlUserId() != null ? dbRecord.getGlUserId() : c7NBaseServiceFacade.userIdToGlUserId(userId);
-        if(Objects.isNull(glUserId)){
+        if (Objects.isNull(glUserId)) {
             rdmMemberAuditRecordRepository.deleteByPrimaryKey(dbRecord.getId());
             return;
         }
