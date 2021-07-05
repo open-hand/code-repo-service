@@ -4,6 +4,7 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+
 import org.gitlab4j.api.models.Member;
 import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuditRecordQueryDTO;
@@ -18,6 +19,7 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.admin.GitlabAdminApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
@@ -138,6 +140,16 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
 
         LOGGER.info("执行时长:{}, 执行详情\n{}", stopWatch.getTotalTimeMillis(), stopWatch.prettyPrint());
 
+        return list;
+    }
+
+    @Override
+    public List<RdmMemberAuditRecord> batchCompareProject(Long organizationId, Long projectId) {
+        // <0> 删除原有数据
+        rdmMemberAuditRecordRepository.delete(new RdmMemberAuditRecord().setProjectId(projectId));
+
+        // <1> 对比项目所有成员
+        List<RdmMemberAuditRecord> list = compareMembersByProjectId(organizationId, projectId);
         return list;
     }
 
@@ -280,6 +292,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
      * 举例:
      * 补全前: userId -> null  glUserId -> 10001
      * 补全后: userId -> 20000 glUserId -> 10001
+     *
      * @param memberAudits
      */
     private List<RdmMemberAuditRecord> fill(List<RdmMemberAuditRecord> memberAudits) {

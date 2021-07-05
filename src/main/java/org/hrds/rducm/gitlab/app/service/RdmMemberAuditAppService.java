@@ -1,5 +1,7 @@
 package org.hrds.rducm.gitlab.app.service;
 
+import java.util.Set;
+
 /**
  * 成员权限审计应用服务
  *
@@ -25,4 +27,8 @@ public interface RdmMemberAuditAppService {
      * @param id
      */
     void auditFix(Long organizationId, Long projectId, Long repositoryId, Long id);
+
+    void batchAuditFix(Long organizationId, Long projectId, Set<Long> recordIds, Long repositoryId);
+
+    void projectAudit(Long organizationId, Long projectId);
 }

@@ -4,6 +4,7 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.swagger.annotation.Permission;
+
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -57,6 +58,28 @@ public class RdmMemberAuditRecordProjController extends BaseController {
                                       @Encrypt @PathVariable Long id,
                                       @Encrypt @RequestParam Long repositoryId) {
         rdmMemberAuditAppService.auditFix(organizationId, projectId, repositoryId, id);
+        return Results.success();
+    }
+
+
+    @ApiOperation(value = "权限批量修复")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @PostMapping("/batch/audit-fix")
+    public ResponseEntity<?> batchAuditFix(@PathVariable Long organizationId,
+                                           @PathVariable Long projectId,
+                                           @Encrypt @RequestBody Set<Long> recordIds,
+                                           @Encrypt @RequestParam Long repositoryId) {
+        rdmMemberAuditAppService.batchAuditFix(organizationId, projectId, recordIds, repositoryId);
+        return Results.success();
+    }
+
+
+    @ApiOperation(value = "项目下权限审计")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @GetMapping("/audit")
+    public ResponseEntity<?> projectAudit(@PathVariable Long organizationId,
+                                          @PathVariable Long projectId) {
+        rdmMemberAuditAppService.projectAudit(organizationId, projectId);
         return Results.success();
     }
 }

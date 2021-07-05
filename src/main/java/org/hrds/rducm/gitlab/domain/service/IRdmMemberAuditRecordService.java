@@ -3,6 +3,7 @@ package org.hrds.rducm.gitlab.domain.service;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuditRecordQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
@@ -35,4 +36,12 @@ public interface IRdmMemberAuditRecordService {
      * @return
      */
     List<RdmMemberAuditRecord> batchCompare(Long organizationId);
+
+    /**
+     * 比对项目下的所有应用服务的成员权限
+     *
+     * @param projectId
+     * @return
+     */
+    List<RdmMemberAuditRecord> batchCompareProject(Long organizationId, Long projectId);
 }
