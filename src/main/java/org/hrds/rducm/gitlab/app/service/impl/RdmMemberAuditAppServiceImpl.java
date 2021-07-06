@@ -109,12 +109,12 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void batchAuditFix(Long organizationId, Long projectId, Set<Long> recordIds, Long repositoryId) {
+    public void batchAuditFix(Long organizationId, Long projectId, Set<Long> recordIds) {
         if (CollectionUtils.isEmpty(recordIds)) {
             return;
         }
         recordIds.forEach(recordId -> {
-            auditFix(organizationId, projectId, repositoryId, recordId);
+            auditFix(organizationId, projectId, 0L, recordId);
         });
     }
 
@@ -142,8 +142,12 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     @Override
     public void auditFix(Long organizationId, Long projectId, Long repositoryId, Long id) {
         logger.debug(">>>>{}>>>{}>>>>{}>>>>{}>", organizationId, projectId, repositoryId, id);
-
-        RdmMemberAuditRecord dbRecord = rdmMemberAuditRecordRepository.selectByUk(organizationId, projectId, repositoryId, id);
+        RdmMemberAuditRecord dbRecord = null;
+        if (repositoryId.longValue() == 0l) {
+            dbRecord = rdmMemberAuditRecordRepository.selectByPrimaryKey(id);
+        } else {
+            dbRecord = rdmMemberAuditRecordRepository.selectByUk(organizationId, projectId, repositoryId, id);
+        }
         AssertExtensionUtils.notNull(dbRecord, "该记录不存在");
 
         Long userId = dbRecord.getUserId();
