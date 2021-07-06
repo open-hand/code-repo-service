@@ -116,9 +116,10 @@ public class RdmMemberChangeSagaHandler {
                         rdmMembers.forEach(rdmMember1 -> {
                             gitlabProjectApi.removeMember(rdmMember1.getGlProjectId(), rdmMember1.getGlUserId());
                         });
+                        // 删除团队成员, 删除权限
+                        handleRemoveMemberOnProjectLevel(organizationId, projectId, userId);
                     }
-                    // 删除团队成员, 删除权限
-                    handleRemoveMemberOnProjectLevel(organizationId, projectId, userId);
+
                 });
 
         // 组织层
