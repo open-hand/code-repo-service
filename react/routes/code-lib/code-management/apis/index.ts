@@ -52,6 +52,14 @@ class CodeManagerApis {
   static asyncPermission(params:any) {
     return axios.post(`/rducm/v1/organizations/${params.organizationId}/projects/${params.projectId}/member-audit-records/${params.id}/audit-fix?repositoryId=${params.repositoryId}`);
   };
+
+  static bacthfix(organizationId:string,projectId:string, data: any[]){
+    return axios.post(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/member-audit-records/batch/audit-fix`, JSON.stringify(data))
+  }
+
+  static bacthAuidt(organizationId:string,projectId:string) {
+    return axios.get(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/member-audit-records/audit`)
+  }
   
 }
 

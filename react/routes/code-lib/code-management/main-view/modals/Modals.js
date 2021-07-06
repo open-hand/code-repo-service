@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import moment, { relativeTimeRounding } from 'moment';
+import moment from 'moment';
 import { message } from 'choerodon-ui';
 import { Modal } from 'choerodon-ui/pro';
 import { Header, Choerodon, axios, HeaderButtons } from '@choerodon/boot';
@@ -12,6 +12,7 @@ import AddTag from './add-tag';
 import PsApply from './ps-apply';
 import { usPsManagerStore } from '../stores';
 import ExportAuthority from './export-authority';
+import Apis from '../../apis';
 
 const modalKey = Modal.key();
 const SyncKey = Modal.key();
@@ -44,20 +45,21 @@ const EnvModals = observer((props) => {
   const [exportModalVisible, setExportModalVisible] = useState(false);
 
   async function fetchExecutionDate() {
-    await overStores.fetchExecutionDate(organizationId, projectId)
-      .then((res) => {
-        if (res.failed) {
-          Choerodon.prompt(res.message);
-          return false;
-        }
-        const dataStr = res.auditEndDate ? moment(res.auditEndDate).format('YYYY-MM-DD HH:mm:ss') : undefined;
-        setExecutionDate(dataStr);
-        return true;
-      })
-      .catch((error) => {
-        Choerodon.handleResponseError(error);
+    try {
+      const res = Apis.fetchExecutionDate(organizationId, projectId);
+      if (res.failed) {
+        Choerodon.prompt(res.message);
         return false;
-      });
+      }
+      const dataStr = res.auditEndDate
+        ? moment(res.auditEndDate).format('YYYY-MM-DD HH:mm:ss')
+        : undefined;
+      setExecutionDate(dataStr);
+      return true;
+    } catch (error) {
+      Choerodon.handleResponseError(error);
+      return false;
+    }
   }
 
   function refresh() {
@@ -254,6 +256,34 @@ const EnvModals = observer((props) => {
     return !arr.length;
   }
 
+  async function handlerBatchAudit() {
+    try {
+      const res = await Apis.bacthAuidt(organizationId, projectId);
+      if (res && res.failed) {
+        message.error('批量审计失败');
+        return true;
+      }
+      psAuditDs.query();
+      return true;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async function handlerBatchAuditFix() {
+    try {
+      const res = await Apis.bacthfix(organizationId, projectId, psAuditDs.selected.map(item => item.get('id')));
+      if (res && res.failed) {
+        message.error('批量修复失败');
+        return true;
+      }
+      psAuditDs.query();
+      return true;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   function getButtons() {
     const buttonData = [{
       name: formatMessage({ id: 'refresh' }),
@@ -263,18 +293,36 @@ const EnvModals = observer((props) => {
       color: 'default',
       display: true,
     }];
-    const disabled = !(psApprovalDs.selected && psApprovalDs.selected.length > 0);
+    const disabledPsApproval = !(psApprovalDs.selected && psApprovalDs.selected.length > 0);
+    const disabledPsAudit = !(psAuditDs.selected && psAuditDs.selected.length > 0);
     switch (type) {
+      case 'psAudit':
+        buttonData.unshift({
+          name: '批量审计',
+          icon: 'playlist_add_check',
+          handler: handlerBatchAudit,
+        }, {
+          name: '批量修复',
+          icon: 'person_add-o',
+          handler: handlerBatchAuditFix,
+          display: true,
+          disabled: disabledPsAudit,
+          tooltipsConfig: {
+            placement: 'bottom',
+            title: disabledPsAudit ? '请在下方列表中勾选用户' : '',
+          },
+        });
+        break;
       case 'psApproval':
         buttonData.unshift({
           name: '批量审批',
           icon: 'playlist_add_check',
           handler: () => handlerBatchApprove(psApprovalDs, refresh),
           display: true,
-          disabled,
+          disabled: disabledPsApproval,
           tooltipsConfig: {
             placement: 'bottom',
-            title: disabled ? '请在下方列表中选择【待审批】状态的申请' : '',
+            title: disabledPsApproval ? '请在下方列表中选择【待审批】状态的申请' : '',
           },
         });
         break;

@@ -25,7 +25,7 @@ const PsApproval = observer(() => {
 
   useEffect(()=>{
     psApprovalDs.query();
-  }, []);
+  }, [psApprovalDs]);
 
   function handleTableFilter(record: any) {
     return record.status !== "add";

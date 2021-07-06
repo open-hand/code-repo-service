@@ -5,7 +5,7 @@ import Apis from '../../apis';
 
 export default ((intlPrefix, formatMessage, organizationId, projectId, branchAppId) => ({
   autoQuery: false,
-  selection: false,
+  selection: 'multiple',
   pageSize: 10,
   transport: {
     read: () => ({

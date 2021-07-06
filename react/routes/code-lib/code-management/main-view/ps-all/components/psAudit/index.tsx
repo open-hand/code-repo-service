@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { Page, Action, Choerodon } from "@choerodon/boot";
 import { Table, Modal } from "choerodon-ui/pro";
 import { Tooltip, Row, Col, Icon, message } from "choerodon-ui";
@@ -28,9 +28,9 @@ const PsAudit = observer(() => {
     setExecutionDate,
   } = usPsManagerStore();
 
-  function refresh() {
+  const refresh = useCallback(() =>{
     psAuditDs.query();
-  }
+  },[psAuditDs])
 
   async function fetchExecutionDate() {
     try {
@@ -54,7 +54,7 @@ const PsAudit = observer(() => {
   useEffect(() => {
     refresh();
     fetchExecutionDate();
-  }, []);
+  }, [refresh]);
 
   async function handleOk(record:any) {
     const params = {
@@ -167,7 +167,7 @@ const PsAudit = observer(() => {
       queryFieldsLimit={3}
       className="c7n-infra-code-management-table"
     >
-      <Column name="realName" renderer={renderName} width={150} />
+      <Column name="realName" renderer={renderName} width={200} />
       <Column renderer={renderAction} width={70} />
       <Column name="loginName" renderer={renderLoginName} />
       <Column name="repositoryName" width={180} />
