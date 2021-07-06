@@ -144,7 +144,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
         logger.debug(">>>>{}>>>{}>>>>{}>>>>{}>", organizationId, projectId, repositoryId, id);
         RdmMemberAuditRecord dbRecord = rdmMemberAuditRecordRepository.selectByPrimaryKey(id);
         AssertExtensionUtils.notNull(dbRecord, "该记录不存在");
-        repositoryId = dbRecord.getRepositoryId();
+        repositoryId = (Objects.isNull(repositoryId) || repositoryId == 0) ? dbRecord.getRepositoryId() : repositoryId;
 
         Long userId = dbRecord.getUserId();
         //如果userId为null 猪齿鱼导入用户失败，导致猪齿鱼里没有这个用户
