@@ -149,8 +149,28 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         rdmMemberAuditRecordRepository.delete(new RdmMemberAuditRecord().setProjectId(projectId));
 
         // <1> 对比项目所有成员
-        List<RdmMemberAuditRecord> list = compareMembersByProjectId(organizationId, projectId);
+        List<RdmMemberAuditRecord> list = batchCompareMembersByProjectId(organizationId, projectId);
+
+        // <2> 批量插入数据库
+        // 优化, 每次最多一次性插入10000条
+
+        int maxInsert = 10000;
+        int curIndex = 0;
+        while (curIndex < list.size()) {
+            rdmMemberAuditRecordRepository.batchInsertCustom(list.subList(curIndex, Math.min(curIndex + maxInsert, list.size())));
+            curIndex += maxInsert;
+        }
         return list;
+    }
+
+    private List<RdmMemberAuditRecord> batchCompareMembersByProjectId(Long organizationId, Long projectId) {
+        // 获取组织管理员, 存入ThreadLocal备用
+        List<C7nUserVO> orgAdministrators = c7NBaseServiceFacade.listOrgAdministrator(organizationId);
+        threadLocal.set(orgAdministrators);
+        List<RdmMemberAuditRecord> rdmMemberAuditRecords = compareMembersByProjectId(organizationId, projectId);
+        threadLocal.remove();
+        return rdmMemberAuditRecords;
+
     }
 
     private List<RdmMemberAuditRecord> compareMembersByOrganizationId(Long organizationId) {

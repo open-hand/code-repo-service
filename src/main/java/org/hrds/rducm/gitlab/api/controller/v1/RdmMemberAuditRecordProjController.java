@@ -67,9 +67,8 @@ public class RdmMemberAuditRecordProjController extends BaseController {
     @PostMapping("/batch/audit-fix")
     public ResponseEntity<?> batchAuditFix(@PathVariable Long organizationId,
                                            @PathVariable Long projectId,
-                                           @Encrypt @RequestBody Set<Long> recordIds,
-                                           @Encrypt @RequestParam Long repositoryId) {
-        rdmMemberAuditAppService.batchAuditFix(organizationId, projectId, recordIds, repositoryId);
+                                           @Encrypt @RequestBody Set<Long> recordIds) {
+        rdmMemberAuditAppService.batchAuditFix(organizationId, projectId, recordIds);
         return Results.success();
     }
 

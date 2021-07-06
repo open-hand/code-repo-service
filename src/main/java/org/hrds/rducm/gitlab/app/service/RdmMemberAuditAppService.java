@@ -28,7 +28,7 @@ public interface RdmMemberAuditAppService {
      */
     void auditFix(Long organizationId, Long projectId, Long repositoryId, Long id);
 
-    void batchAuditFix(Long organizationId, Long projectId, Set<Long> recordIds, Long repositoryId);
+    void batchAuditFix(Long organizationId, Long projectId, Set<Long> recordIds);
 
     void projectAudit(Long organizationId, Long projectId);
 }
