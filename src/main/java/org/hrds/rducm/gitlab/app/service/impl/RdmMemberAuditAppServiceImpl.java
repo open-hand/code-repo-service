@@ -125,7 +125,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
         // 若glUserId为null, 获取glUserId
         Integer glUserId = dbRecord.getGlUserId() != null ? dbRecord.getGlUserId() : c7NBaseServiceFacade.userIdToGlUserId(userId);
-        if(Objects.isNull(glUserId)){
+        if (Objects.isNull(glUserId)) {
             rdmMemberAuditRecordRepository.deleteByPrimaryKey(dbRecord.getId());
             return;
         }
@@ -135,7 +135,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
         // 查询权限
         RdmMember dbMember = rdmMemberRepository.selectOneByUk(projectId, repositoryId, userId);
-        // 查询用户在gitlab中project的权限
+        // 查询用户在gitlab中project的权限 如果是组的所有者，这里查询项目的角色就是404
         Member projectGlMember = gitlabProjectFixApi.getMember(glProjectId, glUserId);
         if (Objects.nonNull(projectGlMember)) {
             logger.debug("Gl项目[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]", glProjectId, projectGlMember.getId(), projectGlMember.getName(), projectGlMember.getAccessLevel());
@@ -171,6 +171,18 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                 if (isProjectAdmin) {
                     // 如果是项目管理员 修复为group Owner权限
                     logger.debug("修复用户[{}]为项目管理员权限", userId);
+                    if (Objects.isNull(dbMember) && !Objects.isNull(groupGlMember)) {
+                        RdmMember rdmMember = new RdmMember();
+                        rdmMember.setSyncGitlabFlag(true);
+                        rdmMember.setGlAccessLevel(AccessLevel.OWNER.toValue());
+                        rdmMember.setProjectId(projectId);
+                        rdmMember.setUserId(userId);
+                        rdmMember.setRepositoryId(repositoryId);
+                        rdmMember.setOrganizationId(organizationId);
+                        rdmMember.setGlProjectId(glProjectId);
+                        rdmMember.setGlUserId(glUserId);
+                        rdmMemberRepository.insert(rdmMember);
+                    }
                     updateGitlabGroupMemberWithOwner(groupGlMember, glGroupId, glUserId);
 
                 } else {
@@ -216,7 +228,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
     private void updateGitLabPermission(Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember, RdmMemberAuditRecord dbRecord) {
         if (groupGlMember != null) {
-            //如果组的权限是owner，则不作处理， 组的权限是owner 他在项目的权限也是owner,这个时候需要按照gotlab的权限来修
+            //如果组的权限是owner，则不作处理， 组的权限是owner 他在项目的权限也是owner,这个时候需要按照gitlab的权限来修
             if (groupGlMember.getAccessLevel().value.intValue() == AccessLevel.OWNER.toValue().intValue()) {
                 dbMember.setSyncGitlabFlag(Boolean.TRUE);
                 dbMember.setGlAccessLevel(AccessLevel.OWNER.toValue().intValue());
