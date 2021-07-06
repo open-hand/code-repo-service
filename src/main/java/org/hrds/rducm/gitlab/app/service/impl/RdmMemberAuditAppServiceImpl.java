@@ -142,13 +142,9 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     @Override
     public void auditFix(Long organizationId, Long projectId, Long repositoryId, Long id) {
         logger.debug(">>>>{}>>>{}>>>>{}>>>>{}>", organizationId, projectId, repositoryId, id);
-        RdmMemberAuditRecord dbRecord = null;
-        if (repositoryId.longValue() == 0l) {
-            dbRecord = rdmMemberAuditRecordRepository.selectByPrimaryKey(id);
-        } else {
-            dbRecord = rdmMemberAuditRecordRepository.selectByUk(organizationId, projectId, repositoryId, id);
-        }
+        RdmMemberAuditRecord dbRecord = rdmMemberAuditRecordRepository.selectByPrimaryKey(id);
         AssertExtensionUtils.notNull(dbRecord, "该记录不存在");
+        repositoryId = dbRecord.getRepositoryId();
 
         Long userId = dbRecord.getUserId();
         //如果userId为null 猪齿鱼导入用户失败，导致猪齿鱼里没有这个用户
