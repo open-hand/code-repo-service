@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.ProjectAuditPayload;
@@ -20,9 +21,11 @@ import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupFixApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectFixApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
+import org.hrds.rducm.gitlab.infra.feign.operate.AsgardServiceClientOperator;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.AssertExtensionUtils;
+import org.hrds.rducm.gitlab.infra.feign.vo.SagaInstanceDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +48,9 @@ import io.choerodon.core.iam.ResourceLevel;
 @Service
 public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     private static final Logger logger = LoggerFactory.getLogger(RdmMemberAuditAppServiceImpl.class);
+
+    private static final String PROJECT_AUDIT_MEMBER_PERMISSION = "projectAuditMemberPermission";
+    private static final String PROJECT_BATCH_FIX_MEMBER_PERMISSION = "projectBatchFixMemberPermission";
 
     @Autowired
     private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
@@ -70,6 +76,8 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     private IRdmMemberAuditRecordService iRdmMemberAuditRecordService;
     @Autowired
     private TransactionalProducer transactionalProducer;
+    @Autowired
+    private AsgardServiceClientOperator asgardServiceClientOperator;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -128,7 +136,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
         transactionalProducer.apply(
                 StartSagaBuilder.newBuilder()
-                        .withRefType("projectBatchFixMemberPermission")
+                        .withRefType(PROJECT_BATCH_FIX_MEMBER_PERMISSION)
                         .withRefId(projectId.toString())
                         .withSagaCode(SagaTopicCodeConstants.PROJECT_BATCH_AUDIT_FIX)
                         .withLevel(ResourceLevel.PROJECT)
@@ -150,7 +158,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
         transactionalProducer.apply(
                 StartSagaBuilder.newBuilder()
-                        .withRefType("projectAuditMemberPermission")
+                        .withRefType(PROJECT_AUDIT_MEMBER_PERMISSION)
                         .withRefId(projectId.toString())
                         .withSagaCode(SagaTopicCodeConstants.PROJECT_AUDIT_MEMBER_PERMISSION)
                         .withLevel(ResourceLevel.PROJECT)
@@ -159,6 +167,25 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                 builder -> {
                 });
 
+    }
+
+    @Override
+    public SagaInstanceDetails projectAuditStatus(Long organizationId, Long projectId) {
+        return getSagaInstanceDetails(PROJECT_AUDIT_MEMBER_PERMISSION, Arrays.asList(projectId.toString()), SagaTopicCodeConstants.PROJECT_AUDIT_MEMBER_PERMISSION);
+    }
+
+    @Override
+    public SagaInstanceDetails projectAuditFixStatus(Long organizationId, Long projectId) {
+        return getSagaInstanceDetails(PROJECT_BATCH_FIX_MEMBER_PERMISSION, Arrays.asList(projectId.toString()), SagaTopicCodeConstants.PROJECT_BATCH_AUDIT_FIX);
+    }
+
+    private SagaInstanceDetails getSagaInstanceDetails(String refType, List<String> refIds, String sagaCode) {
+        List<SagaInstanceDetails> projectAuditMemberPermission = asgardServiceClientOperator.queryByRefTypeAndRefIds(refType, refIds, sagaCode);
+        if (CollectionUtils.isEmpty(projectAuditMemberPermission)) {
+            return new SagaInstanceDetails();
+        }
+        List<SagaInstanceDetails> sagaInstanceDetailsList = projectAuditMemberPermission.stream().sorted(Comparator.comparing(SagaInstanceDetails::getId).reversed()).collect(Collectors.toList());
+        return sagaInstanceDetailsList.get(0);
     }
 
     @Override

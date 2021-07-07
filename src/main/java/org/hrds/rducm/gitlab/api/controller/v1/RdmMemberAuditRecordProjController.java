@@ -12,7 +12,7 @@ import org.hrds.rducm.gitlab.api.controller.dto.MemberAuditRecordQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
-import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
+import org.hrds.rducm.gitlab.infra.feign.vo.SagaInstanceDetails;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.hzero.starter.keyencrypt.core.Encrypt;
@@ -81,4 +81,26 @@ public class RdmMemberAuditRecordProjController extends BaseController {
         rdmMemberAuditAppService.projectAudit(organizationId, projectId);
         return Results.success();
     }
+
+    //请求审计的执行状态
+    @ApiOperation(value = "请求审计的执行状态")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @GetMapping("/audit/status")
+    public ResponseEntity<SagaInstanceDetails> projectAuditStatus(@PathVariable Long organizationId,
+                                                                  @PathVariable Long projectId) {
+
+        return Results.success(rdmMemberAuditAppService.projectAuditStatus(organizationId, projectId));
+    }
+
+
+    @ApiOperation(value = "请求权限修复的执行状态")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @GetMapping("/audit/fix/status")
+    public ResponseEntity<SagaInstanceDetails> projectAuditFixStatus(@PathVariable Long organizationId,
+                                                                  @PathVariable Long projectId) {
+
+        return Results.success(rdmMemberAuditAppService.projectAuditFixStatus(organizationId, projectId));
+    }
+
+
 }
