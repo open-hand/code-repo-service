@@ -9,16 +9,23 @@ import io.choerodon.asgard.saga.annotation.SagaTask;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.domain.AuditDomain;
 
+import java.time.Duration;
 import java.util.*;
 import org.apache.commons.lang3.EnumUtils;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTaskCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.GitlabGroupMemberVO;
+import org.hrds.rducm.gitlab.app.eventhandler.payload.ProjectAuditPayload;
+import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
+import org.hrds.rducm.gitlab.domain.entity.MemberAuditLog;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.repository.MemberAuditLogRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
@@ -60,6 +67,12 @@ public class RdmMemberChangeSagaHandler {
     private IRdmMemberService iRdmMemberService;
     @Autowired
     private GitlabProjectApi gitlabProjectApi;
+    @Autowired
+    private IRdmMemberAuditRecordService iRdmMemberAuditRecordService;
+    @Autowired
+    private MemberAuditLogRepository memberAuditLogRepository;
+    @Autowired
+    private RdmMemberAuditAppService rdmMemberAuditAppService;
 
 
     /**
@@ -181,6 +194,47 @@ public class RdmMemberChangeSagaHandler {
                 rdmMemberRepository.updateOptional(m, RdmMember.FIELD_SYNC_GITLAB_ERROR_MSG);
             }
         });
+    }
+
+    @SagaTask(code = SagaTaskCodeConstants.PROJECT_AUDIT_MEMBER_PERMISSION,
+            description = "项目下成员权限审计",
+            sagaCode = SagaTopicCodeConstants.PROJECT_AUDIT_MEMBER_PERMISSION,
+            maxRetryCount = 3, seq = 1)
+    public void projectAudit(String payload) {
+        ProjectAuditPayload projectAuditPayload = JsonHelper.unmarshalByJackson(payload, ProjectAuditPayload.class);
+        // <1> 保存审计记录
+        Date startDate = new Date();
+        List<RdmMemberAuditRecord> records = iRdmMemberAuditRecordService.batchCompareProject(projectAuditPayload.getOrganizationId(), projectAuditPayload.getProjectId());
+        Date endDate = new Date();
+
+        //插入项目的审计日志
+        String auditNo = UUID.randomUUID().toString();
+        MemberAuditLog log = new MemberAuditLog();
+        log.setOrganizationId(projectAuditPayload.getOrganizationId());
+        log.setProjectId(projectAuditPayload.getProjectId());
+        log.setAuditNo(auditNo);
+        log.setAuditCount(records == null ? 0 : records.size());
+        log.setAuditStartDate(startDate);
+        log.setAuditEndDate(endDate);
+        log.setAuditDuration(Math.toIntExact(Duration.between(startDate.toInstant(), endDate.toInstant()).toMillis()));
+        memberAuditLogRepository.insertSelective(log);
+
+    }
+
+    @SagaTask(code = SagaTaskCodeConstants.BATCH_ADD_GITLAB_MEMBER,
+            description = "项目下成员权限修复",
+            sagaCode = SagaTopicCodeConstants.PROJECT_BATCH_AUDIT_FIX,
+            maxRetryCount = 3, seq = 1)
+    public void batchAuditFix(String payload) {
+        ProjectAuditPayload projectAuditPayload = JsonHelper.unmarshalByJackson(payload, ProjectAuditPayload.class);
+        Set<Long> recordIds = projectAuditPayload.getRecordIds();
+        if (CollectionUtils.isEmpty(recordIds)) {
+            return;
+        }
+        recordIds.forEach(recordId -> {
+            rdmMemberAuditAppService.auditFix(projectAuditPayload.getOrganizationId(), projectAuditPayload.getProjectId(), 0L, recordId);
+        });
+
     }
 
 

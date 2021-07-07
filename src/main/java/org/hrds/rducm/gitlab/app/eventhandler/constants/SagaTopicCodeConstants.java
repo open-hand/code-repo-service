@@ -57,6 +57,17 @@ public class SagaTopicCodeConstants {
 
     public static final String BATCH_ADD_GITLAB_MEMBER = "batch-add-gitlab-member";
 
+    /**
+     * 项目下批量审计成员权限
+     */
+    public static final String PROJECT_AUDIT_MEMBER_PERMISSION = "project-audit-member-permission";
+
+    /**
+     * 项目下修复成员
+     */
+    public static final String PROJECT_BATCH_AUDIT_FIX = "project-batch-audit-fix";
+
+
     private SagaTopicCodeConstants() {
     }
 }
