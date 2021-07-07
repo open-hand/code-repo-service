@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
@@ -13,6 +14,8 @@ import PsApply from './ps-apply';
 import { usPsManagerStore } from '../stores';
 import ExportAuthority from './export-authority';
 import Apis from '../../apis';
+import { FixModal, AuditModal } from './ps-audit';
+
 
 const modalKey = Modal.key();
 const SyncKey = Modal.key();
@@ -284,6 +287,22 @@ const EnvModals = observer((props) => {
     }
   }
 
+  function handleBatchFixModalOpen() {
+    Modal.open({
+      key: Modal.key(),
+      title: '批量修复',
+      children: <FixModal onOk={handlerBatchAuditFix} organizationId={organizationId} projectId={projectId} />,
+    });
+  }
+
+  function handleBatchAuditModalOpen() {
+    Modal.open({
+      key: Modal.key(),
+      title: '批量审计',
+      children: <AuditModal onOk={handlerBatchAudit} organizationId={organizationId} projectId={projectId} />,
+    });
+  }
+
   function getButtons() {
     const buttonData = [{
       name: formatMessage({ id: 'refresh' }),
@@ -300,11 +319,12 @@ const EnvModals = observer((props) => {
         buttonData.unshift({
           name: '批量审计',
           icon: 'playlist_add_check',
-          handler: handlerBatchAudit,
+          handler: handleBatchAuditModalOpen,
+          disabled: !psAuditDs.length,
         }, {
           name: '批量修复',
           icon: 'person_add-o',
-          handler: handlerBatchAuditFix,
+          handler: handleBatchFixModalOpen,
           display: true,
           disabled: disabledPsAudit,
           tooltipsConfig: {
