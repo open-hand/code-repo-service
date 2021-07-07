@@ -4,6 +4,7 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+
 import org.gitlab4j.api.models.Member;
 import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuditRecordQueryDTO;
@@ -247,6 +248,10 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                     // 如果AccessLevel不相等, 说明不一致
                     isDifferent = true;
                 }
+                //如果两边的level都为null 则不插入
+                if (Objects.isNull(dbMember.getGlAccessLevel()) && Objects.isNull(member.getAccessLevel().value)) {
+                    isDifferent = false;
+                }
 
                 if (!Objects.equals(member.getExpiresAt(), dbMember.getGlExpiresAt())) {
                     // 如果ExpiresAt不相等, 说明不一致
@@ -280,6 +285,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
      * 举例:
      * 补全前: userId -> null  glUserId -> 10001
      * 补全后: userId -> 20000 glUserId -> 10001
+     *
      * @param memberAudits
      */
     private List<RdmMemberAuditRecord> fill(List<RdmMemberAuditRecord> memberAudits) {
