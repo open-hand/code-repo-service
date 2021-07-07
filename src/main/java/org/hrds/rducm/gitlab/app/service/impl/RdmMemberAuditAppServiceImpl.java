@@ -173,7 +173,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
         // 查询权限
         RdmMember dbMember = rdmMemberRepository.selectOneByUk(projectId, repositoryId, userId);
-        // 查询用户在gitlab中project的权限
+        // 查询用户在gitlab中project的权限 如果是组的所有者，这里查询项目的角色就是404
         Member projectGlMember = gitlabProjectFixApi.getMember(glProjectId, glUserId);
         if (Objects.nonNull(projectGlMember)) {
             logger.debug("Gl项目[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]", glProjectId, projectGlMember.getId(), projectGlMember.getName(), projectGlMember.getAccessLevel());
@@ -266,7 +266,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
 
     private void updateGitLabPermission(Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember, RdmMemberAuditRecord dbRecord) {
         if (groupGlMember != null) {
-            //如果组的权限是owner，则不作处理， 组的权限是owner 他在项目的权限也是owner,这个时候需要按照gotlab的权限来修
+            //如果组的权限是owner，则不作处理， 组的权限是owner 他在项目的权限也是owner,这个时候需要按照gitlab的权限来修
             if (groupGlMember.getAccessLevel().value.intValue() == AccessLevel.OWNER.toValue().intValue()) {
                 dbMember.setSyncGitlabFlag(Boolean.TRUE);
                 dbMember.setGlAccessLevel(AccessLevel.OWNER.toValue().intValue());
@@ -307,8 +307,8 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                     rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
                     return;
                 }
-                //同步成功的 组里面没有角色 gitlab的AccessLevel只可能小于50  就按照choerodon来修数据
-                if (dbMember.getGlAccessLevel() < 50) {
+                //同步成功的 组里面没有角色 gitlab的AccessLevel只可能小于50  就按照choerodon来修数据 跟新时必须确保成员的权限小于owner
+                if (dbMember.getGlAccessLevel() < 50 && projectGlMember.getAccessLevel().value.intValue() < 50) {
                     gitlabProjectFixApi.updateMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
                 } else {
                     dbMember.setGlAccessLevel(projectGlMember.getAccessLevel().value);
