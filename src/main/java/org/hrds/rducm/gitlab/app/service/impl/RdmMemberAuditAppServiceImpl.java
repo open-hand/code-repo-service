@@ -161,6 +161,19 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
         if (isOrgAdmin) {
             // 修复为group Owner权限
             logger.debug("修复用户[{}]为组织管理员权限", userId);
+            //如果是组织管理员，又是项目成员，需要插入dbMember
+            if (isProjectMember && Objects.isNull(dbMember)) {
+                RdmMember rdmMember = new RdmMember();
+                rdmMember.setSyncGitlabFlag(true);
+                rdmMember.setGlAccessLevel(AccessLevel.OWNER.toValue());
+                rdmMember.setProjectId(projectId);
+                rdmMember.setUserId(userId);
+                rdmMember.setRepositoryId(repositoryId);
+                rdmMember.setOrganizationId(organizationId);
+                rdmMember.setGlProjectId(glProjectId);
+                rdmMember.setGlUserId(glUserId);
+                rdmMemberRepository.insert(rdmMember);
+            }
             updateGitlabGroupMemberWithOwner(groupGlMember, glGroupId, glUserId);
         } else {
             // 是否为团队成员
