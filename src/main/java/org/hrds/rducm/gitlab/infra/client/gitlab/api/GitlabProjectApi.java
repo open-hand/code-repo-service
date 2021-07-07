@@ -7,6 +7,8 @@ import org.gitlab4j.api.models.User;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.constant.GitlabClientConstants;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +19,7 @@ import java.util.Objects;
 @Repository
 public class GitlabProjectApi {
     private final Gitlab4jClientWrapper gitlab4jClient;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public GitlabProjectApi(Gitlab4jClientWrapper gitlab4jClient) {
         this.gitlab4jClient = gitlab4jClient;
@@ -117,7 +120,12 @@ public class GitlabProjectApi {
                     .getProjectApi()
                     .removeMember(projectId, userId);
         } catch (GitLabApiException e) {
-            throw new GitlabClientException(e, e.getMessage());
+            if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                logger.info(">>>>>>>NOT_FOUND:projectId:{},userId:{}>>>>>>>>>>>>>", projectId, userId);
+            } else {
+                throw new GitlabClientException(e, e.getMessage());
+
+            }
         }
     }
 
