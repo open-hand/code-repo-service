@@ -351,7 +351,7 @@ const EnvModals = observer((props) => {
           },
           {
             name: formatMessage({ id: 'infra.button.batch.sync' }),
-            icon: 'delete',
+            icon: 'sync',
             handler: handleSyncOpenModal,
             display: true,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
