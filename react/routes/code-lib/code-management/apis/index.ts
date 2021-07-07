@@ -60,6 +60,14 @@ class CodeManagerApis {
   static bacthAuidt(organizationId:string,projectId:string) {
     return axios.get(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/member-audit-records/audit`)
   }
+
+  static batchAuditStatus(organizationId:string,projectId:string){
+    return axios.get(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/member-audit-records/audit/status`)
+  }
+
+  static bacthfixStatus(organizationId:string,projectId:string){
+    return axios.get(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/member-audit-records/audit/fix/status`)
+  }
   
 }
 
