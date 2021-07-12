@@ -1,5 +1,7 @@
 package org.hrds.rducm.gitlab.infra.enums;
 
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * @author ying.xie@hand-china.com
  * @date 2020/6/9
@@ -52,7 +54,12 @@ public enum RoleLabelEnum {
     /**
      * 平台层角色标签
      */
-    SITE_MGR("SITE_MGR");
+    SITE_MGR("SITE_MGR"),
+
+    /**
+     * 不处理的标签
+     */
+    DEFAULT("DEFAULT");
 
     private final String value;
 

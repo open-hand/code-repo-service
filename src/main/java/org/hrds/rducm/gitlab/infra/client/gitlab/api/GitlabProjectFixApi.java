@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.infra.client.gitlab.api;
 
+import java.io.DataInput;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -10,12 +11,16 @@ import org.gitlab4j.api.models.User;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.constant.GitlabClientConstants;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class GitlabProjectFixApi {
     private final Gitlab4jClientWrapper gitlab4jClient;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitlabProjectFixApi.class);
 
     public GitlabProjectFixApi(Gitlab4jClientWrapper gitlab4jClient) {
         this.gitlab4jClient = gitlab4jClient;
@@ -122,6 +127,9 @@ public class GitlabProjectFixApi {
 
         } catch (GitLabApiException e) {
             if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                return null;
+            } else if (e.getHttpStatus() == HttpStatus.BAD_REQUEST.value()) {
+                LOGGER.info(">>>>>>>>>>>>>>>Bad Request:{},{},{},{}>>>>>>>>>>>>>>>>>", (Integer) projectIdOrPath, userId, accessLevel, expiresAt.getTime());
                 return null;
             } else {
                 throw new GitlabClientException(e, e.getMessage());

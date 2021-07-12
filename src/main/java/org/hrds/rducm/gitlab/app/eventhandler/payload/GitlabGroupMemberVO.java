@@ -1,6 +1,8 @@
 package org.hrds.rducm.gitlab.app.eventhandler.payload;
 
+import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author ying.xie@hand-china.com
@@ -33,6 +35,17 @@ public class GitlabGroupMemberVO {
     private Long userId;
 
     private String uuid;
+
+    @ApiModelProperty("已经删除角色的标签")
+    private Set<String> deleteRoleLabels;
+
+    public Set<String> getDeleteRoleLabels() {
+        return deleteRoleLabels;
+    }
+
+    public void setDeleteRoleLabels(Set<String> deleteRoleLabels) {
+        this.deleteRoleLabels = deleteRoleLabels;
+    }
 
     public String getUsername() {
         return username;
