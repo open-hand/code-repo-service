@@ -249,7 +249,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                 rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
                 return;
             }
-            //如果组的权限存在，先移除组的权限（随之项目的权限也会被移除）
+            //如果组的权限存在，先移除组的权限（随之项目的权限也会被移除,项目原来添加的非Owner权限一并移除）
             //remove的时候注意  一个组至少存在一个owner, 如果删除返回403则不处理
             gitlabGroupFixApi.removeMember(glGroupId, glUserId);
             //然后如果同步成功，按照choerodon来修复，并且choerodon中为其赋予了权限并且同步成功了
@@ -285,6 +285,8 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                 //同步成功的 组里面没有角色 gitlab的AccessLevel只可能小于50  就按照choerodon来修数据 跟新时必须确保成员的权限小于owner
                 if (dbMember.getGlAccessLevel() < 50 && projectGlMember.getAccessLevel().value.intValue() < 50) {
                     gitlabProjectFixApi.updateMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
+//                    gitlabProjectFixApi.removeMember(glProjectId, glUserId);
+//                    gitlabProjectFixApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
                 } else {
                     dbMember.setGlAccessLevel(projectGlMember.getAccessLevel().value);
                     rdmMemberRepository.updateByPrimaryKey(dbMember);

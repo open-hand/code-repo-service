@@ -10,7 +10,9 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.domain.AuditDomain;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTaskCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
@@ -75,7 +77,6 @@ public class RdmMemberChangeSagaHandler {
                 }.getType());
         logger.info("update user role start");
         logger.info("payload:\n{}", gson.toJson(gitlabGroupMemberVOList));
-
         handleProjectLevel(gitlabGroupMemberVOList);
         handleOrgLevel(gitlabGroupMemberVOList);
 
@@ -116,10 +117,9 @@ public class RdmMemberChangeSagaHandler {
                         rdmMembers.forEach(rdmMember1 -> {
                             gitlabProjectApi.removeMember(rdmMember1.getGlProjectId(), rdmMember1.getGlUserId());
                         });
-                        // 删除团队成员, 删除权限
-                        handleRemoveMemberOnProjectLevel(organizationId, projectId, userId);
                     }
-
+                    // 删除团队成员, 删除权限
+                    handleRemoveMemberOnProjectLevel(organizationId, projectId, userId);
                 });
 
         // 组织层
@@ -202,7 +202,13 @@ public class RdmMemberChangeSagaHandler {
                         // 无项目角色, 删除权限
                         handleRemoveMemberOnProjectLevel(organizationId, projectId, userId);
                     } else {
-                        String roleType = fetchRoleLabel(userMemberRoleList);
+                        //删除的角色里面是否包含gitlab Owner的标签
+                        boolean containsGitlabOwner = Boolean.FALSE;
+                        if (!CollectionUtils.isEmpty(gitlabGroupMemberVO.getDeleteRoleLabels())) {
+                            containsGitlabOwner = gitlabGroupMemberVO.getDeleteRoleLabels().contains(RoleLabelEnum.GITLAB_OWNER.value());
+                        }
+                        //新增的角色
+                        String roleType = fetchProjectRoleLabel(userMemberRoleList, containsGitlabOwner);
                         RoleLabelEnum roleLabelEnum = Optional.ofNullable(EnumUtils.getEnum(RoleLabelEnum.class, roleType)).orElseThrow(IllegalArgumentException::new);
 
                         switch (roleLabelEnum) {
@@ -238,7 +244,7 @@ public class RdmMemberChangeSagaHandler {
                         // 如果角色为空
                         handleRemoveOrgAdmin(organizationId, userId);
                     } else {
-                        String roleType = fetchRoleLabel(userMemberRoleList);
+                        String roleType = fetchOrgRoleLabel(userMemberRoleList);
                         RoleLabelEnum roleLabelEnum = Optional.ofNullable(EnumUtils.getEnum(RoleLabelEnum.class, roleType)).orElseThrow(IllegalArgumentException::new);
 
                         switch (roleLabelEnum) {
@@ -281,19 +287,32 @@ public class RdmMemberChangeSagaHandler {
      * @param userMemberRoleList
      * @return
      */
-    private String fetchRoleLabel(List<String> userMemberRoleList) {
-        // 项目层
+    private String fetchProjectRoleLabel(List<String> userMemberRoleList, boolean containsGitlabOwner) {
+        // 项目层  如果删除的角色不包含owner标签，则不应该去掉原来角色分配的权限
         if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_ROLE.value())) {
-            if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_ADMIN.value())) {
+            if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_ADMIN.value()) && containsGitlabOwner) {
                 return RoleLabelEnum.PROJECT_ADMIN.value();
-            } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value())) {
-                return RoleLabelEnum.PROJECT_MEMBER.value();
-            } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_OWNER.value())) {
+            } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_ADMIN.value()) && !containsGitlabOwner) {
                 return RoleLabelEnum.PROJECT_ADMIN.value();
-            } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_DEVELOPER.value())) {
+            } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value()) && containsGitlabOwner) {
                 return RoleLabelEnum.PROJECT_MEMBER.value();
+            } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value()) && !containsGitlabOwner) {
+                return RoleLabelEnum.DEFAULT.value();
+            } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_OWNER.value()) && containsGitlabOwner) {
+                return RoleLabelEnum.PROJECT_ADMIN.value();
+            } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_OWNER.value()) && !containsGitlabOwner) {
+                return RoleLabelEnum.PROJECT_ADMIN.value();
+            } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_DEVELOPER.value()) && containsGitlabOwner) {
+                return RoleLabelEnum.PROJECT_MEMBER.value();
+            } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_DEVELOPER.value()) && !containsGitlabOwner) {
+                return RoleLabelEnum.DEFAULT.value();
             }
         }
+        return null;
+    }
+
+    private String fetchOrgRoleLabel(List<String> userMemberRoleList) {
+
         // 组织层
 //        else if (userMemberRoleList.contains(RoleLabelEnum.TENANT_ROLE.value())) {
         if (userMemberRoleList.contains(RoleLabelEnum.TENANT_ADMIN.value())) {
@@ -307,6 +326,7 @@ public class RdmMemberChangeSagaHandler {
 
         return null;
     }
+
 
     private void handleRemoveMemberOnProjectLevel(Long organizationId, Long projectId, Long userId) {
         // 删除该成员权限
