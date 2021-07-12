@@ -263,7 +263,7 @@ const EnvModals = observer((props) => {
     try {
       const res = await Apis.bacthAuidt(organizationId, projectId);
       if (res && res.failed) {
-        message.error('批量审计失败');
+        message.error('手动审计失败');
         return true;
       }
       psAuditDs.query();
@@ -298,7 +298,7 @@ const EnvModals = observer((props) => {
   function handleBatchAuditModalOpen() {
     Modal.open({
       key: Modal.key(),
-      title: '批量审计',
+      title: '手动审计',
       children: <AuditModal onOk={handlerBatchAudit} organizationId={organizationId} projectId={projectId} />,
     });
   }
@@ -317,10 +317,9 @@ const EnvModals = observer((props) => {
     switch (type) {
       case 'psAudit':
         buttonData.unshift({
-          name: '批量审计',
+          name: '手动审计',
           icon: 'playlist_add_check',
           handler: handleBatchAuditModalOpen,
-          disabled: !psAuditDs.length,
         }, {
           name: '批量修复',
           icon: 'person_add-o',
