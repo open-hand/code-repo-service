@@ -294,14 +294,14 @@ public class RdmMemberChangeSagaHandler {
                 return RoleLabelEnum.PROJECT_ADMIN.value();
             } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_ADMIN.value()) && !containsGitlabOwner) {
                 return RoleLabelEnum.PROJECT_ADMIN.value();
-            } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value()) && containsGitlabOwner) {
-                return RoleLabelEnum.PROJECT_MEMBER.value();
-            } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value()) && !containsGitlabOwner) {
-                return RoleLabelEnum.DEFAULT.value();
             } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_OWNER.value()) && containsGitlabOwner) {
                 return RoleLabelEnum.PROJECT_ADMIN.value();
             } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_OWNER.value()) && !containsGitlabOwner) {
                 return RoleLabelEnum.PROJECT_ADMIN.value();
+            } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value()) && containsGitlabOwner) {
+                return RoleLabelEnum.PROJECT_MEMBER.value();
+            } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value()) && !containsGitlabOwner) {
+                return RoleLabelEnum.DEFAULT.value();
             } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_DEVELOPER.value()) && containsGitlabOwner) {
                 return RoleLabelEnum.PROJECT_MEMBER.value();
             } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_DEVELOPER.value()) && !containsGitlabOwner) {
