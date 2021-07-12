@@ -58,8 +58,8 @@ const AuditModal = ({ modal, organizationId, projectId, onOk }: any) => {
   return (
     <div>
       {isAuditing
-        ? "批量修复正在进行中...."
-        : "确定进行批量修复吗？这个过程可能需要一段时间，可以先进行其他操作"}
+        ? "手动审计正在进行中...."
+        : "确定进行手动审计吗？这个过程可能需要一段时间，可以先进行其他操作"}
     </div>
   );
 };
@@ -120,7 +120,7 @@ const FixModal = ({ modal, organizationId, projectId, onOk }: any) => {
     <div>
       {isFixing
         ? "批量修复正在进行中...."
-        : "确定进行批量审批吗？这个过程可能需要一段时间，可以先进行其他操作"}
+        : "确定进行批量修复吗？这个过程可能需要一段时间，可以先进行其他操作"}
     </div>
   );
 };
