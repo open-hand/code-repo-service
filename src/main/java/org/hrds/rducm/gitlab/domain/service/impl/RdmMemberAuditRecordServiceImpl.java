@@ -279,6 +279,10 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                     // 如果AccessLevel不相等, 说明不一致
                     isDifferent = true;
                 }
+                //如果两边的level都为null 则不插入
+                if (Objects.isNull(dbMember.getGlAccessLevel()) && Objects.isNull(member.getAccessLevel().value)) {
+                    isDifferent = false;
+                }
 
                 if (!Objects.equals(member.getExpiresAt(), dbMember.getGlExpiresAt())) {
                     // 如果ExpiresAt不相等, 说明不一致
