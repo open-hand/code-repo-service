@@ -97,10 +97,11 @@ public class RdmMemberAuditRecordProjController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @GetMapping("/audit/fix/status")
     public ResponseEntity<SagaInstanceDetails> projectAuditFixStatus(@PathVariable Long organizationId,
-                                                                  @PathVariable Long projectId) {
+                                                                     @PathVariable Long projectId) {
 
         return Results.success(rdmMemberAuditAppService.projectAuditFixStatus(organizationId, projectId));
     }
+
 
 
 }

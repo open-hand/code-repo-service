@@ -527,6 +527,22 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void allSync(Long organizationId, Long projectId) {
+        //查询项目下所有未同步的用户
+        RdmMember rdmMember = new RdmMember();
+        rdmMember.setProjectId(projectId);
+        rdmMember.setSyncGitlabFlag(Boolean.FALSE);
+        List<RdmMember> rdmMembers = rdmMemberRepository.select(rdmMember);
+        if (CollectionUtils.isEmpty(rdmMembers)) {
+            return;
+        }
+        rdmMembers.forEach(member -> {
+            syncMember(member.getId());
+        });
+    }
+
     /**
      * 批量预新增或修改, 使用一个新事务
      *

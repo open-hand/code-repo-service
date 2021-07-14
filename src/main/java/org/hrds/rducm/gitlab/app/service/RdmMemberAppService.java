@@ -150,4 +150,6 @@ public interface RdmMemberAppService {
     List<RdmMember> batchValidMember(Long organizationId, Long projectId, Long repositoryId);
 
     void syncBatchMember(List<Long> memberIds);
+
+    void allSync(Long organizationId, Long projectId);
 }
