@@ -85,7 +85,6 @@ public class RdmMemberController extends BaseController {
         rdmMemberAppService.syncMember(memberId);
         return Results.success();
     }
-
     @ApiOperation(value = "手动批量同步代码库成员")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectId", value = ApiInfoConstants.PROJECT_ID, paramType = "path", required = true),
@@ -97,6 +96,15 @@ public class RdmMemberController extends BaseController {
                                              @PathVariable Long projectId,
                                              @Encrypt @RequestBody List<Long> memberIds) {
         rdmMemberAppService.syncBatchMember(memberIds);
+        return Results.success();
+    }
+
+    @ApiOperation(value = "项目下全部同步")
+    @Permission(level = ResourceLevel.ORGANIZATION)
+    @GetMapping("/members/all/sync")
+    public ResponseEntity<Void> allSync(@PathVariable Long organizationId,
+                                        @PathVariable Long projectId) {
+        rdmMemberAppService.allSync(organizationId, projectId);
         return Results.success();
     }
 
