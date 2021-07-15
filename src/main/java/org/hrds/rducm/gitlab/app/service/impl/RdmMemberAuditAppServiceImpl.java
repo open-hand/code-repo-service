@@ -284,6 +284,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                 }
                 //同步成功的 组里面没有角色 gitlab的AccessLevel只可能小于50  就按照choerodon来修数据 跟新时必须确保成员的权限小于owner
                 if (!Objects.isNull(dbMember.getGlAccessLevel()) && dbMember.getGlAccessLevel() < 50 && projectGlMember.getAccessLevel().value.intValue() < 50) {
+                    logger.info("出现异常的数据：{}", dbRecord.getId());
                     gitlabProjectFixApi.updateMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
 //                    gitlabProjectFixApi.removeMember(glProjectId, glUserId);
 //                    gitlabProjectFixApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
