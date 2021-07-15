@@ -11,6 +11,7 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
+import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClient;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupFixApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
@@ -284,10 +285,8 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
                 }
                 //同步成功的 组里面没有角色 gitlab的AccessLevel只可能小于50  就按照choerodon来修数据 跟新时必须确保成员的权限小于owner
                 if (!Objects.isNull(dbMember.getGlAccessLevel()) && dbMember.getGlAccessLevel() < 50 && projectGlMember.getAccessLevel().value.intValue() < 50) {
-                    logger.info("出现异常的数据：{}", dbRecord.getId());
+                    //有一些项目对应的组的id和他实际在gitlab上的组的id不一致，这里跟新会400
                     gitlabProjectFixApi.updateMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-//                    gitlabProjectFixApi.removeMember(glProjectId, glUserId);
-//                    gitlabProjectFixApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
                 } else {
                     dbMember.setGlAccessLevel(projectGlMember.getAccessLevel().value);
                     rdmMemberRepository.updateByPrimaryKey(dbMember);
