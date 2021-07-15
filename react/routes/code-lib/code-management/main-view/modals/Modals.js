@@ -222,7 +222,8 @@ const EnvModals = observer((props) => {
   async function handleSync() {
     const syncData = psSetDs.selected.filter(record => !record.get('syncGitlabFlag')).map(item => item.get('id'));
     try {
-      const res = await axios.post(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members/batch/sync`, JSON.stringify(syncData));
+      // /v1/organizations/{organizationId}/projects/{projectId}/gitlab/repositories/members/all/sync
+      const res = await axios.post(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members/all/sync`, JSON.stringify(syncData));
       if (res && res.failed) {
         message.error('用户同步失败，请检查后重试');
         return true;
