@@ -68,6 +68,10 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
                 return;
             }
             for (RdmMemberAuditRecord record : list) {
+                //已经同步过的不在同步
+                if (record.getSyncFlag()){
+                    return;
+                }
                 rdmMemberAuditAppService.auditFix(record.getOrganizationId(), record.getProjectId(), record.getRepositoryId(), record.getId());
             }
         });
