@@ -150,7 +150,7 @@ public class RdmMemberApplicantProjController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION)
     @PostMapping("/batch/pass")
     public ResponseEntity<?> batchPassAndHandleMember(@RequestBody List<RdmMemberApplicantPassVO> rdmMemberApplicantPassVOS,
-                                                      @RequestParam("expiresAt") Date expiresAt) {
+                                                      @RequestParam(value = "expiresAt",required = false) Date expiresAt) {
 //        validObject(passDTO);
         rdmMemberApplicantAppService.batchPassAndHandleMember(rdmMemberApplicantPassVOS, expiresAt);
         return Results.success();

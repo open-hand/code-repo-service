@@ -113,10 +113,10 @@ public class RdmMemberApplicantAppServiceImpl implements RdmMemberApplicantAppSe
     @Transactional(rollbackFor = Exception.class)
     public void batchPassAndHandleMember(List<RdmMemberApplicantPassVO> rdmMemberApplicantPassVOS, Date expiresAt) {
         //校验时间
-        if (Objects.isNull(expiresAt)) {
-            throw new CommonException("error.expire.time.is.null");
-        }
-        if (expiresAt.getTime() < new Date().getTime()) {
+//        if (Objects.isNull(expiresAt)) {
+//            throw new CommonException("error.expire.time.is.null");
+//        }
+        if (!Objects.isNull(expiresAt) && expiresAt.getTime() < new Date().getTime()) {
             throw new CommonException("error.please.enter.future.time");
         }
         rdmMemberApplicantPassVOS.forEach(rdmMemberApplicantPassVO -> {
