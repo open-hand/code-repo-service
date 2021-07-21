@@ -24,7 +24,8 @@ export default inject('AppState')(observer(({
       const { organizationId, projectId } = AppState.menuType;
       // 如果是批量通过
       if (BatchDs.current.get('result') === 'pass') {
-        const expiresAt = moment(BatchDs.current.get('overdueTime')).format('YYYY-MM-DD HH:mm:ss');
+        const overdueTime = BatchDs.current.get('overdueTime');
+        const expiresAt = overdueTime ? moment(overdueTime).format('YYYY-MM-DD HH:mm:ss') : '';
         try {
           await BatchApproveServices
             .axiosPostBatchPass(organizationId, projectId, expiresAt, list);
@@ -73,6 +74,7 @@ export default inject('AppState')(observer(({
       name: 'overdueTime',
       type: 'date',
       label: '过期时间',
+      required: false,
     }, {
       name: 'rejectReason',
       type: 'string',

@@ -1,6 +1,10 @@
 export default class ApproveApis {
   static getBatchPassUrl(orgId, proId, expiresAt) {
-    return `/rducm/v1/organizations/${orgId}/projects/${proId}/gitlab/repositories/member-applicants/batch/pass?expiresAt=${expiresAt}`;
+    let baseUrl = `/rducm/v1/organizations/${orgId}/projects/${proId}/gitlab/repositories/member-applicants/batch/pass`;
+    if (expiresAt) {
+      baseUrl += `?expiresAt=${expiresAt}`;
+    }
+    return baseUrl;
   }
 
   static getBatchRejectUrl(orgId, proId, approvalMessage) {
