@@ -63,7 +63,7 @@ export const StoreProvider = injectIntl(
             {
               name: "权限审计",
               value: "psAudit",
-              tip: "https://nexus.choerodon.com.cn/repository/private-npm",
+              tip: formatMessage({ id: 'infra.codeManage.ps.message.psAudit.tips' }),
             },
           ],
         ];
