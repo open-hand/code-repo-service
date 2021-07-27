@@ -198,4 +198,6 @@ public interface IRdmMemberService {
      * @param expiredRdmMembers 过期成员数据
      */
     void batchExpireMembers(List<RdmMember> expiredRdmMembers);
+
+    List<RepositoryPrivilegeViewDTO> listMemberRepositoriesByAccesses(Long organizationId, Long projectId, Set<Long> userIds, Integer accessLevel);
 }
