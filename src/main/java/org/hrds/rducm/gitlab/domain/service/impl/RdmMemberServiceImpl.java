@@ -487,6 +487,32 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, eventType, eventParam));
     }
 
+
+    @Override
+    public List<RepositoryPrivilegeViewDTO> listMemberRepositoriesByAccesses(Long organizationId, Long projectId, Set<Long> userIds, Integer accessLevel) {
+        Condition condition = Condition.builder(RdmMember.class)
+                .andWhere(Sqls.custom()
+                        .andEqualTo(RdmMember.FIELD_ORGANIZATION_ID, organizationId)
+                        .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
+                        .andIn(RdmMember.FIELD_USER_ID, userIds)
+                        // 同步状态需为true
+                        .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, Boolean.TRUE)
+                        .andGreaterThan(RdmMember.FIELD_GL_ACCESS_LEVEL,accessLevel))
+                .build();
+        List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
+        Map<Long, List<RdmMember>> group = rdmMembers.stream().collect(Collectors.groupingBy(RdmMember::getUserId));
+
+        List<RepositoryPrivilegeViewDTO> result = new ArrayList<>();
+        group.forEach((k, v) -> {
+            RepositoryPrivilegeViewDTO viewDTO = new RepositoryPrivilegeViewDTO();
+            viewDTO.setUserId(k);
+            viewDTO.setAppServiceIds(v.stream().map(RdmMember::getRepositoryId).collect(Collectors.toSet()));
+            result.add(viewDTO);
+        });
+
+        return result;
+    }
+
     /**
      * 构造审计所需报文参数
      *

@@ -4,6 +4,7 @@ import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import io.choerodon.swagger.annotation.Permission;
+
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
@@ -58,5 +59,24 @@ public class RdmProjectController extends BaseController {
                                                                                    @PathVariable Long projectId,
                                                                                    @RequestBody Set<Long> userIds) {
         return Results.success(iRdmMemberService.selectRepositoriesByPrivilege(organizationId, projectId, userIds));
+    }
+
+
+    /**
+     * 获取用户拥有权限的代码库
+     *
+     * @param organizationId
+     * @param projectId
+     * @param userIds
+     * @return
+     */
+    @ApiOperation(value = "查询用户在项目下有指定权限及以上的应用服务")
+    @Permission(level = ResourceLevel.ORGANIZATION, permissionWithin = true)
+    @PostMapping("/members/access/level/repositories/within")
+    public ResponseEntity<List<RepositoryPrivilegeViewDTO>> listMemberRepositoriesByAccesses(@PathVariable Long organizationId,
+                                                                                             @PathVariable Long projectId,
+                                                                                             @RequestParam("accessLevel") Integer accessLevel,
+                                                                                             @RequestBody Set<Long> userIds) {
+        return Results.success(iRdmMemberService.listMemberRepositoriesByAccesses(organizationId, projectId, userIds, accessLevel));
     }
 }
