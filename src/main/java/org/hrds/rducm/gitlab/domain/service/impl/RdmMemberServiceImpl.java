@@ -497,7 +497,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
                         .andIn(RdmMember.FIELD_USER_ID, userIds)
                         // 同步状态需为true
                         .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, Boolean.TRUE)
-                        .andGreaterThan(RdmMember.FIELD_GL_ACCESS_LEVEL,accessLevel))
+                        .andGreaterThanOrEqualTo(RdmMember.FIELD_GL_ACCESS_LEVEL,accessLevel))
                 .build();
         List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
         Map<Long, List<RdmMember>> group = rdmMembers.stream().collect(Collectors.groupingBy(RdmMember::getUserId));
