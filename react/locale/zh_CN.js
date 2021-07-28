@@ -261,7 +261,7 @@ const psManager = {
   'infra.member.specific': '项目下特定人员',
   'infra.add.member': '分配成员权限',
   'infra.button.batch.delete': '批量删除',
-  'infra.button.batch.sync': '批量同步',
+  'infra.button.batch.sync': '全部同步',
   'infra.view.message.deleteSuccess': '删除成功！',
   'infra.add.outsideMember': '分配外部成员权限',
   'infra.add.outsideMember.tips': '此处需精确输入用户名或登录名来搜索对应的用户',

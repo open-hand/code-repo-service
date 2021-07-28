@@ -213,17 +213,15 @@ const EnvModals = observer((props) => {
   function handleSyncOpenModal() {
     Modal.open({
       title: formatMessage({ id: 'infra.button.batch.sync' }),
-      children: '确认要批量将选中的【未同步】状态用户的代码权限与GitLab仓库内用户的权限进行同步吗？',
+      children: '确认要全部将【未同步】状态用户的代码权限与GitLab仓库内用户的权限进行同步吗？',
       onOk: handleSync,
       key: SyncKey,
     });
   }
 
   async function handleSync() {
-    const syncData = psSetDs.selected.filter(record => !record.get('syncGitlabFlag')).map(item => item.get('id'));
     try {
-      // /v1/organizations/{organizationId}/projects/{projectId}/gitlab/repositories/members/all/sync
-      const res = await axios.post(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members/all/sync`, JSON.stringify(syncData));
+      const res = await axios.get(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members/all/sync`)
       if (res && res.failed) {
         message.error('用户同步失败，请检查后重试');
         return true;
@@ -250,14 +248,6 @@ const EnvModals = observer((props) => {
         width: 380,
       },
     });
-  }
-
-  function checkBatchSyncDisabled() {
-    if (!psSetDs.selected.length) {
-      return true;
-    }
-    const arr = psSetDs.selected.filter(record => !record.get('syncGitlabFlag'));
-    return !arr.length;
   }
 
   async function handlerBatchAudit() {
@@ -375,10 +365,6 @@ const EnvModals = observer((props) => {
             handler: handleSyncOpenModal,
             display: true,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
-            disabled: checkBatchSyncDisabled(),
-            tooltipsConfig: {
-              title: checkBatchSyncDisabled() ? '请在列表中勾选【未同步】状态的用户' : '',
-            },
           },
           {
             name: formatMessage({ id: 'infra.button.batch.delete' }),
