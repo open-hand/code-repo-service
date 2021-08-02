@@ -28,9 +28,9 @@ const PsAudit = observer(() => {
     setExecutionDate,
   } = usPsManagerStore();
 
-  const refresh = useCallback(() =>{
+  const refresh = useCallback(() => {
     psAuditDs.query();
-  },[psAuditDs])
+  }, [psAuditDs])
 
   async function fetchExecutionDate() {
     try {
@@ -47,7 +47,7 @@ const PsAudit = observer(() => {
       }
     } catch (error) {
       Choerodon.handleResponseError(error);
-        return false;
+      return false;
     }
   }
 
@@ -56,7 +56,7 @@ const PsAudit = observer(() => {
     fetchExecutionDate();
   }, [refresh]);
 
-  async function handleOk(record:any) {
+  async function handleOk(record: any) {
     const params = {
       organizationId,
       projectId,
@@ -81,7 +81,7 @@ const PsAudit = observer(() => {
     }
   }
 
-  const openDelete = (record:any) => {
+  const openDelete = (record: any) => {
     Modal.open({
       key: modalKey,
       title: formatMessage({ id: `${intlPrefix}.operate.fixPs` }),
@@ -91,7 +91,7 @@ const PsAudit = observer(() => {
     });
   };
 
-  function renderAction({ record }:any) {
+  function renderAction({ record }: any) {
     const actionData = [
       {
         service: [
@@ -104,7 +104,7 @@ const PsAudit = observer(() => {
     return <Action data={actionData} />;
   }
 
-  function handleTableFilter(record:any) {
+  function handleTableFilter(record: any) {
     return record.status !== "add";
   }
 
@@ -122,7 +122,7 @@ const PsAudit = observer(() => {
     return date;
   }
 
-  function renderName({ record }:any) {
+  function renderName({ record }: any) {
     const avatar = (
       <UserAvatar
         // @ts-expect-error
@@ -137,10 +137,10 @@ const PsAudit = observer(() => {
     );
     return <div style={{ display: "inline-flex" }}>{avatar}</div>;
   }
-  function renderLoginName({ record }:any) {
+  function renderLoginName({ record }: any) {
     return <span>{record.get("user").loginName}</span>;
   }
-  function renderLevel({ text, record }:any) {
+  function renderLevel({ text, record }: any) {
     return (
       <span
         style={{ color: !record.get("accessLevelSyncFlag") ? "#EF4E42" : "" }}
@@ -149,7 +149,7 @@ const PsAudit = observer(() => {
       </span>
     );
   }
-  function renderDate({ text, record }:any) {
+  function renderDate({ text, record }: any) {
     return (
       <span
         style={{ color: !record.get("expiresAtSyncFlag") ? "#EF4E42" : "" }}
@@ -171,9 +171,9 @@ const PsAudit = observer(() => {
       <Column renderer={renderAction} width={70} />
       <Column name="loginName" renderer={renderLoginName} />
       <Column name="repositoryName" width={180} />
-      <Column name="accessLevel" renderer={renderLevel} />
+      <Column name="accessLevel" renderer={renderLevel} help="即用户在Choerodon平台内该项目下被分配的代码权限" />
       <Column name="expiresAt" renderer={renderDate} />
-      <Column name="glAccessLevel" renderer={renderLevel} />
+      <Column name="glAccessLevel" renderer={renderLevel} help="即用户在GitLab仓库中的代码权限" />
       <Column name="glExpiresAt" renderer={renderDate} />
     </Table>
   );

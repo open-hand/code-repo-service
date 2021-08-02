@@ -25,7 +25,7 @@ export default observer((props) => {
     branchServiceDs,
   } = useAddMemberStore();
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log(branchServiceDs);
     console.log(branchServiceDs.current);
   }, [branchServiceDs]);
@@ -40,9 +40,8 @@ export default observer((props) => {
       if (await formDs.submit()) {
         refresh();
         return true;
-      } else {
-        return false;
       }
+      return false;
     } catch (e) {
       Choerodon.handleResponseError(e);
       return false;
@@ -115,14 +114,14 @@ export default observer((props) => {
         addButton={formatMessage({ id: 'infra.add.outsideMember' })}
         dsStore={[dsStore]}
       >
-        {[(itemProps) => (
+        {[itemProps => (
           <Select
             {...itemProps}
             colSpan={4}
             labelLayout="float"
             searchable
             searchMatcher={() => true}
-            onInput={(e) => handleFilterChange(e, itemProps.options)}
+            onInput={e => handleFilterChange(e, itemProps.options)}
             style={{ width: '100%' }}
             optionRenderer={getOption}
             addonAfter={(
@@ -131,7 +130,7 @@ export default observer((props) => {
               </Tooltip>
             )}
           />
-        ), (itemProps) => (
+        ), itemProps => (
           <Select
             {...itemProps}
             labelLayout="float"
@@ -139,7 +138,7 @@ export default observer((props) => {
             onOption={getClusterOptionProp}
             optionsFilter={levelOptionsFilter}
           />
-        ), (itemProps) => (
+        ), itemProps => (
           <DatePicker
             {...itemProps}
             labelLayout="float"
