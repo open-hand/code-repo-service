@@ -49,7 +49,6 @@ const AuditModal = ({ modal, organizationId, projectId, onOk }: any) => {
   }
 
   if (loading) {
-    // @ts-expect-error
     return <Loading display style={{
       minHeight: '100px'
     }} />;
@@ -110,7 +109,6 @@ const FixModal = ({ modal, organizationId, projectId, onOk }: any) => {
   }
 
   if (loading) {
-    // @ts-expect-error
     return <Loading display style={{
       minHeight: '100px'
     }} />;

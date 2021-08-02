@@ -137,12 +137,12 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, repositor
       name: 'realName',
       type: 'string',
       label: formatMessage({ id: 'userName' }),
-    },
+    }, // 用户名
     {
       name: 'loginName',
       type: 'string',
       label: formatMessage({ id: 'loginName' }),
-    },
+    }, // 登陆名
     // {
     //   name: 'repositoryIds',
     //   type: 'string',
