@@ -102,8 +102,10 @@ const ApplyView = observer(() => {
       queryFieldsLimit={3}
     >
       <Column name="repositoryName" width={250} />
+      {/* 应用服务 */}
       <Column renderer={renderAction} width={70} />
       <Column name="applicantType" />
+      {/* 申请类型 */}
       <Column name="accessLevel" />
       <Column name="approvalState" renderer={renderStatus} />
       <Column name="applicantDate" />
