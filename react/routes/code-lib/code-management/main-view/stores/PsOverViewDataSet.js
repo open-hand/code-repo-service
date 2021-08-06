@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+/* eslint-disable import/no-anonymous-default-export */
 
 import React from 'react';
 import Tips from '@/components/new-tips';

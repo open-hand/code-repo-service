@@ -100,6 +100,7 @@ export default observer((props) => {
           searchable
           maxTagCount={3}
           maxTagTextLength={6}
+          searchMatcher={({ record, text, textField }) => record.get('repositoryCode').indexOf(text) !== -1 || record.get(textField).indexOf(text) !== -1}
           maxTagPlaceholder={restValues => `+${restValues.length}...`}
           dropdownMenuStyle={{ width: '5.12rem' }}
           colSpan={6}
