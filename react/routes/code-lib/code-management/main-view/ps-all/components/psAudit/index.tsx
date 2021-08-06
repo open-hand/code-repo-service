@@ -167,10 +167,10 @@ const PsAudit = observer(() => {
       queryFieldsLimit={3}
       className="c7n-infra-code-management-table"
     >
-      <Column name="realName" renderer={renderName} width={200} />
+      <Column name="realName" renderer={renderName} width={120} />
       <Column renderer={renderAction} width={70} />
       <Column name="loginName" renderer={renderLoginName} />
-      <Column name="repositoryName" width={180} />
+      <Column name="repositoryName" width={120} />
       <Column name="accessLevel" renderer={renderLevel} help="即用户在Choerodon平台内该项目下被分配的代码权限" />
       <Column name="expiresAt" renderer={renderDate} />
       <Column name="glAccessLevel" renderer={renderLevel} help="即用户在GitLab仓库中的代码权限" />

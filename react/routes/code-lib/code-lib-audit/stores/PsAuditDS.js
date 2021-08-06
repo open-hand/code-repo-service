@@ -1,3 +1,4 @@
+/* eslint-disable import/no-anonymous-default-export */
 // import { axios } from '@choerodon/boot';
 import { map } from 'lodash';
 
@@ -16,19 +17,18 @@ export default ((formatMessage, organizationId) => ({
           const data = JSON.parse(resp);
           if (data && data.failed) {
             return data;
-          } else {
-            const { list, content, ...others } = data;
-            const tempList = map(data.list || data.content || [], item => ({
-              ...item,
-              accessLevel: item.accessLevel ? `L${item.accessLevel}` : '-',
-              glAccessLevel: item.glAccessLevel ? `L${item.glAccessLevel}` : '-',
-            }));
-            return {
-              ...others,
-              list: tempList,
-              content: tempList,
-            };
           }
+          const { list, content, ...others } = data;
+          const tempList = map(data.list || data.content || [], item => ({
+            ...item,
+            accessLevel: item.accessLevel ? `L${item.accessLevel}` : '-',
+            glAccessLevel: item.glAccessLevel ? `L${item.glAccessLevel}` : '-',
+          }));
+          return {
+            ...others,
+            list: tempList,
+            content: tempList,
+          };
         } catch (e) {
           return resp;
         }
