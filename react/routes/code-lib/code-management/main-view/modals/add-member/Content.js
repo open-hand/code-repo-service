@@ -21,9 +21,8 @@ export default observer(() => {
       if (await formDs.submit() !== false) {
         refresh();
         return true;
-      } else {
-        return false;
       }
+      return false;
     } catch (e) {
       Choerodon.handleResponseError(e);
       return false;
@@ -45,7 +44,7 @@ export default observer(() => {
   }
 
   function optionsFilter(record) {
-    const flag = some(pathListDs.created, (r) => r.get('userId') === record.get('userId'));
+    const flag = some(pathListDs.created, r => r.get('userId') === record.get('userId'));
     return !flag;
   }
   function levelOptionsFilter(record) {
@@ -66,12 +65,13 @@ export default observer(() => {
           searchable
           maxTagCount={3}
           maxTagTextLength={6}
+          searchMatcher={({ record, text, textField }) => record.get('repositoryCode').indexOf(text) !== -1 || record.get(textField).indexOf(text) !== -1}
           maxTagPlaceholder={restValues => `+${restValues.length}...`}
           dropdownMenuStyle={{ width: '5.12rem' }}
           colSpan={6}
         />
       </Form>
-      {map(pathListDs.data, (pathRecord) => (
+      {map(pathListDs.data, pathRecord => (
         <Form record={pathRecord} columns={13} key={pathRecord.id} className="code-lib-management-add-member">
           <Select
             name="userId"
@@ -92,7 +92,7 @@ export default observer(() => {
               funcType="flat"
               icon="delete"
               style={{
-                marginTop: '8px'
+                marginTop: '8px',
               }}
               onClick={() => handleRemovePath(pathRecord)}
             />
