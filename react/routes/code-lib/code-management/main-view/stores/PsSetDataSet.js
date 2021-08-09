@@ -14,7 +14,7 @@ function handleLoad({ dataSet }) {
 }
 export default ((intlPrefix, formatMessage, organizationId, projectId, repositoryIds) => ({
   autoQuery: true,
-  selection: false,
+  selection: 'multiple',
   pageSize: 10,
   transport: {
     read: () => ({
