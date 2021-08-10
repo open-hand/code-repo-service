@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Form, Select } from "choerodon-ui/pro";
 
 import {
@@ -25,9 +25,9 @@ const AppSelector = (props: any) => {
   function renderOpts() {
     const res = map(
       branchServiceDs.toData(),
-      ({ repositoryId, repositoryName }) => (
+      ({ repositoryId, repositoryName, repositoryCode }) => (
         <Option value={repositoryId} key={repositoryId}>
-          {repositoryName}
+          {`${repositoryName}(${repositoryCode})`}
         </Option>
       )
     );
@@ -40,6 +40,11 @@ const AppSelector = (props: any) => {
     }
     return res;
   }
+
+  useEffect(()=>{
+    branchServiceDs.current?.set('repositoryIds', 'all');
+    handleSelect('all');
+  }, [branchServiceDs.current]);
 
   return (
     <Form
