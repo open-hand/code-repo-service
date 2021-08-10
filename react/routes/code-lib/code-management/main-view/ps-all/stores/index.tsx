@@ -7,6 +7,12 @@ import { DataSetSelection } from "choerodon-ui/pro/lib/data-set/enum";
 import useStore, { MainStoreProps } from "./useStore";
 import { usPsManagerStore } from "../../stores";
 import { observer } from "mobx-react-lite";
+import {
+  psApprovalTabData,
+  psAuditTabData,
+  psSetTabData,
+  applyViewTabData,
+} from "./TABMAP";
 
 interface ContextProps {
   prefixCls: string;
@@ -27,62 +33,42 @@ export function usePermissionStore() {
 }
 
 export const StoreProvider = injectIntl(
-  inject("AppState")(observer((props: any) => {
-    const {
-      children,
-      intl: { formatMessage },
-      AppState: {
-        currentMenuType: { projectId },
-      },
-    } = props;
-
-    const psAllStore = useStore();
-
-    const { hasMemberPermission, hasPermission } = usPsManagerStore();
-
-    function getCustomsTabData() {
-      let customTabsData: {
-        tip?: any;
-        name: string;
-        value: string;
-      }[] = [
-        {
-          name: "权限分配",
-          value: "psSet",
-          tip: "",
+  inject("AppState")(
+    observer((props: any) => {
+      const {
+        children,
+        intl: { formatMessage },
+        AppState: {
+          currentMenuType: { projectId },
         },
-      ];
-      if (hasPermission && hasMemberPermission) {
-        customTabsData = [
-          ...customTabsData,
-          ...[
-            {
-              name: "权限审批",
-              value: "psApproval",
-            },
-            {
-              name: "权限审计",
-              value: "psAudit",
-              tip: formatMessage({ id: 'infra.codeManage.ps.message.psAudit.tips' }),
-            },
-          ],
-        ];
-      } else if (!hasPermission && hasMemberPermission) {
-        customTabsData.push({
-          name: "权限申请",
-          value: "applyView",
-        });
-      }
-      return customTabsData;
-    }
+      } = props;
 
-    const value = {
-      ...props,
-      formatMessage,
-      projectId,
-      customTabsData: getCustomsTabData(),
-      psAllStore,
-    };
-    return <Store.Provider value={value}>{children}</Store.Provider>;
-  }))
+      const psAllStore = useStore();
+
+      const { hasMemberPermission, hasPermission } = usPsManagerStore();
+
+      const getCustomsTabData = useCallback(() => {
+        let customTabsData: {
+          tip?: any;
+          name: string;
+          value: string;
+        }[] = [];
+        if (hasPermission && hasMemberPermission) {
+          customTabsData = [psSetTabData, psApprovalTabData, psAuditTabData];
+        } else if (!hasPermission && hasMemberPermission) {
+          customTabsData.push(applyViewTabData);
+        }
+        return customTabsData;
+      }, [hasPermission, hasMemberPermission]);
+
+      const value = {
+        ...props,
+        formatMessage,
+        projectId,
+        customTabsData: getCustomsTabData(),
+        psAllStore,
+      };
+      return <Store.Provider value={value}>{children}</Store.Provider>;
+    })
+  )
 );
