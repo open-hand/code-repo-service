@@ -89,6 +89,18 @@ export default observer((props) => {
     return flag;
   }
 
+  const renderer = ({ text, record }) => (
+    <span style={{ width: '100%' }}>
+      {text}({record.get('repositoryCode')})
+    </span>
+  );
+
+  const optionRenderer = ({ text, record }) => (
+    <Tooltip title={record.get('repositoryCode')} placement="left">
+      {renderer({ text, record })}
+    </Tooltip>
+  );
+
   return (
     <div
       style={{ width: '5.12rem' }}
@@ -101,6 +113,8 @@ export default observer((props) => {
           maxTagCount={3}
           maxTagTextLength={6}
           searchMatcher={({ record, text, textField }) => record.get('repositoryCode').indexOf(text) !== -1 || record.get(textField).indexOf(text) !== -1}
+          optionRenderer={optionRenderer}
+          renderer={renderer}
           maxTagPlaceholder={restValues => `+${restValues.length}...`}
           dropdownMenuStyle={{ width: '5.12rem' }}
           colSpan={6}
