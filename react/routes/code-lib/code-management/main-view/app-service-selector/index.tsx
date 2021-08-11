@@ -41,7 +41,7 @@ const AppSelector = (props: any) => {
     return res;
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     branchServiceDs.current?.set('repositoryIds', 'all');
     handleSelect('all');
   }, [branchServiceDs.current]);

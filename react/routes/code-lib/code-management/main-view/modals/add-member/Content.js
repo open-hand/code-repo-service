@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Form, Select, Button, DatePicker } from 'choerodon-ui/pro';
+import { Form, Select, Button, DatePicker, Tooltip } from 'choerodon-ui/pro';
 import { Choerodon } from '@choerodon/boot';
 import { map, some } from 'lodash';
 import moment from 'moment';
@@ -14,6 +14,7 @@ export default observer(() => {
     intl: { formatMessage },
     modal,
     refresh,
+
   } = useAddMemberStore();
 
   modal.handleOk(async () => {
@@ -55,6 +56,16 @@ export default observer(() => {
     const isTrue = record.get(textField).indexOf(text) !== -1 || record.get('loginName').indexOf(text) !== -1;
     return isTrue;
   }
+  const renderer = ({ text, textField, record }) => (
+    <span style={{ width: '100%' }}>
+      {text}({record.get('repositoryCode')})
+    </span>
+  );
+  const optionRenderer = ({ text, textField, record }) => (
+    <Tooltip title={record.get('repositoryCode')} placement="left">
+      {renderer({ text, record })}
+    </Tooltip>
+  );
 
   return (
     <div style={{ width: '5.12rem' }}>
@@ -66,6 +77,8 @@ export default observer(() => {
           maxTagCount={3}
           maxTagTextLength={6}
           searchMatcher={({ record, text, textField }) => record.get('repositoryCode').indexOf(text) !== -1 || record.get(textField).indexOf(text) !== -1}
+          optionRenderer={optionRenderer}
+          renderer={renderer}
           maxTagPlaceholder={restValues => `+${restValues.length}...`}
           dropdownMenuStyle={{ width: '5.12rem' }}
           colSpan={6}
