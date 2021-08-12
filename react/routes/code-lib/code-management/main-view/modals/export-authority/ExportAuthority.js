@@ -50,6 +50,17 @@ class ExportAuthority extends Component {
       });
   };
 
+  renderButtons = () => (
+    <div>
+      <Button onClick={() => this.props.setExportModalVisible(false)}>
+        取消
+      </Button>
+      <Button onClick={this.exportExcel} color="primary" funcType="raised">
+        确定
+      </Button>
+    </div>
+  )
+
   render() {
     const { loading } = this.state;
     const { exportModalVisible, setExportModalVisible, formatMessage } = this.props;
@@ -62,16 +73,7 @@ class ExportAuthority extends Component {
         confirmLoading={loading}
         closable={false}
         className="c7ncd-exportModal"
-        footer={(
-          <>
-            <Button onClick={this.exportExcel} color="primary" funcType="raised">
-              确定
-            </Button>
-            <Button onClick={() => setExportModalVisible(false)}>
-              取消
-            </Button>
-          </>
-        )}
+        footer={this.renderButtons()}
       >
         <div style={{ margin: '10px 0' }}>
           {formatMessage({ id: 'infra.docManage.message.confirm.export' })}
