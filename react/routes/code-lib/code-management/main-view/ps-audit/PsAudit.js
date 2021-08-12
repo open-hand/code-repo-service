@@ -42,11 +42,10 @@ const PsSet = observer(() => {
         if (res.failed) {
           Choerodon.prompt(res.message);
           return false;
-        } else {
-          const dataStr = res.auditEndDate ? moment(res.auditEndDate).format('YYYY-MM-DD HH:mm:ss') : undefined;
-          setExecutionDate(dataStr);
-          return true;
         }
+        const dataStr = res.auditEndDate ? moment(res.auditEndDate).format('YYYY-MM-DD HH:mm:ss') : undefined;
+        setExecutionDate(dataStr);
+        return true;
       })
       .catch((error) => {
         Choerodon.handleResponseError(error);
@@ -70,11 +69,10 @@ const PsSet = observer(() => {
       if (res.failed) {
         message.error(res.message);
         return false;
-      } else {
-        refresh();
-        message.success(formatMessage({ id: 'infra.codeManage.ps.message.asyncSuccess' }));
-        return true;
       }
+      refresh();
+      message.success(formatMessage({ id: 'infra.codeManage.ps.message.asyncSuccess' }));
+      return true;
     })
       .catch((error) => {
         Choerodon.handleResponseError(error);
@@ -93,7 +91,8 @@ const PsSet = observer(() => {
       onOk: () => handleOk(record),
       footer: ((okBtn, cancelBtn) => (
         <React.Fragment>
-          {cancelBtn}{okBtn}
+          {cancelBtn}
+          {okBtn}
         </React.Fragment>
       )),
       movable: false,

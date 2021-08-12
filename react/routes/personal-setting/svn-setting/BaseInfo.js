@@ -126,8 +126,8 @@ function BaseInfo() {
       onOk: handlePasswordChange,
       footer: (okBtn, cancelBtn) => (
         <div>
-          {okBtn}
           {cancelBtn}
+          {okBtn}
         </div>
       )
       ,
