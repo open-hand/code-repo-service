@@ -54,8 +54,6 @@ const PsBranch = observer(() => {
         title: formatMessage({ id: `${intlPrefix}.cancel.protected` }),
         children: formatMessage({ id: `${intlPrefix}.cancel.protected.confirm.branch` }),
         okText: formatMessage({ id: 'ok' }),
-        okProps: { color: 'red' },
-        cancelProps: { color: 'dark' },
       };
       branchDs.delete(record, modalProps);
     } else {
@@ -64,8 +62,6 @@ const PsBranch = observer(() => {
         title: formatMessage({ id: `${intlPrefix}.cancel.protected` }),
         children: formatMessage({ id: `${intlPrefix}.cancel.protected.confirm.tag` }),
         okText: formatMessage({ id: 'ok' }),
-        okProps: { color: 'red' },
-        cancelProps: { color: 'dark' },
       };
       tagDs.delete(record, modalProps);
     }
