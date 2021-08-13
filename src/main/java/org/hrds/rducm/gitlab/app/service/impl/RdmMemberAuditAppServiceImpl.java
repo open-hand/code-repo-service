@@ -332,7 +332,7 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
             //如果组的权限是owner，则不作处理， 组的权限是owner 他在项目的权限也是owner,这个时候需要按照gitlab的权限来修
             if (groupGlMember.getAccessLevel().value.intValue() == AccessLevel.OWNER.toValue().intValue()) {
                 dbMember.setSyncGitlabFlag(Boolean.TRUE);
-                dbMember.setGlAccessLevel(AccessLevel.OWNER.toValue().intValue());
+                dbMember.setGlAccessLevel(AccessLevel.OWNER.toValue());
                 rdmMemberRepository.updateByPrimaryKey(dbMember);
                 rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
                 return;

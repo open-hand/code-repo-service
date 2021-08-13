@@ -1,14 +1,18 @@
 package org.hrds.rducm.gitlab.infra.feign.fallback;
 
 import feign.hystrix.FallbackFactory;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.exception.FeignException;
+
 import org.hrds.rducm.gitlab.infra.feign.BaseServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nOrgAdministratorVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nTenantVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -21,9 +25,12 @@ import java.util.Set;
  */
 @Component
 public class BaseServiceFeignClientFallBackFactory implements FallbackFactory<BaseServiceFeignClient> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseServiceFeignClientFallBackFactory.class);
+
     @Override
     public BaseServiceFeignClient create(Throwable cause) {
-        cause.printStackTrace();
+        LOGGER.error("error.feign.base", cause);
         return new BaseServiceFeignClient() {
             @Override
             public ResponseEntity<List<C7nProjectVO>> listProjectsByUserIdOnOrgLevel(Long organizationId, Long userId, String name, String code, String category, Boolean enabled, Long createdBy, String params) {
