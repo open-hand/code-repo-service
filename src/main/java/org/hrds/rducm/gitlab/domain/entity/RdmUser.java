@@ -27,8 +27,8 @@ public class RdmUser extends AuditDomain {
 
     public static final String FIELD_ID = "id";
     public static final String FIELD_USER_ID = "userId";
-    public static final String FIELD_INIT_PASSWORD = "initPassword";
-    public static final String FIELD_RESET_PASSWORD_FLAG = "resetPasswordFlag";
+    public static final String FIELD_INIT_PW = "initPassword";
+    public static final String FIELD_RESET_PW_FLAG = "resetPasswordFlag";
     public static final String FIELD_GL_USER_ID = "glUserId";
     public static final String FIELD_GL_USER_NAME = "glUserName";
     public static final String FIELD_GL_IS_ADMIN = "glIsAdmin";

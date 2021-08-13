@@ -78,8 +78,6 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Autowired
     private TransactionalProducer producer;
 
-    @Autowired
-    private RdmMemberQueryHelper rdmMemberQueryHelper;
 
     public RdmMemberAppServiceImpl(RdmMemberRepository rdmMemberRepository) {
         this.rdmMemberRepository = rdmMemberRepository;

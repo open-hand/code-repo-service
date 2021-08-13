@@ -7,6 +7,8 @@ import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nGlUserVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -19,9 +21,11 @@ import java.util.Set;
  */
 @Component
 public class DevOpsServiceFeignClientFallBackFactory implements FallbackFactory<DevOpsServiceFeignClient> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DevOpsServiceFeignClientFallBackFactory.class);
+
     @Override
     public DevOpsServiceFeignClient create(Throwable cause) {
-        cause.printStackTrace();
+        LOGGER.error("error.feign.devops", cause);
         return new DevOpsServiceFeignClient() {
             @Override
             public ResponseEntity<List<C7nAppServiceVO>> listAppServiceByActive(Long projectId) {
