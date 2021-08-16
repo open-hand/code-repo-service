@@ -86,8 +86,6 @@ const PsSet = observer(() => {
       title: formatMessage({ id: `${intlPrefix}.operate.fixPs` }),
       children: formatMessage({ id: `${intlPrefix}.operate.fixPs.confirm` }),
       // okText: formatMessage({ id: 'fix' }),
-      // okProps: { color: 'red' },
-      // cancelProps: { color: 'dark' },
       onOk: () => handleOk(record),
       footer: ((okBtn, cancelBtn) => (
         <React.Fragment>
