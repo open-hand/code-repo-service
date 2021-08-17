@@ -56,7 +56,6 @@ const PsSet = observer(() => {
       title: formatMessage({ id: `${intlPrefix}.permission.delete.title` }),
       children: formatMessage({ id: `${intlPrefix}.permission.delete.des` }),
       okText: formatMessage({ id: 'delete' }),   
-      
     };
     psSetDs.delete(record, mProps);
   }
