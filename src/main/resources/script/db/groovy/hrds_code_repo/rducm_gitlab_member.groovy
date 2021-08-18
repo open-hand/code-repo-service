@@ -37,7 +37,7 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member.groovy') {
     }
 
     changeSet(author: 'wx', id: '2021-08-18-add-column') {
-        addColumn(tableName: 'devops_project') {
+        addColumn(tableName: 'rducm_gitlab_member') {
             column(name: 'type', type: 'VARCHAR(20)', defaultValue: "project", afterColumn: 'project_id', remarks: '权限属于项目层还是全局层')
             column(name: 'gGroupId', type: "int(11)",  afterColumn: 'gl_project_id', remarks: 'gitlab group的id')
         }
