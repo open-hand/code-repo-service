@@ -6,11 +6,13 @@ import io.choerodon.asgard.saga.annotation.Saga;
 import io.choerodon.asgard.saga.producer.StartSagaBuilder;
 import io.choerodon.asgard.saga.producer.TransactionalProducer;
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.domain.AuditDomain;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
+import org.gitlab4j.api.models.Group;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.api.controller.dto.*;
 import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
@@ -19,15 +21,22 @@ import org.hrds.rducm.gitlab.app.async.RdmMemberQueryHelper;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.hrds.rducm.gitlab.domain.entity.payload.GroupMemberPayload;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupApi;
+import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
+import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.core.base.AopProxy;
+import org.hzero.core.base.BaseConstants;
+import org.hzero.core.util.AssertUtils;
 import org.hzero.export.annotation.ExcelExport;
 import org.hzero.export.vo.ExportParam;
 import org.hzero.mybatis.domian.Condition;
@@ -72,11 +81,12 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Autowired
     private RdmMemberAssembler rdmMemberAssembler;
 
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private TransactionalProducer producer;
+
+    @Autowired
+    private GitlabGroupApi gitlabGroupApi;
 
 
     public RdmMemberAppServiceImpl(RdmMemberRepository rdmMemberRepository) {
@@ -539,6 +549,104 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         rdmMembers.forEach(member -> {
             syncMember(member.getId());
         });
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @Saga(code = SagaTopicCodeConstants.BATCH_ADD_GROUP_MEMBER, description = "批量添加项目下gitlab group成员", inputSchemaClass = GroupMemberPayload.class, inputSchema = "{}")
+    public void batchAddGroupMembers(Long organizationId, Long projectId, List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOS) {
+        //查询项目下的group
+        C7nDevopsProjectVO c7nDevopsProjectVO = c7NDevOpsServiceFacade.detailDevopsProjectById(projectId);
+        AssertUtils.notNull(c7nDevopsProjectVO, "error.devops.gitlab.project.not.exist");
+        AssertUtils.notNull(c7nDevopsProjectVO.getGitlabGroupId(), "error.devops.group.id.is.null");
+        //检验这个gitlab group id 能不能查到group, 因为有些人手动删了group，自己又新建了group
+        Group group = gitlabGroupApi.getGroup(Integer.valueOf(String.valueOf(c7nDevopsProjectVO.getGitlabGroupId())));
+        AssertUtils.notNull(group, "error.gitlab.group.not.exist", c7nDevopsProjectVO.getGitlabGroupId());
+
+        List<RdmMember> rdmMembers = new ArrayList<>();
+        //将用户id转换为Gitlab用户Id
+        gitlabMemberCreateDTOS.forEach(gitlabMemberCreateDTO -> {
+            Integer glUserId = c7NBaseServiceFacade.userIdToGlUserId(gitlabMemberCreateDTO.getUserId());
+            if (Objects.isNull(glUserId)) {
+                return;
+            }
+            gitlabMemberCreateDTO.setgUserId(glUserId);
+
+            //插入数据库
+            RdmMember rdmMember = new RdmMember();
+            rdmMember.setOrganizationId(organizationId);
+            rdmMember.setProjectId(projectId);
+            rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+            // 设置gitlab项目id和用户id
+            rdmMember.setGlUserId(glUserId);
+            rdmMember.setgGroupId(group.getId());
+            rdmMembers.add(rdmMember);
+        });
+        self().batchAddOrUpdateMembersBeforeRequestsNew(rdmMembers);
+
+
+        //发送saga
+        GroupMemberPayload groupMemberPayload = new GroupMemberPayload();
+        groupMemberPayload.setgGroupId(Integer.valueOf(String.valueOf(c7nDevopsProjectVO.getGitlabGroupId())));
+        groupMemberPayload.setGitlabMemberCreateDTOS(gitlabMemberCreateDTOS);
+
+        producer.applyAndReturn(
+                StartSagaBuilder
+                        .newBuilder()
+                        .withLevel(ResourceLevel.PROJECT)
+                        .withRefType("batchAddGroupMembers")
+                        .withSagaCode(SagaTopicCodeConstants.BATCH_ADD_GROUP_MEMBER),
+                builder -> {
+                    builder
+                            .withPayloadAndSerialize(groupMemberPayload)
+                            .withRefId(String.valueOf(projectId))
+                            .withSourceId(projectId);
+                    return groupMemberPayload;
+                });
+    }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateGroupMember(Long organizationId, Long projectId, RdmMemberBatchDTO.GitlabMemberCreateDTO gitlabMemberCreateDTO, Long rducmGitlabMemberId) {
+        //查询group
+        Group group = gitlabGroupApi.getGroup(gitlabMemberCreateDTO.getgGroupId());
+        AssertUtils.notNull(group, "error.gitlab.group.not.exist", gitlabMemberCreateDTO.getgGroupId());
+        Member member = gitlabGroupApi.getMember(gitlabMemberCreateDTO.getgGroupId(), gitlabMemberCreateDTO.getgUserId());
+        RdmMember rdmMember = rdmMemberRepository.selectByPrimaryKey(rducmGitlabMemberId);
+        AssertUtils.notNull(rdmMember, "error.rdmMember.is.not.exist");
+        if (rdmMember.getSyncGitlabFlag()) {
+            throw new CommonException("error.sync.flag.fals");
+        }
+        //对比权限是否一致 ,一致就返回
+        if (!Objects.isNull(member) && rdmMember.getGlAccessLevel().intValue() == member.getAccessLevel().value) {
+            return;
+        }
+
+        //不一致则删除添加
+        iRdmMemberService.tryRemoveAndAddGroupMemberToGitlab(group.getId(), gitlabMemberCreateDTO.getgUserId(), gitlabMemberCreateDTO.getGlAccessLevel(), gitlabMemberCreateDTO.getGlExpiresAt());
+
+        //跟新数据库
+        rdmMember.setSyncGitlabFlag(true);
+        rdmMember.setSyncGitlabDate(new Date());
+        rdmMember.setGlAccessLevel(gitlabMemberCreateDTO.getGlAccessLevel());
+        rdmMember.setGlExpiresAt(gitlabMemberCreateDTO.getGlExpiresAt());
+        rdmMemberRepository.updateByPrimaryKey(rdmMember);
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteGroupMember(Long organizationId, Long projectId, Long rducmGitlabMemberId) {
+        RdmMember rdmMember = rdmMemberRepository.selectByPrimaryKey(rducmGitlabMemberId);
+        AssertUtils.notNull(rdmMember, "error.rdmMember.is.null");
+        if (rdmMember.getSyncGitlabFlag()) {
+            throw new CommonException("error.sync.flag.fals");
+        }
+        //删除group的用户
+        gitlabGroupApi.removeMember(rdmMember.getgGroupId(), rdmMember.getGlUserId());
+        //删除数据库
+        rdmMemberRepository.deleteByPrimaryKey(rducmGitlabMemberId);
     }
 
     /**

@@ -27,6 +27,7 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.admin.GitlabAdminApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
@@ -69,6 +70,8 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
+    @Autowired
+    private GitlabGroupApi gitlabGroupApi;
 
     @Override
     public Page<MemberAuthDetailViewDTO> pageMembersRepositoryAuthorized(Long organizationId, Long projectId, PageRequest pageRequest, BaseUserQueryDTO queryDTO) {
@@ -267,6 +270,10 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     @Override
     public void removeMemberToGitlab(Integer glProjectId, Integer glUserId) {
         gitlabProjectApi.removeMember(glProjectId, glUserId);
+    }
+
+    private void removeGroupMemberToGitLab(Integer gGroupId, Integer glUserId) {
+        gitlabGroupApi.removeMember(gGroupId, glUserId);
     }
 
     @Override
@@ -497,7 +504,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
                         .andIn(RdmMember.FIELD_USER_ID, userIds)
                         // 同步状态需为true
                         .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, Boolean.TRUE)
-                        .andGreaterThanOrEqualTo(RdmMember.FIELD_GL_ACCESS_LEVEL,accessLevel))
+                        .andGreaterThanOrEqualTo(RdmMember.FIELD_GL_ACCESS_LEVEL, accessLevel))
                 .build();
         List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
         Map<Long, List<RdmMember>> group = rdmMembers.stream().collect(Collectors.groupingBy(RdmMember::getUserId));
@@ -511,6 +518,36 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         });
 
         return result;
+    }
+
+    @Override
+    public Member tryRemoveAndAddGroupMemberToGitlab(Integer gGroupId, Integer glUserId, Integer accessLevel, Date expiresAt) {
+        // 尝试移除成员
+        this.tryRemoveGroupMemberToGitlab(gGroupId, glUserId);
+        // 添加新成员
+        return this.addGroupMemberToGitlab(gGroupId, glUserId, accessLevel, expiresAt);
+    }
+
+    private Member addGroupMemberToGitlab(Integer gGroupId, Integer glUserId, Integer accessLevel, Date expiresAt) {
+        // 调用gitlab api添加成员
+        return gitlabGroupApi.addMember(gGroupId, glUserId, accessLevel, expiresAt);
+    }
+
+    private void tryRemoveGroupMemberToGitlab(Integer gGroupId, Integer glUserId) {
+        // 先查询Gitlab用户
+        Member glMember = gitlabGroupApi.getMember(gGroupId, glUserId);
+
+        if (glMember != null) {
+            if (glMember.getAccessLevel().toValue() >= RdmAccessLevel.OWNER.toValue()) {
+                throw new CommonException("error.not.allow.remove.owner", glMember.getName());
+            }
+
+            try {
+                this.removeGroupMemberToGitLab(gGroupId, glUserId);
+            } catch (GitlabClientException e) {
+                throw new CommonException("error.member.not.allow.change", e, glMember.getName());
+            }
+        }
     }
 
     /**

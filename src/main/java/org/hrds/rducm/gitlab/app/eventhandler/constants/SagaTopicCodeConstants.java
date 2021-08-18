@@ -57,6 +57,8 @@ public class SagaTopicCodeConstants {
 
     public static final String BATCH_ADD_GITLAB_MEMBER = "batch-add-gitlab-member";
 
+    public static final String BATCH_ADD_GROUP_MEMBER = "batch-add-group-member";
+
     /**
      * 项目下批量审计成员权限
      */
