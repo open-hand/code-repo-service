@@ -35,4 +35,11 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member.groovy') {
         addUniqueConstraint(columnNames: "organization_id,project_id,repository_id,user_id", tableName: "rducm_gitlab_member", constraintName: "uk_project_id_repository_id_user_id")
         addUniqueConstraint(columnNames: "repository_id,user_id", tableName: "rducm_gitlab_member", constraintName: "uk_repository_id_user_id")
     }
+
+    changeSet(author: 'wx', id: '2021-08-18-add-column') {
+        addColumn(tableName: 'devops_project') {
+            column(name: 'type', type: 'VARCHAR(20)', defaultValue: "project", afterColumn: 'project_id', remarks: '权限属于项目层还是全局层')
+            column(name: 'gGroupId', type: "int(11)",  afterColumn: 'gl_project_id', remarks: 'gitlab group的id')
+        }
+    }
 }

@@ -14,7 +14,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.gitlab4j.api.models.Group;
 import org.gitlab4j.api.models.Member;
+import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTaskCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.GitlabGroupMemberVO;
@@ -23,6 +25,7 @@ import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
 import org.hrds.rducm.gitlab.domain.entity.MemberAuditLog;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
+import org.hrds.rducm.gitlab.domain.entity.payload.GroupMemberPayload;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.MemberAuditLogRepository;
@@ -30,12 +33,14 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.enums.RoleLabelEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
 import org.hrds.rducm.gitlab.infra.util.JsonHelper;
 import org.hzero.core.util.AssertUtils;
 import org.slf4j.Logger;
@@ -75,6 +80,10 @@ public class RdmMemberChangeSagaHandler {
     private MemberAuditLogRepository memberAuditLogRepository;
     @Autowired
     private RdmMemberAuditAppService rdmMemberAuditAppService;
+    @Autowired
+    private GitlabGroupApi gitlabGroupApi;
+    @Autowired
+    private RdmMemberMapper rdmMemberMapper;
 
 
     /**
@@ -195,6 +204,26 @@ public class RdmMemberChangeSagaHandler {
             }
         });
     }
+
+
+    @SagaTask(code = SagaTaskCodeConstants.BATCH_ADD_GROUP_MEMBERS,
+            description = "项目下成员权限修复",
+            sagaCode = SagaTopicCodeConstants.BATCH_ADD_GROUP_MEMBER, maxRetryCount = 3, seq = 1)
+    public void addGroupMember(String payload) {
+        GroupMemberPayload groupMemberPayload = JsonHelper.unmarshalByJackson(payload, GroupMemberPayload.class);
+
+        //查询gitlab组是否存在
+        Group group = gitlabGroupApi.getGroup(groupMemberPayload.getgGroupId());
+        AssertUtils.notNull(group, "error.gitlab.group.not.exist", groupMemberPayload.getgGroupId());
+
+        groupMemberPayload.getGitlabMemberCreateDTOS().forEach(gitlabMemberCreateDTO -> {
+            Member member = gitlabGroupApi.addMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId(), gitlabMemberCreateDTO.getGlAccessLevel(), gitlabMemberCreateDTO.getGlExpiresAt());
+            //回写数据库
+            RdmMember rdmMember = rdmMemberMapper.selectByPrimaryKey(gitlabMemberCreateDTO.getUserId());
+            iRdmMemberService.updateMemberAfter(rdmMember, member);
+        });
+    }
+
 
     @SagaTask(code = SagaTaskCodeConstants.PROJECT_AUDIT_MEMBER_PERMISSION,
             description = "项目下成员权限审计",

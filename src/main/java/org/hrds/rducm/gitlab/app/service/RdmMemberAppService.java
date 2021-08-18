@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.app.service;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+
 import org.hrds.rducm.gitlab.api.controller.dto.*;
 import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
@@ -28,8 +29,8 @@ public interface RdmMemberAppService {
     /**
      * 列表查询成员
      *
-     * @param projectId   项目id
-     * @param query       查询参数
+     * @param projectId 项目id
+     * @param query     查询参数
      * @return
      */
     List<RdmMemberViewDTO> listByOptions(Long projectId, RdmMemberQueryDTO query);
@@ -127,7 +128,7 @@ public interface RdmMemberAppService {
 
     /**
      * 批量失效应用服务的所有成员权限
-     *
+     * <p>
      * 禁用应用服务时将代码库具有该应用服务权限的成员失效
      * 失效方式：将成员权限的gitlab过期时间设为当前日期，并将Gitlab的权限清除
      *
@@ -139,7 +140,7 @@ public interface RdmMemberAppService {
 
     /**
      * 批量生效应用服务的所有成员权限
-     *
+     * <p>
      * 启用应用服务时将代码库具有该应用服务权限的成员生效
      * 生效方式：将成员权限的gitlab过期时间清除，并添加Gitlab权限
      *
@@ -152,4 +153,11 @@ public interface RdmMemberAppService {
     void syncBatchMember(List<Long> memberIds);
 
     void allSync(Long organizationId, Long projectId);
+
+    void batchAddGroupMembers(Long organizationId, Long projectId, List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOS);
+
+    void updateGroupMember(Long organizationId, Long projectId, RdmMemberBatchDTO.GitlabMemberCreateDTO gitlabMemberCreateDTO, Long rducmGitlabMemberId);
+
+    void deleteGroupMember(Long organizationId, Long projectId, Long rducmGitlabMemberId);
+
 }

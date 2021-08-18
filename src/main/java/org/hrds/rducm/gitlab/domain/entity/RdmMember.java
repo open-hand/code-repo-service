@@ -109,6 +109,11 @@ public class RdmMember extends AuditDomain {
     private Date syncGitlabDate;
     @ApiModelProperty(value = "同步gitlab失败的错误信息")
     private String syncGitlabErrorMsg;
+    @ApiModelProperty(value = "gitlab组的Id")
+    private Integer  gGroupId;
+    @ApiModelProperty(value = "权限属于项目层还是全局层")
+    private String type;
+
 
     //
     // 非数据库字段
@@ -284,5 +289,21 @@ public class RdmMember extends AuditDomain {
     public RdmMember setRepository(BaseC7nAppServiceViewDTO repository) {
         this.repository = repository;
         return this;
+    }
+
+    public Integer getgGroupId() {
+        return gGroupId;
+    }
+
+    public void setgGroupId(Integer gGroupId) {
+        this.gGroupId = gGroupId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

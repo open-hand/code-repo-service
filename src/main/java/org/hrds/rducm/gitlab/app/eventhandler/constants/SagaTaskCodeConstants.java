@@ -44,6 +44,8 @@ public class SagaTaskCodeConstants {
      */
     public static final String PROJECT_BATCH_AUDIT_FIX = "projectBatchAuditFix";
 
+    public static final String BATCH_ADD_GROUP_MEMBERS = "batchAddGroupMembers";
+
 
     private SagaTaskCodeConstants() {
     }
