@@ -530,7 +530,15 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             return;
         }
         memberIds.forEach(memberId -> {
-            syncMember(memberId);
+            RdmMember dbMember = rdmMemberRepository.selectByPrimaryKey(memberId);
+            if (Objects.isNull(dbMember)) {
+                return;
+            }
+            if (org.apache.commons.lang3.StringUtils.equalsIgnoreCase(dbMember.getType(), AuthorityTypeEnum.PROJECT.getValue())) {
+                syncMember(memberId);
+            } else {
+                syncGroupMember(memberId);
+            }
         });
 
     }
@@ -649,6 +657,19 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         gitlabGroupApi.removeMember(rdmMember.getgGroupId(), rdmMember.getGlUserId());
         //删除数据库
         rdmMemberRepository.deleteByPrimaryKey(rducmGitlabMemberId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void syncGroupMember(Long rducmGitlabMemberId) {
+        // <1> 查询数据库成员
+        RdmMember dbMember = rdmMemberRepository.selectByPrimaryKey(rducmGitlabMemberId);
+
+        // <2> 拉取Gitlab成员, 同步到db
+        iRdmMemberService.syncGroupMemberFromGitlab(dbMember);
+
+        // <3> 发送事件
+//        iRdmMemberService.publishMemberEvent(dbMember, MemberEvent.EventType.SYNC_MEMBER);
     }
 
     /**

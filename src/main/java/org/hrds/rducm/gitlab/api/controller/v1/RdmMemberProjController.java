@@ -138,6 +138,17 @@ public class RdmMemberProjController extends BaseController {
         return Results.success();
     }
 
+    @ApiOperation(value = "同步组的权限")
+    @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.PROJECT_OWNER})
+    @PostMapping("/group/{rducm_gitlab_member_id}/sync")
+    public ResponseEntity<?> syncGroupMember(@PathVariable Long organizationId,
+                                        @PathVariable Long projectId,
+                                        @Encrypt @PathVariable(value = "rducm_gitlab_member_id") Long rducmGitlabMemberId) {
+        rdmMemberAppService.syncGroupMember(rducmGitlabMemberId);
+        return Results.success();
+    }
+
+
 
     @ApiOperation(value = "权限导出")
     @Permission(level = ResourceLevel.ORGANIZATION)

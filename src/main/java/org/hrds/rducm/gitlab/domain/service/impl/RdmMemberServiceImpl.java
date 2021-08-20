@@ -521,6 +521,26 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     }
 
     @Override
+    public void syncGroupMemberFromGitlab(RdmMember dbMember) {
+        // <1> 获取Gitlab成员, 并更新数据库
+        Integer glUserId = Objects.requireNonNull(dbMember.getGlUserId());
+        Member glMember = gitlabGroupApi.getMember(Objects.requireNonNull(dbMember.getgGroupId()), glUserId);
+        // 理论上只会查询到一个成员
+        if (glMember == null) {
+            // 移除数据库成员
+            rdmMemberRepository.deleteByPrimaryKey(dbMember.getId());
+        } else {
+            if (glMember.getAccessLevel().toValue() >= AccessLevel.OWNER.toValue()) {
+                // 移除数据库成员
+                rdmMemberRepository.deleteByPrimaryKey(dbMember.getId());
+            } else {
+                // 更新数据库成员
+                updateMemberAfter(dbMember, glMember);
+            }
+        }
+    }
+
+    @Override
     public Member tryRemoveAndAddGroupMemberToGitlab(Integer gGroupId, Integer glUserId, Integer accessLevel, Date expiresAt) {
         // 尝试移除成员
         this.tryRemoveGroupMemberToGitlab(gGroupId, glUserId);
