@@ -626,6 +626,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     public void updateGroupMember(Long organizationId, Long projectId, RdmMemberBatchDTO.GitlabMemberCreateDTO gitlabMemberCreateDTO, Long rducmGitlabMemberId) {
         RdmMember rdmMember = rdmMemberRepository.selectByPrimaryKey(rducmGitlabMemberId);
         AssertUtils.notNull(rdmMember, "error.rdmMember.is.not.exist");
+        AssertUtils.notNull(rdmMember.getgGroupId(),"error.group.id.is.null");
         if (!rdmMember.getSyncGitlabFlag()) {
             throw new CommonException("error.sync.flag.false");
         }
@@ -634,7 +635,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         AssertUtils.notNull(group, "error.gitlab.group.not.exist", gitlabMemberCreateDTO.getgGroupId());
 
         //删除添加
-        iRdmMemberService.tryRemoveAndAddGroupMemberToGitlab(group.getId(), gitlabMemberCreateDTO.getgUserId(), gitlabMemberCreateDTO.getGlAccessLevel(), gitlabMemberCreateDTO.getGlExpiresAt());
+        iRdmMemberService.tryRemoveAndAddGroupMemberToGitlab(group.getId(), rdmMember.getGlUserId(), gitlabMemberCreateDTO.getGlAccessLevel(), gitlabMemberCreateDTO.getGlExpiresAt());
 
         //跟新数据库
         rdmMember.setSyncGitlabFlag(true);
@@ -650,8 +651,8 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     public void deleteGroupMember(Long organizationId, Long projectId, Long rducmGitlabMemberId) {
         RdmMember rdmMember = rdmMemberRepository.selectByPrimaryKey(rducmGitlabMemberId);
         AssertUtils.notNull(rdmMember, "error.rdmMember.is.null");
-        if (rdmMember.getSyncGitlabFlag()) {
-            throw new CommonException("error.sync.flag.fals");
+        if (!rdmMember.getSyncGitlabFlag()) {
+            throw new CommonException("error.sync.flag.false");
         }
         //删除group的用户
         gitlabGroupApi.removeMember(rdmMember.getgGroupId(), rdmMember.getGlUserId());
