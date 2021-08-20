@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import io.choerodon.asgard.saga.annotation.SagaTask;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.domain.AuditDomain;
 
@@ -217,9 +218,20 @@ public class RdmMemberChangeSagaHandler {
         AssertUtils.notNull(group, "error.gitlab.group.not.exist", groupMemberPayload.getgGroupId());
 
         groupMemberPayload.getGitlabMemberCreateDTOS().forEach(gitlabMemberCreateDTO -> {
+            Member groupApiMember = gitlabGroupApi.getMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId());
+            if (!Objects.isNull(groupApiMember)) {
+                gitlabGroupApi.removeMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId());
+            }
             Member member = gitlabGroupApi.addMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId(), gitlabMemberCreateDTO.getGlAccessLevel(), gitlabMemberCreateDTO.getGlExpiresAt());
             //回写数据库
-            RdmMember rdmMember = rdmMemberMapper.selectByPrimaryKey(gitlabMemberCreateDTO.getUserId());
+            //userId和groupId确定唯一的数据
+            RdmMember record = new RdmMember();
+            record.setUserId(gitlabMemberCreateDTO.getUserId());
+            record.setgGroupId(groupMemberPayload.getgGroupId());
+            RdmMember rdmMember = rdmMemberMapper.selectOne(record);
+            if (Objects.isNull(rdmMember)) {
+                throw new CommonException("error.rdmMember.is.null");
+            }
             iRdmMemberService.updateMemberAfter(rdmMember, member);
         });
     }
