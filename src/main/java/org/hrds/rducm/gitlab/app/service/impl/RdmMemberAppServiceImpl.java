@@ -616,21 +616,16 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateGroupMember(Long organizationId, Long projectId, RdmMemberBatchDTO.GitlabMemberCreateDTO gitlabMemberCreateDTO, Long rducmGitlabMemberId) {
-        //查询group
-        Group group = gitlabGroupApi.getGroup(gitlabMemberCreateDTO.getgGroupId());
-        AssertUtils.notNull(group, "error.gitlab.group.not.exist", gitlabMemberCreateDTO.getgGroupId());
-        Member member = gitlabGroupApi.getMember(gitlabMemberCreateDTO.getgGroupId(), gitlabMemberCreateDTO.getgUserId());
         RdmMember rdmMember = rdmMemberRepository.selectByPrimaryKey(rducmGitlabMemberId);
         AssertUtils.notNull(rdmMember, "error.rdmMember.is.not.exist");
-        if (rdmMember.getSyncGitlabFlag()) {
-            throw new CommonException("error.sync.flag.fals");
+        if (!rdmMember.getSyncGitlabFlag()) {
+            throw new CommonException("error.sync.flag.false");
         }
-        //对比权限是否一致 ,一致就返回
-        if (!Objects.isNull(member) && rdmMember.getGlAccessLevel().intValue() == member.getAccessLevel().value) {
-            return;
-        }
+        //查询group
+        Group group = gitlabGroupApi.getGroup(rdmMember.getgGroupId());
+        AssertUtils.notNull(group, "error.gitlab.group.not.exist", gitlabMemberCreateDTO.getgGroupId());
 
-        //不一致则删除添加
+        //删除添加
         iRdmMemberService.tryRemoveAndAddGroupMemberToGitlab(group.getId(), gitlabMemberCreateDTO.getgUserId(), gitlabMemberCreateDTO.getGlAccessLevel(), gitlabMemberCreateDTO.getGlExpiresAt());
 
         //跟新数据库

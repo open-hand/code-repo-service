@@ -107,7 +107,7 @@ public class RdmMemberProjController extends BaseController {
     @ApiOperation(value = "项目下批量分配应用服务组的权限")
     @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.PROJECT_OWNER})
     @PostMapping("/batch-add/group")
-    public ResponseEntity<?> batchAddGroupMembers(@PathVariable Long organizationId,
+    public ResponseEntity<Void> batchAddGroupMembers(@PathVariable Long organizationId,
                                                   @PathVariable Long projectId,
                                                   @RequestBody List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOs) {
         validObject(gitlabMemberCreateDTOs);
@@ -118,24 +118,24 @@ public class RdmMemberProjController extends BaseController {
     @ApiOperation(value = "项目下更改成员权限")
     @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.PROJECT_OWNER})
     @PutMapping("/group/{rducm_gitlab_member_id}")
-    public ResponseEntity<?> updateGroupMember(@PathVariable Long organizationId,
+    public ResponseEntity<Void> updateGroupMember(@PathVariable Long organizationId,
                                                @PathVariable Long projectId,
                                                @Encrypt @PathVariable(value = "rducm_gitlab_member_id") Long rducmGitlabMemberId,
                                                @RequestBody RdmMemberBatchDTO.GitlabMemberCreateDTO gitlabMemberCreateDTO) {
         validObject(gitlabMemberCreateDTO);
         rdmMemberAppService.updateGroupMember(organizationId, projectId, gitlabMemberCreateDTO, rducmGitlabMemberId);
-        return Results.created(null);
+        return Results.success();
     }
 
     @ApiOperation(value = "删除组的权限")
     @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.PROJECT_OWNER})
     @DeleteMapping("/group/{rducm_gitlab_member_id}")
-    public ResponseEntity<?> deleteGroupMember(@PathVariable Long organizationId,
+    public ResponseEntity<Void> deleteGroupMember(@PathVariable Long organizationId,
                                                @PathVariable Long projectId,
                                                @Encrypt @PathVariable(value = "rducm_gitlab_member_id") Long rducmGitlabMemberId) {
 
         rdmMemberAppService.deleteGroupMember(organizationId, projectId, rducmGitlabMemberId);
-        return Results.created(null);
+        return Results.success();
     }
 
 
