@@ -160,4 +160,6 @@ public interface RdmMemberAppService {
 
     void deleteGroupMember(Long organizationId, Long projectId, Long rducmGitlabMemberId);
 
+    void syncGroupMember(Long rducmGitlabMemberId);
+
 }

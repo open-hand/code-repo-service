@@ -205,4 +205,5 @@ public interface IRdmMemberService {
     Member tryRemoveAndAddGroupMemberToGitlab(Integer gGroupId, Integer glUserId, Integer accessLevel, Date expiresAt);
 
 
+    void syncGroupMemberFromGitlab(RdmMember dbMember);
 }
