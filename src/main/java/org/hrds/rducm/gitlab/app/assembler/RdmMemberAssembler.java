@@ -17,6 +17,7 @@ import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.util.StringUtils;
 
 /**
  * @author ying.xie@hand-china.com
@@ -34,6 +36,7 @@ import java.util.stream.Collectors;
  */
 @Component
 public class RdmMemberAssembler {
+    private static final String PROJECT_OVERALL = "项目全局";
     @Autowired
     private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
     @Autowired
@@ -179,6 +182,10 @@ public class RdmMemberAssembler {
             viewDTO.setCreatedUser(BaseC7nUserViewDTO.convert(c7nCreateUserVO));
 
             viewDTO.setRepositoryName(c7nAppServiceVO.getName());
+
+            if (StringUtils.isEmpty(viewDTO.getRepositoryName()) && org.apache.commons.lang3.StringUtils.equalsIgnoreCase(viewDTO.getType(), AuthorityTypeEnum.GROUP.getValue())) {
+                viewDTO.setRepositoryName(PROJECT_OVERALL);
+            }
         }
 
 //        //按照跟新时间倒序排序表
