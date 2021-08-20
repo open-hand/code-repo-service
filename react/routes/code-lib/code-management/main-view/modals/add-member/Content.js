@@ -1,6 +1,13 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Form, Select, Button, DatePicker, Tooltip } from 'choerodon-ui/pro';
+import {
+  Form,
+  Select,
+  Button,
+  DatePicker,
+  Tooltip,
+  SelectBox,
+} from 'choerodon-ui/pro';
 import { Choerodon } from '@choerodon/boot';
 import { map, some } from 'lodash';
 import moment from 'moment';
@@ -14,12 +21,11 @@ export default observer(() => {
     intl: { formatMessage },
     modal,
     refresh,
-
   } = useAddMemberStore();
 
   modal.handleOk(async () => {
     try {
-      if (await formDs.submit() !== false) {
+      if ((await formDs.submit()) !== false) {
         refresh();
         return true;
       }
@@ -45,7 +51,10 @@ export default observer(() => {
   }
 
   function optionsFilter(record) {
-    const flag = some(pathListDs.created, r => r.get('userId') === record.get('userId'));
+    const flag = some(
+      pathListDs.created,
+      r => r.get('userId') === record.get('userId'),
+    );
     return !flag;
   }
   function levelOptionsFilter(record) {
@@ -53,7 +62,9 @@ export default observer(() => {
     return flag;
   }
   function searchMatcher({ record, text, textField }) {
-    const isTrue = record.get(textField).indexOf(text) !== -1 || record.get('loginName').indexOf(text) !== -1;
+    const isTrue =
+      record.get(textField).indexOf(text) !== -1 ||
+      record.get('loginName').indexOf(text) !== -1;
     return isTrue;
   }
   const renderer = ({ text, textField, record }) => (
@@ -66,26 +77,37 @@ export default observer(() => {
       {renderer({ text, record })}
     </Tooltip>
   );
-
+  // console.log(formDs?.current?.get('permissionsLevel'));
   return (
     <div style={{ width: '5.12rem' }}>
-      <Form dataSet={formDs} columns={6}>
-        <Select
-          multiple
-          name="repositoryIds"
-          searchable
-          maxTagCount={3}
-          maxTagTextLength={6}
-          searchMatcher={({ record, text, textField }) => record.get('repositoryCode').indexOf(text) !== -1 || record.get(textField).indexOf(text) !== -1}
-          optionRenderer={optionRenderer}
-          renderer={renderer}
-          maxTagPlaceholder={restValues => `+${restValues.length}...`}
-          dropdownMenuStyle={{ width: '5.12rem' }}
-          colSpan={6}
-        />
+      <Form dataSet={formDs} columns={1}>
+        <SelectBox name="permissionsLevel" />
+        { formDs?.current?.get('permissionsLevel') === 'applicationService' && (
+          <Select
+            multiple
+            name="repositoryIds"
+            searchable
+            maxTagCount={3}
+            maxTagTextLength={6}
+            searchMatcher={({ record, text, textField }) =>
+              record.get('repositoryCode').indexOf(text) !== -1 ||
+              record.get(textField).indexOf(text) !== -1
+            }
+            optionRenderer={optionRenderer}
+            renderer={renderer}
+            maxTagPlaceholder={restValues => `+${restValues.length}...`}
+            dropdownMenuStyle={{ width: '5.12rem' }}
+            colSpan={6}
+          />
+        )}
       </Form>
       {map(pathListDs.data, pathRecord => (
-        <Form record={pathRecord} columns={13} key={pathRecord.id} className="code-lib-management-add-member">
+        <Form
+          record={pathRecord}
+          columns={13}
+          key={pathRecord.id}
+          className="code-lib-management-add-member"
+        >
           <Select
             name="userId"
             searchable
@@ -99,7 +121,14 @@ export default observer(() => {
             onOption={getClusterOptionProp}
             optionsFilter={levelOptionsFilter}
           />
-          <DatePicker popupCls="code-lib-management-add-member-dayPicker" name="glExpiresAt" min={moment().add(1, 'days').format('YYYY-MM-DD')} colSpan={4} />
+          <DatePicker
+            popupCls="code-lib-management-add-member-dayPicker"
+            name="glExpiresAt"
+            min={moment()
+              .add(1, 'days')
+              .format('YYYY-MM-DD')}
+            colSpan={4}
+          />
           {pathListDs.length > 1 ? (
             <Button
               funcType="flat"
@@ -109,7 +138,9 @@ export default observer(() => {
               }}
               onClick={() => handleRemovePath(pathRecord)}
             />
-          ) : <span />}
+          ) : (
+            <span />
+          )}
         </Form>
       ))}
       <Button

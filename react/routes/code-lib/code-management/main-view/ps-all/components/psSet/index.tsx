@@ -136,9 +136,23 @@ const PSsetTable = () => {
 
   function handleDelete() {
     const record = psSetDs.current;
+    let msg,roleText 
+    let roleList = psSetDs.current.getField('glAccessLevelList').options.toData()
+    let roleValue = psSetDs.current.get('glAccessLevel')
+    roleList.forEach((item: { value: any; meaning: any; })=>{
+      if(item.value===roleValue) {
+        roleText=item.meaning
+      }
+    })
+    if(record.get('type')==='group') { // 权限为项目全局
+      msg = `该用户被分配的是项目全局${roleText}权限，删除了此处的权限后,
+      该用户在该项目下所有代码仓库中的${roleText}权限都将被移除。`
+    } else {
+      msg = formatMessage({ id: `${intlPrefix}.permission.delete.des` })
+    }
     const mProps = {
       title: formatMessage({ id: `${intlPrefix}.permission.delete.title` }),
-      children: formatMessage({ id: `${intlPrefix}.permission.delete.des` }),
+      children: msg,
       okText: formatMessage({ id: 'delete' }),
     };
     psSetDs.delete(record, mProps);
@@ -147,8 +161,12 @@ const PSsetTable = () => {
 
   async function handleAsync() {
     const record = psSetDs.current;
+    let isGroup = false
+    if(record.get('type')==='group') {
+      isGroup = true
+    }
     try {
-      const res = await CodeManagerApis.asyncUser(organizationId, projectId, record.get('repositoryId'), record.get('id'))
+      const res = await CodeManagerApis.asyncUser(organizationId, projectId, record.get('repositoryId'), record.get('id'),isGroup)
       if (res?.failed) {
         Choerodon.prompt(res.message);
       }
@@ -180,7 +198,6 @@ const PSsetTable = () => {
     }
     return <Action data={actionData} />;
   }
-
   return (
     <Table
       dataSet={psSetDs}

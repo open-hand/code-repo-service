@@ -9,7 +9,10 @@ class CodeManagerApis {
     return axios.post(`/rducm/v1/organizations/${orgId}/projects/${proId}/gitlab/repositories/member-applicants/batch/refuse?approvalMessage=${approvalMessage}`, data);
   }
   // 同步用户
-  static asyncUser(organizationId:string, projectId:string, repositoryId:string, memberId:string) {
+  static asyncUser(organizationId:string, projectId:string, repositoryId:string, memberId:string,isGroup=false) {
+    if(isGroup) {
+      return axios.post(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members/group/${memberId}/sync`);
+    }
     return axios.post(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/${repositoryId}/members/${memberId}/sync`);
   }
   static getPsSetListsUrl(organizationId:string, projectId:string, repositoryIds:string){
