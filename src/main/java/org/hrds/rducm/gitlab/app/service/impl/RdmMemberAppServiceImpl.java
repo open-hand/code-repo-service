@@ -580,9 +580,13 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             // 设置gitlab项目id和用户id
             rdmMember.setGlUserId(glUserId);
             rdmMember.setgGroupId(group.getId());
+            rdmMember.setUserId(gitlabMemberCreateDTO.getUserId());
             rdmMembers.add(rdmMember);
         });
-        self().batchAddOrUpdateMembersBeforeRequestsNew(rdmMembers);
+        //批量插入数据库
+//        iRdmMemberService.insertMemberBefore(rdmMember1);
+        rdmMemberRepository.batchInsert(rdmMembers);
+//        self().batchAddOrUpdateMembersBeforeRequestsNew(rdmMembers);
 
 
         //发送saga
