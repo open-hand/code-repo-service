@@ -42,4 +42,11 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member.groovy') {
             column(name: 'g_group_id', type: "int(11)",  afterColumn: 'gl_project_id', remarks: 'gitlab group的id')
         }
     }
+    changeSet(){
+        sql("""
+              alter table rducm_gitlab_member modify repository_id BIGINT(20) null;
+              alter table rducm_gitlab_member modify gl_project_id int(11) null;
+         """)
+    }
+
 }

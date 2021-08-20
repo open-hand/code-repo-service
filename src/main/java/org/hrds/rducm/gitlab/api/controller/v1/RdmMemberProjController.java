@@ -120,7 +120,7 @@ public class RdmMemberProjController extends BaseController {
     @PutMapping("/group/{rducm_gitlab_member_id}")
     public ResponseEntity<?> updateGroupMember(@PathVariable Long organizationId,
                                                @PathVariable Long projectId,
-                                               @Encrypt @PathVariable Long rducmGitlabMemberId,
+                                               @Encrypt @PathVariable(value = "rducm_gitlab_member_id") Long rducmGitlabMemberId,
                                                @RequestBody RdmMemberBatchDTO.GitlabMemberCreateDTO gitlabMemberCreateDTO) {
         validObject(gitlabMemberCreateDTO);
         rdmMemberAppService.updateGroupMember(organizationId, projectId, gitlabMemberCreateDTO, rducmGitlabMemberId);
@@ -132,7 +132,7 @@ public class RdmMemberProjController extends BaseController {
     @DeleteMapping("/group/{rducm_gitlab_member_id}")
     public ResponseEntity<?> deleteGroupMember(@PathVariable Long organizationId,
                                                @PathVariable Long projectId,
-                                               @Encrypt @PathVariable Long rducmGitlabMemberId) {
+                                               @Encrypt @PathVariable(value = "rducm_gitlab_member_id") Long rducmGitlabMemberId) {
 
         rdmMemberAppService.deleteGroupMember(organizationId, projectId, rducmGitlabMemberId);
         return Results.created(null);
