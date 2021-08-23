@@ -15,6 +15,7 @@ class CodeManagerApis {
     }
     return axios.post(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/${repositoryId}/members/${memberId}/sync`);
   }
+
   static getPsSetListsUrl(organizationId:string, projectId:string, repositoryIds:string){
     let tempUrl = `/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members`
     if(!repositoryIds || repositoryIds === 'all'){
