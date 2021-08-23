@@ -31,4 +31,6 @@ public interface RdmMemberMapper extends BaseMapper<RdmMember> {
      * @return
      */
     int batchInsertCustom(List<RdmMember> list);
+
+    List<RdmMember> selectUserGroupAccessLevel( @Param("userIds") Set<Long> userIds);
 }
