@@ -108,8 +108,8 @@ public class RdmMemberProjController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.PROJECT_OWNER})
     @PostMapping("/batch-add/group")
     public ResponseEntity<Void> batchAddGroupMembers(@PathVariable Long organizationId,
-                                                  @PathVariable Long projectId,
-                                                  @RequestBody List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOs) {
+                                                     @PathVariable Long projectId,
+                                                     @RequestBody List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOs) {
         validObject(gitlabMemberCreateDTOs);
         rdmMemberAppService.batchAddGroupMembers(organizationId, projectId, gitlabMemberCreateDTOs);
         return Results.created(null);
@@ -119,9 +119,9 @@ public class RdmMemberProjController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.PROJECT_OWNER})
     @PutMapping("/group/{rducm_gitlab_member_id}")
     public ResponseEntity<Void> updateGroupMember(@PathVariable Long organizationId,
-                                               @PathVariable Long projectId,
-                                               @Encrypt @PathVariable(value = "rducm_gitlab_member_id") Long rducmGitlabMemberId,
-                                               @RequestBody RdmMemberBatchDTO.GitlabMemberCreateDTO gitlabMemberCreateDTO) {
+                                                  @PathVariable Long projectId,
+                                                  @Encrypt @PathVariable(value = "rducm_gitlab_member_id") Long rducmGitlabMemberId,
+                                                  @RequestBody RdmMemberBatchDTO.GitlabMemberCreateDTO gitlabMemberCreateDTO) {
         validObject(gitlabMemberCreateDTO);
         rdmMemberAppService.updateGroupMember(organizationId, projectId, gitlabMemberCreateDTO, rducmGitlabMemberId);
         return Results.success();
@@ -131,23 +131,34 @@ public class RdmMemberProjController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.PROJECT_OWNER})
     @DeleteMapping("/group/{rducm_gitlab_member_id}")
     public ResponseEntity<Void> deleteGroupMember(@PathVariable Long organizationId,
-                                               @PathVariable Long projectId,
-                                               @Encrypt @PathVariable(value = "rducm_gitlab_member_id") Long rducmGitlabMemberId) {
+                                                  @PathVariable Long projectId,
+                                                  @Encrypt @PathVariable(value = "rducm_gitlab_member_id") Long rducmGitlabMemberId) {
 
         rdmMemberAppService.deleteGroupMember(organizationId, projectId, rducmGitlabMemberId);
         return Results.success();
     }
 
+    @ApiOperation(value = "查询用户在项目下的全局权限")
+    @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.PROJECT_OWNER})
+    @GetMapping("/group/{user_id}")
+    public ResponseEntity<RdmMember> getGroupMember(@PathVariable Long organizationId,
+                                               @PathVariable Long projectId,
+                                               @Encrypt @PathVariable(value = "user_id") Long userId) {
+
+
+        return Results.success(rdmMemberAppService.getGroupMember(organizationId, projectId, userId));
+    }
+
+
     @ApiOperation(value = "同步组的权限")
     @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.PROJECT_OWNER})
     @PostMapping("/group/{rducm_gitlab_member_id}/sync")
     public ResponseEntity<?> syncGroupMember(@PathVariable Long organizationId,
-                                        @PathVariable Long projectId,
-                                        @Encrypt @PathVariable(value = "rducm_gitlab_member_id") Long rducmGitlabMemberId) {
+                                             @PathVariable Long projectId,
+                                             @Encrypt @PathVariable(value = "rducm_gitlab_member_id") Long rducmGitlabMemberId) {
         rdmMemberAppService.syncGroupMember(rducmGitlabMemberId);
         return Results.success();
     }
-
 
 
     @ApiOperation(value = "权限导出")
