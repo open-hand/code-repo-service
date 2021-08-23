@@ -52,6 +52,8 @@
         select * from rducm_gitlab_member rgm
         where 1=1
 
+        AND  rgm.type='group'
+
         <if test="userIds!=null and userIds.size > 0">
             and rgm.user_id in
             <foreach collection="userIds" item="userId" open="(" close=")" separator=",">
