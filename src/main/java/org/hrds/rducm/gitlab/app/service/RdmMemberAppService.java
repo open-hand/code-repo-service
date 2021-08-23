@@ -162,4 +162,5 @@ public interface RdmMemberAppService {
 
     void syncGroupMember(Long rducmGitlabMemberId);
 
+    RdmMember getGroupMember(Long organizationId, Long projectId, Long userId);
 }

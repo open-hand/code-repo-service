@@ -626,7 +626,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     public void updateGroupMember(Long organizationId, Long projectId, RdmMemberBatchDTO.GitlabMemberCreateDTO gitlabMemberCreateDTO, Long rducmGitlabMemberId) {
         RdmMember rdmMember = rdmMemberRepository.selectByPrimaryKey(rducmGitlabMemberId);
         AssertUtils.notNull(rdmMember, "error.rdmMember.is.not.exist");
-        AssertUtils.notNull(rdmMember.getgGroupId(),"error.group.id.is.null");
+        AssertUtils.notNull(rdmMember.getgGroupId(), "error.group.id.is.null");
         if (!rdmMember.getSyncGitlabFlag()) {
             throw new CommonException("error.sync.flag.false");
         }
@@ -671,6 +671,15 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         // <3> 发送事件
 //        iRdmMemberService.publishMemberEvent(dbMember, MemberEvent.EventType.SYNC_MEMBER);
+    }
+
+    @Override
+    public RdmMember getGroupMember(Long organizationId, Long projectId, Long userId) {
+        RdmMember rdmMember = new RdmMember();
+        rdmMember.setUserId(userId);
+        rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+        rdmMember.setProjectId(projectId);
+        return rdmMemberRepository.selectOne(rdmMember);
     }
 
     /**
