@@ -3,10 +3,12 @@ package org.hrds.rducm.gitlab.api.controller.v1;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.swagger.annotation.Permission;
 
+import com.google.common.base.Joiner;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import java.util.*;
+import java.util.function.Function;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
@@ -15,10 +17,13 @@ import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
+import org.hzero.core.base.BaseConstants;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.stream.Collectors;
@@ -38,7 +43,7 @@ public class ProjectController extends BaseController {
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
     @Autowired
-    private RdmMemberRepository rdmMemberRepository;
+    private RdmMemberMapper rdmMemberMapper;
 
     @ApiOperation(value = "查询项目成员, 排除'项目管理员'和'组织管理员'角色,并排除自己(项目层)")
     @ApiImplicitParams({
@@ -82,14 +87,22 @@ public class ProjectController extends BaseController {
                             .setRealName(u.getRealName())
                             .setImageUrl(u.getImageUrl())
                             .setProjectMember(u.getProjectMember());
-                    RdmMember rdmMember = new RdmMember();
-                    rdmMember.setUserId(u.getId());
-                    rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
-                    rdmMember.setProjectId(projectId);
-                    RdmMember member = rdmMemberRepository.selectOne(rdmMember);
-                    baseC7NUserViewDTO.setGroupAccessLevel(Objects.isNull(member) ? null : member.getGlAccessLevel());
+
                     return baseC7NUserViewDTO;
                 }).collect(Collectors.toList());
+
+        if (!CollectionUtils.isEmpty(baseC7NUserViewDTOS)) {
+            Set<Long> userIds = baseC7NUserViewDTOS.stream().map(BaseC7nUserViewDTO::getUserId).collect(Collectors.toSet());
+            List<RdmMember> rdmMembers = rdmMemberMapper.selectUserGroupAccessLevel(userIds);
+            if (!CollectionUtils.isEmpty(rdmMembers)) {
+                Map<Long, Integer> longIntegerMap = rdmMembers.stream().collect(Collectors.toMap(RdmMember::getUserId, RdmMember::getGlAccessLevel));
+                baseC7NUserViewDTOS.forEach(baseC7nUserViewDTO -> {
+                    baseC7nUserViewDTO.setGroupAccessLevel(longIntegerMap.get(baseC7nUserViewDTO.getUserId()));
+                });
+            }
+        }
+
+
         return Results.success(baseC7NUserViewDTOS);
 
     }
