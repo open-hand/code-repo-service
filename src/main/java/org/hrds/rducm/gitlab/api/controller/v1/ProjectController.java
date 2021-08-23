@@ -6,8 +6,12 @@ import io.choerodon.swagger.annotation.Permission;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import java.util.*;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
+import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
@@ -17,10 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +37,8 @@ public class ProjectController extends BaseController {
 
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
+    @Autowired
+    private RdmMemberRepository rdmMemberRepository;
 
     @ApiOperation(value = "查询项目成员, 排除'项目管理员'和'组织管理员'角色,并排除自己(项目层)")
     @ApiImplicitParams({
@@ -80,6 +82,12 @@ public class ProjectController extends BaseController {
                             .setRealName(u.getRealName())
                             .setImageUrl(u.getImageUrl())
                             .setProjectMember(u.getProjectMember());
+                    RdmMember rdmMember = new RdmMember();
+                    rdmMember.setUserId(u.getId());
+                    rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+                    rdmMember.setProjectId(projectId);
+                    RdmMember member = rdmMemberRepository.selectOne(rdmMember);
+                    baseC7NUserViewDTO.setGroupAccessLevel(Objects.isNull(member) ? null : member.getGlAccessLevel());
                     return baseC7NUserViewDTO;
                 }).collect(Collectors.toList());
         return Results.success(baseC7NUserViewDTOS);
