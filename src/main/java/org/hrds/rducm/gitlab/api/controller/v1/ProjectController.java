@@ -73,6 +73,9 @@ public class ProjectController extends BaseController {
     private List<BaseC7nUserViewDTO> queryNonProjectUsers(Long projectId, String name) {
         List<C7nUserVO> c7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listDeveloperProjectMembers(projectId, name))
                 .orElse(Collections.emptyList());
+        if (org.springframework.util.StringUtils.isEmpty(name)) {
+            return Collections.EMPTY_LIST;
+        }
 
         // 过滤当前项目成员
         List<C7nUserVO> allC7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listEnabledUsersByUserName(projectId, name))
