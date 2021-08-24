@@ -1,5 +1,7 @@
 /* eslint-disable import/no-anonymous-default-export */
-export default ({ formatMessage, intlPrefix, userOptions }) => (
+export default ({
+  formatMessage, intlPrefix, userOptions,
+}) => (
   {
     autoCreate: false,
     autoQuery: false,

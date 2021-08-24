@@ -1,4 +1,4 @@
-import { axios, Choerodon } from '@choerodon/boot';
+import { Choerodon } from '@choerodon/boot';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import {
@@ -8,15 +8,17 @@ import {
   DatePicker,
   Tooltip,
   SelectBox,
+  Icon,
 } from 'choerodon-ui/pro';
-
-import { map, some } from 'lodash';
+import { map, some, debounce } from 'lodash';
 import moment from 'moment';
 import { useAddMemberStore } from './stores';
 import './index.less';
 
 export default observer(() => {
   const {
+    openType,
+    prefixCls,
     formDs,
     pathListDs,
     intl: { formatMessage },
@@ -80,13 +82,6 @@ export default observer(() => {
     };
   }
 
-  function optionsFilter(record) {
-    const flag = some(
-      pathListDs.created,
-      r => r.get('userId') === record.get('userId'),
-    );
-    return !flag;
-  }
   function levelOptionsFilter(record) {
     const flag = !(Number(record.data.value.substring(1)) >= 50);
     return flag;
@@ -113,11 +108,33 @@ export default observer(() => {
     );
   };
   function searchMatcher({ record, text, textField }) {
-    const isTrue =
+    const exist = some(
+      pathListDs.created,
+      r => r.get('userId') === record.get('userId'),
+    );
+    const nameMatching =
       record.get(textField).indexOf(text) !== -1 ||
       record.get('loginName').indexOf(text) !== -1;
-    return isTrue;
+    if (openType === 'project') {
+      return !exist && nameMatching;
+    }
+    return !exist;
   }
+  const queryUser = debounce((str) => {
+    userOptions.setQueryParameter('name', str);
+    userOptions.setQueryParameter('type', openType);
+    if (str !== '') {
+      userOptions.query();
+    }
+  }, 500);
+
+  const handleUserSearch = (e) => {
+    e.persist();
+    if (openType === 'project') {
+      return;
+    }
+    queryUser(e.target.value);
+  };
   const renderer = ({ text, textField, record }) => (
     <span style={{ width: '100%' }}>
       {text}({record.get('repositoryCode')})
@@ -163,8 +180,21 @@ export default observer(() => {
             name="userId"
             searchable
             colSpan={4}
-            optionsFilter={optionsFilter}
-            searchMatcher={searchMatcher}
+            searchMatcher={({ record, text, textField }) =>
+              searchMatcher({ record, text, textField })
+            }
+            onInput={(e) => {
+              handleUserSearch(e);
+            }}
+            addonAfter={
+              openType === 'project' ? null : (
+                <Tooltip
+                  title={formatMessage({ id: 'infra.add.outsideMember.tips' })}
+                >
+                  <Icon type="help" className={`${prefixCls}-user-help-icon`} />
+                </Tooltip>
+              )
+            }
           />
           <Select
             name="glAccessLevel"
@@ -201,7 +231,12 @@ export default observer(() => {
         icon="add"
         onClick={handleAddPath}
       >
-        {formatMessage({ id: 'infra.add.member' })}
+        {formatMessage({
+          id:
+            openType === 'project'
+              ? 'infra.add.member'
+              : 'infra.add.outsideMember',
+        })}
       </Button>
     </div>
   );

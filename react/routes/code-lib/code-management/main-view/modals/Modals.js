@@ -101,13 +101,20 @@ const EnvModals = observer((props) => {
     tagDs.query();
   }
 
-  function openAdd() {
+  function openAdd(openType) {
+    let strId;
+    if (openType === 'project') {
+      strId = 'infra.add.member';
+    } else {
+      strId = 'infra.add.outsideMember';
+    }
     Modal.open({
       key: modalKey,
       style: modalStyle,
       drawer: true,
-      title: formatMessage({ id: 'infra.add.member' }),
+      title: formatMessage({ id: `${strId}` }),
       children: <AddMember
+        openType={openType}
         refresh={refresh}
         intlPrefix={intlPrefix}
         prefixCls={prefixCls}
@@ -221,7 +228,7 @@ const EnvModals = observer((props) => {
 
   async function handleSync() {
     try {
-      const res = await axios.get(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members/all/sync`)
+      const res = await axios.get(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members/all/sync`);
       if (res && res.failed) {
         message.error('用户同步失败，请检查后重试');
         return true;
@@ -341,14 +348,14 @@ const EnvModals = observer((props) => {
           {
             name: formatMessage({ id: 'infra.add.member' }),
             icon: 'person_add-o',
-            handler: openAdd,
+            handler: () => { openAdd('project'); },
             display: true,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
           },
           {
             name: formatMessage({ id: 'infra.add.outsideMember' }),
             icon: 'person_add-o',
-            handler: openAddOutside,
+            handler: () => { openAdd('nonProject'); },
             display: true,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
           },
