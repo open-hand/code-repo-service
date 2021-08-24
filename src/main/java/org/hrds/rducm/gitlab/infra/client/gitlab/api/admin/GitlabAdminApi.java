@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.infra.client.gitlab.api.admin;
 
 import org.gitlab4j.api.GitLabApiException;
+import org.gitlab4j.api.models.Group;
 import org.gitlab4j.api.models.Member;
 import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
@@ -59,6 +60,36 @@ public class GitlabAdminApi {
                     .getAllMembers(projectId, GitlabClientConstants.DEFAULT_PER_PAGE, null)
                     .all();
         } catch (GitLabApiException e) {
+            throw new GitlabClientException(e, e.getMessage());
+        }
+    }
+
+    public Member getMember(Integer projectId, Integer userId) {
+        try {
+            // 需要查询所有成员
+            return gitlab4jClient.getAdminGitLabApi()
+                    .getProjectApi()
+                    .getMember(projectId, userId);
+        } catch (GitLabApiException e) {
+            if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                return null;
+            } else {
+                throw new GitlabClientException(e, e.getMessage());
+            }
+        }
+    }
+
+    public Group getGroup(Integer appGroupId) {
+        try {
+            Group group = gitlab4jClient.getAdminGitLabApi()
+                    .getGroupApi()
+                    .getGroup(appGroupId);
+            return group;
+        } catch (GitLabApiException e) {
+            // Gitlab查询到不存在的资源会返回404
+            if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                return null;
+            }
             throw new GitlabClientException(e, e.getMessage());
         }
     }

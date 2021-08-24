@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.infra.feign;
 
 import io.choerodon.core.domain.Page;
+
 import org.hrds.rducm.gitlab.infra.feign.fallback.DevOpsServiceFeignClientFallBackFactory;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
@@ -91,11 +92,15 @@ public interface DevOpsServiceFeignClient {
     /**
      * 查询单个服务信息
      *
-     * @param projectId  项目ID
+     * @param projectId    项目ID
      * @param appServiceId 应用服务ID
      * @return
      */
     @GetMapping(value = "/v1/projects/{project_id}/app_service/{app_service_id}")
     ResponseEntity<C7nAppServiceVO> getAppServiceById(@PathVariable(value = "project_id") Long projectId,
                                                       @PathVariable(value = "app_service_id") Long appServiceId);
+
+    @GetMapping(value = "/v1/projects/{project_id}")
+    ResponseEntity<Long> getAppGroupIdByProjectId(@PathVariable(value = "project_id") Long projectId);
+
 }

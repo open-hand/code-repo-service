@@ -155,4 +155,6 @@ public interface C7nDevOpsServiceFacade {
      * @return
      */
     List<C7nAppServiceVO> listAppServiceByIds(Set<Long> repositoryIds);
+
+    Long  getAppGroupIdByProjectId(Long projectId);
 }
