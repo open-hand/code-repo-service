@@ -24,6 +24,8 @@ package org.hrds.rducm.gitlab.infra.client.gitlab.model;
  *   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import io.swagger.annotations.ApiModelProperty;
+import javax.persistence.Transient;
 import org.gitlab4j.api.models.AccessLevel;
 
 import java.util.Date;
@@ -34,7 +36,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Member {
+public class GitlabMember {
 
     private org.gitlab4j.api.models.AccessLevel accessLevel;
     private Date createdAt;
@@ -44,6 +46,28 @@ public class Member {
     private String state;
     private String username;
     private Date expiresAt;
+    @Transient
+    @ApiModelProperty(value = "这个用户的权限层级，在gitlab那边属于project层还是group层")
+    private String type;
+    @Transient
+    @ApiModelProperty(value = "应用服务组的id")
+    private Integer appGroupId;
+
+    public Integer getAppGroupId() {
+        return appGroupId;
+    }
+
+    public void setAppGroupId(Integer appGroupId) {
+        this.appGroupId = appGroupId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public org.gitlab4j.api.models.AccessLevel getAccessLevel() {
         return this.accessLevel;

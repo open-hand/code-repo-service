@@ -3,8 +3,10 @@ package org.hrds.rducm.gitlab.domain.facade.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
@@ -247,6 +249,17 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
             return entity.getBody().getContent();
         } else {
             return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public Long getAppGroupIdByProjectId(Long projectId) {
+        ResponseEntity<Long> appGroupIdByProjectId = devOpsServiceFeignClient.getAppGroupIdByProjectId(projectId);
+
+        if (Objects.requireNonNull(appGroupIdByProjectId.getBody()) != null) {
+            return appGroupIdByProjectId.getBody();
+        } else {
+            return null;
         }
     }
 }
