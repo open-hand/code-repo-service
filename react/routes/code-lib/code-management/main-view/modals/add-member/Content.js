@@ -46,27 +46,37 @@ export default observer(() => {
     pathListDs.remove(removeRecord);
   }
 
-  function getClusterOptionProp({ record }) {
-    const levelNum = Number(record.data.value.substring(1));
+  // 应用服务时,选中人如果有权限等级 拿它和accessLevelStr的权限进行比较
+  function groupAccessLevelCompare(accessLevelStr) {
+    // accessLevelStr 如L10
     let boolean = false;
+    const accessLevelNum = accessLevelStr.substring(1);
     const userId = pathListDs.current.get('userId');
-    let groupAccessLevel; // 当前选中项的全局权限值
+    let selectedGroupAccessLevel; // 当前选中项的全局权限值
     userOptions.toData().forEach((item) => {
       if (userId === item.userId) {
-        // eslint-disable-next-line prefer-destructuring
-        groupAccessLevel = item.groupAccessLevel;
+        selectedGroupAccessLevel = item.groupAccessLevel;
       }
     });
     // 有层级权限并且当前是应用服务授予权限
     if (
-      groupAccessLevel &&
-          formDs.current.get('permissionsLevel') === 'applicationService' &&
-          levelNum <= groupAccessLevel
+      selectedGroupAccessLevel &&
+      formDs.current.get('permissionsLevel') === 'applicationService' &&
+      accessLevelNum <= selectedGroupAccessLevel
     ) {
       boolean = true;
     }
     return {
-      disabled: levelNum >= 50 || boolean,
+      selectedGroupAccessLevel,
+      boolean,
+    };
+  }
+
+  function getClusterOptionProp({ record }) {
+    const accessLevelNum = Number(record.data.value.substring(1));
+    const { boolean } = groupAccessLevelCompare(record.data.value);
+    return {
+      disabled: accessLevelNum >= 50 || boolean,
     };
   }
 
@@ -82,27 +92,16 @@ export default observer(() => {
     return flag;
   }
   const AccessLevelOptionRenderer = ({ record, text, value }) => {
-    const userId = pathListDs.current.get('userId');
-    let groupAccessLevel; // 当前选中项的全局权限值
-    userOptions.toData().forEach((item) => {
-      if (userId === item.userId) {
-        // eslint-disable-next-line prefer-destructuring
-        groupAccessLevel = item.groupAccessLevel;
-      }
-    });
+    const { boolean, selectedGroupAccessLevel } = groupAccessLevelCompare(value);
     const roleList = pathListDs.current
       .getField('glAccessLevel')
       .options.toData();
     let str = text;
     // 有层级权限并且当前是应用服务授予权限
-    if (
-      groupAccessLevel &&
-      formDs.current.get('permissionsLevel') === 'applicationService' &&
-      Number(value.substring(1)) <= groupAccessLevel
-    ) {
-      const levelStr = `L${groupAccessLevel}`;
+    if (boolean) {
+      const accessLevelStr = `L${selectedGroupAccessLevel}`;
       roleList.forEach((item) => {
-        if (item.value === levelStr) {
+        if (item.value === accessLevelStr) {
           str = `该用户已被分配项目全局的${item.meaning}权限`;
         }
       });
@@ -153,52 +152,49 @@ export default observer(() => {
           />
         )}
       </Form>
-      {map(pathListDs.data, (pathRecord) => {
-        console.log(pathRecord.get, 'pathRecord');
-        return (
-          <Form
-            record={pathRecord}
-            columns={13}
-            key={pathRecord.id}
-            className="code-lib-management-add-member"
-          >
-            <Select
-              name="userId"
-              searchable
-              colSpan={4}
-              optionsFilter={optionsFilter}
-              searchMatcher={searchMatcher}
+      {map(pathListDs.data, pathRecord => (
+        <Form
+          record={pathRecord}
+          columns={13}
+          key={pathRecord.id}
+          className="code-lib-management-add-member"
+        >
+          <Select
+            name="userId"
+            searchable
+            colSpan={4}
+            optionsFilter={optionsFilter}
+            searchMatcher={searchMatcher}
+          />
+          <Select
+            name="glAccessLevel"
+            colSpan={4}
+            onOption={getClusterOptionProp}
+            optionsFilter={levelOptionsFilter}
+            optionRenderer={AccessLevelOptionRenderer}
+          />
+          <DatePicker
+            popupCls="code-lib-management-add-member-dayPicker"
+            name="glExpiresAt"
+            min={moment()
+              .add(1, 'days')
+              .format('YYYY-MM-DD')}
+            colSpan={4}
+          />
+          {pathListDs.length > 1 ? (
+            <Button
+              funcType="flat"
+              icon="delete"
+              style={{
+                marginTop: '8px',
+              }}
+              onClick={() => handleRemovePath(pathRecord)}
             />
-            <Select
-              name="glAccessLevel"
-              colSpan={4}
-              onOption={getClusterOptionProp}
-              optionsFilter={levelOptionsFilter}
-              optionRenderer={AccessLevelOptionRenderer}
-            />
-            <DatePicker
-              popupCls="code-lib-management-add-member-dayPicker"
-              name="glExpiresAt"
-              min={moment()
-                .add(1, 'days')
-                .format('YYYY-MM-DD')}
-              colSpan={4}
-            />
-            {pathListDs.length > 1 ? (
-              <Button
-                funcType="flat"
-                icon="delete"
-                style={{
-                  marginTop: '8px',
-                }}
-                onClick={() => handleRemovePath(pathRecord)}
-              />
-            ) : (
-              <span />
-            )}
-          </Form>
-        );
-      })}
+          ) : (
+            <span />
+          )}
+        </Form>
+      ))}
       <Button
         funcType="flat"
         color="primary"

@@ -97,4 +97,15 @@ export default ({
       },
     },
   ],
+  events: {
+    update: ({
+      dataSet, record, name, value, oldValue,
+    }) => {
+      if (name === 'permissionsLevel') {
+        pathListDs.created.forEach((item) => {
+          item.clear();
+        });
+      }
+    },
+  },
 });
