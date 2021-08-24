@@ -1,7 +1,15 @@
+import { axios, Choerodon } from '@choerodon/boot';
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { Form, Select, Button, DatePicker, Tooltip } from 'choerodon-ui/pro';
-import { Choerodon } from '@choerodon/boot';
+import {
+  Form,
+  Select,
+  Button,
+  DatePicker,
+  Tooltip,
+  SelectBox,
+} from 'choerodon-ui/pro';
+
 import { map, some } from 'lodash';
 import moment from 'moment';
 import { useAddMemberStore } from './stores';
@@ -14,12 +22,12 @@ export default observer(() => {
     intl: { formatMessage },
     modal,
     refresh,
-
+    userOptions,
   } = useAddMemberStore();
 
   modal.handleOk(async () => {
     try {
-      if (await formDs.submit() !== false) {
+      if ((await formDs.submit()) !== false) {
         refresh();
         return true;
       }
@@ -38,22 +46,76 @@ export default observer(() => {
     pathListDs.remove(removeRecord);
   }
 
-  function getClusterOptionProp({ record }) {
+  // 应用服务时,选中人如果有权限等级 拿它和accessLevelStr的权限进行比较
+  function groupAccessLevelCompare(accessLevelStr) {
+    // accessLevelStr 如L10
+    let boolean = false;
+    const accessLevelNum = accessLevelStr.substring(1);
+    const userId = pathListDs.current.get('userId');
+    let selectedGroupAccessLevel; // 当前选中项的全局权限值
+    userOptions.toData().forEach((item) => {
+      if (userId === item.userId) {
+        selectedGroupAccessLevel = item.groupAccessLevel;
+      }
+    });
+    // 有层级权限并且当前是应用服务授予权限
+    if (
+      selectedGroupAccessLevel &&
+      formDs.current.get('permissionsLevel') === 'applicationService' &&
+      accessLevelNum <= selectedGroupAccessLevel
+    ) {
+      boolean = true;
+    }
     return {
-      disabled: Number(record.data.value.substring(1)) >= 50,
+      selectedGroupAccessLevel,
+      boolean,
+    };
+  }
+
+  function getClusterOptionProp({ record }) {
+    const accessLevelNum = Number(record.data.value.substring(1));
+    const { boolean } = groupAccessLevelCompare(record.data.value);
+    return {
+      disabled: accessLevelNum >= 50 || boolean,
     };
   }
 
   function optionsFilter(record) {
-    const flag = some(pathListDs.created, r => r.get('userId') === record.get('userId'));
+    const flag = some(
+      pathListDs.created,
+      r => r.get('userId') === record.get('userId'),
+    );
     return !flag;
   }
   function levelOptionsFilter(record) {
     const flag = !(Number(record.data.value.substring(1)) >= 50);
     return flag;
   }
+  const AccessLevelOptionRenderer = ({ record, text, value }) => {
+    const { boolean, selectedGroupAccessLevel } = groupAccessLevelCompare(value);
+    const roleList = pathListDs.current
+      .getField('glAccessLevel')
+      .options.toData();
+    let str = text;
+    // 有层级权限并且当前是应用服务授予权限
+    if (boolean) {
+      const accessLevelStr = `L${selectedGroupAccessLevel}`;
+      roleList.forEach((item) => {
+        if (item.value === accessLevelStr) {
+          str = `该用户已被分配项目全局的${item.meaning}权限`;
+        }
+      });
+    }
+    return (
+      <Tooltip title={str} placement="left">
+        <div>{`${text}`}</div>
+      </Tooltip>
+    );
+  };
   function searchMatcher({ record, text, textField }) {
-    const isTrue = record.get(textField).indexOf(text) !== -1 || record.get('loginName').indexOf(text) !== -1;
+    const isTrue =
+      record.get(textField).indexOf(text) !== -1 ||
+      record.get('loginName').indexOf(text) !== -1;
     return isTrue;
   }
   const renderer = ({ text, textField, record }) => (
@@ -66,26 +128,37 @@ export default observer(() => {
       {renderer({ text, record })}
     </Tooltip>
   );
-
+  // console.log(formDs?.current?.get('permissionsLevel'));
   return (
     <div style={{ width: '5.12rem' }}>
-      <Form dataSet={formDs} columns={6}>
-        <Select
-          multiple
-          name="repositoryIds"
-          searchable
-          maxTagCount={3}
-          maxTagTextLength={6}
-          searchMatcher={({ record, text, textField }) => record.get('repositoryCode').indexOf(text) !== -1 || record.get(textField).indexOf(text) !== -1}
-          optionRenderer={optionRenderer}
-          renderer={renderer}
-          maxTagPlaceholder={restValues => `+${restValues.length}...`}
-          dropdownMenuStyle={{ width: '5.12rem' }}
-          colSpan={6}
-        />
+      <Form dataSet={formDs} columns={1}>
+        <SelectBox name="permissionsLevel" />
+        {formDs?.current?.get('permissionsLevel') === 'applicationService' && (
+          <Select
+            multiple
+            name="repositoryIds"
+            searchable
+            maxTagCount={3}
+            maxTagTextLength={6}
+            searchMatcher={({ record, text, textField }) =>
+              record.get('repositoryCode').indexOf(text) !== -1 ||
+              record.get(textField).indexOf(text) !== -1
+            }
+            optionRenderer={optionRenderer}
+            renderer={renderer}
+            maxTagPlaceholder={restValues => `+${restValues.length}...`}
+            dropdownMenuStyle={{ width: '5.12rem' }}
+            colSpan={6}
+          />
+        )}
       </Form>
       {map(pathListDs.data, pathRecord => (
-        <Form record={pathRecord} columns={13} key={pathRecord.id} className="code-lib-management-add-member">
+        <Form
+          record={pathRecord}
+          columns={13}
+          key={pathRecord.id}
+          className="code-lib-management-add-member"
+        >
           <Select
             name="userId"
             searchable
@@ -98,8 +171,16 @@ export default observer(() => {
             colSpan={4}
             onOption={getClusterOptionProp}
             optionsFilter={levelOptionsFilter}
+            optionRenderer={AccessLevelOptionRenderer}
           />
-          <DatePicker popupCls="code-lib-management-add-member-dayPicker" name="glExpiresAt" min={moment().add(1, 'days').format('YYYY-MM-DD')} colSpan={4} />
+          <DatePicker
+            popupCls="code-lib-management-add-member-dayPicker"
+            name="glExpiresAt"
+            min={moment()
+              .add(1, 'days')
+              .format('YYYY-MM-DD')}
+            colSpan={4}
+          />
           {pathListDs.length > 1 ? (
             <Button
               funcType="flat"
@@ -109,7 +190,9 @@ export default observer(() => {
               }}
               onClick={() => handleRemovePath(pathRecord)}
             />
-          ) : <span />}
+          ) : (
+            <span />
+          )}
         </Form>
       ))}
       <Button
