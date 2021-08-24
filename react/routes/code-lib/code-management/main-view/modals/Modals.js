@@ -7,7 +7,6 @@ import { Modal } from 'choerodon-ui/pro';
 import { Header, Choerodon, axios, HeaderButtons } from '@choerodon/boot';
 import BatchApprove from './batch-approval';
 import AddMember from './add-member';
-import AddOutsideMember from './add-outside-member';
 import AddBranch from './add-branch';
 import AddTag from './add-tag';
 import PsApply from './ps-apply';
@@ -115,22 +114,6 @@ const EnvModals = observer((props) => {
       title: formatMessage({ id: `${strId}` }),
       children: <AddMember
         openType={openType}
-        refresh={refresh}
-        intlPrefix={intlPrefix}
-        prefixCls={prefixCls}
-        currentBranchAppId={branchAppId}
-        branchServiceDs={branchServiceDs}
-      />,
-      okText: formatMessage({ id: 'add' }),
-    });
-  }
-  function openAddOutside() {
-    Modal.open({
-      key: modalKey,
-      style: modalStyle,
-      drawer: true,
-      title: formatMessage({ id: 'infra.add.outsideMember' }),
-      children: <AddOutsideMember
         refresh={refresh}
         intlPrefix={intlPrefix}
         prefixCls={prefixCls}
