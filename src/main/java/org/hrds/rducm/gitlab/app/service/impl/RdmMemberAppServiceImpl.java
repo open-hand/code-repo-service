@@ -555,7 +555,11 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             return;
         }
         rdmMembers.forEach(member -> {
-            syncMember(member.getId());
+            if (org.apache.commons.lang3.StringUtils.equalsIgnoreCase(member.getType(), AuthorityTypeEnum.PROJECT.getValue())) {
+                syncMember(member.getId());
+            } else {
+                syncGroupMember(member.getId());
+            }
         });
     }
 
