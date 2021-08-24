@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import java.util.*;
 import java.util.function.Function;
+import org.apache.commons.lang3.StringUtils;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
@@ -54,8 +55,62 @@ public class ProjectController extends BaseController {
     @GetMapping("/c7n/members/developers")
     public ResponseEntity<List<BaseC7nUserViewDTO>> listDeveloperProjectMembers(@PathVariable Long organizationId,
                                                                                 @PathVariable Long projectId,
-                                                                                @RequestParam(required = false) String name) {
-        //查询项目开发成员
+                                                                                @RequestParam(required = false) String name,
+                                                                                @RequestParam String type) {
+        if (StringUtils.equalsIgnoreCase(type, "project")) {
+            //查询项目开发成员
+            List<BaseC7nUserViewDTO> baseC7NUserViewDTOS = queryProjectUsers(organizationId, projectId, name);
+            return Results.success(baseC7NUserViewDTOS);
+        } else if (StringUtils.equalsIgnoreCase(type, "nonProject")) {
+            //查询项目开发成员
+            List<BaseC7nUserViewDTO> baseC7NUserViewDTOS = queryNonProjectUsers(projectId, name);
+            return Results.success(baseC7NUserViewDTOS);
+        } else {
+            return Results.success(null);
+        }
+    }
+
+    private List<BaseC7nUserViewDTO> queryNonProjectUsers(@PathVariable Long projectId, @RequestParam(required = false) String name) {
+        List<C7nUserVO> c7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listDeveloperProjectMembers(projectId, name))
+                .orElse(Collections.emptyList());
+
+        // 过滤当前项目成员
+        List<C7nUserVO> allC7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listEnabledUsersByUserName(projectId, name))
+                .orElse(Collections.emptyList());
+        Set<Long> memberIds = c7nUserVOS.stream().map(C7nUserVO::getId).collect(Collectors.toSet());
+        List<C7nUserVO> nonProjectMember = allC7nUserVOS.stream().filter(a -> !memberIds.contains(a.getId())).map(a -> a.setProjectMember(false)).collect(Collectors.toList());
+
+        List<BaseC7nUserViewDTO> baseC7NUserViewDTOS = nonProjectMember.stream()
+                .map(u -> {
+                    BaseC7nUserViewDTO baseC7NUserViewDTO = new BaseC7nUserViewDTO();
+                    baseC7NUserViewDTO.setUserId(u.getId())
+                            .setLoginName(u.getLoginName())
+                            .setEmail(u.getEmail())
+                            .setEnabled(u.getEnabled())
+                            .setOrganizationId(u.getOrganizationId())
+                            .setRealName(u.getRealName())
+                            .setImageUrl(u.getImageUrl())
+                            .setProjectMember(u.getProjectMember());
+                    return baseC7NUserViewDTO;
+                }).collect(Collectors.toList());
+        fillAccessLevel(baseC7NUserViewDTOS);
+        return baseC7NUserViewDTOS;
+    }
+
+    private void fillAccessLevel(List<BaseC7nUserViewDTO> baseC7NUserViewDTOS) {
+        if (!CollectionUtils.isEmpty(baseC7NUserViewDTOS)) {
+            Set<Long> userIds = baseC7NUserViewDTOS.stream().map(BaseC7nUserViewDTO::getUserId).collect(Collectors.toSet());
+            List<RdmMember> rdmMembers = rdmMemberMapper.selectUserGroupAccessLevel(userIds);
+            if (!CollectionUtils.isEmpty(rdmMembers)) {
+                Map<Long, Integer> longIntegerMap = rdmMembers.stream().collect(Collectors.toMap(RdmMember::getUserId, RdmMember::getGlAccessLevel));
+                baseC7NUserViewDTOS.forEach(baseC7nUserViewDTO -> {
+                    baseC7nUserViewDTO.setGroupAccessLevel(longIntegerMap.get(baseC7nUserViewDTO.getUserId()));
+                });
+            }
+        }
+    }
+
+    private List<BaseC7nUserViewDTO> queryProjectUsers(@PathVariable Long organizationId, @PathVariable Long projectId, @RequestParam(required = false) String name) {
         List<C7nUserVO> c7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listDeveloperProjectMembers(projectId, name))
                 .orElse(Collections.emptyList());
         c7nUserVOS = c7nUserVOS.stream().map(a -> a.setProjectMember(true)).collect(Collectors.toList());
@@ -91,20 +146,8 @@ public class ProjectController extends BaseController {
                     return baseC7NUserViewDTO;
                 }).collect(Collectors.toList());
 
-        if (!CollectionUtils.isEmpty(baseC7NUserViewDTOS)) {
-            Set<Long> userIds = baseC7NUserViewDTOS.stream().map(BaseC7nUserViewDTO::getUserId).collect(Collectors.toSet());
-            List<RdmMember> rdmMembers = rdmMemberMapper.selectUserGroupAccessLevel(userIds);
-            if (!CollectionUtils.isEmpty(rdmMembers)) {
-                Map<Long, Integer> longIntegerMap = rdmMembers.stream().collect(Collectors.toMap(RdmMember::getUserId, RdmMember::getGlAccessLevel));
-                baseC7NUserViewDTOS.forEach(baseC7nUserViewDTO -> {
-                    baseC7nUserViewDTO.setGroupAccessLevel(longIntegerMap.get(baseC7nUserViewDTO.getUserId()));
-                });
-            }
-        }
-
-
-        return Results.success(baseC7NUserViewDTOS);
-
+        fillAccessLevel(baseC7NUserViewDTOS);
+        return baseC7NUserViewDTOS;
     }
 
     private boolean isGitlabOwnerLabel(C7nUserVO c7nUserVO) {
