@@ -56,7 +56,7 @@ public class ProjectController extends BaseController {
     public ResponseEntity<List<BaseC7nUserViewDTO>> listDeveloperProjectMembers(@PathVariable Long organizationId,
                                                                                 @PathVariable Long projectId,
                                                                                 @RequestParam(required = false) String name,
-                                                                                @RequestParam String type) {
+                                                                                @RequestParam(defaultValue = "project") String type) {
         if (StringUtils.equalsIgnoreCase(type, "project")) {
             //查询项目开发成员
             List<BaseC7nUserViewDTO> baseC7NUserViewDTOS = queryProjectUsers(organizationId, projectId, name);
