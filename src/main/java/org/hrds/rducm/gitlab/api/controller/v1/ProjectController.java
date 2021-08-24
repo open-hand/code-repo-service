@@ -70,7 +70,7 @@ public class ProjectController extends BaseController {
         }
     }
 
-    private List<BaseC7nUserViewDTO> queryNonProjectUsers(@PathVariable Long projectId, @RequestParam(required = false) String name) {
+    private List<BaseC7nUserViewDTO> queryNonProjectUsers(Long projectId, String name) {
         List<C7nUserVO> c7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listDeveloperProjectMembers(projectId, name))
                 .orElse(Collections.emptyList());
 
@@ -110,7 +110,7 @@ public class ProjectController extends BaseController {
         }
     }
 
-    private List<BaseC7nUserViewDTO> queryProjectUsers(@PathVariable Long organizationId, @PathVariable Long projectId, @RequestParam(required = false) String name) {
+    private List<BaseC7nUserViewDTO> queryProjectUsers(Long organizationId, Long projectId, String name) {
         List<C7nUserVO> c7nUserVOS = Optional.ofNullable(c7NBaseServiceFacade.listDeveloperProjectMembers(projectId, name))
                 .orElse(Collections.emptyList());
         c7nUserVOS = c7nUserVOS.stream().map(a -> a.setProjectMember(true)).collect(Collectors.toList());
