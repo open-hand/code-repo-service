@@ -273,7 +273,12 @@ public class RdmMemberChangeSagaHandler {
             return;
         }
         recordIds.forEach(recordId -> {
-            rdmMemberAuditAppService.auditFix(projectAuditPayload.getOrganizationId(), projectAuditPayload.getProjectId(), 0L, recordId);
+            RdmMemberAuditRecord rdmMemberAuditRecord = new RdmMemberAuditRecord();
+            rdmMemberAuditRecord.setRepositoryId(0L);
+            rdmMemberAuditRecord.setId(recordId);
+            rdmMemberAuditRecord.setOrganizationId(projectAuditPayload.getOrganizationId());
+            rdmMemberAuditRecord.setProjectId(projectAuditPayload.getProjectId());
+            rdmMemberAuditAppService.auditFix(rdmMemberAuditRecord);
         });
 
     }
