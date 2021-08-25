@@ -204,7 +204,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         // 获取项目下应用服务组的id
         Long appGroupId = c7NDevOpsServiceFacade.getAppGroupIdByProjectId(projectId);
 
-        //查询组是否存在
+        //查询组是否存在,有些人将组删掉然后自己又创建了一个组，这样他的组id在devops中就对不上了
         if (appGroupId == null || appGroupId == 0 || Objects.isNull(gitlabAdminApi.getGroup(appGroupId.intValue()))) {
             LOGGER.info("There is no app service group in the project:" + projectId);
             return Collections.emptyList();
@@ -251,8 +251,10 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         // 确定member来自group还是project
         if (!CollectionUtils.isEmpty(gitlabMembers)) {
             gitlabMembers.forEach(member -> {
-                Member gitlabProjectMember = gitlabAdminApi.getMember(glProjectId, member.getId());
-                if (Objects.isNull(gitlabProjectMember)) {
+                //两条member 可能权限相同id 相同，过期时间相同，但是分别来自project和group,所以必须确定来自哪个
+                Member gitlabProjectMember = gitlabAdminApi.getProjectMember(glProjectId, member.getId());
+                Member groupMember = gitlabAdminApi.getGroupMember(appGroupId, member.getId());
+                if (member.equals(groupMember)){
                     member.setType("group");
                     member.setAppGroupId(appGroupId);
                 } else {

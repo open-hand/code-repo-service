@@ -74,7 +74,7 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
                 if (record.getSyncFlag()) {
                     return;
                 }
-                rdmMemberAuditAppService.auditFix(record.getOrganizationId(), record.getProjectId(), record.getRepositoryId(), record.getId());
+                rdmMemberAuditAppService.auditFix(record);
             }
         });
     }

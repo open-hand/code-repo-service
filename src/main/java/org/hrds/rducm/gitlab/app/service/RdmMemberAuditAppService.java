@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.app.service;
 
 import java.util.Set;
+import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.infra.feign.vo.SagaInstanceDetails;
 
 /**
@@ -27,7 +28,7 @@ public interface RdmMemberAuditAppService {
      * @param repositoryId
      * @param id
      */
-    void auditFix(Long organizationId, Long projectId, Long repositoryId, Long id);
+    void auditFix(RdmMemberAuditRecord rdmMemberAuditRecord);
 
     void batchAuditFix(Long organizationId, Long projectId, Set<Long> recordIds);
 

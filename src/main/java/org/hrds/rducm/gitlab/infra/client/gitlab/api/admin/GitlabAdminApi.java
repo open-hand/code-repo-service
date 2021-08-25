@@ -64,12 +64,27 @@ public class GitlabAdminApi {
         }
     }
 
-    public Member getMember(Integer projectId, Integer userId) {
+    public Member getProjectMember(Integer projectId, Integer userId) {
         try {
             // 需要查询所有成员
             return gitlab4jClient.getAdminGitLabApi()
                     .getProjectApi()
                     .getMember(projectId, userId);
+        } catch (GitLabApiException e) {
+            if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                return null;
+            } else {
+                throw new GitlabClientException(e, e.getMessage());
+            }
+        }
+    }
+
+    public Member getGroupMember(Integer groupId, Integer userId) {
+        try {
+            // 需要查询所有成员
+            return gitlab4jClient.getAdminGitLabApi()
+                    .getGroupApi()
+                    .getMember(groupId, userId);
         } catch (GitLabApiException e) {
             if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
                 return null;
