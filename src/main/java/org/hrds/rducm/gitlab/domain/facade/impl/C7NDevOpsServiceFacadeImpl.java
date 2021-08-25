@@ -255,8 +255,7 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
     @Override
     public Long getAppGroupIdByProjectId(Long projectId) {
         ResponseEntity<Long> appGroupIdByProjectId = devOpsServiceFeignClient.getAppGroupIdByProjectId(projectId);
-
-        if (Objects.requireNonNull(appGroupIdByProjectId.getBody()) != null) {
+        if (appGroupIdByProjectId.getBody() != null) {
             return appGroupIdByProjectId.getBody();
         } else {
             return null;
