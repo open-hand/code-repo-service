@@ -405,7 +405,7 @@ const codeManagement = {
   'infra.codeManage.ps.message.psApproval': '权限审批',
   'infra.codeManage.ps.message.applyView': '权限申请',
   'infra.codeManage.ps.message.psAudit': '权限审计',
-  'infra.codeManage.ps.message.psAudit.tips': '权限审计模块每月1号将自动去校验Choerodon中成员权限和GitLab的成员权限的差异。对于存在差异的数据，可点击修复按钮将系统内用户的应用服务权限更新为与GitLab的一致。',
+  'infra.codeManage.ps.message.psAudit.tips': '系统每月1号会自动触发【权限审计】操作，去校验C7N中项目成员的代码权限与在Gitlab中权限的差异。也可点击【手动审计】人为触发【权限审计】。对于差异数据可通过【修复】将C7N中设置的代码权限修复为与Gitlab中一致。',
   'infra.codeManage.ps.message.securityAudit': '安全审计',
   'infra.codeManage.ps.message.psBranch': '保护分支/标记',
   'infra.codeManage.ps.message.operationLog': '操作日志',
