@@ -218,12 +218,6 @@ public class RdmMemberChangeSagaHandler {
         AssertUtils.notNull(group, "error.gitlab.group.not.exist", groupMemberPayload.getgGroupId());
 
         groupMemberPayload.getGitlabMemberCreateDTOS().forEach(gitlabMemberCreateDTO -> {
-            Member groupApiMember = gitlabGroupApi.getMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId());
-            if (!Objects.isNull(groupApiMember)) {
-                gitlabGroupApi.removeMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId());
-            }
-            Member member = gitlabGroupApi.addMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId(), gitlabMemberCreateDTO.getGlAccessLevel(), gitlabMemberCreateDTO.getGlExpiresAt());
-            //回写数据库
             //userId和groupId确定唯一的数据
             RdmMember record = new RdmMember();
             record.setUserId(gitlabMemberCreateDTO.getUserId());
@@ -232,7 +226,21 @@ public class RdmMemberChangeSagaHandler {
             if (Objects.isNull(rdmMember)) {
                 throw new CommonException("error.rdmMember.is.null");
             }
-            iRdmMemberService.updateMemberAfter(rdmMember, member);
+            try {
+                Member groupApiMember = gitlabGroupApi.getMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId());
+                if (!Objects.isNull(groupApiMember)) {
+                    gitlabGroupApi.removeMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId());
+                }
+                Member member = gitlabGroupApi.addMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId(), gitlabMemberCreateDTO.getGlAccessLevel(), gitlabMemberCreateDTO.getGlExpiresAt());
+                //回写数据库
+                iRdmMemberService.updateMemberAfter(rdmMember, member);
+            } catch (Exception e) {
+                // 回写数据库错误消息
+                logger.error(e.getMessage(), e);
+                record.setSyncGitlabErrorMsg(e.getMessage());
+                rdmMemberRepository.updateOptional(record, RdmMember.FIELD_SYNC_GITLAB_ERROR_MSG);
+            }
+
         });
     }
 

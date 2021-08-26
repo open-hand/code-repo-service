@@ -10,6 +10,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.app.eventhandler.gitlab.GitlabPermissionRepair;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
@@ -43,6 +44,8 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
     private RdmMemberAuditAppService rdmMemberAuditAppService;
     @Autowired
     private RdmMemberAppService rdmMemberAppService;
+    @Autowired
+    private Map<String, GitlabPermissionRepair> permissionRepairMap;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -74,6 +77,7 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
                 if (record.getSyncFlag()) {
                     return;
                 }
+                permissionRepairMap.get(record.getType()).gitlabPermissionRepair(record);
                 rdmMemberAuditAppService.auditFix(record);
             }
         });
