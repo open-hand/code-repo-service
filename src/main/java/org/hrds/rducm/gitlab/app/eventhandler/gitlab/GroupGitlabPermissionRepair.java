@@ -21,7 +21,7 @@ import org.springframework.util.CollectionUtils;
  * Created by wangxiang on 2021/8/26
  */
 @Component
-public class GitlabGroupPermissionRepair extends AbstractGitlabPermissionRepair {
+public class GroupGitlabPermissionRepair extends AbstractGitlabPermissionRepair {
 
     @Autowired
     private RdmMemberRepository rdmMemberRepository;
