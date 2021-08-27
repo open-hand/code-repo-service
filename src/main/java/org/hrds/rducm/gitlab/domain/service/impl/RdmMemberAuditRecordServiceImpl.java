@@ -333,8 +333,11 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                         if (!Objects.equals(member.getType(), rdmMember1.getType())) {
                             isDifferent = true;
                         }
+                        //剔除
+                        dbMembers = dbMembers.stream().filter(member1 -> !isEqualGitlabAccess(member1, member)).collect(Collectors.toList());
                     }
                 } else {
+
                     isDifferent = true;
                 }
                 if (isDifferent) {
