@@ -5,6 +5,7 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
+import java.util.function.Function;
 import org.gitlab4j.api.models.Member;
 import org.gitlab4j.api.models.Project;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuditRecordQueryDTO;
@@ -198,7 +199,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
 
     private List<RdmMemberAuditRecord> compareMembersByProjectId(Long organizationId,
                                                                  Long projectId) {
-        // 获取项目下所有代码库id和Gitlab项目id
+        // 获取项目下所有代码库id和Gitlab项目id  导入失败的项目有代码库id(应用服务id) 没有gProjectId
         Map<Long, Long> appServiceIdMap = c7NDevOpsServiceFacade.listActiveC7nAppServiceIdsMapOnProjectLevel(projectId);
 
         // 获取项目下应用服务组的id
@@ -254,7 +255,8 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                 //两条member 可能权限相同id 相同，过期时间相同，但是分别来自project和group,所以必须确定来自哪个
                 Member gitlabProjectMember = gitlabAdminApi.getProjectMember(glProjectId, member.getId());
                 Member groupMember = gitlabAdminApi.getGroupMember(appGroupId, member.getId());
-                if (member.equals(groupMember)){
+                GitlabMember gitlabMember = ConvertUtils.convertObject(groupMember, GitlabMember.class);
+                if (member.equals(gitlabMember)) {
                     member.setType("group");
                     member.setAppGroupId(appGroupId);
                 } else {
@@ -266,8 +268,8 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
 
         LOGGER.info("{}项目查询到Gitlab成员数量为:{}", glProjectId, gitlabMembers.size());
 
-        // 查询数据库所有成员
-        List<RdmMember> dbMembers = memberRepository.select(new RdmMember().setGlProjectId(glProjectId));
+        // 查询项目下数据库所有成员
+        List<RdmMember> dbMembers = memberRepository.select(new RdmMember().setProjectId(projectId));
 
         return compareMembersAndReturnAudit(organizationId, projectId, repositoryId, glProjectId, dbMembers, gitlabMembers);
     }
@@ -289,46 +291,64 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                                                                     Integer glProjectId,
                                                                     List<RdmMember> dbMembers,
                                                                     List<GitlabMember> glMembers) {
-        Map<Integer, RdmMember> dbMemberMap = dbMembers.stream().collect(Collectors.toMap(RdmMember::getGlUserId, m -> m));
-
+//        Map<Long, RdmMember> dbMemberMap = dbMembers.stream().collect(Collectors.toMap(RdmMember::getId, m -> m));
+        //获取项目下有gitlab Owner标签的用户
+        List<C7nUserVO> gitlabOwners = c7NBaseServiceFacade.listCustomGitlabOwnerLableUser(projectId, "GITLAB_OWNER");
+        List<String> loginNames = gitlabOwners.stream().map(C7nUserVO::getLoginName).collect(Collectors.toList());
         // 比较是否有差异
         List<RdmMemberAuditRecord> memberAudits = new ArrayList<>();
         for (GitlabMember member : glMembers) {
             boolean isDifferent = false;
-
-            // 查找数据库是否有此成员
-            RdmMember dbMember = dbMemberMap.get(member.getId());
-
-            // 移除
-            dbMemberMap.remove(member.getId());
-            if (dbMember == null) {
-                // 数据库未找到该成员, 说明不一致
-                isDifferent = true;
+            RdmMember rdmMember;
+            //看看这个用户是不是有 gitlabOwner标签
+            if (loginNames.contains(member.getUsername())) {
+                //如果有
+                if (member.getAccessLevel().value == 50) {
+                    //移除 这个用户下项目下所有应用服务的owner权限
+                    dbMembers = dbMembers.stream().filter(rdmMember1 -> !isEqualProjectAccess(rdmMember1, member)).collect(Collectors.toList());
+                } else {
+                    //有gitlab标签，但是小于50，则全部有问题
+                }
             } else {
-                if (!Objects.equals(member.getAccessLevel().toValue(), dbMember.getGlAccessLevel())) {
-                    // 如果AccessLevel不相等, 说明不一致
+                //没有owner标签就是项目成员或者外部成员
+                //如果能查到db权限，并且与gitlab的相等，则通过校验，不能 则也是有问题的权限
+                rdmMember = getRdmMember(member);
+                if (!Objects.isNull(rdmMember)) {
+                    List<RdmMember> rdmMembers = dbMembers.stream().filter(rdmMember1 -> isEqualGitlabAccess(rdmMember1, member)).collect(Collectors.toList());
+                    if (!CollectionUtils.isEmpty(rdmMembers)) {
+                        RdmMember rdmMember1 = rdmMembers.get(0);
+                        if (!Objects.equals(member.getAccessLevel().toValue(), rdmMember1.getGlAccessLevel())) {
+                            // 如果AccessLevel不相等, 说明不一致
+                            isDifferent = true;
+                        }
+                        //如果两边的level都为null 则不插入
+                        if (Objects.isNull(rdmMember1.getGlAccessLevel()) && Objects.isNull(member.getAccessLevel().value)) {
+                            isDifferent = false;
+                        }
+
+                        if (!Objects.equals(member.getExpiresAt(), rdmMember1.getGlExpiresAt())) {
+                            // 如果ExpiresAt不相等, 说明不一致
+                            isDifferent = true;
+                        }
+                        if (!Objects.equals(member.getType(), rdmMember1.getType())) {
+                            isDifferent = true;
+                        }
+                    }
+                } else {
                     isDifferent = true;
                 }
-                //如果两边的level都为null 则不插入
-                if (Objects.isNull(dbMember.getGlAccessLevel()) && Objects.isNull(member.getAccessLevel().value)) {
-                    isDifferent = false;
+                if (isDifferent) {
+                    memberAudits.add(buildMemberAudit(organizationId, projectId, repositoryId, glProjectId, member, rdmMember));
+                    //记录之后移除
+                    dbMembers = dbMembers.stream().filter(rdmMember1 -> !isEqualGitlabAccess(rdmMember1, member)).collect(Collectors.toList());
                 }
-
-                if (!Objects.equals(member.getExpiresAt(), dbMember.getGlExpiresAt())) {
-                    // 如果ExpiresAt不相等, 说明不一致
-                    isDifferent = true;
-                }
-            }
-
-            if (isDifferent) {
-                memberAudits.add(buildMemberAudit(organizationId, projectId, repositoryId, glProjectId, member, dbMember));
             }
         }
 
         // 如果dbMemberMap还有数据, 说明不一致
-        if (!dbMemberMap.isEmpty()) {
-            dbMemberMap.forEach((k, v) -> {
-                memberAudits.add(buildMemberAudit(organizationId, projectId, repositoryId, glProjectId, null, v));
+        if (!dbMembers.isEmpty()) {
+            dbMembers.forEach(rdmMember -> {
+                memberAudits.add(buildMemberAudit(organizationId, projectId, repositoryId, glProjectId, null, rdmMember));
             });
         }
 
@@ -339,6 +359,27 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         List<RdmMemberAuditRecord> result = excludeOrgAdmin(memberAuditsWrapper);
 
         return result;
+    }
+
+    private boolean isEqualGitlabAccess(RdmMember rdmMember, GitlabMember gitlabMember) {
+        return rdmMember.getGlUserId().intValue() == gitlabMember.getId().intValue()
+                && rdmMember.getGlAccessLevel().intValue() == gitlabMember.getAccessLevel().value
+                && org.apache.commons.lang3.StringUtils.equalsIgnoreCase(rdmMember.getType(), gitlabMember.getType());
+    }
+
+    private RdmMember getRdmMember(GitlabMember member) {
+        RdmMember record = new RdmMember();
+        record.setType(member.getType());
+        record.setGlUserId(member.getId());
+        record.setgGroupId(member.getAppGroupId());
+        return memberRepository.selectOne(record);
+    }
+
+    private boolean isEqualProjectAccess(RdmMember rdmMember, GitlabMember gitlabMember) {
+
+        return rdmMember.getGlUserId().intValue() == gitlabMember.getId().intValue()
+                && rdmMember.getGlAccessLevel().intValue() == gitlabMember.getAccessLevel().value
+                && "project".equals(rdmMember.getType());
     }
 
     /**

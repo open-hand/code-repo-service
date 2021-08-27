@@ -214,7 +214,7 @@ public class RdmMemberChangeSagaHandler {
 
 
     @SagaTask(code = SagaTaskCodeConstants.BATCH_ADD_GROUP_MEMBERS,
-            description = "项目下成员权限修复",
+            description = "批量添加组的权限",
             sagaCode = SagaTopicCodeConstants.BATCH_ADD_GROUP_MEMBER, maxRetryCount = 3, seq = 1)
     public void addGroupMember(String payload) {
         GroupMemberPayload groupMemberPayload = JsonHelper.unmarshalByJackson(payload, GroupMemberPayload.class);

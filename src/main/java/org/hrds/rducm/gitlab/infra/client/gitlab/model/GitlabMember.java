@@ -25,6 +25,7 @@ package org.hrds.rducm.gitlab.infra.client.gitlab.model;
  */
 
 import io.swagger.annotations.ApiModelProperty;
+import java.util.Objects;
 import javax.persistence.Transient;
 import org.gitlab4j.api.models.AccessLevel;
 
@@ -131,5 +132,43 @@ public class GitlabMember {
 
     public void setExpiresAt(Date expiresAt) {
         this.expiresAt = expiresAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GitlabMember that = (GitlabMember) o;
+        return accessLevel == that.accessLevel &&
+                Objects.equals(createdAt, that.createdAt) &&
+                Objects.equals(email, that.email) &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(state, that.state) &&
+                Objects.equals(username, that.username) &&
+                Objects.equals(expiresAt, that.expiresAt) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(appGroupId, that.appGroupId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(accessLevel, createdAt, email, id, name, state, username, expiresAt, type, appGroupId);
+    }
+
+    @Override
+    public String toString() {
+        return "GitlabMember{" +
+                "accessLevel=" + accessLevel +
+                ", createdAt=" + createdAt +
+                ", email='" + email + '\'' +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", state='" + state + '\'' +
+                ", username='" + username + '\'' +
+                ", expiresAt=" + expiresAt +
+                ", type='" + type + '\'' +
+                ", appGroupId=" + appGroupId +
+                '}';
     }
 }

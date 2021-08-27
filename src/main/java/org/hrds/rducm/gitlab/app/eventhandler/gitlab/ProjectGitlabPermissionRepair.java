@@ -78,7 +78,7 @@ public class ProjectGitlabPermissionRepair extends AbstractGitlabPermissionRepai
         if (super.isProjectMember(c7nUserVO) && !c7nUserVO.isProjectAdmin()) {
             //如果不是项目管理员，项目成员的角色
             if (rdmMember == null || !rdmMember.getSyncGitlabFlag()) {
-                // 如果dbMember为null 或者同步失败 移除gitlab权限
+                // 如果dbMember为null 或者同步失败 移除gitlab权限,如果组有权限这里是移不掉的
                 gitlabProjectFixApi.removeMember(rdmMemberAuditRecord.getGlProjectId(), rdmMemberAuditRecord.getGlUserId());
 
             } else {
