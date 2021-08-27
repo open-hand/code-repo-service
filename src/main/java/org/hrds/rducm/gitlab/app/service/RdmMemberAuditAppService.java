@@ -20,15 +20,6 @@ public interface RdmMemberAuditAppService {
      */
     void syncByStrategy(Long id, int syncStrategy);
 
-    /**
-     * 修复审计权限
-     *
-     * @param organizationId
-     * @param projectId
-     * @param repositoryId
-     * @param id
-     */
-    void auditFix(RdmMemberAuditRecord rdmMemberAuditRecord);
 
     void batchAuditFix(Long organizationId, Long projectId, Set<Long> recordIds);
 

@@ -77,8 +77,8 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
                 if (record.getSyncFlag()) {
                     return;
                 }
-                permissionRepairMap.get(record.getType()).gitlabPermissionRepair(record);
-                rdmMemberAuditAppService.auditFix(record);
+                // group
+                permissionRepairMap.get(record.getType() + "GitlabPermissionRepair").gitlabPermissionRepair(record);
             }
         });
     }

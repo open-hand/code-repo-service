@@ -20,6 +20,7 @@ import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTaskCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
+import org.hrds.rducm.gitlab.app.eventhandler.gitlab.GitlabPermissionRepair;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.GitlabGroupMemberVO;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.ProjectAuditPayload;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
@@ -30,6 +31,7 @@ import org.hrds.rducm.gitlab.domain.entity.payload.GroupMemberPayload;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.MemberAuditLogRepository;
+import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
@@ -85,6 +87,10 @@ public class RdmMemberChangeSagaHandler {
     private GitlabGroupApi gitlabGroupApi;
     @Autowired
     private RdmMemberMapper rdmMemberMapper;
+    @Autowired
+    private Map<String, GitlabPermissionRepair> permissionRepairMap;
+    @Autowired
+    private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
 
 
     /**
@@ -281,12 +287,11 @@ public class RdmMemberChangeSagaHandler {
             return;
         }
         recordIds.forEach(recordId -> {
-            RdmMemberAuditRecord rdmMemberAuditRecord = new RdmMemberAuditRecord();
-            rdmMemberAuditRecord.setRepositoryId(0L);
-            rdmMemberAuditRecord.setId(recordId);
-            rdmMemberAuditRecord.setOrganizationId(projectAuditPayload.getOrganizationId());
-            rdmMemberAuditRecord.setProjectId(projectAuditPayload.getProjectId());
-            rdmMemberAuditAppService.auditFix(rdmMemberAuditRecord);
+            RdmMemberAuditRecord rdmMemberAuditRecord = rdmMemberAuditRecordRepository.selectByPrimaryKey(recordId);
+            if (Objects.isNull(rdmMemberAuditRecord)) {
+                return;
+            }
+            permissionRepairMap.get(rdmMemberAuditRecord.getType() + "GitlabPermissionRepair").gitlabPermissionRepair(rdmMemberAuditRecord);
         });
 
     }
