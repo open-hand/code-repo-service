@@ -269,7 +269,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         LOGGER.info("{}项目查询到Gitlab成员数量为:{}", glProjectId, gitlabMembers.size());
 
         // 查询项目下数据库所有成员
-        List<RdmMember> dbMembers = memberRepository.select(new RdmMember().setProjectId(projectId));
+        List<RdmMember> dbMembers = memberRepository.select(new RdmMember().setGlProjectId(glProjectId));
 
         return compareMembersAndReturnAudit(organizationId, projectId, repositoryId, glProjectId, dbMembers, gitlabMembers);
     }
