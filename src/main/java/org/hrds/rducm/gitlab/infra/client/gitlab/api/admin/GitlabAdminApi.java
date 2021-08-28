@@ -94,6 +94,23 @@ public class GitlabAdminApi {
         }
     }
 
+    public List<Member> getAllGroupMember(Integer groupId) {
+        try {
+            // 需要查询所有成员
+            return gitlab4jClient.getAdminGitLabApi()
+                    .getGroupApi()
+                    .getMembers(groupId);
+        } catch (GitLabApiException e) {
+            if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                return null;
+            } else {
+                throw new GitlabClientException(e, e.getMessage());
+            }
+        }
+    }
+
+
+
     public Group getGroup(Integer appGroupId) {
         try {
             Group group = gitlab4jClient.getAdminGitLabApi()
