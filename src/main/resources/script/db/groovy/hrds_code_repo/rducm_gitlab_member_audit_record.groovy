@@ -40,5 +40,10 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member_audit_record.g
             column(name: 'type', type: 'VARCHAR(20)', defaultValue: "project", afterColumn: 'project_id', remarks: '权限属于项目层还是全局层')
             column(name: 'g_group_id', type: "int(11)",  afterColumn: 'gl_project_id', remarks: 'gitlab group的id')
         }
+        sql("""
+              alter table rducm_gitlab_member_audit_record modify repository_id BIGINT(20) null;
+              alter table rducm_gitlab_member_audit_record modify gl_project_id int(11) null;
+         """)
     }
+
 }

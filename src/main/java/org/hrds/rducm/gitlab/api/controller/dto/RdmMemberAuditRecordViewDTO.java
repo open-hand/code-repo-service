@@ -76,6 +76,17 @@ public class RdmMemberAuditRecordViewDTO {
     @ApiModelProperty(value = "过期日期是否一致")
     private Boolean expiresAtSyncFlag;
 
+    @ApiModelProperty(value = "权限属于项目层还是全局层")
+    private String type;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public Long getId() {
         return id;
     }
