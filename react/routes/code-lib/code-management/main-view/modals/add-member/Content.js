@@ -75,6 +75,10 @@ export default observer(() => {
   }
 
   function getClusterOptionProp({ record }) {
+    const userId = pathListDs.current.get('userId');
+    if (!userId) {
+      return { disabled: true };
+    }
     const accessLevelNum = Number(record.data.value.substring(1));
     const { boolean } = groupAccessLevelCompare(record.data.value);
     return {
@@ -106,6 +110,16 @@ export default observer(() => {
         <div>{`${text}`}</div>
       </Tooltip>
     );
+  };
+  const userFilter = (record) => {
+    const lev = formDs.current.get('permissionsLevel');
+    if (lev === 'applicationService') {
+      return true;
+    }
+    if (record.get('groupAccessLevel')) { // 已经有全局权限了
+      return false;
+    }
+    return true;
   };
   function searchMatcher({ record, text, textField }) {
     const exist = some(
@@ -180,6 +194,7 @@ export default observer(() => {
             name="userId"
             searchable
             colSpan={4}
+            optionsFilter={userFilter}
             searchMatcher={({ record, text, textField }) =>
               searchMatcher({ record, text, textField })
             }
