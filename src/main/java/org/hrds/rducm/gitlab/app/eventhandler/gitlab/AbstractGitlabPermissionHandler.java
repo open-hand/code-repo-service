@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Created by wangxiang on 2021/8/26
  */
-public abstract class AbstractGitlabPermissionRepair implements GitlabPermissionRepair {
+public abstract class AbstractGitlabPermissionHandler implements GitlabPermissionHandler {
 
     @Autowired
     private C7nBaseServiceFacade c7nBaseServiceFacade;
@@ -65,6 +65,7 @@ public abstract class AbstractGitlabPermissionRepair implements GitlabPermission
         nonProjectMemberPermissionRepair(rdmMemberAuditRecord, dbRdmMember, groupGlMember, c7nUserVO);
         rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
     }
+
 
     protected abstract void nonProjectMemberPermissionRepair(RdmMemberAuditRecord rdmMemberAuditRecord, RdmMember rdmMember, Member groupGlMember, C7nUserVO c7nUserVO);
 

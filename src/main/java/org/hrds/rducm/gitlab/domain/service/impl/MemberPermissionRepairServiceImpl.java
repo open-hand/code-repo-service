@@ -10,13 +10,14 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
-import org.hrds.rducm.gitlab.app.eventhandler.gitlab.GitlabPermissionRepair;
+import org.hrds.rducm.gitlab.app.eventhandler.gitlab.GitlabPermissionHandler;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.service.IMemberPermissionRepairService;
+import org.hrds.rducm.gitlab.infra.constant.RepoConstants;
 import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
@@ -45,7 +46,7 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
     @Autowired
     private RdmMemberAppService rdmMemberAppService;
     @Autowired
-    private Map<String, GitlabPermissionRepair> permissionRepairMap;
+    private Map<String, GitlabPermissionHandler> permissionRepairMap;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -78,7 +79,7 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
                     return;
                 }
                 // group
-                permissionRepairMap.get(record.getType() + "GitlabPermissionRepair").gitlabPermissionRepair(record);
+                permissionRepairMap.get(record.getType() + RepoConstants.GITLAB_PERMISSION_HANDLER).gitlabPermissionRepair(record);
             }
         });
     }
