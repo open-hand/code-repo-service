@@ -574,6 +574,9 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         //查询项目下的group
         C7nDevopsProjectVO c7nDevopsProjectVO = c7NDevOpsServiceFacade.detailDevopsProjectById(projectId);
         checkIamProject(c7nDevopsProjectVO);
+        //校验是否已经存在
+        checkGroupPermissionExist(projectId, gitlabMemberCreateDTOS);
+
         //检验这个gitlab group id 能不能查到group, 因为有些人手动删了group，自己又新建了group
         Group group = gitlabGroupApi.getGroup(Integer.valueOf(String.valueOf(c7nDevopsProjectVO.getGitlabGroupId())));
         checkProjectGroup(c7nDevopsProjectVO, group);
@@ -581,6 +584,22 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         persistenceMemberToDB(gitlabMemberCreateDTOS, organizationId, projectId, group.getId());
         //发送saga
         sendAddGroupMemberSaga(projectId, gitlabMemberCreateDTOS, c7nDevopsProjectVO);
+    }
+
+    private void checkGroupPermissionExist(Long projectId, List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOS) {
+        if (CollectionUtils.isEmpty(gitlabMemberCreateDTOS)) {
+            throw new CommonException("error.group.member.is.null");
+        }
+        List<Long> userIds = gitlabMemberCreateDTOS.stream().map(RdmMemberBatchDTO.GitlabMemberCreateDTO::getUserId).collect(Collectors.toList());
+        long count = userIds.stream().distinct().count();
+        if (userIds.size() != count) {
+            throw new CommonException("error.group.member.exist");
+        }
+        List<RdmMember> rdmMembers = rdmMemberRepository.groupMemberByUserId(projectId, userIds);
+        if (!CollectionUtils.isEmpty(rdmMembers)) {
+            throw new CommonException("error.group.member.exist");
+        }
+
     }
 
     private void checkProjectGroup(C7nDevopsProjectVO c7nDevopsProjectVO, Group group) {

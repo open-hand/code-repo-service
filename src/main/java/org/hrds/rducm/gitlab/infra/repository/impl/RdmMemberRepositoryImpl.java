@@ -123,4 +123,9 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
     public List<MemberAuthDetailAgg> selectMembersRepositoryAuthorized(Long organizationId, Long projectId, Set<Long> userIds) {
         return rdmMemberMapper.selectMembersRepositoryAuthorized(organizationId, projectId, userIds);
     }
+
+    @Override
+    public List<RdmMember> groupMemberByUserId(Long projectId, List<Long> userIds) {
+        return rdmMemberMapper.groupMemberByUserId(projectId, userIds);
+    }
 }

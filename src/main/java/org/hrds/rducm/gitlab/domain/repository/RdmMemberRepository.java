@@ -93,4 +93,6 @@ public interface RdmMemberRepository extends BaseRepository<RdmMember> {
      * @return
      */
     int batchInsertCustom(List<RdmMember> list);
+
+    List<RdmMember> groupMemberByUserId(Long projectId, List<Long> userIds);
 }
