@@ -65,6 +65,16 @@ public class RdmMemberViewDTO {
 
     private Long objectVersionNumber;
 
+    private Integer groupAccessLevel;
+
+    public Integer getGroupAccessLevel() {
+        return groupAccessLevel;
+    }
+
+    public void setGroupAccessLevel(Integer groupAccessLevel) {
+        this.groupAccessLevel = groupAccessLevel;
+    }
+
     public Long getId() {
         return id;
     }

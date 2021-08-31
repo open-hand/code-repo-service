@@ -100,7 +100,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Override
     public Page<RdmMemberViewDTO> pageByOptions(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query) {
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> listRdmMemberByOptions(projectId, query));
-        return rdmMemberAssembler.pageToRdmMemberViewDTO(page, ResourceLevel.PROJECT);
+        return rdmMemberAssembler.pageToRdmMemberViewDTO(page, ResourceLevel.PROJECT, projectId);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         }
         Page<RdmMember> rdmMemberPage = new Page<>();
         rdmMemberPage.setContent(list);
-        Page<RdmMemberViewDTO> page = rdmMemberAssembler.pageToRdmMemberViewDTO(rdmMemberPage, ResourceLevel.PROJECT);
+        Page<RdmMemberViewDTO> page = rdmMemberAssembler.pageToRdmMemberViewDTO(rdmMemberPage, ResourceLevel.PROJECT, projectId);
         return page.getContent();
     }
 
@@ -257,7 +257,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectByCondition(condition));
 
-        return rdmMemberAssembler.pageToRdmMemberViewDTO(page, ResourceLevel.ORGANIZATION);
+        return rdmMemberAssembler.pageToRdmMemberViewDTO(page, ResourceLevel.ORGANIZATION, null);
     }
 
     /**
