@@ -12,15 +12,12 @@ import io.choerodon.mybatis.domain.AuditDomain;
 
 import java.time.Duration;
 import java.util.*;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.gitlab4j.api.models.Group;
 import org.gitlab4j.api.models.Member;
-import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberBatchDTO;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTaskCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
-import org.hrds.rducm.gitlab.app.eventhandler.gitlab.GitlabPermissionRepair;
+import org.hrds.rducm.gitlab.app.eventhandler.gitlab.GitlabPermissionHandler;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.GitlabGroupMemberVO;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.ProjectAuditPayload;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
@@ -38,10 +35,10 @@ import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
+import org.hrds.rducm.gitlab.infra.constant.RepoConstants;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.enums.RoleLabelEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
-import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
 import org.hrds.rducm.gitlab.infra.util.JsonHelper;
@@ -88,7 +85,7 @@ public class RdmMemberChangeSagaHandler {
     @Autowired
     private RdmMemberMapper rdmMemberMapper;
     @Autowired
-    private Map<String, GitlabPermissionRepair> permissionRepairMap;
+    private Map<String, GitlabPermissionHandler> permissionRepairMap;
     @Autowired
     private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
 
@@ -291,7 +288,7 @@ public class RdmMemberChangeSagaHandler {
             if (Objects.isNull(rdmMemberAuditRecord)) {
                 return;
             }
-            permissionRepairMap.get(rdmMemberAuditRecord.getType() + "GitlabPermissionRepair").gitlabPermissionRepair(rdmMemberAuditRecord);
+            permissionRepairMap.get(rdmMemberAuditRecord.getType() + RepoConstants.GITLAB_PERMISSION_HANDLER).gitlabPermissionRepair(rdmMemberAuditRecord);
         });
 
     }

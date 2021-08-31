@@ -12,11 +12,12 @@ import java.util.Map;
 import java.util.Objects;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuditRecordQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
-import org.hrds.rducm.gitlab.app.eventhandler.gitlab.GitlabPermissionRepair;
+import org.hrds.rducm.gitlab.app.eventhandler.gitlab.GitlabPermissionHandler;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
+import org.hrds.rducm.gitlab.infra.constant.RepoConstants;
 import org.hrds.rducm.gitlab.infra.feign.vo.SagaInstanceDetails;
 import org.hzero.core.base.BaseController;
 import org.hzero.core.util.Results;
@@ -41,7 +42,7 @@ public class RdmMemberAuditRecordProjController extends BaseController {
     @Autowired
     private RdmMemberAuditAppService rdmMemberAuditAppService;
     @Autowired
-    private Map<String, GitlabPermissionRepair> permissionRepairMap;
+    private Map<String, GitlabPermissionHandler> permissionRepairMap;
     @Autowired
     private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
 
@@ -68,7 +69,7 @@ public class RdmMemberAuditRecordProjController extends BaseController {
                                       @Encrypt @RequestParam Long repositoryId) {
         RdmMemberAuditRecord memberAuditRecord = rdmMemberAuditRecordRepository.selectByPrimaryKey(id);
         if (!Objects.isNull(memberAuditRecord)) {
-            permissionRepairMap.get(memberAuditRecord.getType() + "GitlabPermissionRepair").gitlabPermissionRepair(memberAuditRecord);
+            permissionRepairMap.get(memberAuditRecord.getType() + RepoConstants.GITLAB_PERMISSION_HANDLER).gitlabPermissionRepair(memberAuditRecord);
         }
         return Results.success();
     }

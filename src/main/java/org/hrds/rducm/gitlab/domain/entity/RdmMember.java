@@ -142,6 +142,8 @@ public class RdmMember extends AuditDomain {
     @Transient
     private BaseC7nProjectViewDTO project;
 
+    @Transient
+    private String loginName;
     //
     // getter/setter
     // ------------------------------------------------------------------------------
@@ -305,5 +307,13 @@ public class RdmMember extends AuditDomain {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getLoginName() {
+        return loginName;
+    }
+
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
     }
 }

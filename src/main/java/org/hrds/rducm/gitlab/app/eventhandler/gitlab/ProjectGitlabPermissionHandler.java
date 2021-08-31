@@ -22,7 +22,7 @@ import org.springframework.util.CollectionUtils;
  * Created by wangxiang on 2021/8/26
  */
 @Component
-public class ProjectGitlabPermissionRepair extends AbstractGitlabPermissionRepair {
+public class ProjectGitlabPermissionHandler extends AbstractGitlabPermissionHandler {
 
 
     @Autowired
