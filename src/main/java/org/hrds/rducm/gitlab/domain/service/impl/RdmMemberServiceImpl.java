@@ -49,6 +49,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -447,25 +448,48 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
 
     @Override
     public List<RepositoryPrivilegeViewDTO> selectRepositoriesByPrivilege(Long organizationId, Long projectId, Set<Long> userIds) {
+        //先判断有没有组的权限
         Condition condition = Condition.builder(RdmMember.class)
                 .andWhere(Sqls.custom()
                         .andEqualTo(RdmMember.FIELD_ORGANIZATION_ID, organizationId)
                         .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
                         .andIn(RdmMember.FIELD_USER_ID, userIds)
+                        .andEqualTo(RdmMember.FIELD_TYPE, "group")
                         // 同步状态需为true
                         .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, Boolean.TRUE))
                 .build();
         List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
-        Map<Long, List<RdmMember>> group = rdmMembers.stream().collect(Collectors.groupingBy(RdmMember::getUserId));
-
         List<RepositoryPrivilegeViewDTO> result = new ArrayList<>();
-        group.forEach((k, v) -> {
-            RepositoryPrivilegeViewDTO viewDTO = new RepositoryPrivilegeViewDTO();
-            viewDTO.setUserId(k);
-            viewDTO.setAppServiceIds(v.stream().map(RdmMember::getRepositoryId).collect(Collectors.toSet()));
-            result.add(viewDTO);
-        });
-
+        if (!CollectionUtils.isEmpty(rdmMembers)) {
+            rdmMembers.forEach(rdmMember -> {
+                RepositoryPrivilegeViewDTO repositoryPrivilegeViewDTO = new RepositoryPrivilegeViewDTO();
+                //查询项目下应用服务的
+                List<C7nAppServiceVO> c7nAppServiceVOS = c7NDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId);
+                repositoryPrivilegeViewDTO.setUserId(rdmMember.getUserId());
+                if (!CollectionUtils.isEmpty(c7nAppServiceVOS)) {
+                    repositoryPrivilegeViewDTO.setAppServiceIds(c7nAppServiceVOS.stream().map(C7nAppServiceVO::getId).collect(Collectors.toSet()));
+                }
+                result.add(repositoryPrivilegeViewDTO);
+            });
+        } else {
+            Condition projectCondition = Condition.builder(RdmMember.class)
+                    .andWhere(Sqls.custom()
+                            .andEqualTo(RdmMember.FIELD_ORGANIZATION_ID, organizationId)
+                            .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
+                            .andIn(RdmMember.FIELD_USER_ID, userIds)
+                            .andEqualTo(RdmMember.FIELD_TYPE, "project")
+                            // 同步状态需为true
+                            .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, Boolean.TRUE))
+                    .build();
+            List<RdmMember> projectRdmMembers = rdmMemberRepository.selectByCondition(projectCondition);
+            Map<Long, List<RdmMember>> group = projectRdmMembers.stream().collect(Collectors.groupingBy(RdmMember::getUserId));
+            group.forEach((k, v) -> {
+                RepositoryPrivilegeViewDTO viewDTO = new RepositoryPrivilegeViewDTO();
+                viewDTO.setUserId(k);
+                viewDTO.setAppServiceIds(v.stream().map(RdmMember::getRepositoryId).collect(Collectors.toSet()));
+                result.add(viewDTO);
+            });
+        }
         return result;
     }
 
