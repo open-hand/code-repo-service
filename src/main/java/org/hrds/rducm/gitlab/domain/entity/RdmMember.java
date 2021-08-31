@@ -1,10 +1,12 @@
 package org.hrds.rducm.gitlab.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.annotation.ModifyAudit;
 import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nAppServiceViewDTO;
@@ -43,6 +45,7 @@ public class RdmMember extends AuditDomain {
     public static final String FIELD_SYNC_GITLAB_FLAG = "syncGitlabFlag";
     public static final String FIELD_SYNC_GITLAB_DATE = "syncGitlabDate";
     public static final String FIELD_SYNC_GITLAB_ERROR_MSG = "syncGitlabErrorMsg";
+    public static final String FIELD_TYPE = "type";
 
     //
     // 业务方法(按public protected private顺序排列)
@@ -110,7 +113,7 @@ public class RdmMember extends AuditDomain {
     @ApiModelProperty(value = "同步gitlab失败的错误信息")
     private String syncGitlabErrorMsg;
     @ApiModelProperty(value = "gitlab组的Id")
-    private Integer  gGroupId;
+    private Integer gGroupId;
     @ApiModelProperty(value = "权限属于项目层还是全局层")
     private String type;
 
