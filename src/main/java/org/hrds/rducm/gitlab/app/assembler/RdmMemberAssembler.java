@@ -17,17 +17,21 @@ import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
+import org.hzero.mybatis.domian.Condition;
+import org.hzero.mybatis.util.Sqls;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -41,6 +45,8 @@ public class RdmMemberAssembler {
     private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
+    @Autowired
+    private RdmMemberRepository rdmMemberRepository;
 
     /**
      * 将GitlabMemberBatchDTO转换为List<RdmMember>
@@ -121,7 +127,7 @@ public class RdmMemberAssembler {
      * @param resourceLevel
      * @return
      */
-    public Page<RdmMemberViewDTO> pageToRdmMemberViewDTO(Page<RdmMember> page, ResourceLevel resourceLevel) {
+    public Page<RdmMemberViewDTO> pageToRdmMemberViewDTO(Page<RdmMember> page, ResourceLevel resourceLevel, Long projectId) {
         Page<RdmMemberViewDTO> rdmMemberViewDTOS = ConvertUtils.convertPage(page, RdmMemberViewDTO.class);
 
         // 获取用户id集合, 格式如: {projectId: [userId1, userId2]}, 用于查询项目角色
@@ -143,8 +149,8 @@ public class RdmMemberAssembler {
         // 查询用户信息, 带角色信息
         Map<Long, C7nUserVO> userWithRolesVOMap = new HashMap<>();
 
-        projectIdAndUserIds.asMap().forEach((projectId, uIds) -> {
-            Map<Long, C7nUserVO> tempMap = c7NBaseServiceFacade.listC7nUserToMapOnProjectLevel(projectId, Sets.newHashSet(uIds));
+        projectIdAndUserIds.asMap().forEach((userProject, uIds) -> {
+            Map<Long, C7nUserVO> tempMap = c7NBaseServiceFacade.listC7nUserToMapOnProjectLevel(userProject, Sets.newHashSet(uIds));
             userWithRolesVOMap.putAll(tempMap);
         });
 
@@ -158,6 +164,22 @@ public class RdmMemberAssembler {
         Map<Long, C7nProjectVO> c7nProjectVOMap = Collections.emptyMap();
         if (ResourceLevel.ORGANIZATION.equals(resourceLevel)) {
             c7nProjectVOMap = c7NBaseServiceFacade.listProjectsByIdsToMap(projectIds);
+        }
+        //查询项目下的全局权限
+        Map<Long, Integer> longIntegerMap = new HashMap<>();
+        if (!Objects.isNull(projectId)){
+            Condition condition = Condition.builder(RdmMember.class)
+                    .andWhere(Sqls.custom()
+                            .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
+                            .andIn(RdmMember.FIELD_USER_ID, userIds)
+                            .andEqualTo(RdmMember.FIELD_TYPE, "group")
+                            // 同步状态需为true
+                            .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, Boolean.TRUE))
+                    .build();
+            List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
+            if (!CollectionUtils.isEmpty(rdmMembers)) {
+                longIntegerMap = rdmMembers.stream().collect(Collectors.toMap(RdmMember::getUserId, RdmMember::getGlAccessLevel));
+            }
         }
 
         // 填充数据
@@ -185,6 +207,9 @@ public class RdmMemberAssembler {
 
             if (StringUtils.isEmpty(viewDTO.getRepositoryName()) && org.apache.commons.lang3.StringUtils.equalsIgnoreCase(viewDTO.getType(), AuthorityTypeEnum.GROUP.getValue())) {
                 viewDTO.setRepositoryName(PROJECT_OVERALL);
+            }
+            if (org.apache.commons.lang3.StringUtils.equalsIgnoreCase(viewDTO.getType(), AuthorityTypeEnum.PROJECT.getValue())) {
+                viewDTO.setGroupAccessLevel(longIntegerMap.get(viewDTO.getUserId()));
             }
         }
 
