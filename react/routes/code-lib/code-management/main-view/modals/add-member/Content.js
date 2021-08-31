@@ -75,7 +75,12 @@ export default observer(() => {
   }
 
   function getClusterOptionProp({ record }) {
+    // console.log(userOptions);
+    // console.log(text, value);
     const userId = pathListDs.current.get('userId');
+    // console.log(userId);
+    // console.log(pathListDs.currentSelected);
+    // console.log(pathListDs.current.getField('userId').options.toData());
     if (!userId) {
       return { disabled: true };
     }
@@ -113,6 +118,13 @@ export default observer(() => {
   };
   const userFilter = (record) => {
     const lev = formDs.current.get('permissionsLevel');
+    const exist = some(
+      pathListDs.created,
+      r => r.get('userId') === record.get('userId'),
+    );
+    if (exist) { // 前面已经选过了
+      return false;
+    }
     if (lev === 'applicationService') {
       return true;
     }
@@ -129,7 +141,7 @@ export default observer(() => {
     const nameMatching =
       record.get(textField).indexOf(text) !== -1 ||
       record.get('loginName').indexOf(text) !== -1;
-    if (openType === 'project') {
+    if (openType === 'project') { // 项目内部成员
       return !exist && nameMatching;
     }
     return !exist;
