@@ -103,7 +103,7 @@ export default ({
     }) => {
       if (name === 'permissionsLevel') {
         pathListDs.created.forEach((item) => {
-          item.clear();
+          item.reset();
         });
       }
     },
