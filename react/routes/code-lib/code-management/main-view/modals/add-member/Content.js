@@ -49,11 +49,10 @@ export default observer(() => {
   }
 
   // 应用服务时,选中人如果有权限等级 拿它和accessLevelStr的权限进行比较
-  function groupAccessLevelCompare(accessLevelStr) {
+  function groupAccessLevelCompare(accessLevelStr, userId) {
     // accessLevelStr 如L10
     let boolean = false;
     const accessLevelNum = accessLevelStr.substring(1);
-    const userId = pathListDs.current.get('userId');
     let selectedGroupAccessLevel; // 当前选中项的全局权限值
     userOptions.toData().forEach((item) => {
       if (userId === item.userId) {
@@ -74,18 +73,13 @@ export default observer(() => {
     };
   }
 
-  function getClusterOptionProp({ record }) {
-    // console.log(userOptions);
-    // console.log(text, value);
-    const userId = pathListDs.current.get('userId');
-    // console.log(userId);
-    // console.log(pathListDs.currentSelected);
-    // console.log(pathListDs.current.getField('userId').options.toData());
+  function getClusterOptionProp(record, pathRecord) {
+    const userId = pathRecord.get('userId');
     if (!userId) {
       return { disabled: true };
     }
     const accessLevelNum = Number(record.data.value.substring(1));
-    const { boolean } = groupAccessLevelCompare(record.data.value);
+    const { boolean } = groupAccessLevelCompare(record.data.value, userId);
     return {
       disabled: accessLevelNum >= 50 || boolean,
     };
@@ -95,11 +89,18 @@ export default observer(() => {
     const flag = !(Number(record.data.value.substring(1)) >= 50);
     return flag;
   }
-  const AccessLevelOptionRenderer = ({ record, text, value }) => {
-    const { boolean, selectedGroupAccessLevel } = groupAccessLevelCompare(value);
-    const roleList = pathListDs.current
-      .getField('glAccessLevel')
-      .options.toData();
+  const AccessLevelOptionRenderer = (
+    record,
+    text,
+    value,
+    pathRecord,
+  ) => {
+    const userId = pathRecord.get('userId');
+    const { boolean, selectedGroupAccessLevel } = groupAccessLevelCompare(
+      value,
+      userId,
+    );
+    const roleList = pathRecord.getField('glAccessLevel').options.toData();
     let str = text;
     // 有层级权限并且当前是应用服务授予权限
     if (boolean) {
@@ -122,13 +123,15 @@ export default observer(() => {
       pathListDs.created,
       r => r.get('userId') === record.get('userId'),
     );
-    if (exist) { // 前面已经选过了
+    if (exist) {
+      // 前面已经选过了
       return false;
     }
     if (lev === 'applicationService') {
       return true;
     }
-    if (record.get('groupAccessLevel')) { // 已经有全局权限了
+    if (record.get('groupAccessLevel')) {
+      // 已经有全局权限了
       return false;
     }
     return true;
@@ -141,7 +144,8 @@ export default observer(() => {
     const nameMatching =
       record.get(textField).indexOf(text) !== -1 ||
       record.get('loginName').indexOf(text) !== -1;
-    if (openType === 'project') { // 项目内部成员
+    if (openType === 'project') {
+      // 项目内部成员
       return !exist && nameMatching;
     }
     return !exist;
@@ -226,9 +230,14 @@ export default observer(() => {
           <Select
             name="glAccessLevel"
             colSpan={4}
-            onOption={getClusterOptionProp}
+            onOption={({ record }) => getClusterOptionProp(record, pathRecord)}
             optionsFilter={levelOptionsFilter}
-            optionRenderer={AccessLevelOptionRenderer}
+            optionRenderer={({ record, text, value }) => AccessLevelOptionRenderer(
+                record,
+                text,
+                value,
+                pathRecord,
+              )}
           />
           <DatePicker
             popupCls="code-lib-management-add-member-dayPicker"
