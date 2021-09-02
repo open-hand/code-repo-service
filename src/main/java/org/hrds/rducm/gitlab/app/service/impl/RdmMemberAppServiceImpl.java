@@ -697,6 +697,12 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         gitlabGroupFixApi.removeMember(rdmMember.getgGroupId(), rdmMember.getGlUserId());
         //删除数据库
         rdmMemberRepository.deleteByPrimaryKey(rducmGitlabMemberId);
+        //删除组的权限的时候会把用户在组下所有应用服务的权限删除
+        RdmMember record = new RdmMember();
+        record.setUserId(rdmMember.getUserId());
+        record.setProjectId(projectId);
+        record.setType(AuthorityTypeEnum.PROJECT.getValue());
+        rdmMemberRepository.delete(record);
     }
 
     @Override
