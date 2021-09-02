@@ -146,7 +146,7 @@ const PSsetTable = () => {
     })
     if(record.get('type')==='group') { // 权限为项目全局
       msg = `该用户被分配的是项目全局${roleText}权限，删除了此处的权限后,
-      该用户在该项目下所有代码仓库中的${roleText}权限都将被移除。`
+      该用户在该项目下所有代码仓库中的权限都将被移除。`
     } else {
       msg = formatMessage({ id: `${intlPrefix}.permission.delete.des` })
     }
