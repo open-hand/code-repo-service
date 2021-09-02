@@ -89,12 +89,7 @@ export default observer(() => {
     const flag = !(Number(record.data.value.substring(1)) >= 50);
     return flag;
   }
-  const AccessLevelOptionRenderer = (
-    record,
-    text,
-    value,
-    pathRecord,
-  ) => {
+  const AccessLevelOptionRenderer = (record, text, value, pathRecord) => {
     const userId = pathRecord.get('userId');
     const { boolean, selectedGroupAccessLevel } = groupAccessLevelCompare(
       value,
@@ -165,14 +160,11 @@ export default observer(() => {
     }
     queryUser(e.target.value);
   };
-  const renderer = ({ text, textField, record }) => (
-    <span style={{ width: '100%' }}>
-      {text}({record.get('repositoryCode')})
-    </span>
-  );
   const optionRenderer = ({ text, textField, record }) => (
     <Tooltip title={record.get('repositoryCode')} placement="left">
-      {renderer({ text, record })}
+      <span style={{ width: '100%' }}>
+        {`${text}(${record.get('repositoryCode')})`}
+      </span>
     </Tooltip>
   );
   // console.log(formDs?.current?.get('permissionsLevel'));
@@ -186,13 +178,12 @@ export default observer(() => {
             name="repositoryIds"
             searchable
             maxTagCount={3}
-            maxTagTextLength={6}
+            maxTagTextLength={16}
             searchMatcher={({ record, text, textField }) =>
               record.get('repositoryCode').indexOf(text) !== -1 ||
               record.get(textField).indexOf(text) !== -1
             }
             optionRenderer={optionRenderer}
-            renderer={renderer}
             maxTagPlaceholder={restValues => `+${restValues.length}...`}
             dropdownMenuStyle={{ width: '5.12rem' }}
             colSpan={6}
@@ -232,12 +223,9 @@ export default observer(() => {
             colSpan={4}
             onOption={({ record }) => getClusterOptionProp(record, pathRecord)}
             optionsFilter={levelOptionsFilter}
-            optionRenderer={({ record, text, value }) => AccessLevelOptionRenderer(
-                record,
-                text,
-                value,
-                pathRecord,
-              )}
+            optionRenderer={({ record, text, value }) =>
+              AccessLevelOptionRenderer(record, text, value, pathRecord)
+            }
           />
           <DatePicker
             popupCls="code-lib-management-add-member-dayPicker"
