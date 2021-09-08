@@ -70,7 +70,7 @@ export default ({
       textField: 'text',
       valueField: 'value',
       options: permissionsLevelDataSet,
-      defaultValue: 'allProject',
+      defaultValue: 'applicationService',
     },
     // 应用服务
     {
