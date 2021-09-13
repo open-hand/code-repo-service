@@ -23,6 +23,7 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
@@ -47,6 +48,8 @@ public class RdmMemberAssembler {
     private C7nBaseServiceFacade c7NBaseServiceFacade;
     @Autowired
     private RdmMemberRepository rdmMemberRepository;
+    @Autowired
+    private RdmMemberMapper rdmMemberMapper;
 
     /**
      * 将GitlabMemberBatchDTO转换为List<RdmMember>
@@ -167,16 +170,9 @@ public class RdmMemberAssembler {
         }
         //查询项目下的全局权限
         Map<Long, Integer> longIntegerMap = new HashMap<>();
-        if (!Objects.isNull(projectId)){
-            Condition condition = Condition.builder(RdmMember.class)
-                    .andWhere(Sqls.custom()
-                            .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
-                            .andIn(RdmMember.FIELD_USER_ID, userIds)
-                            .andEqualTo(RdmMember.FIELD_TYPE, "group")
-                            // 同步状态需为true
-                            .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, Boolean.TRUE))
-                    .build();
-            List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
+        if (!Objects.isNull(projectId)) {
+            List<RdmMember> rdmMembers = rdmMemberMapper.selectProjectMemberByUserIds(projectId, userIds, AuthorityTypeEnum.GROUP.getValue());
+//            List<RdmMember> rdmMembers = rdmMemberRepository(condition);
             if (!CollectionUtils.isEmpty(rdmMembers)) {
                 longIntegerMap = rdmMembers.stream().collect(Collectors.toMap(RdmMember::getUserId, RdmMember::getGlAccessLevel));
             }
