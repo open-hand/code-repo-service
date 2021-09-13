@@ -36,7 +36,9 @@ import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.constant.RepoConstants;
+import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
+import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.enums.RoleLabelEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
@@ -92,6 +94,8 @@ public class RdmMemberChangeSagaHandler {
 
     /**
      * 角色同步事件
+     *  添加用户成员在这里
+     *  变更角色也在这里（添加，删除）
      */
     @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_UPDATE_MEMBER_ROLE,
             description = "角色同步事件",
@@ -112,6 +116,7 @@ public class RdmMemberChangeSagaHandler {
 
     /**
      * 删除角色同步事件
+     * 删除用户成员在这里
      */
     @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_DELETE_MEMBER_ROLE,
             description = "删除角色同步事件",
@@ -492,16 +497,31 @@ public class RdmMemberChangeSagaHandler {
 
     private void insertProjectOwner(Long organizationId, Long projectId, Long userId) {
         Integer glUserId = c7nBaseServiceFacade.userIdToGlUserId(userId);
-        List<C7nAppServiceVO> appServiceVOS = c7nDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId);
-        appServiceVOS.forEach(appServiceVO -> {
-            if (appServiceVO.getId() == null || appServiceVO.getGitlabProjectId() == null) {
-                logger.warn("项目{}, 应用服务{}, 未查询到对应GitlabProjectId, 跳过该应用服务", projectId, appServiceVO.getId());
-            } else {
-                Long repositoryId = appServiceVO.getId();
-                Integer glProjectId = Math.toIntExact(appServiceVO.getGitlabProjectId());
-                rdmMemberRepository.insertWithOwner(organizationId, projectId, repositoryId, userId, glProjectId, glUserId);
-            }
-        });
+        Long appGroupIdByProjectId = c7nDevOpsServiceFacade.getAppGroupIdByProjectId(projectId);
+
+        RdmMember rdmMember = new RdmMember();
+        rdmMember.setUserId(userId);
+        rdmMember.setGlAccessLevel(RdmAccessLevel.OWNER.value);
+        rdmMember.setSyncGitlabFlag(Boolean.TRUE);
+        rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+        rdmMember.setOrganizationId(organizationId);
+        rdmMember.setGlUserId(glUserId);
+        rdmMember.setgGroupId(appGroupIdByProjectId.intValue());
+        rdmMember.setProjectId(projectId);
+        rdmMember.setSyncGitlabDate(new Date());
+        rdmMemberMapper.insert(rdmMember);
+
+//        List<C7nAppServiceVO> appServiceVOS = c7nDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId);
+
+//        appServiceVOS.forEach(appServiceVO -> {
+//            if (appServiceVO.getId() == null || appServiceVO.getGitlabProjectId() == null) {
+//                logger.warn("项目{}, 应用服务{}, 未查询到对应GitlabProjectId, 跳过该应用服务", projectId, appServiceVO.getId());
+//            } else {
+//                Long repositoryId = appServiceVO.getId();
+//                Integer glProjectId = Math.toIntExact(appServiceVO.getGitlabProjectId());
+//                rdmMemberRepository.insertWithOwner(organizationId, projectId, repositoryId, userId, glProjectId, glUserId);
+//            }
+//        });
     }
 
     private Boolean isProjectAdmin(C7nUserVO vo) {

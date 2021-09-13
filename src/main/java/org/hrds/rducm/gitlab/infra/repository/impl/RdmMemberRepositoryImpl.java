@@ -83,7 +83,6 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
         param.setSyncGitlabFlag(Boolean.TRUE);
         param.setGlAccessLevel(RdmAccessLevel.OWNER.toValue());
         param.setSyncGitlabDate(new Date());
-
         return this.insertSelective(param);
     }
 
