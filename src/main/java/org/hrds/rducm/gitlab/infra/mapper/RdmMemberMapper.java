@@ -33,7 +33,7 @@ public interface RdmMemberMapper extends BaseMapper<RdmMember> {
      */
     int batchInsertCustom(List<RdmMember> list);
 
-    List<RdmMember> selectUserGroupAccessLevel(@Param("userIds") Set<Long> userIds);
+    List<RdmMember> selectUserGroupAccessLevel(@Param("userIds") Set<Long> userIds,@Param("projectId") Long projectId);
 
     List<RdmMember> groupMemberByUserId(@Param("projectId") Long projectId, @Param("userIds") List<Long> userIds);
 

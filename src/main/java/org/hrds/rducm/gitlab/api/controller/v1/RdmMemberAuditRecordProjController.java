@@ -66,7 +66,7 @@ public class RdmMemberAuditRecordProjController extends BaseController {
     public ResponseEntity<?> auditFix(@PathVariable Long organizationId,
                                       @PathVariable Long projectId,
                                       @Encrypt @PathVariable Long id,
-                                      @Encrypt @RequestParam Long repositoryId) {
+                                      @Encrypt @RequestParam(required = false) Long repositoryId) {
         RdmMemberAuditRecord memberAuditRecord = rdmMemberAuditRecordRepository.selectByPrimaryKey(id);
         if (!Objects.isNull(memberAuditRecord)) {
             permissionRepairMap.get(memberAuditRecord.getType() + RepoConstants.GITLAB_PERMISSION_HANDLER).gitlabPermissionRepair(memberAuditRecord);
