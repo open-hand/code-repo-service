@@ -2,9 +2,12 @@ package org.hrds.rducm.gitlab.infra.repository.impl;
 
 import org.hrds.rducm.gitlab.domain.aggregate.MemberAuthDetailAgg;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
+import org.hzero.core.base.BaseConstants;
 import org.hzero.core.util.AssertUtils;
 import org.hzero.mybatis.base.impl.BaseRepositoryImpl;
 import org.hzero.mybatis.domian.Condition;
@@ -20,6 +23,9 @@ import java.util.Set;
 public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> implements RdmMemberRepository {
     @Autowired
     private RdmMemberMapper rdmMemberMapper;
+
+    @Autowired
+    private C7nDevOpsServiceFacade c7nDevOpsServiceFacade;
 
     @Override
     public RdmMember selectOneByUk(Long projectId, Long repositoryId, Long userId) {
@@ -73,17 +79,27 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
 
     @Override
     public int insertWithOwner(Long organizationId, Long projectId, Long repositoryId, Long userId, Integer glProjectId, Integer glUserId) {
-        RdmMember param = new RdmMember();
-        param.setOrganizationId(organizationId);
-        param.setProjectId(projectId);
-        param.setRepositoryId(repositoryId);
-        param.setUserId(userId);
-        param.setGlProjectId(glProjectId);
-        param.setGlUserId(glUserId);
-        param.setSyncGitlabFlag(Boolean.TRUE);
-        param.setGlAccessLevel(RdmAccessLevel.OWNER.toValue());
-        param.setSyncGitlabDate(new Date());
-        return this.insertSelective(param);
+        RdmMember record = new RdmMember();
+        record.setType(AuthorityTypeEnum.GROUP.getValue());
+        record.setUserId(userId);
+        record.setProjectId(projectId);
+        record.setGlAccessLevel(RdmAccessLevel.OWNER.toValue());
+        RdmMember rdmMember = rdmMemberMapper.selectOne(record);
+        if (rdmMember == null) {
+            RdmMember param = new RdmMember();
+            param.setOrganizationId(organizationId);
+            param.setProjectId(projectId);
+            param.setUserId(userId);
+            param.setGlUserId(glUserId);
+            param.setSyncGitlabFlag(Boolean.TRUE);
+            param.setGlAccessLevel(RdmAccessLevel.OWNER.toValue());
+            param.setSyncGitlabDate(new Date());
+            param.setType(AuthorityTypeEnum.GROUP.getValue());
+            param.setgGroupId(c7nDevOpsServiceFacade.getAppGroupIdByProjectId(projectId).intValue());
+            return this.insertSelective(param);
+        }
+        return BaseConstants.Digital.ZERO;
+
     }
 
     @Override
