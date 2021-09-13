@@ -54,6 +54,18 @@ public class GitlabMember {
     @ApiModelProperty(value = "应用服务组的id")
     private Integer appGroupId;
 
+    @ApiModelProperty(value = "iam里面的userId")
+    @Transient
+    private Long userId;
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
     public Integer getAppGroupId() {
         return appGroupId;
     }
