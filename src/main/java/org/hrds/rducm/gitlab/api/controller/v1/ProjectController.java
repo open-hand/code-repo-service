@@ -96,14 +96,14 @@ public class ProjectController extends BaseController {
                             .setProjectMember(u.getProjectMember());
                     return baseC7NUserViewDTO;
                 }).collect(Collectors.toList());
-        fillAccessLevel(baseC7NUserViewDTOS);
+        fillAccessLevel(baseC7NUserViewDTOS, projectId);
         return baseC7NUserViewDTOS;
     }
 
-    private void fillAccessLevel(List<BaseC7nUserViewDTO> baseC7NUserViewDTOS) {
+    private void fillAccessLevel(List<BaseC7nUserViewDTO> baseC7NUserViewDTOS, Long projectId) {
         if (!CollectionUtils.isEmpty(baseC7NUserViewDTOS)) {
             Set<Long> userIds = baseC7NUserViewDTOS.stream().map(BaseC7nUserViewDTO::getUserId).collect(Collectors.toSet());
-            List<RdmMember> rdmMembers = rdmMemberMapper.selectUserGroupAccessLevel(userIds);
+            List<RdmMember> rdmMembers = rdmMemberMapper.selectUserGroupAccessLevel(userIds, projectId);
             if (!CollectionUtils.isEmpty(rdmMembers)) {
                 Map<Long, Integer> longIntegerMap = rdmMembers.stream().collect(Collectors.toMap(RdmMember::getUserId, RdmMember::getGlAccessLevel));
                 baseC7NUserViewDTOS.forEach(baseC7nUserViewDTO -> {
@@ -149,7 +149,7 @@ public class ProjectController extends BaseController {
                     return baseC7NUserViewDTO;
                 }).collect(Collectors.toList());
 
-        fillAccessLevel(baseC7NUserViewDTOS);
+        fillAccessLevel(baseC7NUserViewDTOS, projectId);
         return baseC7NUserViewDTOS;
     }
 
