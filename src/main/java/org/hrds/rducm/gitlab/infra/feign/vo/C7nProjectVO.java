@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
 import java.util.List;
+import javax.persistence.Transient;
 
 public class C7nProjectVO {
     @ApiModelProperty(value = "主键ID/非必填")
@@ -36,6 +37,18 @@ public class C7nProjectVO {
     private Long createdBy;
 
     private Date creationDate;
+
+    @ApiModelProperty(value = "项目类型(一对多)")
+    @Transient
+    private List<ProjectCategoryVO> categories;
+
+    public List<ProjectCategoryVO> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<ProjectCategoryVO> categories) {
+        this.categories = categories;
+    }
 
     public Long getId() {
         return id;

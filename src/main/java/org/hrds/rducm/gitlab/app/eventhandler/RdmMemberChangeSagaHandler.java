@@ -12,6 +12,7 @@ import io.choerodon.mybatis.domain.AuditDomain;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.EnumUtils;
 import org.gitlab4j.api.models.Group;
 import org.gitlab4j.api.models.Member;
@@ -41,7 +42,9 @@ import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.enums.RoleLabelEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.ProjectCategoryVO;
 import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
 import org.hrds.rducm.gitlab.infra.util.JsonHelper;
 import org.hzero.core.util.AssertUtils;
@@ -65,6 +68,8 @@ public class RdmMemberChangeSagaHandler {
     private static final Logger logger = LoggerFactory.getLogger(RdmMemberChangeSagaHandler.class);
 
     private static final Gson gson = new Gson();
+
+    private static final String N_DEVOPS = "N_DEVOPS";
 
     @Autowired
     private RdmMemberRepository rdmMemberRepository;
@@ -94,8 +99,8 @@ public class RdmMemberChangeSagaHandler {
 
     /**
      * 角色同步事件
-     *  添加用户成员在这里
-     *  变更角色也在这里（添加，删除）
+     * 添加用户成员在这里
+     * 变更角色也在这里（添加，删除）
      */
     @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_UPDATE_MEMBER_ROLE,
             description = "角色同步事件",
@@ -495,33 +500,35 @@ public class RdmMemberChangeSagaHandler {
         rdmMemberRepository.deleteByOrganizationIdAndUserId(organizationId, userId);
     }
 
-    private void insertProjectOwner(Long organizationId, Long projectId, Long userId) {
+    public void insertProjectOwner(Long organizationId, Long projectId, Long userId) {
         Integer glUserId = c7nBaseServiceFacade.userIdToGlUserId(userId);
-        Long appGroupIdByProjectId = c7nDevOpsServiceFacade.getAppGroupIdByProjectId(projectId);
+        //这里需要判断项目的类型 如果是非devops项目，
+        C7nProjectVO c7nProjectVO = c7nBaseServiceFacade.detailC7nProject(projectId);
+        if (c7nProjectVO != null
+                && !CollectionUtils.isEmpty(c7nProjectVO.getCategories())
+                && c7nProjectVO.getCategories().stream().map(ProjectCategoryVO::getCode).collect(Collectors.toList()).contains(N_DEVOPS)) {
+            Long appGroupIdByProjectId = c7nDevOpsServiceFacade.getAppGroupIdByProjectId(projectId);
+            RdmMember rdmMember = new RdmMember();
+            rdmMember.setUserId(userId);
+            rdmMember.setGlAccessLevel(RdmAccessLevel.OWNER.value);
+            rdmMember.setSyncGitlabFlag(Boolean.TRUE);
+            rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+            rdmMember.setOrganizationId(organizationId);
+            rdmMember.setGlUserId(glUserId);
+            rdmMember.setgGroupId(appGroupIdByProjectId.intValue());
+            rdmMember.setProjectId(projectId);
+            rdmMember.setSyncGitlabDate(new Date());
 
-        RdmMember rdmMember = new RdmMember();
-        rdmMember.setUserId(userId);
-        rdmMember.setGlAccessLevel(RdmAccessLevel.OWNER.value);
-        rdmMember.setSyncGitlabFlag(Boolean.TRUE);
-        rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
-        rdmMember.setOrganizationId(organizationId);
-        rdmMember.setGlUserId(glUserId);
-        rdmMember.setgGroupId(appGroupIdByProjectId.intValue());
-        rdmMember.setProjectId(projectId);
-        rdmMember.setSyncGitlabDate(new Date());
-        rdmMemberMapper.insert(rdmMember);
+            RdmMember exists = new RdmMember();
+            exists.setProjectId(projectId);
+            exists.setUserId(userId);
+            exists.setType(AuthorityTypeEnum.GROUP.getValue());
+            exists.setGlAccessLevel(RdmAccessLevel.OWNER.value);
+            if (CollectionUtils.isEmpty(rdmMemberMapper.select(exists))) {
+                rdmMemberMapper.insert(rdmMember);
+            }
+        }
 
-//        List<C7nAppServiceVO> appServiceVOS = c7nDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId);
-
-//        appServiceVOS.forEach(appServiceVO -> {
-//            if (appServiceVO.getId() == null || appServiceVO.getGitlabProjectId() == null) {
-//                logger.warn("项目{}, 应用服务{}, 未查询到对应GitlabProjectId, 跳过该应用服务", projectId, appServiceVO.getId());
-//            } else {
-//                Long repositoryId = appServiceVO.getId();
-//                Integer glProjectId = Math.toIntExact(appServiceVO.getGitlabProjectId());
-//                rdmMemberRepository.insertWithOwner(organizationId, projectId, repositoryId, userId, glProjectId, glUserId);
-//            }
-//        });
     }
 
     private Boolean isProjectAdmin(C7nUserVO vo) {
