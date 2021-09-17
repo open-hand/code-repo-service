@@ -76,7 +76,8 @@ public class RdmProjectController extends BaseController {
     public ResponseEntity<List<RepositoryPrivilegeViewDTO>> listMemberRepositoriesByAccesses(@PathVariable Long organizationId,
                                                                                              @PathVariable Long projectId,
                                                                                              @RequestParam("accessLevel") Integer accessLevel,
+                                                                                             @RequestParam("appId") Long appId,
                                                                                              @RequestBody Set<Long> userIds) {
-        return Results.success(iRdmMemberService.listMemberRepositoriesByAccesses(organizationId, projectId, userIds, accessLevel));
+        return Results.success(iRdmMemberService.listMemberRepositoriesByAccesses(organizationId, projectId, userIds, accessLevel, appId));
     }
 }

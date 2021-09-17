@@ -200,7 +200,7 @@ public interface IRdmMemberService {
      */
     void batchExpireMembers(List<RdmMember> expiredRdmMembers);
 
-    List<RepositoryPrivilegeViewDTO> listMemberRepositoriesByAccesses(Long organizationId, Long projectId, Set<Long> userIds, Integer accessLevel);
+    List<RepositoryPrivilegeViewDTO> listMemberRepositoriesByAccesses(Long organizationId, Long projectId, Set<Long> userIds, Integer accessLevel, Long appId);
 
     Member tryRemoveAndAddGroupMemberToGitlab(Integer gGroupId, Integer glUserId, Integer accessLevel, Date expiresAt);
 
