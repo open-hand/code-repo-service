@@ -145,11 +145,28 @@ export default observer(() => {
     }
     return !exist;
   }
-  const queryUser = debounce((str) => {
+  const queryUser = debounce(async (str) => {
     userOptions.setQueryParameter('name', str);
     userOptions.setQueryParameter('type', openType);
     if (str !== '') {
-      userOptions.query();
+      const existArr = []; // 公用的一个userOptions。防止重新获取后之前的value匹配不到
+      pathListDs.created.forEach((record) => {
+        if (record.get('userId')) {
+          let loginName;
+          userOptions.forEach((userRecord) => {
+            if (userRecord.get('userId') === record.get('userId')) {
+              loginName = userRecord.get('loginName');
+            }
+          });
+          existArr.push({
+            userId: record.getField('userId').getValue(),
+            realName: record.getField('userId').getText(),
+            loginName,
+          });
+        }
+      });
+      await userOptions.query();
+      userOptions.appendData(existArr);
     }
   }, 500);
 
