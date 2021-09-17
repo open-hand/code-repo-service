@@ -43,8 +43,6 @@ export const StoreProvider = injectIntl(
         },
       } = props;
 
-      const psAllStore = useStore();
-
       const { hasMemberPermission, hasPermission } = usPsManagerStore();
 
       const getCustomsTabData = useCallback(() => {
@@ -61,11 +59,15 @@ export const StoreProvider = injectIntl(
         return customTabsData;
       }, [hasPermission, hasMemberPermission]);
 
+      const customTabsData = getCustomsTabData();
+
+      const psAllStore = useStore(customTabsData[0]?.value);
+
       const value = {
         ...props,
         formatMessage,
         projectId,
-        customTabsData: getCustomsTabData(),
+        customTabsData,
         psAllStore,
       };
       return <Store.Provider value={value}>{children}</Store.Provider>;
