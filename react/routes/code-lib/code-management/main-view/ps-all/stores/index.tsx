@@ -54,7 +54,7 @@ export const StoreProvider = injectIntl(
         if (hasPermission) {
           customTabsData = [psSetTabData, psApprovalTabData, psAuditTabData];
         } else if (!hasPermission && hasMemberPermission) {
-          customTabsData.push(applyViewTabData);
+          customTabsData = [psSetTabData, applyViewTabData]
         }
         return customTabsData;
       }, [hasPermission, hasMemberPermission]);
