@@ -5,9 +5,9 @@ interface RefObject<T> {
   readonly current: T | null;
 }
 
-export default function useStore() {
+export default function useStore(defaultValue:string) {
   return useLocalStore(() => ({
-    selectedTabkey: 'psSet',
+    selectedTabkey: defaultValue || 'psSet',
     setSelectedTab(value:string){
       console.log(value);
       this.selectedTabkey = value;

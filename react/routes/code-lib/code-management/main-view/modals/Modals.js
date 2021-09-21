@@ -11,6 +11,7 @@ import AddBranch from './add-branch';
 import AddTag from './add-tag';
 import PsApply from './ps-apply';
 import { usPsManagerStore } from '../stores';
+import { useManagementStore } from '../../stores';
 import ExportAuthority from './export-authority';
 import Apis from '../../apis';
 import { FixModal, AuditModal } from './ps-audit';
@@ -43,6 +44,11 @@ const EnvModals = observer((props) => {
     branchServiceDs,
     applyViewDs,
   } = usPsManagerStore();
+
+  const {
+    hasPermission,
+  } = useManagementStore();
+
   const { type } = props;
   const [exportModalVisible, setExportModalVisible] = useState(false);
 
@@ -347,7 +353,7 @@ const EnvModals = observer((props) => {
             icon: 'get_app-o',
             handler: () => setExportModalVisible(true),
             display: true,
-            permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-member'],
+            permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
           },
           {
             name: formatMessage({ id: 'infra.button.batch.sync' }),
@@ -403,12 +409,14 @@ const EnvModals = observer((props) => {
   return (
     <Header>
       <HeaderButtons items={getButtons()} />
-      <ExportAuthority
-        formatMessage={formatMessage}
-        exportModalVisible={exportModalVisible}
-        setExportModalVisible={setExportModalVisible}
-        psSetDs={psSetDs}
-      />
+      {
+        hasPermission && <ExportAuthority
+          formatMessage={formatMessage}
+          exportModalVisible={exportModalVisible}
+          setExportModalVisible={setExportModalVisible}
+          psSetDs={psSetDs}
+        />
+      }
     </Header>
   );
 });

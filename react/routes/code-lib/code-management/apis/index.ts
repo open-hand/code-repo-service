@@ -54,7 +54,11 @@ class CodeManagerApis {
   }
       // 同步权限
   static asyncPermission(params:any) {
-    return axios.post(`/rducm/v1/organizations/${params.organizationId}/projects/${params.projectId}/member-audit-records/${params.id}/audit-fix?repositoryId=${params.repositoryId}`);
+    let string = ''
+    if(params.repositoryId) {
+      string = `?repositoryId=${params.repositoryId}`
+    }
+    return axios.post(`/rducm/v1/organizations/${params.organizationId}/projects/${params.projectId}/member-audit-records/${params.id}/audit-fix${string}`);
   };
 
   static bacthfix(organizationId:string,projectId:string, data: any[]){

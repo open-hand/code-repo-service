@@ -56,11 +56,10 @@ public class FixMemberTask {
             if (!CollectionUtils.isEmpty(projectIds)) {
                 projectIds.forEach(projectId -> {
                     //查询项目下所有有gitlab owner标签的用户
-                    List<C7nUserVO> c7nUserVOS = c7nBaseServiceFacade.listCustomGitlabOwnerLableUser(projectId,"GITLAB_OWNER");
+                    List<C7nUserVO> c7nUserVOS = c7nBaseServiceFacade.listCustomGitlabOwnerLableUser(projectId, "GITLAB_OWNER");
                     if (!CollectionUtils.isEmpty(c7nUserVOS)) {
                         //查询项目组的
                         Long appGroupIdByProjectId = c7nDevOpsServiceFacade.getAppGroupIdByProjectId(projectId);
-
                         c7nUserVOS.forEach(c7nUserVO -> {
                             RdmMember record = new RdmMember();
                             record.setType(AuthorityTypeEnum.PROJECT.getValue());
@@ -78,13 +77,23 @@ public class FixMemberTask {
                                 rdmMember.setGlAccessLevel(RdmAccessLevel.OWNER.value);
                                 rdmMember.setSyncGitlabFlag(true);
                                 rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+
                                 rdmMember.setOrganizationId(c7nTenantVO.getTenantId());
                                 rdmMember.setGlUserId(member.getGlUserId());
                                 rdmMember.setgGroupId(appGroupIdByProjectId.intValue());
                                 rdmMember.setProjectId(projectId);
                                 rdmMember.setSyncGitlabDate(member.getSyncGitlabDate());
                                 rdmMember.setExpiredFlag(member.getExpiredFlag());
-                                rdmMemberMapper.insert(rdmMember);
+                                //不重复插入
+                                RdmMember exists = new RdmMember();
+                                exists.setProjectId(projectId);
+                                exists.setUserId(c7nUserVO.getId());
+                                exists.setType(AuthorityTypeEnum.GROUP.getValue());
+                                exists.setGlAccessLevel(RdmAccessLevel.OWNER.value);
+                                if (CollectionUtils.isEmpty(rdmMemberMapper.select(exists))) {
+                                    rdmMemberMapper.insert(rdmMember);
+                                }
+
                             }
                         });
                     }

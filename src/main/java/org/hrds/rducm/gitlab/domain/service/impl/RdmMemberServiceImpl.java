@@ -31,11 +31,13 @@ import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.admin.GitlabAdminApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
+import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.enums.RdmMemberStateEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
@@ -73,6 +75,8 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     private C7nBaseServiceFacade c7NBaseServiceFacade;
     @Autowired
     private GitlabGroupApi gitlabGroupApi;
+    @Autowired
+    private RdmMemberMapper rdmMemberMapper;
 
     @Override
     public Page<MemberAuthDetailViewDTO> pageMembersRepositoryAuthorized(Long organizationId, Long projectId, PageRequest pageRequest, BaseUserQueryDTO queryDTO) {
@@ -436,12 +440,37 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
                                                       Long projectId,
                                                       Set<Long> repositoryIds) {
         Long userId = DetailsHelper.getUserDetails().getUserId();
+        RdmMember groupMember = new RdmMember();
+        groupMember.setType(AuthorityTypeEnum.GROUP.getValue());
+        groupMember.setUserId(userId);
+        groupMember.setProjectId(projectId);
+        RdmMember rdmMember = rdmMemberMapper.selectOne(groupMember);
+        //如果全局层的权限为null,就查找项目层的
+        if (rdmMember == null) {
+            return repositoryIds.stream().map(repositoryId -> {
+                RdmMember dbMember = Optional.ofNullable(rdmMemberRepository.selectOneByUk(projectId, repositoryId, userId))
+                        .orElse(new RdmMember());
+                MemberPrivilegeViewDTO viewDTO = new MemberPrivilegeViewDTO();
+                viewDTO.setRepositoryId(repositoryId)
+                        .setAccessLevel(dbMember.getGlAccessLevel());
+                return viewDTO;
+            }).collect(Collectors.toList());
+        }
+        // 综合返回全局和仓库的权限
         return repositoryIds.stream().map(repositoryId -> {
             RdmMember dbMember = Optional.ofNullable(rdmMemberRepository.selectOneByUk(projectId, repositoryId, userId))
                     .orElse(new RdmMember());
             MemberPrivilegeViewDTO viewDTO = new MemberPrivilegeViewDTO();
-            viewDTO.setRepositoryId(repositoryId)
-                    .setAccessLevel(dbMember.getGlAccessLevel());
+            viewDTO.setRepositoryId(repositoryId);
+            if (dbMember.getGlAccessLevel() == null) {
+                viewDTO.setAccessLevel(rdmMember.getGlAccessLevel());
+            } else {
+                if (dbMember.getGlAccessLevel() > rdmMember.getGlAccessLevel()) {
+                    viewDTO.setAccessLevel(dbMember.getGlAccessLevel());
+                } else {
+                    viewDTO.setAccessLevel(rdmMember.getGlAccessLevel());
+                }
+            }
             return viewDTO;
         }).collect(Collectors.toList());
     }
@@ -520,28 +549,39 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
 
 
     @Override
-    public List<RepositoryPrivilegeViewDTO> listMemberRepositoriesByAccesses(Long organizationId, Long projectId, Set<Long> userIds, Integer accessLevel) {
-        Condition condition = Condition.builder(RdmMember.class)
-                .andWhere(Sqls.custom()
-                        .andEqualTo(RdmMember.FIELD_ORGANIZATION_ID, organizationId)
-                        .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
-                        .andIn(RdmMember.FIELD_USER_ID, userIds)
-                        // 同步状态需为true
-                        .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, Boolean.TRUE)
-                        .andGreaterThanOrEqualTo(RdmMember.FIELD_GL_ACCESS_LEVEL, accessLevel))
-                .build();
-        List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
-        Map<Long, List<RdmMember>> group = rdmMembers.stream().collect(Collectors.groupingBy(RdmMember::getUserId));
-
-        List<RepositoryPrivilegeViewDTO> result = new ArrayList<>();
-        group.forEach((k, v) -> {
-            RepositoryPrivilegeViewDTO viewDTO = new RepositoryPrivilegeViewDTO();
-            viewDTO.setUserId(k);
-            viewDTO.setAppServiceIds(v.stream().map(RdmMember::getRepositoryId).collect(Collectors.toSet()));
-            result.add(viewDTO);
+    public List<RepositoryPrivilegeViewDTO> listMemberRepositoriesByAccesses(Long organizationId, Long projectId, Set<Long> userIds, Integer accessLevel, Long appId) {
+        //查询全局层的权限
+        if (CollectionUtils.isEmpty(userIds)) {
+            return Collections.EMPTY_LIST;
+        }
+        List<RepositoryPrivilegeViewDTO> repositoryPrivilegeViewDTOS = new ArrayList<>();
+        userIds.forEach(userId -> {
+            RepositoryPrivilegeViewDTO repositoryPrivilegeViewDTO = new RepositoryPrivilegeViewDTO();
+            repositoryPrivilegeViewDTO.setUserId(userId);
+            //先查项目层的权限
+            RdmMember groupMember = new RdmMember();
+            groupMember.setType(AuthorityTypeEnum.GROUP.getValue());
+            groupMember.setUserId(userId);
+            groupMember.setProjectId(projectId);
+            RdmMember rdmMember = rdmMemberMapper.selectOne(groupMember);
+            if (rdmMember != null && rdmMember.getGlAccessLevel() >= accessLevel.intValue()) {
+                HashSet<Long> appIds = new HashSet<>();
+                appIds.add(appId);
+                repositoryPrivilegeViewDTO.setAppServiceIds(appIds);
+            } else {
+                //查询项目层的权限
+                RdmMember dbMember = Optional.ofNullable(rdmMemberRepository.selectOneByUk(projectId, appId, userId))
+                        .orElse(new RdmMember());
+                if (dbMember != null && dbMember.getGlAccessLevel() != null && dbMember.getGlAccessLevel() >= accessLevel.intValue()) {
+                    HashSet<Long> appIds = new HashSet<>();
+                    appIds.add(appId);
+                    repositoryPrivilegeViewDTO.setAppServiceIds(appIds);
+                }
+            }
+            repositoryPrivilegeViewDTOS.add(repositoryPrivilegeViewDTO);
         });
 
-        return result;
+        return repositoryPrivilegeViewDTOS;
     }
 
     @Override

@@ -1,28 +1,30 @@
+/* eslint-disable import/first */
 /**
  * 代码库-项目层
  * @author JZH <zhihao.jiang@hand-china.com>
  * @creationDate 2020/3/26
  * @copyright 2020 ® HAND
  */
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { Page, Content, Header, Breadcrumb, HeaderButtons } from '@choerodon/boot';
-import { Tabs, Button } from 'choerodon-ui';
+import { Tabs } from 'choerodon-ui';
 import { observer } from 'mobx-react-lite';
 import Tips from '@/components/new-tips';
 import { useStore, TabKeyEnum } from './stores';
 import ProjectList from './ProjectList';
 import TimeLine from './TimeLine';
 import PSView from './PSView';
+import { useModal } from 'choerodon-ui/pro';
 import ExportAuthority from './export-authority-codelib';
 import PsAudit from './ps-audit';
 import './index.less';
+
 
 const { TabPane } = Tabs;
 
 const Container = () => {
   const [activeTabKey, setActiveTabKey] = useState(TabKeyEnum.PSVIEW);
   const [activeProject, setActiveProject] = useState({});
-  const [exportModalVisible, setExportModalVisible] = useState(false);
   const {
     intlPrefix,
     intl: { formatMessage },
@@ -33,7 +35,7 @@ const Container = () => {
     psAuditDs,
     organizationId,
   } = useStore();
-
+  const Modal = useModal();
   const refresh = () => {
     projectListDs.query().then(() => {
       setActiveProject({
@@ -61,11 +63,18 @@ const Container = () => {
     formatMessage, optLogDs, timeLineStore, activeProject, activeTabKey,
   }), [activeProject, optLogDs, timeLineStore, activeTabKey]);
   const exportAuthorityProps = useMemo(() => ({
-    formatMessage, exportModalVisible, setExportModalVisible, activeProject, psViewDs,
-  }), [exportModalVisible, activeProject, psViewDs]);
+    formatMessage, activeProject, psViewDs,
+  }), [activeProject, psViewDs]);
+
   const psAuditProps = useMemo(() => ({
     psAuditDs, activeProject, formatMessage, activeTabKey, organizationId,
   }), [activeProject, psAuditDs, formatMessage, activeTabKey, organizationId]);
+  const openExportModal = useCallback(() => {
+    Modal.open({
+      title: formatMessage({ id: 'exportModal.confirm.title', defaultMessage: '权限导出确认' }),
+      children: <ExportAuthority {...exportAuthorityProps} />,
+    });
+  }, []);
 
   return (
     <Page
@@ -79,7 +88,7 @@ const Container = () => {
             name: formatMessage({ id: 'exportAuth', defaultMessage: '导出权限' }),
             icon: 'get_app-o',
             display: true,
-            handler: () => setExportModalVisible(true),
+            handler: () => openExportModal(),
           }])}
         />
       </Header>
@@ -115,7 +124,6 @@ const Container = () => {
           </Tabs>
         </div>
       </Content>
-      <ExportAuthority {...exportAuthorityProps} />
     </Page>
   );
 };

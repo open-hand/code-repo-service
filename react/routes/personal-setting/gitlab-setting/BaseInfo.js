@@ -187,7 +187,7 @@ function BaseInfo() {
       Modal.open({
         key: Modal.key(),
         title: intl.formatMessage({ id: 'infra.personal.operate.updatePassword' }),
-        content: intl.formatMessage({ id: 'infra.personal.message.modifyConfirm' }),
+        children: intl.formatMessage({ id: 'infra.personal.message.modifyConfirm' }),
         okText: intl.formatMessage({ id: 'edit' }),
         onOk: () => {
           const { resetGitlabPasswordUrl } = enablePwd;
@@ -200,7 +200,7 @@ function BaseInfo() {
       Modal.open({
         key: Modal.key(),
         title: intl.formatMessage({ id: 'infra.personal.operate.updatePassword' }),
-        content: intl.formatMessage({ id: 'infra.personal.message.noUrl' }),
+        children: intl.formatMessage({ id: 'infra.personal.message.noUrl' }),
         okText: intl.formatMessage({ id: 'infra.personal.message.iKnow' }),
       });
     }
