@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Loading } from "@choerodon/components";
+import { Loading } from '@choerodon/components';
 import Apis from "../../../apis";
 import get from "lodash/get";
 import { useEffect } from "react";
@@ -49,7 +49,7 @@ const AuditModal = ({ modal, organizationId, projectId, onOk }: any) => {
   }
 
   if (loading) {
-    return <Loading display style={{
+    return <Loading display type="c7n" style={{
       minHeight: '100px'
     }} />;
   }
@@ -109,7 +109,7 @@ const FixModal = ({ modal, organizationId, projectId, onOk }: any) => {
   }
 
   if (loading) {
-    return <Loading display style={{
+    return <Loading display type="c7n" style={{
       minHeight: '100px'
     }} />;
   }
