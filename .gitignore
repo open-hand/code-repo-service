@@ -67,3 +67,4 @@ config-local.js
 /dist
 /lib
 /.history
+application-default.yml
