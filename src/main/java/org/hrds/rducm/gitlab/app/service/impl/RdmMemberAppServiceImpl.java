@@ -129,8 +129,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         Condition condition = Condition.builder(RdmMember.class)
                 .where(Sqls.custom()
                         .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
-                        .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, syncGitlabFlag, true)
-                        .andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIds, true))
+                        .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, syncGitlabFlag, true))
                 .orderByDesc(RdmMember.FIELD_LAST_UPDATE_DATE)
                 .build();
 
@@ -166,7 +165,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                 return new Page<>();
             }
 
-            condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
+            condition.and().orIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet).orIsNull(RdmMember.FIELD_REPOSITORY_ID);
         }
 
         // 根据params多条件查询
@@ -187,17 +186,19 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                 return new Page<>();
             } else if (!userIsEmpty && !repositoryIsEmpty) {
                 // 都不为空, or条件查询
-                condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet)
-                        .orIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
+                condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
+                condition.and().orIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet).orIsNull(RdmMember.FIELD_REPOSITORY_ID);
             } else if (!userIsEmpty) {
                 // 用户查询不为空
                 condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
             } else {
                 // 应用服务查询不为空
-                condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
+                condition.and().orIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet).orIsNull(RdmMember.FIELD_REPOSITORY_ID);
             }
         }
-
+        if (!CollectionUtils.isEmpty(repositoryIds)) {
+            condition.and().orIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIds).orIsNull(RdmMember.FIELD_REPOSITORY_ID);
+        }
         stopWatch.stop();
         logger.info(stopWatch.prettyPrint());
 

@@ -139,7 +139,7 @@ function BaseInfo() {
       Modal.open({
         key: Modal.key(),
         title: intl.formatMessage({ id: 'infra.personal.operate.resetPassword' }),
-        content: intl.formatMessage({ id: 'infra.personal.message.noUrl' }),
+        children: intl.formatMessage({ id: 'infra.personal.message.noUrl' }),
         okText: intl.formatMessage({ id: 'infra.personal.message.iKnow' }),
       });
     }
