@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import org.springframework.util.CollectionUtils;
 
 @Repository
 public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> implements RdmMemberRepository {
@@ -67,14 +68,19 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
     }
 
     @Override
-    public int deleteByOrganizationIdAndUserId(Long organizationId, Long userId) {
+    public void deleteByOrganizationIdAndUserId(Long organizationId, Long userId) {
         AssertUtils.notNull(organizationId, "organizationId not null");
         AssertUtils.notNull(userId, "userId not null");
 
         RdmMember param = new RdmMember();
         param.setOrganizationId(organizationId);
         param.setUserId(userId);
-        return this.delete(param);
+        List<RdmMember> rdmMembers = rdmMemberMapper.select(param);
+        if (!CollectionUtils.isEmpty(rdmMembers)){
+            rdmMembers.forEach(rdmMember -> {
+                rdmMemberMapper.deleteByPrimaryKey(rdmMember.getId());
+            });
+        }
     }
 
     @Override
