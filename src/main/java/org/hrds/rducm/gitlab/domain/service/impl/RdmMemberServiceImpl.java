@@ -39,6 +39,7 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
+import org.hzero.core.base.BaseConstants;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
 import org.slf4j.Logger;
@@ -533,9 +534,27 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
                         .andGreaterThanOrEqualTo(RdmMember.FIELD_GL_ACCESS_LEVEL, RdmAccessLevel.DEVELOPER.toValue()))
                 .build();
         List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
-        Set<Long> appServiceIds = rdmMembers.stream().map(RdmMember::getRepositoryId).collect(Collectors.toSet());
+        //处理rdmMembers，包含project层和group层的
         RepositoryPrivilegeViewDTO result = new RepositoryPrivilegeViewDTO();
         result.setUserId(userId);
+        //如果是group层的，则查询devops
+        if (CollectionUtils.isEmpty(rdmMembers)) {
+            result.setAppServiceIds(Collections.EMPTY_SET);
+            return result;
+        }
+        Set<Long> appServiceIds = new HashSet<>();
+        List<Long> projectIds = rdmMembers.stream().filter(rdmMember -> org.apache.commons.lang3.StringUtils.equalsIgnoreCase(rdmMember.getType(), AuthorityTypeEnum.GROUP.getValue())).map(RdmMember::getProjectId).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(projectIds)) {
+            List<C7nAppServiceVO> c7nAppServiceVOS = c7NDevOpsServiceFacade.queryAppByProjectIds(0L, projectIds);
+            if (!CollectionUtils.isEmpty(c7nAppServiceVOS)) {
+                Set<Long> groupAppServiceIds = c7nAppServiceVOS.stream().map(C7nAppServiceVO::getId).collect(Collectors.toSet());
+                appServiceIds.addAll(groupAppServiceIds);
+            }
+        }
+        Set<Long> projectAppServiceIds = rdmMembers.stream().filter(rdmMember -> org.apache.commons.lang3.StringUtils.equalsIgnoreCase(rdmMember.getType(), AuthorityTypeEnum.PROJECT.getValue())).map(RdmMember::getRepositoryId).collect(Collectors.toSet());
+        if (!CollectionUtils.isEmpty(projectAppServiceIds)) {
+            appServiceIds.addAll(projectAppServiceIds);
+        }
         result.setAppServiceIds(appServiceIds);
         return result;
     }
