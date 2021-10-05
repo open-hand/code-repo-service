@@ -268,12 +268,12 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
 
 
         //对比两边的权限
-        List<RdmMemberAuditRecord> rdmMemberAuditRecords = compareGroupMembersAndReturnAudit(organizationId, projectId, dbMembers, gitlabMembers);
+        List<RdmMemberAuditRecord> rdmMemberAuditRecords = compareGroupMembersAndReturnAudit(organizationId, projectId, dbMembers, gitlabMembers, appGroupId);
 
         return rdmMemberAuditRecords;
     }
 
-    private List<RdmMemberAuditRecord> compareGroupMembersAndReturnAudit(Long organizationId, Long projectId, List<RdmMember> dbMembers, List<GitlabMember> gitlabMembers) {
+    private List<RdmMemberAuditRecord> compareGroupMembersAndReturnAudit(Long organizationId, Long projectId, List<RdmMember> dbMembers, List<GitlabMember> gitlabMembers, Integer groupId) {
         List<RdmMemberAuditRecord> memberAudits = new ArrayList<>();
         //开始比对权限 dbMembers 包含的是项目下group层级的群贤，gitlabMembers包含的是gitlab group 非owner权限的组成员
         gitlabMembers.forEach(gitlabMember -> {
@@ -293,10 +293,10 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                 }
                 dbMembers.remove(rdmMember);
             } else {
-                memberAudits.add(buildMemberAudit(organizationId, projectId, null, null, gitlabMember, rdmMember));
+                memberAudits.add(buildMemberAudit(organizationId, projectId, null, null, gitlabMember, rdmMember, groupId));
             }
             if (isDifferent) {
-                memberAudits.add(buildMemberAudit(organizationId, projectId, null, null, gitlabMember, rdmMember));
+                memberAudits.add(buildMemberAudit(organizationId, projectId, null, null, gitlabMember, rdmMember, groupId));
                 dbMembers.remove(rdmMember);
             }
         });
@@ -304,7 +304,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         // 如果dbMemberMap还有数据, 说明不一致
         if (!dbMembers.isEmpty()) {
             dbMembers.forEach(rdmMember -> {
-                memberAudits.add(buildMemberAudit(organizationId, projectId, null, null, null, rdmMember));
+                memberAudits.add(buildMemberAudit(organizationId, projectId, null, null, null, rdmMember, groupId));
             });
         }
         return memberAudits;
@@ -395,7 +395,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
             List<Long> oegAdminIds = orgAdmins.stream().map(C7nUserVO::getId).collect(Collectors.toList());
             //排除了项目成员的组织id
             gitlabProjectMembers = gitlabProjectMembers.stream().filter(gitlabMember -> !oegAdminIds.contains(gitlabMember.getUserId())).collect(Collectors.toList());
-            if (!CollectionUtils.isEmpty(dbMembers)){
+            if (!CollectionUtils.isEmpty(dbMembers)) {
                 dbMembers = dbMembers.stream().filter(rdmMember1 -> !oegAdminIds.contains(rdmMember1.getUserId())).collect(Collectors.toList());
 
             }
@@ -469,11 +469,11 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                 record.setGlAccessLevel(gitlabMember.getAccessLevel().value);
                 List<RdmMember> rdmMembers = memberRepository.select(record);
                 if (CollectionUtils.isEmpty(rdmMembers)) {
-                    memberAudits.add(buildMemberAudit(organizationId, projectId, repositoryId, glProjectId, gitlabMember, null));
+                    memberAudits.add(buildMemberAudit(organizationId, projectId, repositoryId, glProjectId, gitlabMember, null, appGroupId));
                 }
             }
             if (isDifferent) {
-                memberAudits.add(buildMemberAudit(organizationId, projectId, repositoryId, glProjectId, gitlabMember, rdmMember));
+                memberAudits.add(buildMemberAudit(organizationId, projectId, repositoryId, glProjectId, gitlabMember, rdmMember, appGroupId));
                 dbMembers.remove(rdmMember);
             }
         });
@@ -481,7 +481,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         // 如果dbMemberMap还有数据, 说明不一致
         if (!dbMembers.isEmpty()) {
             dbMembers.forEach(rdmMember -> {
-                memberAudits.add(buildMemberAudit(organizationId, projectId, repositoryId, glProjectId, null, rdmMember));
+                memberAudits.add(buildMemberAudit(organizationId, projectId, repositoryId, glProjectId, null, rdmMember, appGroupId));
             });
         }
 
@@ -530,12 +530,14 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                                                   Long repositoryId,
                                                   Integer glProjectId,
                                                   GitlabMember glMember,
-                                                  RdmMember dbMember) {
+                                                  RdmMember dbMember,
+                                                  Integer groupId) {
         RdmMemberAuditRecord memberAudit = new RdmMemberAuditRecord()
                 .setOrganizationId(organizationId)
                 .setProjectId(projectId)
                 .setRepositoryId(repositoryId)
-                .setGlProjectId(glProjectId);
+                .setGlProjectId(glProjectId)
+                .setgGroupId(groupId);
 
 
         if (glMember != null) {
@@ -543,15 +545,13 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                     .setGlAccessLevel(glMember.getAccessLevel().toValue())
                     .setGlExpiresAt(glMember.getExpiresAt());
             memberAudit.setType(glMember.getType());
-            memberAudit.setgGroupId(glMember.getAppGroupId());
             memberAudit.setUserId(glMember.getUserId());
         }
 
         if (dbMember != null) {
             memberAudit.setUserId(dbMember.getUserId())
                     .setAccessLevel(dbMember.getGlAccessLevel())
-                    .setExpiresAt(dbMember.getGlExpiresAt())
-            .setgGroupId(dbMember.getgGroupId());
+                    .setExpiresAt(dbMember.getGlExpiresAt());
             if (memberAudit.getType() == null) {
                 memberAudit.setType(dbMember.getType());
             }

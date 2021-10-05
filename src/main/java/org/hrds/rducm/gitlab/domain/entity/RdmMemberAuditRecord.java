@@ -203,8 +203,9 @@ public class RdmMemberAuditRecord extends AuditDomain {
         return gGroupId;
     }
 
-    public void setgGroupId(Integer gGroupId) {
+    public RdmMemberAuditRecord setgGroupId(Integer gGroupId) {
         this.gGroupId = gGroupId;
+        return this;
     }
 
     public String getType() {
