@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.infra.feign.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModelProperty;
+import org.hzero.starter.keyencrypt.core.Encrypt;
 
 import java.util.Date;
 
@@ -80,6 +81,11 @@ public class C7nAppServiceVO {
     @ApiModelProperty("最近更新者登录名")
     private String updateLoginName;
 
+
+    @Encrypt
+    @ApiModelProperty("外部仓库配置id")
+    private Long externalConfigId;
+
 //    @ApiModelProperty("此应用服务是够跳过权限检查，true表示允许项目下所有的项目成员及项目所有者访问")
 //    private Boolean skipCheckPermission;
 
@@ -105,6 +111,14 @@ public class C7nAppServiceVO {
 //        this.chart = chart;
 //    }
 
+
+    public Long getExternalConfigId() {
+        return externalConfigId;
+    }
+
+    public void setExternalConfigId(Long externalConfigId) {
+        this.externalConfigId = externalConfigId;
+    }
 
     public Long getId() {
         return id;

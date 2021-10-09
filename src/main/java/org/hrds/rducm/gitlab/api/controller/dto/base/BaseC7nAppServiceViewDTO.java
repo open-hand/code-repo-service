@@ -26,6 +26,10 @@ public class BaseC7nAppServiceViewDTO {
     private String imgUrl;
     private Integer glProjectId;
 
+    @Encrypt
+    @ApiModelProperty("外部仓库配置id")
+    private Long externalConfigId;
+
     //
     // 工具方法
     // ------------------------------------------------------------------------------
@@ -40,6 +44,14 @@ public class BaseC7nAppServiceViewDTO {
                 .setGlProjectId(Optional.ofNullable(c7nAppServiceVO.getGitlabProjectId())
                         .map(Math::toIntExact)
                         .orElse(null));
+    }
+
+    public Long getExternalConfigId() {
+        return externalConfigId;
+    }
+
+    public void setExternalConfigId(Long externalConfigId) {
+        this.externalConfigId = externalConfigId;
     }
 
     public Long getRepositoryId() {
