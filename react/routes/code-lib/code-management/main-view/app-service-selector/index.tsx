@@ -9,6 +9,7 @@ import map from "lodash/map";
 import { usPsManagerStore } from "../stores";
 import "./index.less";
 import { observer } from "mobx-react-lite";
+import { Tooltip } from 'choerodon-ui';
 
 const { Option } = Select;
 
@@ -25,9 +26,12 @@ const AppSelector = (props: any) => {
   function renderOpts() {
     const res = map(
       branchServiceDs.toData(),
-      ({ repositoryId, repositoryName, repositoryCode }) => (
-        <Option value={repositoryId} key={repositoryId}>
+      ({ repositoryId, repositoryName, repositoryCode,externalConfigId}) => (
+        <Option value={repositoryId} key={repositoryId}  disabled={Boolean(externalConfigId)}>
+          <Tooltip title={externalConfigId ? '外置GitLab代码仓库的应用服务不支持配置' : ''}>
           {`${repositoryName}(${repositoryCode})`}
+          </Tooltip>
+         
         </Option>
       )
     );

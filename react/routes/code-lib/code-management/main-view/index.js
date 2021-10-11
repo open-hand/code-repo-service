@@ -2,8 +2,11 @@ import React from 'react';
 import { StoreProvider } from './stores';
 import MainView from './MainView';
 
-export default (props) => (
+const index = props => (
   <StoreProvider {...props}>
     <MainView />
   </StoreProvider>
 );
+
+
+export default index;
