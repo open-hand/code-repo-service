@@ -1,4 +1,6 @@
-export default (({ formatMessage, organizationId, projectId, setBranchApp }) => ({
+export default (({
+  formatMessage, organizationId, projectId, setBranchApp,
+}) => ({
   paging: false,
   autoQuery: true,
   transport: {
