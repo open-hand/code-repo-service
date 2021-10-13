@@ -1,7 +1,10 @@
+/* eslint-disable max-len */
+/* eslint-disable react/jsx-no-bind */
 import React, { useCallback } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Icon, Button } from 'choerodon-ui';
 import { Spin } from 'choerodon-ui/pro';
+import { Loading } from '@choerodon/components';
 
 const imgStyle = {
   width: '18px',
@@ -20,7 +23,9 @@ const iconStyle = {
   textAlign: 'center',
 };
 
-const TimeLine = ({ isMore, opEventTypeLookupData, loadData, listViewDs }) => {
+const TimeLine = ({
+  isMore, opEventTypeLookupData, loadData, listViewDs,
+}) => {
   const record = listViewDs.current && listViewDs.toData();
 
   const getOpEventTypeMeaning = useCallback((code) => {
@@ -56,17 +61,15 @@ const TimeLine = ({ isMore, opEventTypeLookupData, loadData, listViewDs }) => {
   const getUserIcon = (imageUrl, name) => {
     if (imageUrl) {
       return <img src={imageUrl} alt="" />;
-    } else {
-      return <div className="code-lib-opreation-log-timeLine-card-content-text-div-icon">{name[0]}</div>;
     }
+    return <div className="code-lib-opreation-log-timeLine-card-content-text-div-icon">{name[0]}</div>;
   };
 
   const getRepositoryIcon = useCallback((imageUrl, name) => {
     if (imageUrl) {
       return <img src={imageUrl} alt="" style={imgStyle} />;
-    } else {
-      return <div style={iconStyle}>{name[0]}</div>;
     }
+    return <div style={iconStyle}>{name[0]}</div>;
   });
 
   function renderData() {
@@ -74,7 +77,9 @@ const TimeLine = ({ isMore, opEventTypeLookupData, loadData, listViewDs }) => {
       <ul>
         {
           record.map((item, index) => {
-            const { id, opDate, opEventType, opContent, repositoryName, opUserImageUrl, opUserName, repositoryImageUrl } = item;
+            const {
+ id, opDate, opEventType, opContent, repositoryName, opUserImageUrl, opUserName, repositoryImageUrl,
+} = item;
             const [date, time] = opDate.split(' ');
             return (
               <li key={id}>
@@ -112,24 +117,24 @@ const TimeLine = ({ isMore, opEventTypeLookupData, loadData, listViewDs }) => {
     ) : null;
   }
 
+  if (listViewDs.status === 'loading') {
+    return <Loading type="c7n" />;
+  }
+
   return (
-
-    <Spin dataSet={listViewDs}>
-      <div className="code-lib-opreation-log-timeLine">
-        {
-          record && record.length > 0 ? (
-            <div className="code-lib-opreation-log-timeLine-body">
-              {renderData()}
-            </div>
-          ) : (
-            <div className="code-lib-opreation-log-timeLine-no-content">
-              <span>暂无操作记录</span>
-            </div>)
-        }
-        {isMore && <Button type="primary" onClick={loadMoreOptsRecord}>加载更多</Button>}
-      </div>
-    </Spin>
-
+    <div className="code-lib-opreation-log-timeLine">
+      {
+        record && record.length > 0 ? (
+          <div className="code-lib-opreation-log-timeLine-body">
+            {renderData()}
+          </div>
+        ) : (
+          <div className="code-lib-opreation-log-timeLine-no-content">
+            <span>暂无操作记录</span>
+          </div>)
+      }
+      {isMore && <Button type="primary" onClick={loadMoreOptsRecord}>加载更多</Button>}
+    </div>
   );
 };
 
