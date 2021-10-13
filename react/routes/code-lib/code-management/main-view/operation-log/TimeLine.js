@@ -78,8 +78,8 @@ const TimeLine = ({
         {
           record.map((item, index) => {
             const {
- id, opDate, opEventType, opContent, repositoryName, opUserImageUrl, opUserName, repositoryImageUrl,
-} = item;
+              id, opDate, opEventType, opContent, repositoryName, opUserImageUrl, opUserName, repositoryImageUrl,
+            } = item;
             const [date, time] = opDate.split(' ');
             return (
               <li key={id}>
@@ -117,24 +117,23 @@ const TimeLine = ({
     ) : null;
   }
 
-  if (listViewDs.status === 'loading') {
-    return <Loading type="c7n" />;
-  }
 
   return (
-    <div className="code-lib-opreation-log-timeLine">
-      {
-        record && record.length > 0 ? (
-          <div className="code-lib-opreation-log-timeLine-body">
-            {renderData()}
-          </div>
-        ) : (
-          <div className="code-lib-opreation-log-timeLine-no-content">
-            <span>暂无操作记录</span>
-          </div>)
-      }
-      {isMore && <Button type="primary" onClick={loadMoreOptsRecord}>加载更多</Button>}
-    </div>
+    <Loading display={listViewDs.status === 'loading'} type="c7n">
+      <div className="code-lib-opreation-log-timeLine">
+        {
+          record && record.length > 0 ? (
+            <div className="code-lib-opreation-log-timeLine-body">
+              {renderData()}
+            </div>
+          ) : (
+            <div className="code-lib-opreation-log-timeLine-no-content">
+              <span>暂无操作记录</span>
+            </div>)
+        }
+        {isMore && <Button type="primary" onClick={loadMoreOptsRecord}>加载更多</Button>}
+      </div>
+    </Loading>
   );
 };
 
