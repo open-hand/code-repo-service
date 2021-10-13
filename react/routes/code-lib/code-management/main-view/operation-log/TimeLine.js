@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+/* eslint-disable react/jsx-no-bind */
 import React, { useCallback } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Icon, Button } from 'choerodon-ui';
@@ -115,24 +117,24 @@ const TimeLine = ({
     ) : null;
   }
 
+  if (listViewDs.status === 'loading') {
+    return <Loading type="c7n" />;
+  }
+
   return (
-
-    <Loading dataSet={listViewDs} type="c7n">
-      <div className="code-lib-opreation-log-timeLine">
-        {
-          record && record.length > 0 ? (
-            <div className="code-lib-opreation-log-timeLine-body">
-              {renderData()}
-            </div>
-          ) : (
-            <div className="code-lib-opreation-log-timeLine-no-content">
-              <span>暂无操作记录</span>
-            </div>)
-        }
-        {isMore && <Button type="primary" onClick={loadMoreOptsRecord}>加载更多</Button>}
-      </div>
-    </Loading>
-
+    <div className="code-lib-opreation-log-timeLine">
+      {
+        record && record.length > 0 ? (
+          <div className="code-lib-opreation-log-timeLine-body">
+            {renderData()}
+          </div>
+        ) : (
+          <div className="code-lib-opreation-log-timeLine-no-content">
+            <span>暂无操作记录</span>
+          </div>)
+      }
+      {isMore && <Button type="primary" onClick={loadMoreOptsRecord}>加载更多</Button>}
+    </div>
   );
 };
 
