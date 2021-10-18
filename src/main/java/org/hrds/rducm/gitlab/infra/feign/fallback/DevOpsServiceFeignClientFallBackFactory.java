@@ -66,6 +66,11 @@ public class DevOpsServiceFeignClientFallBackFactory implements FallbackFactory<
             public ResponseEntity<Long> getAppGroupIdByProjectId(Long projectId) {
                 throw new CommonException("error.feign.fallback");
             }
+
+            @Override
+            public ResponseEntity<List<C7nAppServiceVO>> queryAppByProjectIds(Long projectId, List<Long> projectIds) {
+                throw new CommonException("error.feign.fallback");
+            }
         };
     }
 }

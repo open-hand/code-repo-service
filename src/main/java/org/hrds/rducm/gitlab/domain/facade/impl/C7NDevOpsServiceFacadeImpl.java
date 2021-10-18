@@ -261,4 +261,14 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
             return null;
         }
     }
+
+    @Override
+    public List<C7nAppServiceVO> queryAppByProjectIds(Long projectId, List<Long> projectIds) {
+        ResponseEntity<List<C7nAppServiceVO>> listResponseEntity = devOpsServiceFeignClient.queryAppByProjectIds(projectId, projectIds);
+        if (listResponseEntity.getBody() != null) {
+            return listResponseEntity.getBody();
+        } else {
+            return null;
+        }
+    }
 }
