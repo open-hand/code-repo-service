@@ -79,6 +79,7 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
                     return;
                 }
                 // group
+                LOGGER.debug(">>record Id is {}", record.getId());
                 permissionRepairMap.get(record.getType() + RepoConstants.GITLAB_PERMISSION_HANDLER).gitlabPermissionRepair(record);
             }
         });

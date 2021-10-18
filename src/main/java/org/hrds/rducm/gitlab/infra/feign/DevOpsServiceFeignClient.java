@@ -103,4 +103,9 @@ public interface DevOpsServiceFeignClient {
     @GetMapping(value = "/v1/projects/{project_id}")
     ResponseEntity<Long> getAppGroupIdByProjectId(@PathVariable(value = "project_id") Long projectId);
 
+
+    @PostMapping(value = "/v1/projects/{project_id}/app_service/by_project_ids")
+    ResponseEntity<List<C7nAppServiceVO>> queryAppByProjectIds(@PathVariable(value = "project_id") Long projectId,
+                                                                    @RequestBody List<Long> projectIds);
+
 }
