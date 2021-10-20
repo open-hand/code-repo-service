@@ -138,7 +138,7 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             BigDecimal authorizedRepositoryCountBigD = Optional.ofNullable(viewDTO.getAuthorizedRepositoryCount()).map(BigDecimal::new).orElse(BigDecimal.ZERO);
             //根据角色来判断授权的服务的百分比
             C7nUserVO userVO = c7NBaseServiceFacade.detailC7nUserOnProjectLevel(projectId, v.getUserId());
-            if (userVO.isProjectAdmin()) {
+            if (userVO != null && userVO.isProjectAdmin()) {
                 viewDTO.setAuthorizedRepositoryCount(viewDTO.getAllRepositoryCount());
                 authorizedRepositoryCountBigD = new BigDecimal(viewDTO.getAuthorizedRepositoryCount());
             } else {
@@ -154,7 +154,6 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
                     authorizedRepositoryCountBigD = new BigDecimal(viewDTO.getAuthorizedRepositoryCount());
                 }
             }
-
             if (allRepositoryCountBigD.compareTo(BigDecimal.ZERO) != 0) {
                 viewDTO.setAuthorizedRepositoryPercent(authorizedRepositoryCountBigD.divide(allRepositoryCountBigD, 4, BigDecimal.ROUND_HALF_UP));
             }
