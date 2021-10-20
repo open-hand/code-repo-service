@@ -329,8 +329,13 @@ public class RdmMemberChangeSagaHandler {
                         }
                         //新增的角色
                         String roleType = fetchProjectRoleLabel(userMemberRoleList, containsGitlabOwner);
+                        //如果用户新增的角色是项目成员，但是还包含其他owner的权限则roleType为default(这里主要考虑带owner标签的自定义角色)
+                        if (!CollectionUtils.isEmpty(gitlabGroupMemberVO.getRoleLabels())) {
+                            if (gitlabGroupMemberVO.getDeleteRoleLabels().contains(RoleLabelEnum.GITLAB_OWNER.value())) {
+                                roleType = RoleLabelEnum.DEFAULT.value();
+                            }
+                        }
                         RoleLabelEnum roleLabelEnum = Optional.ofNullable(EnumUtils.getEnum(RoleLabelEnum.class, roleType)).orElseThrow(IllegalArgumentException::new);
-
                         switch (roleLabelEnum) {
                             case PROJECT_MEMBER:
                                 // 设置角色为项目成员, 删除权限
@@ -421,7 +426,7 @@ public class RdmMemberChangeSagaHandler {
             } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value()) && containsGitlabOwner) {
                 return RoleLabelEnum.PROJECT_MEMBER.value();
             } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value()) && !containsGitlabOwner) {
-                return RoleLabelEnum.DEFAULT.value();
+                return RoleLabelEnum.PROJECT_MEMBER.value();
             } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_DEVELOPER.value()) && containsGitlabOwner) {
                 return RoleLabelEnum.PROJECT_MEMBER.value();
             } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_DEVELOPER.value()) && !containsGitlabOwner) {
