@@ -196,6 +196,10 @@ public class RdmMemberChangeSagaHandler {
             } else {
                 throw new IllegalArgumentException("record status is invalid");
             }
+            RdmMember rdmMember = rdmMemberRepository.selectByPrimaryKey(m.getId());
+            if (rdmMember == null) {
+                return;
+            }
 
             // <2.2> 新增或更新成员至gitlab
             try {
