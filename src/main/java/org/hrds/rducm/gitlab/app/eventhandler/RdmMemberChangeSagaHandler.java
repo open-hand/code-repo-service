@@ -335,7 +335,7 @@ public class RdmMemberChangeSagaHandler {
                         String roleType = fetchProjectRoleLabel(userMemberRoleList, containsGitlabOwner);
                         //如果用户新增的角色是项目成员，但是还包含其他owner的权限则roleType为default(这里主要考虑带owner标签的自定义角色)
                         if (!CollectionUtils.isEmpty(gitlabGroupMemberVO.getRoleLabels())) {
-                            if (gitlabGroupMemberVO.getDeleteRoleLabels().contains(RoleLabelEnum.GITLAB_OWNER.value())) {
+                            if (gitlabGroupMemberVO.getRoleLabels().contains(RoleLabelEnum.GITLAB_OWNER.value())) {
                                 roleType = RoleLabelEnum.DEFAULT.value();
                             }
                         }
