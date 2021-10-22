@@ -136,6 +136,24 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             viewDTO.setRoleNames(c7nUserWithRolesVO.getRoles().stream().map(C7nRoleVO::getName).collect(Collectors.toList()));
 
             BigDecimal authorizedRepositoryCountBigD = Optional.ofNullable(viewDTO.getAuthorizedRepositoryCount()).map(BigDecimal::new).orElse(BigDecimal.ZERO);
+            //根据角色来判断授权的服务的百分比
+            C7nUserVO userVO = c7NBaseServiceFacade.detailC7nUserOnProjectLevel(projectId, v.getUserId());
+            if (userVO != null && userVO.isProjectAdmin()) {
+                viewDTO.setAuthorizedRepositoryCount(viewDTO.getAllRepositoryCount());
+                authorizedRepositoryCountBigD = new BigDecimal(viewDTO.getAuthorizedRepositoryCount());
+            } else {
+                //如果拥有group层级的权限
+                RdmMember rdmMember = new RdmMember();
+                rdmMember.setProjectId(projectId);
+                rdmMember.setUserId(v.getUserId());
+                rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+                rdmMember.setSyncGitlabFlag(Boolean.TRUE);
+                List<RdmMember> rdmMembers = rdmMemberMapper.select(rdmMember);
+                if (!CollectionUtils.isEmpty(rdmMembers)) {
+                    viewDTO.setAuthorizedRepositoryCount(viewDTO.getAllRepositoryCount());
+                    authorizedRepositoryCountBigD = new BigDecimal(viewDTO.getAuthorizedRepositoryCount());
+                }
+            }
             if (allRepositoryCountBigD.compareTo(BigDecimal.ZERO) != 0) {
                 viewDTO.setAuthorizedRepositoryPercent(authorizedRepositoryCountBigD.divide(allRepositoryCountBigD, 4, BigDecimal.ROUND_HALF_UP));
             }
