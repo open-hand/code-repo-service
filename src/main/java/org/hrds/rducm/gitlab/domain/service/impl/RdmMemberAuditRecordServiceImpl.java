@@ -208,7 +208,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         Integer appGroupId = getAppServiceGroupId(projectId);
 
         //在组里面有权限的用户
-        List<GitlabMember> gitlabGroupMembers = new ArrayList<>();
+        Set<GitlabMember> gitlabGroupMembers = new HashSet<>();
         //审计组的权限
         List<RdmMemberAuditRecord> rdmGroupMemberAuditRecords = compareGitlabGroupMembers(organizationId, projectId, appGroupId, gitlabGroupMembers);
         //审计项目下应用服务的权限
@@ -220,7 +220,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         return rdmMemberAuditRecords;
     }
 
-    private List<RdmMemberAuditRecord> compareGitlabProjectMembers(Long organizationId, Long projectId, Integer appGroupId, List<GitlabMember> gitlabGroupMembers) {
+    private List<RdmMemberAuditRecord> compareGitlabProjectMembers(Long organizationId, Long projectId, Integer appGroupId, Set<GitlabMember> gitlabGroupMembers) {
         // 获取项目下所有代码库id和Gitlab项目id  导入失败的项目有代码库id(应用服务id) 没有gProjectId
         Map<Long, Long> appServiceIdMap = c7NDevOpsServiceFacade.listActiveC7nAppServiceIdsMapOnProjectLevel(projectId);
         //审计应用服务的权限
@@ -247,7 +247,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         return appGroupIdByProjectId.intValue();
     }
 
-    private List<RdmMemberAuditRecord> compareGitlabGroupMembers(Long organizationId, Long projectId, Integer appGroupId, List<GitlabMember> gitlabGroupMembers) {
+    private List<RdmMemberAuditRecord> compareGitlabGroupMembers(Long organizationId, Long projectId, Integer appGroupId, Set<GitlabMember> gitlabGroupMembers) {
         List<GitlabMember> gitlabMembers = getGitlabGroupMembers(appGroupId);
         gitlabGroupMembers.addAll(gitlabMembers);
         //查询数据库的权限
@@ -354,7 +354,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                                                                     Long repositoryId,
                                                                     Integer glProjectId,
                                                                     Integer appGroupId,
-                                                                    List<GitlabMember> gitlabGroupMemberList) {
+                                                                    Set<GitlabMember> gitlabGroupMemberList) {
         // 判断一下gitlab是否存在该仓库, 避免报错
         Project project = gitlabAdminApi.getProject(glProjectId);
         if (project == null) {

@@ -50,7 +50,6 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
         String role = getUserRole(c7nUserVO);
         //4.根据用户角色来修复数据
         permissionRepair(role, rdmMemberAuditRecord);
-
         // 5. 回写数据
         rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
 
