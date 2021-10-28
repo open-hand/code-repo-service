@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-bind */
 /* eslint-disable max-len */
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
