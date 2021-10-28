@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
 import { message } from 'choerodon-ui';
-import { Modal } from 'choerodon-ui/pro';
+import { Modal, ModalProvider } from 'choerodon-ui/pro';
 import { Header, Choerodon, axios, HeaderButtons } from '@choerodon/boot';
 import BatchApprove from './batch-approval';
 import AddMember from './add-member';
@@ -118,6 +118,7 @@ const EnvModals = observer((props) => {
       style: modalStyle,
       drawer: true,
       title: formatMessage({ id: `${strId}` }),
+      closeOnLocationChange: true,
       children: <AddMember
         openType={openType}
         refresh={refresh}
@@ -407,17 +408,19 @@ const EnvModals = observer((props) => {
   }
 
   return (
-    <Header>
-      <HeaderButtons items={getButtons()} />
-      {
-        hasPermission && <ExportAuthority
-          formatMessage={formatMessage}
-          exportModalVisible={exportModalVisible}
-          setExportModalVisible={setExportModalVisible}
-          psSetDs={psSetDs}
-        />
-      }
-    </Header>
+    <ModalProvider location={window.location}>
+      <Header>
+        <HeaderButtons items={getButtons()} />
+        {
+          hasPermission && <ExportAuthority
+            formatMessage={formatMessage}
+            exportModalVisible={exportModalVisible}
+            setExportModalVisible={setExportModalVisible}
+            psSetDs={psSetDs}
+          />
+        }
+      </Header>
+    </ModalProvider>
   );
 });
 
