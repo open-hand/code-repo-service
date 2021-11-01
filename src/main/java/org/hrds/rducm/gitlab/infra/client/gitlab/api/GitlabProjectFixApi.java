@@ -106,6 +106,9 @@ public class GitlabProjectFixApi {
         } catch (GitLabApiException e) {
             if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
                 return null;
+            } else if (e.getHttpStatus() == HttpStatus.BAD_REQUEST.value()) {
+                LOGGER.info(">>>>>>>>>>>>>>>Bad Request:{},{},{}>>>>>>>>>>>>>>>>>", (Integer) projectIdOrPath, userId, accessLevel);
+                return null;
             } else {
                 throw new GitlabClientException(e, e.getMessage());
 
