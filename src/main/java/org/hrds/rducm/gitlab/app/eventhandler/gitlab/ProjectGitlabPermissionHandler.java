@@ -1,19 +1,25 @@
 package org.hrds.rducm.gitlab.app.eventhandler.gitlab;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.gitlab4j.api.models.Member;
+import org.hrds.rducm.gitlab.app.eventhandler.gitlab.processor.RolePermissionProcessor;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
+import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupFixApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectFixApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
 import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -24,6 +30,7 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class ProjectGitlabPermissionHandler extends AbstractGitlabPermissionHandler {
 
+    private Logger LOGGER = LoggerFactory.getLogger(ProjectGitlabPermissionHandler.class);
 
     @Autowired
     private RdmMemberRepository rdmMemberRepository;
@@ -39,6 +46,40 @@ public class ProjectGitlabPermissionHandler extends AbstractGitlabPermissionHand
 
     @Autowired
     private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
+
+    @Autowired
+    private Map<String, RolePermissionProcessor> permissionProcessorMap;
+
+    @Autowired
+    private C7nDevOpsServiceFacade c7nDevOpsServiceFacade;
+
+    @Override
+    public void permissionRepair(String role, RdmMemberAuditRecord rdmMemberAuditRecord) {
+        //校验 在项目层 如果 glProjectId为null 则直接同步
+        if (rdmMemberAuditRecord.getGlProjectId() == null) {
+            rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
+            return;
+        }
+        RdmMember dbRdmMember = getDbRdmMember(rdmMemberAuditRecord);
+        if (rdmMemberAuditRecord.getGlUserId() == null && dbRdmMember == null) {
+            rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
+            return;
+        }
+        Member projectGlMember = null;
+        if (rdmMemberAuditRecord.getGlUserId() != null) {
+            projectGlMember = queryProjectGlMember(rdmMemberAuditRecord);
+        }
+        if (projectGlMember == null) {
+            LOGGER.warn("group member not exist user id is {}", rdmMemberAuditRecord.getUserId());
+        }
+
+        permissionProcessorMap.get(role + "PermissionProcessor").repairProjectPermissionByRole(projectGlMember, dbRdmMember, rdmMemberAuditRecord);
+//        permissionProcessorMap.get(role).repairGitlabPermissionByRole();
+    }
+
+    private Member queryProjectGlMember(RdmMemberAuditRecord rdmMemberAuditRecord) {
+        return gitlabProjectFixApi.getMember(rdmMemberAuditRecord.getGlProjectId(), rdmMemberAuditRecord.getGlUserId());
+    }
 
     @Override
     protected RdmMember getDbRdmMember(RdmMemberAuditRecord rdmMemberAuditRecord) {
@@ -194,4 +235,5 @@ public class ProjectGitlabPermissionHandler extends AbstractGitlabPermissionHand
         rdmMember.setType(AuthorityTypeEnum.PROJECT.getValue());
         rdmMemberRepository.insert(rdmMember);
     }
+
 }

@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.infra.client.gitlab.api;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.models.Group;
 import org.gitlab4j.api.models.Member;
