@@ -211,7 +211,7 @@ const EnvModals = observer((props) => {
   function handleSyncOpenModal() {
     Modal.open({
       title: formatMessage({ id: 'infra.button.batch.sync' }),
-      children: '确认要全部将【未同步】状态用户的代码权限与GitLab仓库内用户的权限进行同步吗？',
+      children: '确认将全部【未同步】状态用户的代码权限与GitLab仓库内用户的权限进行同步吗？',
       onOk: handleSync,
       key: SyncKey,
     });
