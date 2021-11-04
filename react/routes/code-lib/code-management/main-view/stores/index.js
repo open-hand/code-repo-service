@@ -40,6 +40,7 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
   const { appServiceIds } = queryString.parse(location.search);
 
   const [branchAppId, setBranchApp] = useState(undefined);
+  const [executionDate, setExecutionDate] = useState(undefined);
 
   const intlPrefix = 'infra';
   const branchServiceDs = useMemo(() => new DataSet(BranchServiceDs({
@@ -58,7 +59,6 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
   const listViewDs = useMemo(() => new DataSet(ListViewDataSet(formatMessage, organizationId, projectId)), [formatMessage, projectId]); // 操作日志
   const overStores = useStore();
 
-  const [executionDate, setExecutionDate] = useState(undefined);
   const securityAuditDs = useMemo(() => new DataSet(SecurityAuditDS(intlPrefix, formatMessage, organizationId, projectId)), [formatMessage, projectId]);
 
   const value = {
