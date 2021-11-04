@@ -8,6 +8,8 @@ import org.gitlab4j.api.models.Group;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClientWrapper;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Repository;
 public class GitlabGroupFixApi {
 
     private final Gitlab4jClientWrapper gitlab4jClient;
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitlabGroupFixApi.class);
 
     public GitlabGroupFixApi(Gitlab4jClientWrapper gitlab4jClient) {
         this.gitlab4jClient = gitlab4jClient;
@@ -101,12 +104,14 @@ public class GitlabGroupFixApi {
                     .removeMember(glGroupId, glUserId);
         } catch (GitLabApiException e) {
             if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                LOGGER.error("remove gitlab member 404 :", e.getMessage());
                 return;
-            }
-            if (e.getHttpStatus() == HttpStatus.FORBIDDEN.value()) {
+            } else if (e.getHttpStatus() == HttpStatus.FORBIDDEN.value()) {
+                LOGGER.error("remove gitlab member 403 :", e.getMessage());
                 return;
             } else {
-                throw new GitlabClientException(e, e.getMessage());
+                LOGGER.error("remove gitlab member :", e.getMessage());
+                return;
             }
         }
     }

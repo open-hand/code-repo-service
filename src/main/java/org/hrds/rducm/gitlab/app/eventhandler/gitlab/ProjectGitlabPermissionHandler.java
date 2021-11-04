@@ -52,6 +52,10 @@ public class ProjectGitlabPermissionHandler extends AbstractGitlabPermissionHand
         RdmMember dbRdmMember = getDbRdmMember(rdmMemberAuditRecord);
         if (rdmMemberAuditRecord.getGlUserId() == null && dbRdmMember == null) {
             rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
+            //如果choerodon为null 直接删除这个账户
+            if (rdmMemberAuditRecord.getGlProjectId() != null && rdmMemberAuditRecord.getGlUserId() != null) {
+                gitlabProjectFixApi.removeMember(rdmMemberAuditRecord.getGlProjectId(), rdmMemberAuditRecord.getGlUserId());
+            }
             return;
         }
         Member projectGlMember = null;

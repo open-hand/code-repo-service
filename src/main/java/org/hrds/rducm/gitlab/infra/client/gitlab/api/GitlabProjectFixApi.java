@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.infra.client.gitlab.api;
 
-import java.io.DataInput;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -147,12 +146,14 @@ public class GitlabProjectFixApi {
                     .removeMember(projectId, userId);
         } catch (GitLabApiException e) {
             if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                LOGGER.error("remove gitlab member 404 :", e.getMessage());
                 return;
-            }
-            if (e.getHttpStatus() == HttpStatus.FORBIDDEN.value()) {
+            } else if (e.getHttpStatus() == HttpStatus.FORBIDDEN.value()) {
+                LOGGER.error("remove gitlab member 403 :", e.getMessage());
                 return;
             } else {
-                throw new GitlabClientException(e, e.getMessage());
+                LOGGER.error("remove gitlab member :", e.getMessage());
+                return;
             }
         }
     }

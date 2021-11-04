@@ -36,10 +36,6 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
         //2.获得当前权限的层级
         //3.获得当前审计数据用户的角色
         C7nUserVO c7nUserVO = c7nBaseServiceFacade.detailC7nUserOnProjectLevel(rdmMemberAuditRecord.getProjectId(), rdmMemberAuditRecord.getUserId());
-        if (c7nUserVO == null) {
-            rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
-            return;
-        }
         String role = getUserRole(c7nUserVO);
         //4.根据用户角色来修复数据
         permissionRepair(role, rdmMemberAuditRecord);
@@ -50,6 +46,9 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
     protected abstract void permissionRepair(String role, RdmMemberAuditRecord rdmMemberAuditRecord);
 
     private String getUserRole(C7nUserVO c7nUserVO) {
+        if (c7nUserVO == null) {
+            return UserRoleEnum.NON_PROJECT_MEMBER.getValue();
+        }
         Boolean isOrgAdmin = c7nBaseServiceFacade.checkIsOrgAdmin(c7nUserVO.getOrganizationId(), c7nUserVO.getId());
         if (isProjectMember(c7nUserVO)) {
             if (isOrgAdmin) {
