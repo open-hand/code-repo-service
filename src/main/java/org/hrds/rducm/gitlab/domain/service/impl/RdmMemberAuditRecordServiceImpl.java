@@ -222,7 +222,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
 
     private List<RdmMemberAuditRecord> compareGitlabProjectMembers(Long organizationId, Long projectId, Integer appGroupId, Set<GitlabMember> gitlabGroupMembers) {
         // 获取项目下所有代码库id和Gitlab项目id  导入失败的项目有代码库id(应用服务id) 没有gProjectId
-        Map<Long, Long> appServiceIdMap = c7NDevOpsServiceFacade.listActiveC7nAppServiceIdsMapOnProjectLevel(projectId);
+        Map<Long, Long> appServiceIdMap = c7NDevOpsServiceFacade.listBuiltInActiveC7nAppServiceIdsMapOnProjectLevel(projectId);
         //审计应用服务的权限
         List<RdmMemberAuditRecord> list = appServiceIdMap.entrySet()
                 .stream()
