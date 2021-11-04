@@ -309,6 +309,7 @@ const EnvModals = observer((props) => {
           name: '手动审计',
           icon: 'playlist_add_check',
           handler: handleBatchAuditModalOpen,
+          permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
         }, {
           name: '批量修复',
           icon: 'person_add-o',
