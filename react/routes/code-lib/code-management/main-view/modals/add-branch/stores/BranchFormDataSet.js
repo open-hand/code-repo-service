@@ -1,8 +1,6 @@
-// import { axios } from '@choerodon/boot';
-// import map from 'lodash/map';
-// import getTablePostData from '@/utils/getTablePostData';
 const intlPrefix = 'infra.codeManage';
-export default ((formatMessage, projectId, repositoryId, branchOptions) => ({
+// eslint-disable-next-line import/no-anonymous-default-export
+export default ((formatMessage, projectId, repositoryId) => ({
   autoQuery: false,
   transport: {
     create: ({ data: editData }) => {
@@ -25,7 +23,11 @@ export default ((formatMessage, projectId, repositoryId, branchOptions) => ({
       label: formatMessage({ id: `${intlPrefix}.branch.protected` }),
       textField: 'name',
       valueField: 'name',
-      options: branchOptions,
+      // options: branchOptions,
+      lookupAxiosConfig: ({ dataSet, record, params }) => ({
+        url: `/rducm/v1/projects/${projectId}/gitlab/repositories/${repositoryId}/branches?excludeProtectedFlag=true`,
+        method: 'get',
+      }),
     }, // 受保护的分支
     {
       name: 'pushAccessLevel',
