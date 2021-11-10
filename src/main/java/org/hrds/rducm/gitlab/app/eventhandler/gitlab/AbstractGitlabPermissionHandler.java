@@ -5,11 +5,10 @@ import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
-import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupFixApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
-import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
+import org.hrds.rducm.gitlab.infra.enums.UserRoleEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,8 +20,6 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
     @Autowired
     private C7nBaseServiceFacade c7nBaseServiceFacade;
 
-    @Autowired
-    private C7nDevOpsServiceFacade c7nDevOpsServiceFacade;
 
     @Autowired
     private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
@@ -32,48 +29,55 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
 
 
     public void gitlabPermissionRepair(RdmMemberAuditRecord rdmMemberAuditRecord) {
+        //1.常规性数据校验
+        if (!checkStatus(rdmMemberAuditRecord)) {
+            return;
+        }
+        //2.获得当前权限的层级
+        //3.获得当前审计数据用户的角色
+        C7nUserVO c7nUserVO = c7nBaseServiceFacade.detailC7nUserOnProjectLevel(rdmMemberAuditRecord.getProjectId(), rdmMemberAuditRecord.getUserId());
+        String role = getUserRole(c7nUserVO);
+        //4.根据用户角色来修复数据
+        permissionRepair(role, rdmMemberAuditRecord);
+        // 5. 回写数据
+        rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
+    }
+
+    protected abstract void permissionRepair(String role, RdmMemberAuditRecord rdmMemberAuditRecord);
+
+    private String getUserRole(C7nUserVO c7nUserVO) {
+        if (c7nUserVO == null) {
+            return UserRoleEnum.NON_PROJECT_MEMBER.getValue();
+        }
+        Boolean isOrgAdmin = c7nBaseServiceFacade.checkIsOrgAdmin(c7nUserVO.getOrganizationId(), c7nUserVO.getId());
+        if (isProjectMember(c7nUserVO)) {
+            if (isOrgAdmin) {
+                return UserRoleEnum.ORGANIZATION_ADMIN.getValue();
+            } else if (c7nUserVO.isProjectAdmin()) {
+                return UserRoleEnum.PROJECT_ADMIN.getValue();
+            } else {
+                return UserRoleEnum.PROJECT_MEMBER.getValue();
+            }
+        } else {
+            return UserRoleEnum.NON_PROJECT_MEMBER.getValue();
+        }
+    }
+
+    private boolean checkStatus(RdmMemberAuditRecord rdmMemberAuditRecord) {
         Long userId = rdmMemberAuditRecord.getUserId();
-        Integer glProjectId = rdmMemberAuditRecord.getGlProjectId();
         //如果userId为null 猪齿鱼导入用户失败，导致猪齿鱼里没有这个用户
-        if (Objects.isNull(userId) || Objects.isNull(glProjectId)) {
+        if (Objects.isNull(userId)) {
             //如果userId不存在，这个数据就是异常的数据，直接同步
             rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
-            return;
+            return Boolean.FALSE;
         }
         Integer glUserId = getGlUserId(rdmMemberAuditRecord, userId);
         if (Objects.isNull(glUserId)) {
             rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
-            return;
+            return Boolean.FALSE;
         }
-        C7nDevopsProjectVO c7nDevopsProjectVO = c7nDevOpsServiceFacade.detailDevopsProjectById(rdmMemberAuditRecord.getProjectId());
-        Integer glGroupId = Math.toIntExact(c7nDevopsProjectVO.getGitlabGroupId());
-        //查询choerodon权限
-        RdmMember dbRdmMember = getDbRdmMember(rdmMemberAuditRecord);
-        Boolean isOrgAdmin = c7nBaseServiceFacade.checkIsOrgAdmin(rdmMemberAuditRecord.getOrganizationId(), userId);
-        C7nUserVO c7nUserVO = c7nBaseServiceFacade.detailC7nUserOnProjectLevel(rdmMemberAuditRecord.getProjectId(), userId);
-        //查询用户在gitlab中group的权限
-        Member groupGlMember = queryGroupGlMember(glGroupId, glUserId);
-        //修复组织管理员
-        if (isOrgAdmin) {
-            orgAdminPermissionRepair(dbRdmMember, rdmMemberAuditRecord, groupGlMember, c7nUserVO);
-        }
-        //修复项目所有者权限
-        projectOwnerMemberPermissionRepair(rdmMemberAuditRecord, c7nUserVO, dbRdmMember, groupGlMember);
-        //修复项目用户权限
-        projectMemberPermissionRepair(rdmMemberAuditRecord, dbRdmMember, groupGlMember, c7nUserVO);
-        //修复项目外成员权限
-        nonProjectMemberPermissionRepair(rdmMemberAuditRecord, dbRdmMember, groupGlMember, c7nUserVO);
-        rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
+        return Boolean.TRUE;
     }
-
-
-    protected abstract void nonProjectMemberPermissionRepair(RdmMemberAuditRecord rdmMemberAuditRecord, RdmMember rdmMember, Member groupGlMember, C7nUserVO c7nUserVO);
-
-    protected abstract void projectMemberPermissionRepair(RdmMemberAuditRecord rdmMemberAuditRecord, RdmMember rdmMember, Member groupGlMember, C7nUserVO c7nUserVO);
-
-    protected abstract void projectOwnerMemberPermissionRepair(RdmMemberAuditRecord rdmMemberAuditRecord, C7nUserVO c7nUserVO, RdmMember rdmMember, Member groupGlMember);
-
-    protected abstract void orgAdminPermissionRepair(RdmMember rdmMember, RdmMemberAuditRecord rdmMemberAuditRecord, Member member, C7nUserVO c7nUserVO);
 
 
     protected boolean isProjectMember(C7nUserVO c7nUserVO) {
@@ -90,9 +94,6 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
         }
     }
 
-    private Member queryGroupGlMember(Integer glGroupId, Integer glUserId) {
-        return gitlabGroupFixApi.getMember(glGroupId, glUserId);
-    }
 
     private Integer getGlUserId(RdmMemberAuditRecord rdmMemberAuditRecord, Long userId) {
         if (rdmMemberAuditRecord.getGlUserId() == null) {

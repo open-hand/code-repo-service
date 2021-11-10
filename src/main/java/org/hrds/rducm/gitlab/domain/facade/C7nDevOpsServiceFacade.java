@@ -161,4 +161,6 @@ public interface C7nDevOpsServiceFacade {
 
 
     List<C7nAppServiceVO> queryAppByProjectIds(Long projectId, List<Long> projectIds);
+
+    Map<Long, Long> listBuiltInActiveC7nAppServiceIdsMapOnProjectLevel(Long projectId);
 }
