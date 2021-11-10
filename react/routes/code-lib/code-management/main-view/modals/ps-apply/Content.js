@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite';
 import { Form, Select, TextField } from 'choerodon-ui/pro';
 import { Choerodon, axios } from '@choerodon/boot';
 import { useAddMemberStore } from './stores';
+import { message } from 'choerodon-ui';
 import './index.less';
 
 export default observer(() => {
@@ -18,27 +19,31 @@ export default observer(() => {
   const record = formDs.current;
   if (!record) return;
 
-  modal.handleOk(async () => {
+  async function handleOk () {
     try {
-      if (await formDs.submit() !== false) {
-        refresh();
-        return true;
+      const res = await formDs.submit();
+      if (res && res?.failed) {
+        message.error(res?.message);
+        return false;
       }
-      return false;
+      refresh();
+      return true;
     } catch (e) {
       Choerodon.handleResponseError(e);
       return false;
     }
-  });
+  }
+
+  modal.handleOk(handleOk);
 
   // eslint-disable-next-line
-  function getClusterOptionProp({ record }) {
+  function getClusterOptionProp ({ record }) {
     return {
       disabled: Number(record.data.value.substring(1)) >= 50 || record.data.value === formDs.current.get('oldAccessLevel'),
     };
   }
 
-  function rendererOpt(data) {
+  function rendererOpt (data) {
     return (
       <div style={{ width: '100%' }}>
         {data.text && <span className="code-lib-management-ps-apply-old-level" >{formDs.current.get('applicantType') === 'MEMBER_PERMISSION_CHANGE' ? `${formDs.current.getField('oldAccessLevel').getText()} -> ` : ''}</span>}
@@ -46,7 +51,7 @@ export default observer(() => {
       </div>);
   }
 
-  function getLevelOption(data) {
+  function getLevelOption (data) {
     return (
       // <Tooltip placement="left" title={`${record.get('email')}`}>
       rendererOpt(data)
@@ -54,7 +59,7 @@ export default observer(() => {
     );
   }
 
-  async function handleSelect(value) {
+  async function handleSelect (value) {
     await axios.post(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/member-applicants/self/detect-applicant-type?repositoryId=${value}`)
       .then((response) => {
         if (response.failed) {
@@ -71,13 +76,13 @@ export default observer(() => {
       });
   }
   // eslint-disable-next-line no-shadow
-  function optionsFilter(record) {
+  function optionsFilter (record) {
     const flag = !(Number(record.data.value.substring(1)) >= 50 || record.data.value === formDs.current.get('oldAccessLevel'));
     return flag;
   }
 
   // eslint-disable-next-line no-shadow
-  function searchMatcher({ record, text, textField }) {
+  function searchMatcher ({ record, text, textField }) {
     const isTrue = record.get(textField).indexOf(text) !== -1 || record.get('repositoryCode').indexOf(text) !== -1;
     return isTrue;
   }

@@ -1,9 +1,10 @@
+/* eslint-disable react/jsx-no-bind */
 /* eslint-disable max-len */
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
 import { message } from 'choerodon-ui';
-import { Modal } from 'choerodon-ui/pro';
+import { Modal, ModalProvider } from 'choerodon-ui/pro';
 import { Header, Choerodon, axios, HeaderButtons } from '@choerodon/boot';
 import BatchApprove from './batch-approval';
 import AddMember from './add-member';
@@ -118,6 +119,7 @@ const EnvModals = observer((props) => {
       style: modalStyle,
       drawer: true,
       title: formatMessage({ id: `${strId}` }),
+      closeOnLocationChange: true,
       children: <AddMember
         openType={openType}
         refresh={refresh}
@@ -209,7 +211,7 @@ const EnvModals = observer((props) => {
   function handleSyncOpenModal() {
     Modal.open({
       title: formatMessage({ id: 'infra.button.batch.sync' }),
-      children: '确认要全部将【未同步】状态用户的代码权限与GitLab仓库内用户的权限进行同步吗？',
+      children: '确认将全部【未同步】状态用户的代码权限与GitLab仓库内用户的权限进行同步吗？',
       onOk: handleSync,
       key: SyncKey,
     });
@@ -307,6 +309,7 @@ const EnvModals = observer((props) => {
           name: '手动审计',
           icon: 'playlist_add_check',
           handler: handleBatchAuditModalOpen,
+          permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
         }, {
           name: '批量修复',
           icon: 'person_add-o',
@@ -407,17 +410,19 @@ const EnvModals = observer((props) => {
   }
 
   return (
-    <Header>
-      <HeaderButtons items={getButtons()} />
-      {
-        hasPermission && <ExportAuthority
-          formatMessage={formatMessage}
-          exportModalVisible={exportModalVisible}
-          setExportModalVisible={setExportModalVisible}
-          psSetDs={psSetDs}
-        />
-      }
-    </Header>
+    <ModalProvider location={window.location}>
+      <Header>
+        <HeaderButtons items={getButtons()} />
+        {
+          hasPermission && <ExportAuthority
+            formatMessage={formatMessage}
+            exportModalVisible={exportModalVisible}
+            setExportModalVisible={setExportModalVisible}
+            psSetDs={psSetDs}
+          />
+        }
+      </Header>
+    </ModalProvider>
   );
 });
 

@@ -21,6 +21,7 @@ import org.hrds.rducm.gitlab.app.async.RdmMemberQueryHelper;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.entity.payload.GroupMemberPayload;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
@@ -29,6 +30,7 @@ import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupFixApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
 import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
@@ -727,6 +729,23 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         rdmMember.setProjectId(projectId);
         return rdmMemberRepository.selectOne(rdmMember);
     }
+
+
+    @Override
+    public void insertGroupMember(RdmMemberAuditRecord rdmMemberAuditRecord) {
+        RdmMember record = new RdmMember();
+        record.setSyncGitlabFlag(true);
+        record.setGlAccessLevel(AccessLevel.OWNER.toValue());
+        record.setProjectId(rdmMemberAuditRecord.getProjectId());
+        record.setUserId(rdmMemberAuditRecord.getUserId());
+        record.setOrganizationId(rdmMemberAuditRecord.getOrganizationId());
+        record.setGlProjectId(rdmMemberAuditRecord.getGlProjectId());
+        record.setGlUserId(rdmMemberAuditRecord.getGlUserId());
+        record.setType(AuthorityTypeEnum.GROUP.getValue());
+        record.setgGroupId(rdmMemberAuditRecord.getgGroupId());
+        rdmMemberRepository.insert(record);
+    }
+
 
     /**
      * 批量预新增或修改, 使用一个新事务
