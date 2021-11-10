@@ -417,7 +417,6 @@ const EnvModals = observer((props) => {
   }
 
   return (
-    <ModalProvider location={window.location}>
       <Header>
         <HeaderButtons items={getButtons()} />
         {
@@ -429,7 +428,6 @@ const EnvModals = observer((props) => {
           />
         }
       </Header>
-    </ModalProvider>
   );
 });
 
