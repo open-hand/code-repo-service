@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
 import { message } from 'choerodon-ui';
-import { Modal, ModalProvider } from 'choerodon-ui/pro';
+import { Modal } from 'choerodon-ui/pro';
+import { useUnmount } from 'ahooks';
 import { Header, Choerodon, axios, HeaderButtons } from '@choerodon/boot';
 import BatchApprove from './batch-approval';
 import AddMember from './add-member';
@@ -17,7 +18,7 @@ import ExportAuthority from './export-authority';
 import Apis from '../../apis';
 import { FixModal, AuditModal } from './ps-audit';
 
-
+let addmemberModal;
 const modalKey = Modal.key();
 const SyncKey = Modal.key();
 const deleteKey = Modal.key();
@@ -52,6 +53,12 @@ const EnvModals = observer((props) => {
 
   const { type } = props;
   const [exportModalVisible, setExportModalVisible] = useState(false);
+
+  useUnmount(() => {
+    if (addmemberModal) {
+      addmemberModal.close();
+    }
+  });
 
   async function fetchExecutionDate() {
     try {
@@ -114,7 +121,7 @@ const EnvModals = observer((props) => {
     } else {
       strId = 'infra.add.outsideMember';
     }
-    Modal.open({
+    addmemberModal = Modal.open({
       key: modalKey,
       style: modalStyle,
       drawer: true,
@@ -410,7 +417,6 @@ const EnvModals = observer((props) => {
   }
 
   return (
-    <ModalProvider location={window.location}>
       <Header>
         <HeaderButtons items={getButtons()} />
         {
@@ -422,7 +428,6 @@ const EnvModals = observer((props) => {
           />
         }
       </Header>
-    </ModalProvider>
   );
 });
 
