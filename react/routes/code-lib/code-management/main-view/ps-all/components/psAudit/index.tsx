@@ -35,7 +35,6 @@ const PsAudit = observer(() => {
   async function fetchExecutionDate() {
     try {
       const res = await Apis.fetchExecutionDate(organizationId, projectId);
-      debugger
       if (res.failed) {
         Choerodon.prompt(res.message);
         return false;
