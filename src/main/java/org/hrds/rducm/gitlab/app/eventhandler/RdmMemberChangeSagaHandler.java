@@ -206,6 +206,7 @@ public class RdmMemberChangeSagaHandler {
                 Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
 
                 // <2.3> 回写数据库
+                m.setObjectVersionNumber(rdmMember.getObjectVersionNumber());
                 iRdmMemberService.updateMemberAfter(m, glMember);
 
                 // <2.4> 发送事件
@@ -218,6 +219,7 @@ public class RdmMemberChangeSagaHandler {
                 // 回写数据库错误消息
                 logger.error(e.getMessage(), e);
                 m.setSyncGitlabErrorMsg(e.getMessage());
+                m.setObjectVersionNumber(rdmMember.getObjectVersionNumber());
                 rdmMemberRepository.updateOptional(m, RdmMember.FIELD_SYNC_GITLAB_ERROR_MSG);
             }
         });
@@ -287,7 +289,7 @@ public class RdmMemberChangeSagaHandler {
 
     }
 
-    @SagaTask(code = SagaTaskCodeConstants.BATCH_ADD_GITLAB_MEMBER,
+    @SagaTask(code = SagaTaskCodeConstants.PROJECT_BATCH_AUDIT_FIX,
             description = "项目下成员权限修复",
             sagaCode = SagaTopicCodeConstants.PROJECT_BATCH_AUDIT_FIX,
             maxRetryCount = 3, seq = 1)
