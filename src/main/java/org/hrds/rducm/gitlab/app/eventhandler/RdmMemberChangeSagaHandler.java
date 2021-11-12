@@ -150,6 +150,7 @@ public class RdmMemberChangeSagaHandler {
         if (CollectionUtils.isEmpty(rdmMembers)) {
             return;
         }
+
         rdmMembers.forEach((m) -> {
             // <2.1> 判断新增或更新
             boolean isExists;
@@ -160,12 +161,17 @@ public class RdmMemberChangeSagaHandler {
             } else {
                 throw new IllegalArgumentException("record status is invalid");
             }
+            RdmMember rdmMember = rdmMemberRepository.selectByPrimaryKey(m.getId());
+            if (rdmMember == null) {
+                return;
+            }
 
             // <2.2> 新增或更新成员至gitlab
             try {
                 Member glMember = iRdmMemberService.tryRemoveAndAddMemberToGitlab(m.getGlProjectId(), m.getGlUserId(), m.getGlAccessLevel(), m.getGlExpiresAt());
 
                 // <2.3> 回写数据库
+                m.setObjectVersionNumber(rdmMember.getObjectVersionNumber());
                 iRdmMemberService.updateMemberAfter(m, glMember);
 
                 // <2.4> 发送事件
@@ -178,6 +184,7 @@ public class RdmMemberChangeSagaHandler {
                 // 回写数据库错误消息
                 logger.error(e.getMessage(), e);
                 m.setSyncGitlabErrorMsg(e.getMessage());
+                m.setObjectVersionNumber(rdmMember.getObjectVersionNumber());
                 rdmMemberRepository.updateOptional(m, RdmMember.FIELD_SYNC_GITLAB_ERROR_MSG);
             }
         });
