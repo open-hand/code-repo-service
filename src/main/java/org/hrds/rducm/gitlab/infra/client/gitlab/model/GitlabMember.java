@@ -24,6 +24,9 @@ package org.hrds.rducm.gitlab.infra.client.gitlab.model;
  *   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import io.swagger.annotations.ApiModelProperty;
+import java.util.Objects;
+import javax.persistence.Transient;
 import org.gitlab4j.api.models.AccessLevel;
 
 import java.util.Date;
@@ -34,7 +37,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Member {
+public class GitlabMember {
 
     private org.gitlab4j.api.models.AccessLevel accessLevel;
     private Date createdAt;
@@ -44,6 +47,40 @@ public class Member {
     private String state;
     private String username;
     private Date expiresAt;
+    @Transient
+    @ApiModelProperty(value = "这个用户的权限层级，在gitlab那边属于project层还是group层")
+    private String type;
+    @Transient
+    @ApiModelProperty(value = "应用服务组的id")
+    private Integer appGroupId;
+
+    @ApiModelProperty(value = "iam里面的userId")
+    @Transient
+    private Long userId;
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Integer getAppGroupId() {
+        return appGroupId;
+    }
+
+    public void setAppGroupId(Integer appGroupId) {
+        this.appGroupId = appGroupId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public org.gitlab4j.api.models.AccessLevel getAccessLevel() {
         return this.accessLevel;
@@ -107,5 +144,43 @@ public class Member {
 
     public void setExpiresAt(Date expiresAt) {
         this.expiresAt = expiresAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GitlabMember that = (GitlabMember) o;
+        return accessLevel == that.accessLevel &&
+                Objects.equals(createdAt, that.createdAt) &&
+                Objects.equals(email, that.email) &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(state, that.state) &&
+                Objects.equals(username, that.username) &&
+                Objects.equals(expiresAt, that.expiresAt) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(appGroupId, that.appGroupId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(accessLevel, createdAt, email, id, name, state, username, expiresAt, type, appGroupId);
+    }
+
+    @Override
+    public String toString() {
+        return "GitlabMember{" +
+                "accessLevel=" + accessLevel +
+                ", createdAt=" + createdAt +
+                ", email='" + email + '\'' +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", state='" + state + '\'' +
+                ", username='" + username + '\'' +
+                ", expiresAt=" + expiresAt +
+                ", type='" + type + '\'' +
+                ", appGroupId=" + appGroupId +
+                '}';
     }
 }

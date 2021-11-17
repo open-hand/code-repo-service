@@ -1,5 +1,9 @@
 package org.hrds.rducm.gitlab.app.service;
 
+import java.util.Set;
+import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
+import org.hrds.rducm.gitlab.infra.feign.vo.SagaInstanceDetails;
+
 /**
  * 成员权限审计应用服务
  *
@@ -16,13 +20,12 @@ public interface RdmMemberAuditAppService {
      */
     void syncByStrategy(Long id, int syncStrategy);
 
-    /**
-     * 修复审计权限
-     *
-     * @param organizationId
-     * @param projectId
-     * @param repositoryId
-     * @param id
-     */
-    void auditFix(Long organizationId, Long projectId, Long repositoryId, Long id);
+
+    void batchAuditFix(Long organizationId, Long projectId, Set<Long> recordIds);
+
+    void projectAudit(Long organizationId, Long projectId);
+
+    SagaInstanceDetails projectAuditStatus(Long organizationId, Long projectId);
+
+    SagaInstanceDetails projectAuditFixStatus(Long organizationId, Long projectId);
 }

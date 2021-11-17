@@ -50,17 +50,6 @@ export default function useStore() {
     approvalRefuse(organizationId, projectId, id, objectVersionNumber, data) {
       return axios.post(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/member-applicants/${id}/refuse?objectVersionNumber=${objectVersionNumber}`, data);
     },
-    // 同步用户
-    asyncUser(organizationId, projectId, repositoryId, memberId) {
-      return axios.post(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/${repositoryId}/members/${memberId}/sync`);
-    },
-    // 查询权限审计执行日期
-    fetchExecutionDate(organizationId, projectId) {
-      return axios.get(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/member-audit-logs/detail/latest`);
-    },
-    // 同步权限
-    asyncPermission(params) {
-      return axios.post(`/rducm/v1/organizations/${params.organizationId}/projects/${params.projectId}/member-audit-records/${params.id}/audit-fix?repositoryId=${params.repositoryId}`);
-    },
+
   }));
 }

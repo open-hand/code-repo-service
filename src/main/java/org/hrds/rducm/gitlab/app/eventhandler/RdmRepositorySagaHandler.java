@@ -11,12 +11,15 @@ import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.AppServiceImportPayload;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.DevOpsAppServicePayload;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
+import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.*;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
+import org.hzero.core.util.AssertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.util.CollectionUtils;
 
 /**
  * 监听应用服务相关saga事件
@@ -59,6 +63,8 @@ public class RdmRepositorySagaHandler {
     private RdmOperationLogRepository rdmOperationLogRepository;
     @Autowired
     private RdmMemberAppService rdmMemberAppService;
+    @Autowired
+    private RdmMemberMapper rdmMemberMapper;
 
     /**
      * 创建应用服务事件后 代码库初始化权限
@@ -163,8 +169,18 @@ public class RdmRepositorySagaHandler {
         Long repositoryId = devOpsAppServicePayload.getAppServiceId();
         Long organizationId = c7nBaseServiceFacade.getOrganizationId(projectId);
 
-        // 删除权限
+
+        // 删除权限 先删除单独为用户分配的应用服务的权限
         rdmMemberRepository.deleteByRepositoryId(organizationId, projectId, repositoryId);
+        //如果没有应用服务了删除权限，如果有则不删除
+        List<C7nAppServiceVO> c7nAppServiceVOS = c7nDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId);
+        if (CollectionUtils.isEmpty(c7nAppServiceVOS)){
+            RdmMember param = new RdmMember();
+            param.setOrganizationId(organizationId);
+            param.setProjectId(projectId);
+            rdmMemberMapper.delete(param);
+        }
+
         // 删除审计记录
         memberAuditLogRepository.deleteByRepositoryId(organizationId, projectId, repositoryId);
         rdmMemberAuditRecordRepository.deleteByRepositoryId(organizationId, projectId, repositoryId);

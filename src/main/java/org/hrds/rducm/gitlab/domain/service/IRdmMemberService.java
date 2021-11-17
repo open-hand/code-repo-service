@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.domain.service;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuthDetailViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberPrivilegeViewDTO;
@@ -198,4 +199,11 @@ public interface IRdmMemberService {
      * @param expiredRdmMembers 过期成员数据
      */
     void batchExpireMembers(List<RdmMember> expiredRdmMembers);
+
+    List<RepositoryPrivilegeViewDTO> listMemberRepositoriesByAccesses(Long organizationId, Long projectId, Set<Long> userIds, Integer accessLevel, Long appId);
+
+    Member tryRemoveAndAddGroupMemberToGitlab(Integer gGroupId, Integer glUserId, Integer accessLevel, Date expiresAt);
+
+
+    void syncGroupMemberFromGitlab(RdmMember dbMember);
 }

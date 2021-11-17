@@ -243,7 +243,6 @@ export default observer(({ record, modal, formatMessage, overStores, organizatio
         <div className="code-lib-ps-approval-sider-failed">{commitMsg.message}</div>
       )
       }
-    
       {record.getPristineValue('approvalState') !== 'PENDING' && renderApprovalDetail()}
     </div>
   );

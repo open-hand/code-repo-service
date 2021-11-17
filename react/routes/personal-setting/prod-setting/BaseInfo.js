@@ -124,8 +124,8 @@ function BaseInfo() {
       },
       footer: (okBtn, cancelBtn) => (
         <div>
-          {okBtn}
           {cancelBtn}
+          {okBtn}
         </div>
       )
       ,

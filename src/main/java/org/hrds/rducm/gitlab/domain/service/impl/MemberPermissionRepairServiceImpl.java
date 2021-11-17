@@ -7,14 +7,18 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberViewDTO;
+import org.hrds.rducm.gitlab.app.eventhandler.gitlab.GitlabPermissionHandler;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.service.IMemberPermissionRepairService;
+import org.hrds.rducm.gitlab.infra.constant.RepoConstants;
+import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
 import org.slf4j.Logger;
@@ -41,6 +45,8 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
     private RdmMemberAuditAppService rdmMemberAuditAppService;
     @Autowired
     private RdmMemberAppService rdmMemberAppService;
+    @Autowired
+    private Map<String, GitlabPermissionHandler> permissionRepairMap;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -69,10 +75,12 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
             }
             for (RdmMemberAuditRecord record : list) {
                 //已经同步过的不在同步
-                if (record.getSyncFlag()){
+                if (record.getSyncFlag()) {
                     return;
                 }
-                rdmMemberAuditAppService.auditFix(record.getOrganizationId(), record.getProjectId(), record.getRepositoryId(), record.getId());
+                // group
+                LOGGER.debug(">>record Id is {}", record.getId());
+                permissionRepairMap.get(record.getType() + RepoConstants.GITLAB_PERMISSION_HANDLER).gitlabPermissionRepair(record);
             }
         });
     }
@@ -89,11 +97,17 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
             RdmMemberQueryDTO rdmMemberQueryDTO = new RdmMemberQueryDTO();
             rdmMemberQueryDTO.setSyncGitlabFlag(Boolean.FALSE);
             List<RdmMemberViewDTO> rdmMemberViewDTOS = rdmMemberAppService.listByOptions(projectId, rdmMemberQueryDTO);
-            if (CollectionUtils.isEmpty(rdmMemberViewDTOS)){
+            if (CollectionUtils.isEmpty(rdmMemberViewDTOS)) {
                 return;
             }
             rdmMemberViewDTOS.forEach(rdmMemberViewDTO -> {
-                rdmMemberAppService.syncMember(rdmMemberViewDTO.getId());
+                if (StringUtils.equalsIgnoreCase(rdmMemberViewDTO.getType(), AuthorityTypeEnum.PROJECT.getValue())) {
+                    rdmMemberAppService.syncMember(rdmMemberViewDTO.getId());
+                } else if (StringUtils.equalsIgnoreCase(rdmMemberViewDTO.getType(), AuthorityTypeEnum.GROUP.getValue())) {
+                    rdmMemberAppService.syncGroupMember(rdmMemberViewDTO.getId());
+                } else {
+                    return;
+                }
             });
         });
     }

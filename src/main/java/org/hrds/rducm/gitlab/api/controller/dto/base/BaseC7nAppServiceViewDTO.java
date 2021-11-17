@@ -15,7 +15,6 @@ import java.util.Optional;
  * @author ying.xie@hand-china.com
  * @date 2020/3/17
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseC7nAppServiceViewDTO {
     @Encrypt
     private Long repositoryId;
@@ -25,6 +24,10 @@ public class BaseC7nAppServiceViewDTO {
     @ApiModelProperty("应用服务图标url")
     private String imgUrl;
     private Integer glProjectId;
+
+    @Encrypt
+    @ApiModelProperty("外部仓库配置id")
+    private Long externalConfigId;
 
     //
     // 工具方法
@@ -37,9 +40,19 @@ public class BaseC7nAppServiceViewDTO {
                 .setRepositoryCode(c7nAppServiceVO.getCode())
                 .setType(c7nAppServiceVO.getType())
                 .setImgUrl(c7nAppServiceVO.getImgUrl())
+                .setExternalConfigId(c7nAppServiceVO.getExternalConfigId())
                 .setGlProjectId(Optional.ofNullable(c7nAppServiceVO.getGitlabProjectId())
                         .map(Math::toIntExact)
                         .orElse(null));
+    }
+
+    public Long getExternalConfigId() {
+        return externalConfigId;
+    }
+
+    public BaseC7nAppServiceViewDTO setExternalConfigId(Long externalConfigId) {
+        this.externalConfigId = externalConfigId;
+        return this;
     }
 
     public Long getRepositoryId() {

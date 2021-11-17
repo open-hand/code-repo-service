@@ -6,11 +6,13 @@ import io.choerodon.asgard.saga.annotation.Saga;
 import io.choerodon.asgard.saga.producer.StartSagaBuilder;
 import io.choerodon.asgard.saga.producer.TransactionalProducer;
 import io.choerodon.core.domain.Page;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.domain.AuditDomain;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
+import org.gitlab4j.api.models.Group;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.api.controller.dto.*;
 import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
@@ -19,15 +21,25 @@ import org.hrds.rducm.gitlab.app.async.RdmMemberQueryHelper;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
+import org.hrds.rducm.gitlab.domain.entity.payload.GroupMemberPayload;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupFixApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
+import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
+import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.core.base.AopProxy;
+import org.hzero.core.base.BaseConstants;
+import org.hzero.core.util.AssertUtils;
 import org.hzero.export.annotation.ExcelExport;
 import org.hzero.export.vo.ExportParam;
 import org.hzero.mybatis.domian.Condition;
@@ -72,14 +84,16 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Autowired
     private RdmMemberAssembler rdmMemberAssembler;
 
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private TransactionalProducer producer;
 
     @Autowired
-    private RdmMemberQueryHelper rdmMemberQueryHelper;
+    private GitlabGroupApi gitlabGroupApi;
+
+    @Autowired
+    private GitlabGroupFixApi gitlabGroupFixApi;
+
 
     public RdmMemberAppServiceImpl(RdmMemberRepository rdmMemberRepository) {
         this.rdmMemberRepository = rdmMemberRepository;
@@ -88,7 +102,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Override
     public Page<RdmMemberViewDTO> pageByOptions(Long projectId, PageRequest pageRequest, RdmMemberQueryDTO query) {
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> listRdmMemberByOptions(projectId, query));
-        return rdmMemberAssembler.pageToRdmMemberViewDTO(page, ResourceLevel.PROJECT);
+        return rdmMemberAssembler.pageToRdmMemberViewDTO(page, ResourceLevel.PROJECT, projectId);
     }
 
     @Override
@@ -99,7 +113,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         }
         Page<RdmMember> rdmMemberPage = new Page<>();
         rdmMemberPage.setContent(list);
-        Page<RdmMemberViewDTO> page = rdmMemberAssembler.pageToRdmMemberViewDTO(rdmMemberPage, ResourceLevel.PROJECT);
+        Page<RdmMemberViewDTO> page = rdmMemberAssembler.pageToRdmMemberViewDTO(rdmMemberPage, ResourceLevel.PROJECT, projectId);
         return page.getContent();
     }
 
@@ -117,8 +131,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         Condition condition = Condition.builder(RdmMember.class)
                 .where(Sqls.custom()
                         .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
-                        .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, syncGitlabFlag, true)
-                        .andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIds, true))
+                        .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, syncGitlabFlag, true))
                 .orderByDesc(RdmMember.FIELD_LAST_UPDATE_DATE)
                 .build();
 
@@ -154,7 +167,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                 return new Page<>();
             }
 
-            condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
+            condition.and().orIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet).orIsNull(RdmMember.FIELD_REPOSITORY_ID);
         }
 
         // 根据params多条件查询
@@ -175,17 +188,19 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                 return new Page<>();
             } else if (!userIsEmpty && !repositoryIsEmpty) {
                 // 都不为空, or条件查询
-                condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet)
-                        .orIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
+                condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
+                condition.and().orIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet).orIsNull(RdmMember.FIELD_REPOSITORY_ID);
             } else if (!userIsEmpty) {
                 // 用户查询不为空
                 condition.and().andIn(RdmMember.FIELD_USER_ID, userIdsSet);
             } else {
                 // 应用服务查询不为空
-                condition.and().andIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet);
+                condition.and().orIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIdSet).orIsNull(RdmMember.FIELD_REPOSITORY_ID);
             }
         }
-
+        if (!CollectionUtils.isEmpty(repositoryIds)) {
+            condition.and().orIn(RdmMember.FIELD_REPOSITORY_ID, repositoryIds).orIsNull(RdmMember.FIELD_REPOSITORY_ID);
+        }
         stopWatch.stop();
         logger.info(stopWatch.prettyPrint());
 
@@ -245,7 +260,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.selectByCondition(condition));
 
-        return rdmMemberAssembler.pageToRdmMemberViewDTO(page, ResourceLevel.ORGANIZATION);
+        return rdmMemberAssembler.pageToRdmMemberViewDTO(page, ResourceLevel.ORGANIZATION, null);
     }
 
     /**
@@ -514,6 +529,223 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         rdmMemberRepository.batchUpdateByPrimaryKey(rdmMemberList);
         return rdmMemberList;
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void syncBatchMember(List<Long> memberIds) {
+        if (CollectionUtils.isEmpty(memberIds)) {
+            return;
+        }
+        memberIds.forEach(memberId -> {
+            RdmMember dbMember = rdmMemberRepository.selectByPrimaryKey(memberId);
+            if (Objects.isNull(dbMember)) {
+                return;
+            }
+            if (org.apache.commons.lang3.StringUtils.equalsIgnoreCase(dbMember.getType(), AuthorityTypeEnum.PROJECT.getValue())) {
+                syncMember(memberId);
+            } else {
+                syncGroupMember(memberId);
+            }
+        });
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void allSync(Long organizationId, Long projectId) {
+        //查询项目下所有未同步的用户
+        RdmMember rdmMember = new RdmMember();
+        rdmMember.setProjectId(projectId);
+        rdmMember.setSyncGitlabFlag(Boolean.FALSE);
+        List<RdmMember> rdmMembers = rdmMemberRepository.select(rdmMember);
+        if (CollectionUtils.isEmpty(rdmMembers)) {
+            return;
+        }
+        rdmMembers.forEach(member -> {
+            if (org.apache.commons.lang3.StringUtils.equalsIgnoreCase(member.getType(), AuthorityTypeEnum.PROJECT.getValue())) {
+                syncMember(member.getId());
+            } else {
+                syncGroupMember(member.getId());
+            }
+        });
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @Saga(code = SagaTopicCodeConstants.BATCH_ADD_GROUP_MEMBER, description = "批量添加项目下gitlab group成员", inputSchemaClass = GroupMemberPayload.class, inputSchema = "{}")
+    public void batchAddGroupMembers(Long organizationId, Long projectId, List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOS) {
+        //查询项目下的group
+        C7nDevopsProjectVO c7nDevopsProjectVO = c7NDevOpsServiceFacade.detailDevopsProjectById(projectId);
+        checkIamProject(c7nDevopsProjectVO);
+        //校验是否已经存在
+        checkGroupPermissionExist(projectId, gitlabMemberCreateDTOS);
+
+        //检验这个gitlab group id 能不能查到group, 因为有些人手动删了group，自己又新建了group
+        Group group = gitlabGroupApi.getGroup(Integer.valueOf(String.valueOf(c7nDevopsProjectVO.getGitlabGroupId())));
+        checkProjectGroup(c7nDevopsProjectVO, group);
+        //持久化到数据库
+        persistenceMemberToDB(gitlabMemberCreateDTOS, organizationId, projectId, group.getId());
+        //发送saga
+        sendAddGroupMemberSaga(projectId, gitlabMemberCreateDTOS, c7nDevopsProjectVO);
+    }
+
+    private void checkGroupPermissionExist(Long projectId, List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOS) {
+        if (CollectionUtils.isEmpty(gitlabMemberCreateDTOS)) {
+            throw new CommonException("error.group.member.is.null");
+        }
+        List<Long> userIds = gitlabMemberCreateDTOS.stream().map(RdmMemberBatchDTO.GitlabMemberCreateDTO::getUserId).collect(Collectors.toList());
+        long count = userIds.stream().distinct().count();
+        if (userIds.size() != count) {
+            throw new CommonException("error.group.member.exist");
+        }
+        List<RdmMember> rdmMembers = rdmMemberRepository.groupMemberByUserId(projectId, userIds);
+        if (!CollectionUtils.isEmpty(rdmMembers)) {
+            throw new CommonException("error.group.member.exist");
+        }
+
+    }
+
+    private void checkProjectGroup(C7nDevopsProjectVO c7nDevopsProjectVO, Group group) {
+        AssertUtils.notNull(group, "error.gitlab.group.not.exist", c7nDevopsProjectVO.getGitlabGroupId());
+    }
+
+    private void checkIamProject(C7nDevopsProjectVO c7nDevopsProjectVO) {
+        AssertUtils.notNull(c7nDevopsProjectVO, "error.devops.gitlab.project.not.exist");
+        AssertUtils.notNull(c7nDevopsProjectVO.getGitlabGroupId(), "error.devops.group.id.is.null");
+    }
+
+    private void sendAddGroupMemberSaga(Long projectId, List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOS, C7nDevopsProjectVO c7nDevopsProjectVO) {
+        GroupMemberPayload groupMemberPayload = new GroupMemberPayload();
+        groupMemberPayload.setgGroupId(Integer.valueOf(String.valueOf(c7nDevopsProjectVO.getGitlabGroupId())));
+        groupMemberPayload.setGitlabMemberCreateDTOS(gitlabMemberCreateDTOS);
+
+        producer.applyAndReturn(
+                StartSagaBuilder
+                        .newBuilder()
+                        .withLevel(ResourceLevel.PROJECT)
+                        .withRefType("batchAddGroupMembers")
+                        .withSagaCode(SagaTopicCodeConstants.BATCH_ADD_GROUP_MEMBER),
+                builder -> {
+                    builder
+                            .withPayloadAndSerialize(groupMemberPayload)
+                            .withRefId(String.valueOf(projectId))
+                            .withSourceId(projectId);
+                    return groupMemberPayload;
+                });
+    }
+
+    private void persistenceMemberToDB(List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOS, Long organizationId, Long projectId, Integer groupId) {
+        List<RdmMember> rdmMembers = new ArrayList<>();
+        //将用户id转换为Gitlab用户Id
+        gitlabMemberCreateDTOS.forEach(gitlabMemberCreateDTO -> {
+            Integer glUserId = c7NBaseServiceFacade.userIdToGlUserId(gitlabMemberCreateDTO.getUserId());
+            if (Objects.isNull(glUserId)) {
+                return;
+            }
+            gitlabMemberCreateDTO.setgUserId(glUserId);
+
+            //插入数据库
+            RdmMember rdmMember = new RdmMember();
+            rdmMember.setOrganizationId(organizationId);
+            rdmMember.setProjectId(projectId);
+            rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+            // 设置gitlab项目id和用户id
+            rdmMember.setGlUserId(glUserId);
+            rdmMember.setgGroupId(groupId);
+            rdmMember.setUserId(gitlabMemberCreateDTO.getUserId());
+            rdmMember.setSyncGitlabFlag(false);
+            rdmMember.setGlAccessLevel(null);
+            rdmMember.setGlExpiresAt(null);
+            rdmMembers.add(rdmMember);
+        });
+        //批量插入数据库
+        rdmMemberRepository.batchInsert(rdmMembers);
+    }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateGroupMember(Long organizationId, Long projectId, RdmMemberBatchDTO.GitlabMemberCreateDTO gitlabMemberCreateDTO, Long rducmGitlabMemberId) {
+        RdmMember rdmMember = rdmMemberRepository.selectByPrimaryKey(rducmGitlabMemberId);
+        AssertUtils.notNull(rdmMember, "error.rdmMember.is.not.exist");
+        AssertUtils.notNull(rdmMember.getgGroupId(), "error.group.id.is.null");
+        if (!rdmMember.getSyncGitlabFlag()) {
+            throw new CommonException("error.sync.flag.false");
+        }
+        //查询group
+        Group group = gitlabGroupApi.getGroup(rdmMember.getgGroupId());
+        AssertUtils.notNull(group, "error.gitlab.group.not.exist", gitlabMemberCreateDTO.getgGroupId());
+
+        //删除添加
+        iRdmMemberService.tryRemoveAndAddGroupMemberToGitlab(group.getId(), rdmMember.getGlUserId(), gitlabMemberCreateDTO.getGlAccessLevel(), gitlabMemberCreateDTO.getGlExpiresAt());
+
+        //跟新数据库
+        rdmMember.setSyncGitlabFlag(true);
+        rdmMember.setSyncGitlabDate(new Date());
+        rdmMember.setGlAccessLevel(gitlabMemberCreateDTO.getGlAccessLevel());
+        rdmMember.setGlExpiresAt(gitlabMemberCreateDTO.getGlExpiresAt());
+        rdmMemberRepository.updateByPrimaryKey(rdmMember);
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteGroupMember(Long organizationId, Long projectId, Long rducmGitlabMemberId) {
+        RdmMember rdmMember = rdmMemberRepository.selectByPrimaryKey(rducmGitlabMemberId);
+        AssertUtils.notNull(rdmMember, "error.rdmMember.is.null");
+        if (!rdmMember.getSyncGitlabFlag()) {
+            throw new CommonException("error.sync.flag.false");
+        }
+        //删除group的用户
+        gitlabGroupFixApi.removeMember(rdmMember.getgGroupId(), rdmMember.getGlUserId());
+        //删除数据库
+        rdmMemberRepository.deleteByPrimaryKey(rducmGitlabMemberId);
+        //删除组的权限的时候会把用户在组下所有应用服务的权限删除
+        RdmMember record = new RdmMember();
+        record.setUserId(rdmMember.getUserId());
+        record.setProjectId(projectId);
+        record.setType(AuthorityTypeEnum.PROJECT.getValue());
+        rdmMemberRepository.delete(record);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void syncGroupMember(Long rducmGitlabMemberId) {
+        // <1> 查询数据库成员
+        RdmMember dbMember = rdmMemberRepository.selectByPrimaryKey(rducmGitlabMemberId);
+
+        // <2> 拉取Gitlab成员, 同步到db
+        iRdmMemberService.syncGroupMemberFromGitlab(dbMember);
+
+        // <3> 发送事件
+//        iRdmMemberService.publishMemberEvent(dbMember, MemberEvent.EventType.SYNC_MEMBER);
+    }
+
+    @Override
+    public RdmMember getGroupMember(Long organizationId, Long projectId, Long userId) {
+        RdmMember rdmMember = new RdmMember();
+        rdmMember.setUserId(userId);
+        rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+        rdmMember.setProjectId(projectId);
+        return rdmMemberRepository.selectOne(rdmMember);
+    }
+
+
+    @Override
+    public void insertGroupMember(RdmMemberAuditRecord rdmMemberAuditRecord) {
+        RdmMember record = new RdmMember();
+        record.setSyncGitlabFlag(true);
+        record.setGlAccessLevel(AccessLevel.OWNER.toValue());
+        record.setProjectId(rdmMemberAuditRecord.getProjectId());
+        record.setUserId(rdmMemberAuditRecord.getUserId());
+        record.setOrganizationId(rdmMemberAuditRecord.getOrganizationId());
+        record.setGlProjectId(rdmMemberAuditRecord.getGlProjectId());
+        record.setGlUserId(rdmMemberAuditRecord.getGlUserId());
+        record.setType(AuthorityTypeEnum.GROUP.getValue());
+        record.setgGroupId(rdmMemberAuditRecord.getgGroupId());
+        rdmMemberRepository.insert(record);
+    }
+
 
     /**
      * 批量预新增或修改, 使用一个新事务

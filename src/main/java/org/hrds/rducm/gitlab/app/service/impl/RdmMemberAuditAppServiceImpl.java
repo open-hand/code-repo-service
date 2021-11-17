@@ -1,14 +1,20 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.gitlab4j.api.models.Member;
-import org.gitlab4j.api.models.Project;
+import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
+import org.hrds.rducm.gitlab.app.eventhandler.payload.ProjectAuditPayload;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.repository.MemberAuditLogRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.client.gitlab.Gitlab4jClient;
@@ -17,18 +23,25 @@ import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupFixApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectFixApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
+import org.hrds.rducm.gitlab.infra.enums.ApplicantTypeEnum;
+import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
+import org.hrds.rducm.gitlab.infra.feign.operate.AsgardServiceClientOperator;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.AssertExtensionUtils;
+import org.hrds.rducm.gitlab.infra.feign.vo.SagaInstanceDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.Objects;
-import org.springframework.util.StringUtils;
+import org.springframework.util.CollectionUtils;
+
+import io.choerodon.asgard.saga.annotation.Saga;
+import io.choerodon.asgard.saga.producer.StartSagaBuilder;
+import io.choerodon.asgard.saga.producer.TransactionalProducer;
+import io.choerodon.core.iam.ResourceLevel;
 
 /**
  * 成员权限审计应用服务默认实现
@@ -39,6 +52,9 @@ import org.springframework.util.StringUtils;
 @Service
 public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     private static final Logger logger = LoggerFactory.getLogger(RdmMemberAuditAppServiceImpl.class);
+
+    private static final String PROJECT_AUDIT_MEMBER_PERMISSION = "projectAuditMemberPermission";
+    private static final String PROJECT_BATCH_FIX_MEMBER_PERMISSION = "projectBatchFixMemberPermission";
 
     @Autowired
     private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
@@ -51,13 +67,15 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
     @Autowired
-    private GitlabProjectApi gitlabProjectApi;
-    @Autowired
-    private GitlabGroupApi gitlabGroupApi;
-    @Autowired
     private GitlabGroupFixApi gitlabGroupFixApi;
     @Autowired
     private GitlabProjectFixApi gitlabProjectFixApi;
+    @Autowired
+    private TransactionalProducer transactionalProducer;
+    @Autowired
+    private AsgardServiceClientOperator asgardServiceClientOperator;
+    @Autowired
+    private C7nBaseServiceFacade c7nBaseServiceFacade;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -103,273 +121,69 @@ public class RdmMemberAuditAppServiceImpl implements RdmMemberAuditAppService {
     }
 
     @Override
-    public void auditFix(Long organizationId, Long projectId, Long repositoryId, Long id) {
-        logger.debug(">>>>{}>>>{}>>>>{}>>>>{}>", organizationId, projectId, repositoryId, id);
-
-        RdmMemberAuditRecord dbRecord = rdmMemberAuditRecordRepository.selectByUk(organizationId, projectId, repositoryId, id);
-        AssertExtensionUtils.notNull(dbRecord, "该记录不存在");
-
-        Long userId = dbRecord.getUserId();
-        //如果userId为null 猪齿鱼导入用户失败，导致猪齿鱼里没有这个用户
-        if (Objects.isNull(userId)) {
-            //如果userId不存在，这个数据就是异常的数据，那么就删除
-            rdmMemberAuditRecordRepository.deleteByPrimaryKey(dbRecord.getId());
+    @Transactional(rollbackFor = Exception.class)
+    @Saga(code = SagaTopicCodeConstants.PROJECT_BATCH_AUDIT_FIX, description = "项目下批量修复成员代码权限", inputSchema = "{}")
+    public void batchAuditFix(Long organizationId, Long projectId, Set<Long> recordIds) {
+        if (CollectionUtils.isEmpty(recordIds)) {
             return;
         }
-        //首先判断项目是不是存在，不存在则不修,没有默认分支就认为它是空库
-//        Project project = gitlabProjectFixApi.getProject(repositoryId.intValue());
-//        if (Objects.isNull(project) && StringUtils.isEmpty(project.getDefaultBranch())) {
-//            //同步这条记录
-//            rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
-//            return;
-//        }
+        ProjectAuditPayload projectAuditPayload = new ProjectAuditPayload();
+        projectAuditPayload.setOrganizationId(organizationId);
+        projectAuditPayload.setProjectId(projectId);
+        projectAuditPayload.setRecordIds(recordIds);
 
-        // 若glUserId为null, 获取glUserId
-        Integer glUserId = dbRecord.getGlUserId() != null ? dbRecord.getGlUserId() : c7NBaseServiceFacade.userIdToGlUserId(userId);
-        if (Objects.isNull(glUserId)) {
-            rdmMemberAuditRecordRepository.deleteByPrimaryKey(dbRecord.getId());
-            return;
-        }
-        Integer glProjectId = dbRecord.getGlProjectId();
-        C7nDevopsProjectVO c7nDevopsProjectVO = c7NDevOpsServiceFacade.detailDevopsProjectById(projectId);
-        Integer glGroupId = Math.toIntExact(c7nDevopsProjectVO.getGitlabGroupId());
+        transactionalProducer.apply(
+                StartSagaBuilder.newBuilder()
+                        .withRefType(PROJECT_BATCH_FIX_MEMBER_PERMISSION)
+                        .withRefId(projectId.toString())
+                        .withSagaCode(SagaTopicCodeConstants.PROJECT_BATCH_AUDIT_FIX)
+                        .withLevel(ResourceLevel.PROJECT)
+                        .withSourceId(projectId)
+                        .withPayloadAndSerialize(projectAuditPayload),
+                builder -> {
+                });
 
-        // 查询权限
-        RdmMember dbMember = rdmMemberRepository.selectOneByUk(projectId, repositoryId, userId);
-        // 查询用户在gitlab中project的权限 如果是组的所有者，这里查询项目的角色就是404
-        Member projectGlMember = gitlabProjectFixApi.getMember(glProjectId, glUserId);
-        if (Objects.nonNull(projectGlMember)) {
-            logger.debug("Gl项目[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]", glProjectId, projectGlMember.getId(), projectGlMember.getName(), projectGlMember.getAccessLevel());
-        }
-        // 查询用户在gitlab中group的权限
-        Member groupGlMember = gitlabGroupFixApi.getMember(glGroupId, glUserId);
-        if (Objects.nonNull(groupGlMember)) {
-            logger.debug("Gl组[{}]权限，ID为[{}],用户名[{}]的权限级别[{}]", glGroupId, groupGlMember.getId(), groupGlMember.getName(), groupGlMember.getAccessLevel());
-        }
-
-        // 判断是否是组织管理员
-        Boolean isOrgAdmin = c7NBaseServiceFacade.checkIsOrgAdmin(organizationId, userId);
-        logger.debug("用户[{}]是否为组织[{}]管理员[{}]", userId, organizationId, isOrgAdmin);
-
-        // 判断是否是项目团队成员
-        C7nUserVO c7nUserVO = c7NBaseServiceFacade.detailC7nUserOnProjectLevel(projectId, userId);
-        boolean isProjectMember = c7nUserVO != null;
-        logger.debug("用户[{}]是否为项目[{}]的成员[{}]", userId, projectId, isProjectMember);
-
-        // <> 按gitlab group和project两类情况讨论
-        // 是否为组织管理员
-
-        if (isOrgAdmin) {
-            // 修复为group Owner权限
-            logger.debug("修复用户[{}]为组织管理员权限", userId);
-            //如果是组织管理员，又是项目成员，需要插入dbMember
-            if (isProjectMember && Objects.isNull(dbMember)) {
-                RdmMember rdmMember = new RdmMember();
-                rdmMember.setSyncGitlabFlag(true);
-                rdmMember.setGlAccessLevel(AccessLevel.OWNER.toValue());
-                rdmMember.setProjectId(projectId);
-                rdmMember.setUserId(userId);
-                rdmMember.setRepositoryId(repositoryId);
-                rdmMember.setOrganizationId(organizationId);
-                rdmMember.setGlProjectId(glProjectId);
-                rdmMember.setGlUserId(glUserId);
-                rdmMemberRepository.insert(rdmMember);
-            }
-            updateGitlabGroupMemberWithOwner(groupGlMember, glGroupId, glUserId);
-        } else {
-            // 是否为团队成员
-            if (isProjectMember) {
-                // 如果是团队成员
-                // 是否是项目管理员
-                Boolean isProjectAdmin = c7nUserVO.isProjectAdmin();
-                if (isProjectAdmin) {
-                    // 如果是项目管理员 修复为group Owner权限
-                    logger.debug("修复用户[{}]为项目管理员权限", userId);
-                    if (Objects.isNull(dbMember) && !Objects.isNull(groupGlMember)) {
-                        RdmMember rdmMember = new RdmMember();
-                        rdmMember.setSyncGitlabFlag(true);
-                        rdmMember.setGlAccessLevel(AccessLevel.OWNER.toValue());
-                        rdmMember.setProjectId(projectId);
-                        rdmMember.setUserId(userId);
-                        rdmMember.setRepositoryId(repositoryId);
-                        rdmMember.setOrganizationId(organizationId);
-                        rdmMember.setGlProjectId(glProjectId);
-                        rdmMember.setGlUserId(glUserId);
-                        rdmMemberRepository.insert(rdmMember);
-                    }
-                    updateGitlabGroupMemberWithOwner(groupGlMember, glGroupId, glUserId);
-
-                } else {
-                    handProjectMember(userId, glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember, dbRecord);
-                }
-            } else {
-                handNonProjectMember(userId, glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember, dbRecord);
-            }
-        }
-
-        // <2> 修复结束, 设置审计记录同步标识为true
-        rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    @Saga(code = SagaTopicCodeConstants.PROJECT_AUDIT_MEMBER_PERMISSION, description = "项目下审计成员代码权限", inputSchema = "{}")
+    public void projectAudit(Long organizationId, Long projectId) {
 
-    private void handNonProjectMember(Long userId, Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember, RdmMemberAuditRecord dbRecord) {
-        if (Objects.isNull(dbMember)) {
-            // 如果不是团队成员,也不是赋予权限的项目外成员 移除gitlab权限
-            logger.debug("用户[{}]是项目成员也不是外部成员，没有代码库权限，移除", userId);
-            if (groupGlMember != null) {
-                gitlabGroupFixApi.removeMember(glGroupId, glUserId);
-            } else if (projectGlMember != null) {
-                gitlabProjectFixApi.removeMember(glProjectId, glUserId);
-            }
-        } else {
-            logger.debug("用户[{}]是外部成员，有代码库权限，修复GL权限", userId);
-            updateGitLabPermission(glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember, dbRecord);
-        }
+        ProjectAuditPayload projectAuditPayload = new ProjectAuditPayload();
+        projectAuditPayload.setOrganizationId(organizationId);
+        projectAuditPayload.setProjectId(projectId);
+
+        transactionalProducer.apply(
+                StartSagaBuilder.newBuilder()
+                        .withRefType(PROJECT_AUDIT_MEMBER_PERMISSION)
+                        .withRefId(projectId.toString())
+                        .withSagaCode(SagaTopicCodeConstants.PROJECT_AUDIT_MEMBER_PERMISSION)
+                        .withLevel(ResourceLevel.PROJECT)
+                        .withSourceId(projectId)
+                        .withPayloadAndSerialize(projectAuditPayload),
+                builder -> {
+                });
+
     }
 
-    private void handProjectMember(Long userId, Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember, RdmMemberAuditRecord dbRecord) {
-        //如果不是项目管理员，修复为该用户当前的代码库数据库的权限
-        if (dbMember == null || !dbMember.getSyncGitlabFlag()) {
-            // 如果dbMember为null 或者同步失败 移除gitlab权限
-            logger.debug("用户[{}]为项目成员，但没有代码库权限，移除Gl权限", userId);
-            removeGitlabMemberGP(glUserId, glProjectId, glGroupId, projectGlMember, groupGlMember);
-        } else {
-            // 修改gitlab权限
-            logger.debug("用户[{}]为项目成员，有代码库权限，修复Gl权限", userId);
-            updateGitLabPermission(glUserId, glProjectId, glGroupId, dbMember, projectGlMember, groupGlMember, dbRecord);
-        }
+    @Override
+    public SagaInstanceDetails projectAuditStatus(Long organizationId, Long projectId) {
+        return getSagaInstanceDetails(PROJECT_AUDIT_MEMBER_PERMISSION, Arrays.asList(projectId.toString()), SagaTopicCodeConstants.PROJECT_AUDIT_MEMBER_PERMISSION);
     }
 
-    private void updateGitLabPermission(Integer glUserId, Integer glProjectId, Integer glGroupId, RdmMember dbMember, Member projectGlMember, Member groupGlMember, RdmMemberAuditRecord dbRecord) {
-        if (groupGlMember != null) {
-            //如果组的权限是owner，则不作处理， 组的权限是owner 他在项目的权限也是owner,这个时候需要按照gitlab的权限来修
-            if (groupGlMember.getAccessLevel().value.intValue() == AccessLevel.OWNER.toValue().intValue()) {
-                dbMember.setSyncGitlabFlag(Boolean.TRUE);
-                dbMember.setGlAccessLevel(AccessLevel.OWNER.toValue().intValue());
-                rdmMemberRepository.updateByPrimaryKey(dbMember);
-                rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
-                return;
-            }
-            //如果组的权限存在，先移除组的权限（随之项目的权限也会被移除,项目原来添加的非Owner权限一并移除）
-            //remove的时候注意  一个组至少存在一个owner, 如果删除返回403则不处理
-            gitlabGroupFixApi.removeMember(glGroupId, glUserId);
-            //然后如果同步成功，按照choerodon来修复，并且choerodon中为其赋予了权限并且同步成功了
-            if (dbMember.getSyncGitlabFlag() && !Objects.isNull(dbMember.getGlAccessLevel())) {
-                //上一步删除权限可以没有删掉 这里添加可能会报："should be higher than Owner inherited membership from group
-                //如果上一步删除组的权限没有删掉，这里就不给
-                gitlabProjectFixApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-                rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
-                return;
-            } else {
-                //如果同步失败， 直接删掉这条数据
-                rdmMemberRepository.deleteByPrimaryKey(dbMember);
-                //如果项目成员的角色存在也直接删掉
-                if (!Objects.isNull(projectGlMember)) {
-                    gitlabProjectFixApi.removeMember(glProjectId, glUserId);
-                }
-            }
-            //如果gitlab组的权限存在，且是同步失败的
-        } else {
-            //如果gitlab组的权限为null,
-            if (projectGlMember != null) {
-                // gitlab项目的权限不为null
-                // 2 如果同步失败的用户或者权限小于50,按照gitlab的权限来修复
-                //这里为项目变更权限的时候需要注意，如果数据库的用户的权限是50，这里按照gitlab的权限来修复。
-                //如果用户是同步失败了的， AccessLevel为null
-                if (!dbMember.getSyncGitlabFlag() || Objects.isNull(dbMember.getGlAccessLevel())) {
-                    dbMember.setGlAccessLevel(projectGlMember.getAccessLevel().value);
-                    dbMember.setSyncGitlabFlag(Boolean.TRUE);
-                    rdmMemberRepository.updateByPrimaryKey(dbMember);
-                    rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
-                    return;
-                }
-                //同步成功的 组里面没有角色 gitlab的AccessLevel只可能小于50  就按照choerodon来修数据 跟新时必须确保成员的权限小于owner
-                if (!Objects.isNull(dbMember.getGlAccessLevel()) && dbMember.getGlAccessLevel() < 50 && projectGlMember.getAccessLevel().value.intValue() < 50) {
-                    //有一些项目对应的组的id和他实际在gitlab上的组的id不一致，这里跟新会400
-                    gitlabProjectFixApi.updateMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-                } else {
-                    dbMember.setGlAccessLevel(projectGlMember.getAccessLevel().value);
-                    rdmMemberRepository.updateByPrimaryKey(dbMember);
-                }
-
-            } else {
-                // 如果gitlab组的权限为null,gitlab项目的权限也为null
-                // 如果在choerodon是同步成功的 权限小于50，则按照choerodon来修复权限
-                if (dbMember.getSyncGitlabFlag() && dbMember.getGlAccessLevel() < 50) {
-                    gitlabProjectFixApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-                    rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(dbRecord);
-                    return;
-                }
-                //如果在gitlab 一个权限也没有，在choerodon又是同步失败的，则直接删除这种数据
-                //如果如果gitlab组的权限为null,gitlab项目的权限也为null，同步成功，且权限>50，这种数据也删除
-                else {
-                    rdmMemberRepository.deleteByPrimaryKey(dbMember);
-                }
-            }
-        }
+    @Override
+    public SagaInstanceDetails projectAuditFixStatus(Long organizationId, Long projectId) {
+        return getSagaInstanceDetails(PROJECT_BATCH_FIX_MEMBER_PERMISSION, Arrays.asList(projectId.toString()), SagaTopicCodeConstants.PROJECT_BATCH_AUDIT_FIX);
     }
 
-    private void removeGitlabMemberGP(Integer glUserId, Integer glProjectId, Integer glGroupId, Member projectGlMember, Member groupGlMember) {
-        if (groupGlMember != null) {
-            gitlabGroupFixApi.removeMember(glGroupId, glUserId);
-        } else if (projectGlMember != null) {
-            gitlabProjectFixApi.removeMember(glProjectId, glUserId);
+    private SagaInstanceDetails getSagaInstanceDetails(String refType, List<String> refIds, String sagaCode) {
+        List<SagaInstanceDetails> projectAuditMemberPermission = asgardServiceClientOperator.queryByRefTypeAndRefIds(refType, refIds, sagaCode);
+        if (CollectionUtils.isEmpty(projectAuditMemberPermission)) {
+            return new SagaInstanceDetails();
         }
-    }
-
-    /**
-     * 移除gitlab权限, 分两步
-     * 1. 如果group有权限, 直接移除group的权限(移除group权限会将project权限也移除); 否则,进入2
-     * 2. 如果project有权限, 移除project的权限
-     */
-//    private void removeGitlabMemberGP(Member groupGlMember, Member projectGlMember, Integer glGroupId, Integer glProjectId, Integer glUserId) {
-//        if (groupGlMember != null) {
-//            gitlabGroupApi.removeMember(glGroupId, glUserId);
-//        } else if (projectGlMember != null) {
-//            gitlabProjectApi.removeMember(glProjectId, glUserId);
-//        }
-//    }
-
-    /**
-     * 更新gitlab权限, 分两步
-     * 1. 如果group有权限, 先移除group的权限, 再新增(移除group权限会将project权限也移除); 否则, 进入2
-     * 2. 如果project有权限, 更新project的权限; 否则, 进入3
-     * 3. 如果project无权限, 新增project的权限
-     */
-//    private void updateGitlabMemberP(RdmMember dbMember, Member groupGlMember, Member projectGlMember, Integer glGroupId, Integer glProjectId, Integer glUserId) {
-//        // 1
-//        if (groupGlMember != null) {
-//            gitlabGroupApi.removeMember(glGroupId, glUserId);
-//
-//            gitlabProjectApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-//        } else {
-//            if (projectGlMember != null) {
-//                // 2
-//                gitlabProjectApi.updateMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-//            } else {
-//                // 3
-//                gitlabProjectApi.addMember(glProjectId, glUserId, dbMember.getGlAccessLevel(), dbMember.getGlExpiresAt());
-//            }
-//        }
-//    }
-
-    /**
-     * 修改Gitlab group权限为Owner, 分2步
-     * 如果group成员不存在, 新增Owner
-     * 如果group成员存在, 更新为Owner
-     *
-     * @param groupGlMember
-     * @param glGroupId
-     * @param glUserId
-     */
-    private void updateGitlabGroupMemberWithOwner(Member groupGlMember, Integer glGroupId, Integer glUserId) {
-        if (groupGlMember == null) {
-            // 添加
-            gitlabGroupFixApi.addMember(glGroupId, glUserId, AccessLevel.OWNER.toValue(), null);
-        } else if (!groupGlMember.getAccessLevel().toValue().equals(AccessLevel.OWNER.toValue())) {
-            // 更新
-            gitlabGroupFixApi.updateMember(glGroupId, glUserId, AccessLevel.OWNER.toValue(), null);
-        }
+        List<SagaInstanceDetails> sagaInstanceDetailsList = projectAuditMemberPermission.stream().sorted(Comparator.comparing(SagaInstanceDetails::getId).reversed()).collect(Collectors.toList());
+        return sagaInstanceDetailsList.get(0);
     }
 
 

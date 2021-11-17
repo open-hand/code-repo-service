@@ -1,13 +1,14 @@
-// import { axios } from '@choerodon/boot';
+/* eslint-disable import/no-anonymous-default-export */
 import { map } from 'lodash';
+import CodeManagerApis from '../../apis';
 
-export default ((intlPrefix, formatMessage, organizationId, projectId, branchServiceDs) => ({
+export default ((intlPrefix, formatMessage, organizationId, projectId, branchAppId) => ({
   autoQuery: false,
   selection: 'multiple',
   pageSize: 10,
   transport: {
     read: () => ({
-      url: `/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/member-applicants`,
+      url: CodeManagerApis.getPsApprovalUrl(organizationId, projectId, branchAppId),
       method: 'get',
       transformResponse: (resp) => {
         try {
@@ -118,14 +119,6 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
       lookupCode: 'RDUCM.APPROVAL_STATE',
       textField: 'meaning',
       valueField: 'value',
-    },
-    {
-      name: 'repositoryIds',
-      type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.service` }),
-      textField: 'repositoryName',
-      valueField: 'repositoryId',
-      options: branchServiceDs,
     },
   ],
   events: {

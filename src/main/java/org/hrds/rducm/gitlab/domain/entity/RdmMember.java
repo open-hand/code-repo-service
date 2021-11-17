@@ -1,10 +1,12 @@
 package org.hrds.rducm.gitlab.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+
 import io.choerodon.core.exception.CommonException;
 import io.choerodon.mybatis.annotation.ModifyAudit;
 import io.choerodon.mybatis.annotation.VersionAudit;
 import io.choerodon.mybatis.domain.AuditDomain;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nAppServiceViewDTO;
@@ -43,6 +45,7 @@ public class RdmMember extends AuditDomain {
     public static final String FIELD_SYNC_GITLAB_FLAG = "syncGitlabFlag";
     public static final String FIELD_SYNC_GITLAB_DATE = "syncGitlabDate";
     public static final String FIELD_SYNC_GITLAB_ERROR_MSG = "syncGitlabErrorMsg";
+    public static final String FIELD_TYPE = "type";
 
     //
     // 业务方法(按public protected private顺序排列)
@@ -109,6 +112,11 @@ public class RdmMember extends AuditDomain {
     private Date syncGitlabDate;
     @ApiModelProperty(value = "同步gitlab失败的错误信息")
     private String syncGitlabErrorMsg;
+    @ApiModelProperty(value = "gitlab组的Id")
+    private Integer gGroupId;
+    @ApiModelProperty(value = "权限属于项目层还是全局层")
+    private String type;
+
 
     //
     // 非数据库字段
@@ -137,6 +145,8 @@ public class RdmMember extends AuditDomain {
     @Transient
     private BaseC7nProjectViewDTO project;
 
+    @Transient
+    private String loginName;
     //
     // getter/setter
     // ------------------------------------------------------------------------------
@@ -284,5 +294,29 @@ public class RdmMember extends AuditDomain {
     public RdmMember setRepository(BaseC7nAppServiceViewDTO repository) {
         this.repository = repository;
         return this;
+    }
+
+    public Integer getgGroupId() {
+        return gGroupId;
+    }
+
+    public void setgGroupId(Integer gGroupId) {
+        this.gGroupId = gGroupId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getLoginName() {
+        return loginName;
+    }
+
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
     }
 }

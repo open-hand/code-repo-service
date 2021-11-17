@@ -27,15 +27,19 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.audit.event.OperationEventPublisherHelper;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.admin.GitlabAdminApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.exception.GitlabClientException;
+import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.enums.RdmMemberStateEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
+import org.hzero.core.base.BaseConstants;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
 import org.slf4j.Logger;
@@ -48,6 +52,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -69,6 +74,10 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
+    @Autowired
+    private GitlabGroupApi gitlabGroupApi;
+    @Autowired
+    private RdmMemberMapper rdmMemberMapper;
 
     @Override
     public Page<MemberAuthDetailViewDTO> pageMembersRepositoryAuthorized(Long organizationId, Long projectId, PageRequest pageRequest, BaseUserQueryDTO queryDTO) {
@@ -127,6 +136,24 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
             viewDTO.setRoleNames(c7nUserWithRolesVO.getRoles().stream().map(C7nRoleVO::getName).collect(Collectors.toList()));
 
             BigDecimal authorizedRepositoryCountBigD = Optional.ofNullable(viewDTO.getAuthorizedRepositoryCount()).map(BigDecimal::new).orElse(BigDecimal.ZERO);
+            //根据角色来判断授权的服务的百分比
+            C7nUserVO userVO = c7NBaseServiceFacade.detailC7nUserOnProjectLevel(projectId, v.getUserId());
+            if (userVO != null && userVO.isProjectAdmin()) {
+                viewDTO.setAuthorizedRepositoryCount(viewDTO.getAllRepositoryCount());
+                authorizedRepositoryCountBigD = new BigDecimal(viewDTO.getAuthorizedRepositoryCount());
+            } else {
+                //如果拥有group层级的权限
+                RdmMember rdmMember = new RdmMember();
+                rdmMember.setProjectId(projectId);
+                rdmMember.setUserId(v.getUserId());
+                rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+                rdmMember.setSyncGitlabFlag(Boolean.TRUE);
+                List<RdmMember> rdmMembers = rdmMemberMapper.select(rdmMember);
+                if (!CollectionUtils.isEmpty(rdmMembers)) {
+                    viewDTO.setAuthorizedRepositoryCount(viewDTO.getAllRepositoryCount());
+                    authorizedRepositoryCountBigD = new BigDecimal(viewDTO.getAuthorizedRepositoryCount());
+                }
+            }
             if (allRepositoryCountBigD.compareTo(BigDecimal.ZERO) != 0) {
                 viewDTO.setAuthorizedRepositoryPercent(authorizedRepositoryCountBigD.divide(allRepositoryCountBigD, 4, BigDecimal.ROUND_HALF_UP));
             }
@@ -267,6 +294,10 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     @Override
     public void removeMemberToGitlab(Integer glProjectId, Integer glUserId) {
         gitlabProjectApi.removeMember(glProjectId, glUserId);
+    }
+
+    private void removeGroupMemberToGitLab(Integer gGroupId, Integer glUserId) {
+        gitlabGroupApi.removeMember(gGroupId, glUserId);
     }
 
     @Override
@@ -428,37 +459,85 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
                                                       Long projectId,
                                                       Set<Long> repositoryIds) {
         Long userId = DetailsHelper.getUserDetails().getUserId();
+        RdmMember groupMember = new RdmMember();
+        groupMember.setType(AuthorityTypeEnum.GROUP.getValue());
+        groupMember.setUserId(userId);
+        groupMember.setProjectId(projectId);
+        RdmMember rdmMember = rdmMemberMapper.selectOne(groupMember);
+        //如果全局层的权限为null,就查找项目层的
+        if (rdmMember == null) {
+            return repositoryIds.stream().map(repositoryId -> {
+                RdmMember dbMember = Optional.ofNullable(rdmMemberRepository.selectOneByUk(projectId, repositoryId, userId))
+                        .orElse(new RdmMember());
+                MemberPrivilegeViewDTO viewDTO = new MemberPrivilegeViewDTO();
+                viewDTO.setRepositoryId(repositoryId)
+                        .setAccessLevel(dbMember.getGlAccessLevel());
+                return viewDTO;
+            }).collect(Collectors.toList());
+        }
+        // 综合返回全局和仓库的权限
         return repositoryIds.stream().map(repositoryId -> {
             RdmMember dbMember = Optional.ofNullable(rdmMemberRepository.selectOneByUk(projectId, repositoryId, userId))
                     .orElse(new RdmMember());
             MemberPrivilegeViewDTO viewDTO = new MemberPrivilegeViewDTO();
-            viewDTO.setRepositoryId(repositoryId)
-                    .setAccessLevel(dbMember.getGlAccessLevel());
+            viewDTO.setRepositoryId(repositoryId);
+            if (dbMember.getGlAccessLevel() == null) {
+                viewDTO.setAccessLevel(rdmMember.getGlAccessLevel());
+            } else {
+                if (dbMember.getGlAccessLevel() > rdmMember.getGlAccessLevel()) {
+                    viewDTO.setAccessLevel(dbMember.getGlAccessLevel());
+                } else {
+                    viewDTO.setAccessLevel(rdmMember.getGlAccessLevel());
+                }
+            }
             return viewDTO;
         }).collect(Collectors.toList());
     }
 
     @Override
     public List<RepositoryPrivilegeViewDTO> selectRepositoriesByPrivilege(Long organizationId, Long projectId, Set<Long> userIds) {
+        //先判断有没有组的权限
         Condition condition = Condition.builder(RdmMember.class)
                 .andWhere(Sqls.custom()
                         .andEqualTo(RdmMember.FIELD_ORGANIZATION_ID, organizationId)
                         .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
                         .andIn(RdmMember.FIELD_USER_ID, userIds)
+                        .andEqualTo(RdmMember.FIELD_TYPE, "group")
                         // 同步状态需为true
                         .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, Boolean.TRUE))
                 .build();
         List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
-        Map<Long, List<RdmMember>> group = rdmMembers.stream().collect(Collectors.groupingBy(RdmMember::getUserId));
-
         List<RepositoryPrivilegeViewDTO> result = new ArrayList<>();
-        group.forEach((k, v) -> {
-            RepositoryPrivilegeViewDTO viewDTO = new RepositoryPrivilegeViewDTO();
-            viewDTO.setUserId(k);
-            viewDTO.setAppServiceIds(v.stream().map(RdmMember::getRepositoryId).collect(Collectors.toSet()));
-            result.add(viewDTO);
-        });
-
+        if (!CollectionUtils.isEmpty(rdmMembers)) {
+            rdmMembers.forEach(rdmMember -> {
+                RepositoryPrivilegeViewDTO repositoryPrivilegeViewDTO = new RepositoryPrivilegeViewDTO();
+                //查询项目下应用服务的
+                List<C7nAppServiceVO> c7nAppServiceVOS = c7NDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId);
+                repositoryPrivilegeViewDTO.setUserId(rdmMember.getUserId());
+                if (!CollectionUtils.isEmpty(c7nAppServiceVOS)) {
+                    repositoryPrivilegeViewDTO.setAppServiceIds(c7nAppServiceVOS.stream().map(C7nAppServiceVO::getId).collect(Collectors.toSet()));
+                }
+                result.add(repositoryPrivilegeViewDTO);
+            });
+        } else {
+            Condition projectCondition = Condition.builder(RdmMember.class)
+                    .andWhere(Sqls.custom()
+                            .andEqualTo(RdmMember.FIELD_ORGANIZATION_ID, organizationId)
+                            .andEqualTo(RdmMember.FIELD_PROJECT_ID, projectId)
+                            .andIn(RdmMember.FIELD_USER_ID, userIds)
+                            .andEqualTo(RdmMember.FIELD_TYPE, "project")
+                            // 同步状态需为true
+                            .andEqualTo(RdmMember.FIELD_SYNC_GITLAB_FLAG, Boolean.TRUE))
+                    .build();
+            List<RdmMember> projectRdmMembers = rdmMemberRepository.selectByCondition(projectCondition);
+            Map<Long, List<RdmMember>> group = projectRdmMembers.stream().collect(Collectors.groupingBy(RdmMember::getUserId));
+            group.forEach((k, v) -> {
+                RepositoryPrivilegeViewDTO viewDTO = new RepositoryPrivilegeViewDTO();
+                viewDTO.setUserId(k);
+                viewDTO.setAppServiceIds(v.stream().map(RdmMember::getRepositoryId).collect(Collectors.toSet()));
+                result.add(viewDTO);
+            });
+        }
         return result;
     }
 
@@ -473,9 +552,27 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
                         .andGreaterThanOrEqualTo(RdmMember.FIELD_GL_ACCESS_LEVEL, RdmAccessLevel.DEVELOPER.toValue()))
                 .build();
         List<RdmMember> rdmMembers = rdmMemberRepository.selectByCondition(condition);
-        Set<Long> appServiceIds = rdmMembers.stream().map(RdmMember::getRepositoryId).collect(Collectors.toSet());
+        //处理rdmMembers，包含project层和group层的
         RepositoryPrivilegeViewDTO result = new RepositoryPrivilegeViewDTO();
         result.setUserId(userId);
+        //如果是group层的，则查询devops
+        if (CollectionUtils.isEmpty(rdmMembers)) {
+            result.setAppServiceIds(Collections.EMPTY_SET);
+            return result;
+        }
+        Set<Long> appServiceIds = new HashSet<>();
+        List<Long> projectIds = rdmMembers.stream().filter(rdmMember -> org.apache.commons.lang3.StringUtils.equalsIgnoreCase(rdmMember.getType(), AuthorityTypeEnum.GROUP.getValue())).map(RdmMember::getProjectId).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(projectIds)) {
+            List<C7nAppServiceVO> c7nAppServiceVOS = c7NDevOpsServiceFacade.queryAppByProjectIds(0L, projectIds);
+            if (!CollectionUtils.isEmpty(c7nAppServiceVOS)) {
+                Set<Long> groupAppServiceIds = c7nAppServiceVOS.stream().map(C7nAppServiceVO::getId).collect(Collectors.toSet());
+                appServiceIds.addAll(groupAppServiceIds);
+            }
+        }
+        Set<Long> projectAppServiceIds = rdmMembers.stream().filter(rdmMember -> org.apache.commons.lang3.StringUtils.equalsIgnoreCase(rdmMember.getType(), AuthorityTypeEnum.PROJECT.getValue())).map(RdmMember::getRepositoryId).collect(Collectors.toSet());
+        if (!CollectionUtils.isEmpty(projectAppServiceIds)) {
+            appServiceIds.addAll(projectAppServiceIds);
+        }
         result.setAppServiceIds(appServiceIds);
         return result;
     }
@@ -485,6 +582,93 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         // 发送事件
         MemberEvent.EventParam eventParam = buildEventParam(param.getOrganizationId(), param.getProjectId(), param.getRepositoryId(), param.getUserId(), param.getGlAccessLevel(), param.getGlExpiresAt());
         OperationEventPublisherHelper.publishMemberEvent(new MemberEvent(this, eventType, eventParam));
+    }
+
+
+    @Override
+    public List<RepositoryPrivilegeViewDTO> listMemberRepositoriesByAccesses(Long organizationId, Long projectId, Set<Long> userIds, Integer accessLevel, Long appId) {
+        //查询全局层的权限
+        if (CollectionUtils.isEmpty(userIds)) {
+            return Collections.EMPTY_LIST;
+        }
+        List<RepositoryPrivilegeViewDTO> repositoryPrivilegeViewDTOS = new ArrayList<>();
+        userIds.forEach(userId -> {
+            RepositoryPrivilegeViewDTO repositoryPrivilegeViewDTO = new RepositoryPrivilegeViewDTO();
+            repositoryPrivilegeViewDTO.setUserId(userId);
+            //先查项目层的权限
+            RdmMember groupMember = new RdmMember();
+            groupMember.setType(AuthorityTypeEnum.GROUP.getValue());
+            groupMember.setUserId(userId);
+            groupMember.setProjectId(projectId);
+            RdmMember rdmMember = rdmMemberMapper.selectOne(groupMember);
+            if (rdmMember != null && rdmMember.getGlAccessLevel() >= accessLevel.intValue()) {
+                HashSet<Long> appIds = new HashSet<>();
+                appIds.add(appId);
+                repositoryPrivilegeViewDTO.setAppServiceIds(appIds);
+            } else {
+                //查询项目层的权限
+                RdmMember dbMember = Optional.ofNullable(rdmMemberRepository.selectOneByUk(projectId, appId, userId))
+                        .orElse(new RdmMember());
+                if (dbMember != null && dbMember.getGlAccessLevel() != null && dbMember.getGlAccessLevel() >= accessLevel.intValue()) {
+                    HashSet<Long> appIds = new HashSet<>();
+                    appIds.add(appId);
+                    repositoryPrivilegeViewDTO.setAppServiceIds(appIds);
+                }
+            }
+            repositoryPrivilegeViewDTOS.add(repositoryPrivilegeViewDTO);
+        });
+
+        return repositoryPrivilegeViewDTOS;
+    }
+
+    @Override
+    public void syncGroupMemberFromGitlab(RdmMember dbMember) {
+        // <1> 获取Gitlab成员, 并更新数据库
+        Integer glUserId = Objects.requireNonNull(dbMember.getGlUserId());
+        Member glMember = gitlabGroupApi.getMember(Objects.requireNonNull(dbMember.getgGroupId()), glUserId);
+        // 理论上只会查询到一个成员
+        if (glMember == null) {
+            // 移除数据库成员
+            rdmMemberRepository.deleteByPrimaryKey(dbMember.getId());
+        } else {
+            if (glMember.getAccessLevel().toValue() >= AccessLevel.OWNER.toValue()) {
+                // 移除数据库成员
+                rdmMemberRepository.deleteByPrimaryKey(dbMember.getId());
+            } else {
+                // 更新数据库成员
+                updateMemberAfter(dbMember, glMember);
+            }
+        }
+    }
+
+    @Override
+    public Member tryRemoveAndAddGroupMemberToGitlab(Integer gGroupId, Integer glUserId, Integer accessLevel, Date expiresAt) {
+        // 尝试移除成员
+        this.tryRemoveGroupMemberToGitlab(gGroupId, glUserId);
+        // 添加新成员
+        return this.addGroupMemberToGitlab(gGroupId, glUserId, accessLevel, expiresAt);
+    }
+
+    private Member addGroupMemberToGitlab(Integer gGroupId, Integer glUserId, Integer accessLevel, Date expiresAt) {
+        // 调用gitlab api添加成员
+        return gitlabGroupApi.addMember(gGroupId, glUserId, accessLevel, expiresAt);
+    }
+
+    private void tryRemoveGroupMemberToGitlab(Integer gGroupId, Integer glUserId) {
+        // 先查询Gitlab用户
+        Member glMember = gitlabGroupApi.getMember(gGroupId, glUserId);
+
+        if (glMember != null) {
+            if (glMember.getAccessLevel().toValue() >= RdmAccessLevel.OWNER.toValue()) {
+                throw new CommonException("error.not.allow.remove.owner", glMember.getName());
+            }
+
+            try {
+                this.removeGroupMemberToGitLab(gGroupId, glUserId);
+            } catch (GitlabClientException e) {
+                throw new CommonException("error.member.not.allow.change", e, glMember.getName());
+            }
+        }
     }
 
     /**

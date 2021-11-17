@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.domain.facade;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
 
@@ -155,4 +156,11 @@ public interface C7nDevOpsServiceFacade {
      * @return
      */
     List<C7nAppServiceVO> listAppServiceByIds(Set<Long> repositoryIds);
+
+    Long getAppGroupIdByProjectId(Long projectId);
+
+
+    List<C7nAppServiceVO> queryAppByProjectIds(Long projectId, List<Long> projectIds);
+
+    Map<Long, Long> listBuiltInActiveC7nAppServiceIdsMapOnProjectLevel(Long projectId);
 }

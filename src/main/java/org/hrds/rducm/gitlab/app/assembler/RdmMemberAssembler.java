@@ -17,16 +17,23 @@ import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
+import org.hzero.mybatis.domian.Condition;
+import org.hzero.mybatis.util.Sqls;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * @author ying.xie@hand-china.com
@@ -34,10 +41,15 @@ import java.util.stream.Collectors;
  */
 @Component
 public class RdmMemberAssembler {
+    private static final String PROJECT_OVERALL = "项目全局";
     @Autowired
     private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
+    @Autowired
+    private RdmMemberRepository rdmMemberRepository;
+    @Autowired
+    private RdmMemberMapper rdmMemberMapper;
 
     /**
      * 将GitlabMemberBatchDTO转换为List<RdmMember>
@@ -118,7 +130,7 @@ public class RdmMemberAssembler {
      * @param resourceLevel
      * @return
      */
-    public Page<RdmMemberViewDTO> pageToRdmMemberViewDTO(Page<RdmMember> page, ResourceLevel resourceLevel) {
+    public Page<RdmMemberViewDTO> pageToRdmMemberViewDTO(Page<RdmMember> page, ResourceLevel resourceLevel, Long projectId) {
         Page<RdmMemberViewDTO> rdmMemberViewDTOS = ConvertUtils.convertPage(page, RdmMemberViewDTO.class);
 
         // 获取用户id集合, 格式如: {projectId: [userId1, userId2]}, 用于查询项目角色
@@ -140,8 +152,8 @@ public class RdmMemberAssembler {
         // 查询用户信息, 带角色信息
         Map<Long, C7nUserVO> userWithRolesVOMap = new HashMap<>();
 
-        projectIdAndUserIds.asMap().forEach((projectId, uIds) -> {
-            Map<Long, C7nUserVO> tempMap = c7NBaseServiceFacade.listC7nUserToMapOnProjectLevel(projectId, Sets.newHashSet(uIds));
+        projectIdAndUserIds.asMap().forEach((userProject, uIds) -> {
+            Map<Long, C7nUserVO> tempMap = c7NBaseServiceFacade.listC7nUserToMapOnProjectLevel(userProject, Sets.newHashSet(uIds));
             userWithRolesVOMap.putAll(tempMap);
         });
 
@@ -156,6 +168,16 @@ public class RdmMemberAssembler {
         if (ResourceLevel.ORGANIZATION.equals(resourceLevel)) {
             c7nProjectVOMap = c7NBaseServiceFacade.listProjectsByIdsToMap(projectIds);
         }
+        //查询项目下的全局权限
+//        Map<Long, Integer> longIntegerMap = new HashMap<>();
+//        if (!Objects.isNull(projectId)) {
+//            List<RdmMember> rdmMembers = rdmMemberMapper.selectProjectMemberByUserIds(projectId, userIds, AuthorityTypeEnum.GROUP.getValue());
+//            List<RdmMember> rdmMembers = rdmMemberRepository(condition);
+//            if (!CollectionUtils.isEmpty(rdmMembers)) {
+//                //
+//                longIntegerMap = rdmMembers.stream().collect(Collectors.toMap(RdmMember::getUserId, RdmMember::getGlAccessLevel));
+//            }
+//        }
 
         // 填充数据
         for (RdmMemberViewDTO viewDTO : rdmMemberViewDTOS.getContent()) {
@@ -179,6 +201,13 @@ public class RdmMemberAssembler {
             viewDTO.setCreatedUser(BaseC7nUserViewDTO.convert(c7nCreateUserVO));
 
             viewDTO.setRepositoryName(c7nAppServiceVO.getName());
+
+            if (StringUtils.isEmpty(viewDTO.getRepositoryName()) && org.apache.commons.lang3.StringUtils.equalsIgnoreCase(viewDTO.getType(), AuthorityTypeEnum.GROUP.getValue())) {
+                viewDTO.setRepositoryName(PROJECT_OVERALL);
+            }
+            if (org.apache.commons.lang3.StringUtils.equalsIgnoreCase(viewDTO.getType(), AuthorityTypeEnum.PROJECT.getValue())) {
+                viewDTO.setGroupAccessLevel(viewDTO.getGroupAccessLevel());
+            }
         }
 
 //        //按照跟新时间倒序排序表

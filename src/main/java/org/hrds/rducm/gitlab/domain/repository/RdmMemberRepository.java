@@ -45,7 +45,7 @@ public interface RdmMemberRepository extends BaseRepository<RdmMember> {
      * @param userId
      * @return
      */
-    int deleteByOrganizationIdAndUserId(Long organizationId, Long userId);
+    void deleteByOrganizationIdAndUserId(Long organizationId, Long userId);
 
     /**
      * 插入Owner权限的成员
@@ -93,4 +93,6 @@ public interface RdmMemberRepository extends BaseRepository<RdmMember> {
      * @return
      */
     int batchInsertCustom(List<RdmMember> list);
+
+    List<RdmMember> groupMemberByUserId(Long projectId, List<Long> userIds);
 }

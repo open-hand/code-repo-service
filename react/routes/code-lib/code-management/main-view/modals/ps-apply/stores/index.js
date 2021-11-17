@@ -17,9 +17,10 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
     intl: { formatMessage },
     intlPrefix,
     branchServiceDs,
+    currentBranchAppId,
   } = props;
 
-  const formDs = useMemo(() => new DataSet(FormDataSet({ formatMessage, intlPrefix, organizationId, projectId, userId, realName, branchServiceDs })), [organizationId, projectId, userId, branchServiceDs]);
+  const formDs = useMemo(() => new DataSet(FormDataSet({ formatMessage, intlPrefix, organizationId, projectId, userId, realName, branchServiceDs, currentBranchAppId })), [currentBranchAppId, organizationId, projectId, userId, branchServiceDs]);
 
   useEffect(() => {
     formDs.create();

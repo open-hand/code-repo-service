@@ -1,7 +1,7 @@
 {
   "name": "@choerodon/code-repo",
   "routeName": "rducm",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "",
   "main": "./lib/index.js",
   "scripts": {
@@ -42,8 +42,8 @@
     "react-dom": "16.14.0"
   },
   "devDependencies": {
-    "@choerodon/boot": "0.23.1",
-    "@choerodon/master": "1.0.1",
+    "@choerodon/boot": "0.23.3",
+    "@choerodon/master": "1.1.0",
     "babel-eslint": "8.2.6",
     "babel-preset-c7n": "^0.0.2",
     "eslint": "^4.14.0",

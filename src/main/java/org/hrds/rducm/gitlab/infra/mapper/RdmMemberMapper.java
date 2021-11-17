@@ -1,6 +1,7 @@
 package org.hrds.rducm.gitlab.infra.mapper;
 
 import io.choerodon.mybatis.common.BaseMapper;
+
 import org.apache.ibatis.annotations.Param;
 import org.hrds.rducm.gitlab.domain.aggregate.MemberAuthDetailAgg;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
@@ -31,4 +32,10 @@ public interface RdmMemberMapper extends BaseMapper<RdmMember> {
      * @return
      */
     int batchInsertCustom(List<RdmMember> list);
+
+    List<RdmMember> selectUserGroupAccessLevel(@Param("userIds") Set<Long> userIds,@Param("projectId") Long projectId);
+
+    List<RdmMember> groupMemberByUserId(@Param("projectId") Long projectId, @Param("userIds") List<Long> userIds);
+
+    List<RdmMember> selectProjectMemberByUserIds(@Param("projectId") Long projectId, @Param("userIds") Set<Long> userIds, @Param("type") String type);
 }

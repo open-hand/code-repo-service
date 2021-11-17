@@ -3,8 +3,10 @@ package org.hrds.rducm.gitlab.domain.facade.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
@@ -247,6 +249,39 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
             return entity.getBody().getContent();
         } else {
             return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public Long getAppGroupIdByProjectId(Long projectId) {
+        ResponseEntity<Long> appGroupIdByProjectId = devOpsServiceFeignClient.getAppGroupIdByProjectId(projectId);
+        if (appGroupIdByProjectId.getBody() != null) {
+            return appGroupIdByProjectId.getBody();
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public List<C7nAppServiceVO> queryAppByProjectIds(Long projectId, List<Long> projectIds) {
+        ResponseEntity<List<C7nAppServiceVO>> listResponseEntity = devOpsServiceFeignClient.queryAppByProjectIds(projectId, projectIds);
+        if (listResponseEntity.getBody() != null) {
+            return listResponseEntity.getBody();
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public Map<Long, Long> listBuiltInActiveC7nAppServiceIdsMapOnProjectLevel(Long projectId) {
+        List<C7nAppServiceVO> list = this.listC7nAppServiceOnProjectLevel(projectId);
+        //过滤掉外部仓库
+        if (!CollectionUtils.isEmpty(list)) {
+            return list.stream().filter(c7nAppServiceVO -> c7nAppServiceVO.getExternalConfigId() == null)
+                    .collect(HashMap::new, (m, v) ->
+                            m.put(v.getId(), v.getGitlabProjectId()), HashMap::putAll);
+        } else {
+            return Collections.emptyMap();
         }
     }
 }

@@ -13,7 +13,9 @@
              gl_project_id,
              gl_user_id,
              gl_access_level,
-             gl_expires_at)
+             gl_expires_at,
+             type,
+             g_group_id)
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.organizationId},
@@ -25,7 +27,9 @@
             #{item.glProjectId},
             #{item.glUserId},
             #{item.glAccessLevel},
-            #{item.glExpiresAt})
+            #{item.glExpiresAt},
+            #{item.type},
+            #{item.gGroupId})
         </foreach>
     </insert>
 </mapper>

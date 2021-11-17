@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { observer } from 'mobx-react-lite';
 import { TabPage, Header, Page, Content, HeaderButtons } from '@choerodon/boot';
-import { Button, DatePicker } from 'choerodon-ui';
+import { Button, DatePicker, Tooltip } from 'choerodon-ui';
 import { Stores, Select } from 'choerodon-ui/pro';
 
 import CodeManagerHeader from '../../header';
 import TimeLine from './TimeLine.js';
 import { usPsManagerStore } from '../stores';
 import './log.less';
+
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -63,7 +64,8 @@ const OperationLogTab = () => {
   return (
     <div style={{
       height: '100%',
-    }}>
+    }}
+    >
       <Header>
         <HeaderButtons
           showClassName={false}
@@ -79,19 +81,29 @@ const OperationLogTab = () => {
       <Content style={{
         height: 'calc(100% - 64px)',
         overflow: 'scroll',
-      }}>
+      }}
+      >
         <div className="code-lib-opreation-log-search">
           <Select
             placeholder={formatMessage({ id: 'infra.codelib.audit.model.service' })}
             onChange={val => handleSearch({ repositoryIds: val })}
               // eslint-disable-next-line
-              clearButton={true}
+            clearButton={true}
+            dataSet={branchServiceDs}
             searchable
             style={{ maxWidth: '2.85rem', marginRight: '0.12rem' }}
           >
             {
                 branchServiceDs.toData().map(o => (
-                  <Option key={o.repositoryId} value={o.repositoryId}>{o.repositoryName}</Option>
+                  <Option
+                    key={o.repositoryId}
+                    value={o.repositoryId}
+                    disabled={Boolean(o.externalConfigId)}
+                  >
+                    <Tooltip title={o.externalConfigId ? '外置GitLab代码仓库的应用服务不支持配置' : ''}>
+                      {o.repositoryName}
+                    </Tooltip>
+                  </Option>
                 ))
               }
           </Select>

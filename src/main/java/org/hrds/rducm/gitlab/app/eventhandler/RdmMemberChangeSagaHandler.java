@@ -6,29 +6,46 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import io.choerodon.asgard.saga.annotation.SagaTask;
+import io.choerodon.core.exception.CommonException;
 import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.domain.AuditDomain;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.gitlab4j.api.models.Group;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTaskCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
+import org.hrds.rducm.gitlab.app.eventhandler.gitlab.GitlabPermissionHandler;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.GitlabGroupMemberVO;
+import org.hrds.rducm.gitlab.app.eventhandler.payload.ProjectAuditPayload;
+import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
+import org.hrds.rducm.gitlab.domain.entity.MemberAuditLog;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
+import org.hrds.rducm.gitlab.domain.entity.payload.GroupMemberPayload;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
+import org.hrds.rducm.gitlab.domain.repository.MemberAuditLogRepository;
+import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
+import org.hrds.rducm.gitlab.infra.constant.RepoConstants;
+import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
+import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.enums.RoleLabelEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.ProjectCategoryVO;
+import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
 import org.hrds.rducm.gitlab.infra.util.JsonHelper;
 import org.hzero.core.util.AssertUtils;
 import org.slf4j.Logger;
@@ -52,6 +69,8 @@ public class RdmMemberChangeSagaHandler {
 
     private static final Gson gson = new Gson();
 
+    private static final String N_DEVOPS = "N_DEVOPS";
+
     @Autowired
     private RdmMemberRepository rdmMemberRepository;
     @Autowired
@@ -62,10 +81,26 @@ public class RdmMemberChangeSagaHandler {
     private IRdmMemberService iRdmMemberService;
     @Autowired
     private GitlabProjectApi gitlabProjectApi;
+    @Autowired
+    private IRdmMemberAuditRecordService iRdmMemberAuditRecordService;
+    @Autowired
+    private MemberAuditLogRepository memberAuditLogRepository;
+    @Autowired
+    private RdmMemberAuditAppService rdmMemberAuditAppService;
+    @Autowired
+    private GitlabGroupApi gitlabGroupApi;
+    @Autowired
+    private RdmMemberMapper rdmMemberMapper;
+    @Autowired
+    private Map<String, GitlabPermissionHandler> permissionRepairMap;
+    @Autowired
+    private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
 
 
     /**
      * 角色同步事件
+     * 添加用户成员在这里
+     * 变更角色也在这里（添加，删除）
      */
     @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_UPDATE_MEMBER_ROLE,
             description = "角色同步事件",
@@ -86,6 +121,7 @@ public class RdmMemberChangeSagaHandler {
 
     /**
      * 删除角色同步事件
+     * 删除用户成员在这里
      */
     @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_DELETE_MEMBER_ROLE,
             description = "删除角色同步事件",
@@ -191,6 +227,90 @@ public class RdmMemberChangeSagaHandler {
     }
 
 
+    @SagaTask(code = SagaTaskCodeConstants.BATCH_ADD_GROUP_MEMBERS,
+            description = "批量添加组的权限",
+            sagaCode = SagaTopicCodeConstants.BATCH_ADD_GROUP_MEMBER, maxRetryCount = 3, seq = 1)
+    public void addGroupMember(String payload) {
+        GroupMemberPayload groupMemberPayload = JsonHelper.unmarshalByJackson(payload, GroupMemberPayload.class);
+
+        //查询gitlab组是否存在
+        Group group = gitlabGroupApi.getGroup(groupMemberPayload.getgGroupId());
+        AssertUtils.notNull(group, "error.gitlab.group.not.exist", groupMemberPayload.getgGroupId());
+
+        groupMemberPayload.getGitlabMemberCreateDTOS().forEach(gitlabMemberCreateDTO -> {
+            //userId和groupId确定唯一的数据
+            RdmMember record = new RdmMember();
+            record.setUserId(gitlabMemberCreateDTO.getUserId());
+            record.setgGroupId(groupMemberPayload.getgGroupId());
+            RdmMember rdmMember = rdmMemberMapper.selectOne(record);
+            if (Objects.isNull(rdmMember)) {
+                throw new CommonException("error.rdmMember.is.null");
+            }
+            try {
+                Member groupApiMember = gitlabGroupApi.getMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId());
+                if (!Objects.isNull(groupApiMember)) {
+                    gitlabGroupApi.removeMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId());
+                }
+                Member member = gitlabGroupApi.addMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId(), gitlabMemberCreateDTO.getGlAccessLevel(), gitlabMemberCreateDTO.getGlExpiresAt());
+                //回写数据库
+                iRdmMemberService.updateMemberAfter(rdmMember, member);
+            } catch (Exception e) {
+                // 回写数据库错误消息
+                logger.error(e.getMessage(), e);
+                record.setSyncGitlabErrorMsg(e.getMessage());
+                rdmMemberRepository.updateOptional(record, RdmMember.FIELD_SYNC_GITLAB_ERROR_MSG);
+            }
+
+        });
+    }
+
+
+    @SagaTask(code = SagaTaskCodeConstants.PROJECT_AUDIT_MEMBER_PERMISSION,
+            description = "项目下成员权限审计",
+            sagaCode = SagaTopicCodeConstants.PROJECT_AUDIT_MEMBER_PERMISSION,
+            maxRetryCount = 3, seq = 1)
+    public void projectAudit(String payload) {
+        ProjectAuditPayload projectAuditPayload = JsonHelper.unmarshalByJackson(payload, ProjectAuditPayload.class);
+        // <1> 保存审计记录
+        Date startDate = new Date();
+        List<RdmMemberAuditRecord> records = iRdmMemberAuditRecordService.batchCompareProject(projectAuditPayload.getOrganizationId(), projectAuditPayload.getProjectId());
+        Date endDate = new Date();
+
+        //插入项目的审计日志
+        String auditNo = UUID.randomUUID().toString();
+        MemberAuditLog log = new MemberAuditLog();
+        log.setOrganizationId(projectAuditPayload.getOrganizationId());
+        log.setProjectId(projectAuditPayload.getProjectId());
+        log.setAuditNo(auditNo);
+        log.setAuditCount(records == null ? 0 : records.size());
+        log.setAuditStartDate(startDate);
+        log.setAuditEndDate(endDate);
+        log.setAuditDuration(Math.toIntExact(Duration.between(startDate.toInstant(), endDate.toInstant()).toMillis()));
+        memberAuditLogRepository.insertSelective(log);
+
+    }
+
+    @SagaTask(code = SagaTaskCodeConstants.BATCH_ADD_GITLAB_MEMBER,
+            description = "项目下成员权限修复",
+            sagaCode = SagaTopicCodeConstants.PROJECT_BATCH_AUDIT_FIX,
+            maxRetryCount = 3, seq = 1)
+    public void batchAuditFix(String payload) {
+        ProjectAuditPayload projectAuditPayload = JsonHelper.unmarshalByJackson(payload, ProjectAuditPayload.class);
+        Set<Long> recordIds = projectAuditPayload.getRecordIds();
+        if (CollectionUtils.isEmpty(recordIds)) {
+            return;
+        }
+        recordIds.forEach(recordId -> {
+            RdmMemberAuditRecord rdmMemberAuditRecord = rdmMemberAuditRecordRepository.selectByPrimaryKey(recordId);
+            if (Objects.isNull(rdmMemberAuditRecord)) {
+                return;
+            }
+            permissionRepairMap.get(rdmMemberAuditRecord.getType() + RepoConstants.GITLAB_PERMISSION_HANDLER).gitlabPermissionRepair(rdmMemberAuditRecord);
+        });
+
+    }
+
+
     /**
      * 处理项目层的团队成员角色变更
      * 由于saga参数只给出了修改后的角色信息, 没有给出修改前的角色信息, 无法做更精确的判断
@@ -216,8 +336,13 @@ public class RdmMemberChangeSagaHandler {
                         }
                         //新增的角色
                         String roleType = fetchProjectRoleLabel(userMemberRoleList, containsGitlabOwner);
+                        //如果用户新增的角色是项目成员，但是还包含其他owner的权限则roleType为default(这里主要考虑带owner标签的自定义角色)
+                        if (!CollectionUtils.isEmpty(gitlabGroupMemberVO.getRoleLabels())) {
+                            if (gitlabGroupMemberVO.getRoleLabels().contains(RoleLabelEnum.GITLAB_OWNER.value())) {
+                                roleType = RoleLabelEnum.DEFAULT.value();
+                            }
+                        }
                         RoleLabelEnum roleLabelEnum = Optional.ofNullable(EnumUtils.getEnum(RoleLabelEnum.class, roleType)).orElseThrow(IllegalArgumentException::new);
-
                         switch (roleLabelEnum) {
                             case PROJECT_MEMBER:
                                 // 设置角色为项目成员, 删除权限
@@ -308,7 +433,7 @@ public class RdmMemberChangeSagaHandler {
             } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value()) && containsGitlabOwner) {
                 return RoleLabelEnum.PROJECT_MEMBER.value();
             } else if (userMemberRoleList.contains(RoleLabelEnum.PROJECT_MEMBER.value()) && !containsGitlabOwner) {
-                return RoleLabelEnum.DEFAULT.value();
+                return RoleLabelEnum.PROJECT_MEMBER.value();
             } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_DEVELOPER.value()) && containsGitlabOwner) {
                 return RoleLabelEnum.PROJECT_MEMBER.value();
             } else if (userMemberRoleList.contains(RoleLabelEnum.GITLAB_DEVELOPER.value()) && !containsGitlabOwner) {
@@ -387,18 +512,35 @@ public class RdmMemberChangeSagaHandler {
         rdmMemberRepository.deleteByOrganizationIdAndUserId(organizationId, userId);
     }
 
-    private void insertProjectOwner(Long organizationId, Long projectId, Long userId) {
+    public void insertProjectOwner(Long organizationId, Long projectId, Long userId) {
         Integer glUserId = c7nBaseServiceFacade.userIdToGlUserId(userId);
-        List<C7nAppServiceVO> appServiceVOS = c7nDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId);
-        appServiceVOS.forEach(appServiceVO -> {
-            if (appServiceVO.getId() == null || appServiceVO.getGitlabProjectId() == null) {
-                logger.warn("项目{}, 应用服务{}, 未查询到对应GitlabProjectId, 跳过该应用服务", projectId, appServiceVO.getId());
-            } else {
-                Long repositoryId = appServiceVO.getId();
-                Integer glProjectId = Math.toIntExact(appServiceVO.getGitlabProjectId());
-                rdmMemberRepository.insertWithOwner(organizationId, projectId, repositoryId, userId, glProjectId, glUserId);
+        //这里需要判断项目的类型 如果是非devops项目，
+        C7nProjectVO c7nProjectVO = c7nBaseServiceFacade.detailC7nProject(projectId);
+        if (c7nProjectVO != null
+                && !CollectionUtils.isEmpty(c7nProjectVO.getCategories())
+                && c7nProjectVO.getCategories().stream().map(ProjectCategoryVO::getCode).collect(Collectors.toList()).contains(N_DEVOPS)) {
+            Long appGroupIdByProjectId = c7nDevOpsServiceFacade.getAppGroupIdByProjectId(projectId);
+            RdmMember rdmMember = new RdmMember();
+            rdmMember.setUserId(userId);
+            rdmMember.setGlAccessLevel(RdmAccessLevel.OWNER.value);
+            rdmMember.setSyncGitlabFlag(Boolean.TRUE);
+            rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+            rdmMember.setOrganizationId(organizationId);
+            rdmMember.setGlUserId(glUserId);
+            rdmMember.setgGroupId(appGroupIdByProjectId.intValue());
+            rdmMember.setProjectId(projectId);
+            rdmMember.setSyncGitlabDate(new Date());
+
+            RdmMember exists = new RdmMember();
+            exists.setProjectId(projectId);
+            exists.setUserId(userId);
+            exists.setType(AuthorityTypeEnum.GROUP.getValue());
+            exists.setGlAccessLevel(RdmAccessLevel.OWNER.value);
+            if (CollectionUtils.isEmpty(rdmMemberMapper.select(exists))) {
+                rdmMemberMapper.insert(rdmMember);
             }
-        });
+        }
+
     }
 
     private Boolean isProjectAdmin(C7nUserVO vo) {

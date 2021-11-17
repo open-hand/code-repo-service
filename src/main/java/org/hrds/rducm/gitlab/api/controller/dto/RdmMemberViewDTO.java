@@ -53,6 +53,8 @@ public class RdmMemberViewDTO {
 
     @ApiModelProperty("Gitlab同步时间")
     private Date syncGitlabDate;
+    @ApiModelProperty(value = "权限属于项目层还是全局层")
+    private String type;
 
     @JsonIgnore
     private Long createdBy;
@@ -63,6 +65,16 @@ public class RdmMemberViewDTO {
 
     private Long objectVersionNumber;
 
+    private Integer groupAccessLevel;
+
+    public Integer getGroupAccessLevel() {
+        return groupAccessLevel;
+    }
+
+    public void setGroupAccessLevel(Integer groupAccessLevel) {
+        this.groupAccessLevel = groupAccessLevel;
+    }
+
     public Long getId() {
         return id;
     }
@@ -70,6 +82,14 @@ public class RdmMemberViewDTO {
     public RdmMemberViewDTO setId(Long id) {
         this.id = id;
         return this;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getRepositoryName() {

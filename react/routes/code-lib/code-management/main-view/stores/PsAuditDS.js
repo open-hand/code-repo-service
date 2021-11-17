@@ -1,32 +1,33 @@
+/* eslint-disable import/no-anonymous-default-export */
 // import { axios } from '@choerodon/boot';
 import { map } from 'lodash';
+import Apis from '../../apis';
 
-export default ((intlPrefix, formatMessage, organizationId, projectId, branchServiceDs) => ({
+export default ((intlPrefix, formatMessage, organizationId, projectId, branchAppId) => ({
   autoQuery: false,
-  selection: false,
+  selection: 'multiple',
   pageSize: 10,
   transport: {
     read: () => ({
-      url: `/rducm/v1/organizations/${organizationId}/projects/${projectId}/member-audit-records`,
+      url: Apis.getAuditUrl(organizationId, projectId, branchAppId),
       method: 'get',
       transformResponse: (resp) => {
         try {
           const data = JSON.parse(resp);
           if (data && data.failed) {
             return data;
-          } else {
-            const { list, content, ...others } = data;
-            const tempList = map(data.list || data.content || [], item => ({
-              ...item,
-              accessLevel: item.accessLevel ? `L${item.accessLevel}` : '-',
-              glAccessLevel: item.glAccessLevel ? `L${item.glAccessLevel}` : '-',
-            }));
-            return {
-              ...others,
-              list: tempList,
-              content: tempList,
-            };
           }
+          const { list, content, ...others } = data;
+          const tempList = map(data.list || data.content || [], item => ({
+            ...item,
+            accessLevel: item.accessLevel ? `L${item.accessLevel}` : '-',
+            glAccessLevel: item.glAccessLevel ? `L${item.glAccessLevel}` : '-',
+          }));
+          return {
+            ...others,
+            list: tempList,
+            content: tempList,
+          };
         } catch (e) {
           return resp;
         }
@@ -75,26 +76,5 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchSer
       name: 'syncGitlabFlag',
       type: 'boolean',
     }, // 是否已同步
-  ],
-  queryFields: [
-    // {
-    //   name: 'realName',
-    //   type: 'string',
-    //   label: formatMessage({ id: 'userName' }),
-    // },
-    // {
-    //   name: 'loginName',
-    //   type: 'string',
-    //   label: formatMessage({ id: 'loginName' }),
-    // },
-    {
-      name: 'repositoryIds',
-      type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.service` }),
-      textField: 'repositoryName',
-      valueField: 'repositoryId',
-      options: branchServiceDs,
-      // lookupUrl: `/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/list-by-active`,
-    },
   ],
 }));

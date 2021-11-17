@@ -39,6 +39,10 @@ public class BaseC7nUserViewDTO {
     private Boolean projectMember;
     @ApiModelProperty(value = "ladp")
     private Boolean ldap;
+    @ApiModelProperty(value = "group的成员权限")
+    private Integer groupAccessLevel;
+
+
 
 
     //
@@ -136,5 +140,13 @@ public class BaseC7nUserViewDTO {
     public BaseC7nUserViewDTO setLdap(Boolean ldap) {
         this.ldap = ldap;
         return this;
+    }
+
+    public Integer getGroupAccessLevel() {
+        return groupAccessLevel;
+    }
+
+    public void setGroupAccessLevel(Integer groupAccessLevel) {
+        this.groupAccessLevel = groupAccessLevel;
     }
 }

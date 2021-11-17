@@ -3,6 +3,8 @@ package org.hrds.rducm.gitlab.app.assembler;
 import com.google.common.collect.Sets;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.iam.ResourceLevel;
+
+import org.apache.commons.lang3.StringUtils;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nProjectViewDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.base.BaseC7nUserViewDTO;
@@ -72,6 +74,9 @@ public class RdmMemberAuditRecordAssembler {
             viewDTO.setRepositoryName(c7nAppServiceVO.getName());
             viewDTO.setAccessLevelSyncFlag(Objects.equals(viewDTO.getAccessLevel(), viewDTO.getGlAccessLevel()));
             viewDTO.setExpiresAtSyncFlag(Objects.equals(viewDTO.getExpiresAt(), viewDTO.getGlExpiresAt()));
+            if (StringUtils.equalsIgnoreCase(viewDTO.getType(),"group")){
+                viewDTO.setRepositoryName("项目全局");
+            }
 
             // 组织层添加项目信息
             if (ResourceLevel.ORGANIZATION.equals(resourceLevel)) {

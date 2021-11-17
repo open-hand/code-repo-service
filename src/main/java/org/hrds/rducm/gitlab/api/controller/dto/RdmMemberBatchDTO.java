@@ -36,6 +36,25 @@ public class RdmMemberBatchDTO {
         @ApiModelProperty(ApiInfoConstants.GL_EXPIRES_AT)
         private Date glExpiresAt;
 
+        private Integer gUserId;
+
+        private Integer gGroupId;
+
+        public Integer getgGroupId() {
+            return gGroupId;
+        }
+
+        public void setgGroupId(Integer gGroupId) {
+            this.gGroupId = gGroupId;
+        }
+
+        public Integer getgUserId() {
+            return gUserId;
+        }
+
+        public void setgUserId(Integer gUserId) {
+            this.gUserId = gUserId;
+        }
 
         public Long getUserId() {
             return userId;

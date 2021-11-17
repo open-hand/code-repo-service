@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { inject } from 'mobx-react';
 import moment from 'moment';
 import { DataSet, Form, SelectBox, DatePicker, TextArea } from 'choerodon-ui/pro';
-import BatchApproveServices from '@/routes/code-lib/code-management/main-view/ps-approval/services';
+import BatchApproveServices from '@/routes/code-lib/code-management/apis';
 
 
 export default inject('AppState')(observer(({

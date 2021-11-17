@@ -16,21 +16,21 @@ export default observer(() => {
       if (await branchFormDs.submit() !== false) {
         refresh();
         return true;
-      } else {
-        return false;
       }
+      return false;
     } catch (e) {
       Choerodon.handleResponseError(e);
       return false;
     }
   });
-  
+
   modal.handleCancel(() => {
     branchFormDs.reset();
   });
 
   function handleChange(value) {
-    branchFormDs.current.set('branchName', value);
+    // branchFormDs.current.set('branchName', value);
+    console.log(6666);
   }
 
   /**
@@ -68,9 +68,10 @@ export default observer(() => {
       <Form dataSet={branchFormDs}>
         <Select
           name="branchName"
-          combo
-          onChange={handleChange}
-          clearButton={false}
+          // combo
+          // searchable
+          // onChange={handleChange}
+          // clearButton={false}
           optionRenderer={optionRenderer}
           renderer={rendererOpt}
         />

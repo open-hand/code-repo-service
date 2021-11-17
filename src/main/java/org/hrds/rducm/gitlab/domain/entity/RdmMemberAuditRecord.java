@@ -79,6 +79,10 @@ public class RdmMemberAuditRecord extends AuditDomain {
     private Date glExpiresAt;
     @ApiModelProperty(value = "同步标识")
     private Boolean syncFlag;
+    @ApiModelProperty(value = "gitlab组的Id")
+    private Integer  gGroupId;
+    @ApiModelProperty(value = "权限属于项目层还是全局层")
+    private String type;
     //
     // 非数据库字段
     // ------------------------------------------------------------------------------
@@ -193,5 +197,22 @@ public class RdmMemberAuditRecord extends AuditDomain {
     public RdmMemberAuditRecord setSyncFlag(Boolean syncFlag) {
         this.syncFlag = syncFlag;
         return this;
+    }
+
+    public Integer getgGroupId() {
+        return gGroupId;
+    }
+
+    public RdmMemberAuditRecord setgGroupId(Integer gGroupId) {
+        this.gGroupId = gGroupId;
+        return this;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

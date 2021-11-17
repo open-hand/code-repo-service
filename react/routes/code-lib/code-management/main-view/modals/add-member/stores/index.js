@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable max-len */
 import React, { createContext, useContext, useMemo, useEffect } from 'react';
 import { inject } from 'mobx-react';
 import { injectIntl } from 'react-intl';
@@ -19,18 +21,28 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
     intl: { formatMessage },
     intlPrefix,
     branchServiceDs,
+    currentBranchAppId,
+    openType,
   } = props;
-
-  // 无权限的人员
-  const userOptions = useMemo(() => new DataSet(UserNoDataSet({ organizationId, projectId })), [projectId]);
-  const pathListDs = useMemo(() => new DataSet(PathListDataSet({ formatMessage, intlPrefix, userOptions })), [projectId]);
-  const formDs = useMemo(() => new DataSet(FormDataSet({ formatMessage, intlPrefix, pathListDs, organizationId, projectId, branchServiceDs })), [organizationId, projectId, branchServiceDs]);
+  // 人员options  DataSet
+  const userOptions = useMemo(() => new DataSet(UserNoDataSet({
+    organizationId, projectId, type: openType,
+  })), [projectId]);
+  const pathListDs = useMemo(() => new DataSet(PathListDataSet({
+    formatMessage, intlPrefix, userOptions,
+  })), [projectId]);
+  const formDs = useMemo(() => new DataSet(FormDataSet({
+    formatMessage, intlPrefix, pathListDs, organizationId, projectId, branchServiceDs, currentBranchAppId, openType,
+  })), [organizationId, projectId, currentBranchAppId, branchServiceDs]);
 
   useEffect(() => {
     formDs.create();
     pathListDs.create();
+    return () => {
+      formDs.reset();
+      pathListDs.reset();
+    };
   }, []);
-
   const value = {
     ...props,
     formDs,

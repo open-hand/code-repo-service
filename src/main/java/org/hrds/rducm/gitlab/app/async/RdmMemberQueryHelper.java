@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.app.async;
 
-import io.choerodon.core.domain.Page;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
@@ -21,6 +20,7 @@ import java.util.concurrent.*;
 
 /**
  * TODO 查询多线程优化, 待完成
+ *
  * @author ying.xie@hand-china.com
  * @date 2020/6/8
  */
@@ -103,19 +103,11 @@ public class RdmMemberQueryHelper {
                 repositoryIdSet = futureTask3.get();
             } catch (InterruptedException | ExecutionException e) {
                 Thread.currentThread().interrupt();
-                e.printStackTrace();
+                logger.error("error.params.condition", e);
             }
             Set<Long> userIdsSet = new HashSet<>();
             userIdsSet.addAll(userIdsSet1);
             userIdsSet.addAll(userIdsSet2);
-
-//            Set<Long> userIdsSet1 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, params, null);
-//            Set<Long> userIdsSet2 = c7NBaseServiceFacade.listC7nUserIdsByNameOnProjectLevel(projectId, null, params);
-//            Set<Long> userIdsSet = new HashSet<>();
-//            userIdsSet.addAll(userIdsSet1);
-//            userIdsSet.addAll(userIdsSet2);
-//
-//            Set<Long> repositoryIdSet = c7NDevOpsServiceFacade.listC7nAppServiceIdsByNameOnProjectLevel(projectId, params);
 
             boolean userIsEmpty = userIdsSet.isEmpty();
             boolean repositoryIsEmpty = repositoryIdSet.isEmpty();

@@ -1,20 +1,27 @@
+/* eslint-disable react/jsx-no-bind */
+/* eslint-disable max-len */
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
 import { message } from 'choerodon-ui';
 import { Modal } from 'choerodon-ui/pro';
+import { useUnmount } from 'ahooks';
 import { Header, Choerodon, axios, HeaderButtons } from '@choerodon/boot';
-import BatchApprove from '../ps-approval/BatchApprove';
+import BatchApprove from './batch-approval';
 import AddMember from './add-member';
-import AddOutsideMember from './add-outside-member';
-// import ImportMember from './import-member';
 import AddBranch from './add-branch';
 import AddTag from './add-tag';
 import PsApply from './ps-apply';
 import { usPsManagerStore } from '../stores';
+import { useManagementStore } from '../../stores';
 import ExportAuthority from './export-authority';
+import Apis from '../../apis';
+import { FixModal, AuditModal } from './ps-audit';
 
+let addmemberModal;
 const modalKey = Modal.key();
+const SyncKey = Modal.key();
+const deleteKey = Modal.key();
 const modalStyle = {
   width: 740,
 };
@@ -39,24 +46,36 @@ const EnvModals = observer((props) => {
     branchServiceDs,
     applyViewDs,
   } = usPsManagerStore();
+
+  const {
+    hasPermission,
+  } = useManagementStore();
+
   const { type } = props;
   const [exportModalVisible, setExportModalVisible] = useState(false);
 
+  useUnmount(() => {
+    if (addmemberModal) {
+      addmemberModal.close();
+    }
+  });
+
   async function fetchExecutionDate() {
-    await overStores.fetchExecutionDate(organizationId, projectId)
-      .then((res) => {
-        if (res.failed) {
-          Choerodon.prompt(res.message);
-          return false;
-        }
-        const dataStr = res.auditEndDate ? moment(res.auditEndDate).format('YYYY-MM-DD HH:mm:ss') : undefined;
-        setExecutionDate(dataStr);
-        return true;
-      })
-      .catch((error) => {
-        Choerodon.handleResponseError(error);
+    try {
+      const res = Apis.fetchExecutionDate(organizationId, projectId);
+      if (res.failed) {
+        Choerodon.prompt(res.message);
         return false;
-      });
+      }
+      const dataStr = res.auditEndDate
+        ? moment(res.auditEndDate).format('YYYY-MM-DD HH:mm:ss')
+        : undefined;
+      setExecutionDate(dataStr);
+      return true;
+    } catch (error) {
+      Choerodon.handleResponseError(error);
+      return false;
+    }
   }
 
   function refresh() {
@@ -94,35 +113,26 @@ const EnvModals = observer((props) => {
   function refreshTag() {
     tagDs.query();
   }
-  // function refreshApproval() {
-  //   psApprovalDs.query();
-  // }
 
-  function openAdd() {
-    Modal.open({
+  function openAdd(openType) {
+    let strId;
+    if (openType === 'project') {
+      strId = 'infra.add.member';
+    } else {
+      strId = 'infra.add.outsideMember';
+    }
+    addmemberModal = Modal.open({
       key: modalKey,
       style: modalStyle,
       drawer: true,
-      title: formatMessage({ id: 'infra.add.member' }),
+      title: formatMessage({ id: `${strId}` }),
+      closeOnLocationChange: true,
       children: <AddMember
+        openType={openType}
         refresh={refresh}
         intlPrefix={intlPrefix}
         prefixCls={prefixCls}
-        branchServiceDs={branchServiceDs}
-      />,
-      okText: formatMessage({ id: 'add' }),
-    });
-  }
-  function openAddOutside() {
-    Modal.open({
-      key: modalKey,
-      style: modalStyle,
-      drawer: true,
-      title: formatMessage({ id: 'infra.add.outsideMember' }),
-      children: <AddOutsideMember
-        refresh={refresh}
-        intlPrefix={intlPrefix}
-        prefixCls={prefixCls}
+        currentBranchAppId={branchAppId}
         branchServiceDs={branchServiceDs}
       />,
       okText: formatMessage({ id: 'add' }),
@@ -138,25 +148,12 @@ const EnvModals = observer((props) => {
         refresh={refresh}
         intlPrefix={intlPrefix}
         prefixCls={prefixCls}
+        currentBranchAppId={branchAppId}
         branchServiceDs={branchServiceDs}
       />,
       okText: formatMessage({ id: 'add' }),
     });
   }
-  // function openImport() {
-  //   Modal.open({
-  //     children: <ImportMember onOk={refresh} />,
-  //     key: modalKey,
-  //     drawer: true,
-  //     style: { width: 380 },
-  //     fullScreen: true,
-  //     destroyOnClose: true,
-  //     className: 'base-site-user-sider',
-  //     okText: '返回',
-  //     okCancel: false,
-  //     title: '导入成员',
-  //   });
-  // }
   function openBranch() {
     Modal.open({
       title: formatMessage({ id: 'infra.add.branch' }),
@@ -191,6 +188,17 @@ const EnvModals = observer((props) => {
       okText: formatMessage({ id: 'add' }),
     });
   }
+
+  function openDeleteModal() {
+    Modal.open({
+      key: deleteKey,
+      title: formatMessage({ id: 'infra.button.batch.delete' }),
+      children: '确认要删除选中的用户对应的代码库权限吗？',
+      okText: formatMessage({ id: 'delete' }),
+      onOk: handleDelete,
+    });
+  }
+
   async function handleDelete() {
     const deleteData = psSetDs.selected.map(item => item.get('id'));
     await axios.delete(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members/batch-remove`, { params: { memberIds: deleteData.join(',') } })
@@ -205,6 +213,30 @@ const EnvModals = observer((props) => {
       .catch((error) => {
         Choerodon.handleResponseError(error);
       });
+  }
+
+  function handleSyncOpenModal() {
+    Modal.open({
+      title: formatMessage({ id: 'infra.button.batch.sync' }),
+      children: '确认将全部【未同步】状态用户的代码权限与GitLab仓库内用户的权限进行同步吗？',
+      onOk: handleSync,
+      key: SyncKey,
+    });
+  }
+
+  async function handleSync() {
+    try {
+      const res = await axios.get(`/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members/all/sync`);
+      if (res && res.failed) {
+        message.error('用户同步失败，请检查后重试');
+        return true;
+      }
+      psSetDs.query();
+      return true;
+    } catch (error) {
+      Choerodon.handleResponseError(error);
+      return false;
+    }
   }
 
   /**
@@ -223,6 +255,50 @@ const EnvModals = observer((props) => {
     });
   }
 
+  async function handlerBatchAudit() {
+    try {
+      const res = await Apis.bacthAuidt(organizationId, projectId);
+      if (res && res.failed) {
+        message.error('手动审计失败');
+        return true;
+      }
+      psAuditDs.query();
+      return true;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async function handlerBatchAuditFix() {
+    try {
+      const res = await Apis.bacthfix(organizationId, projectId, psAuditDs.selected.map(item => item.get('id')));
+      if (res && res.failed) {
+        message.error('批量修复失败');
+        return true;
+      }
+      psAuditDs.query();
+      return true;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  function handleBatchFixModalOpen() {
+    Modal.open({
+      key: Modal.key(),
+      title: '批量修复',
+      children: <FixModal onOk={handlerBatchAuditFix} organizationId={organizationId} projectId={projectId} />,
+    });
+  }
+
+  function handleBatchAuditModalOpen() {
+    Modal.open({
+      key: Modal.key(),
+      title: '手动审计',
+      children: <AuditModal onOk={handlerBatchAudit} organizationId={organizationId} projectId={projectId} />,
+    });
+  }
+
   function getButtons() {
     const buttonData = [{
       name: formatMessage({ id: 'refresh' }),
@@ -232,18 +308,37 @@ const EnvModals = observer((props) => {
       color: 'default',
       display: true,
     }];
-    const disabled = !(psApprovalDs.selected && psApprovalDs.selected.length > 0);
+    const disabledPsApproval = !(psApprovalDs.selected && psApprovalDs.selected.length > 0);
+    const disabledPsAudit = !(psAuditDs.selected && psAuditDs.selected.length > 0);
     switch (type) {
+      case 'psAudit':
+        buttonData.unshift({
+          name: '手动审计',
+          icon: 'playlist_add_check',
+          handler: handleBatchAuditModalOpen,
+          permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
+        }, {
+          name: '批量修复',
+          icon: 'person_add-o',
+          handler: handleBatchFixModalOpen,
+          display: true,
+          disabled: disabledPsAudit,
+          tooltipsConfig: {
+            placement: 'bottom',
+            title: disabledPsAudit ? '请在下方列表中勾选用户' : '',
+          },
+        });
+        break;
       case 'psApproval':
         buttonData.unshift({
           name: '批量审批',
           icon: 'playlist_add_check',
           handler: () => handlerBatchApprove(psApprovalDs, refresh),
           display: true,
-          disabled,
+          disabled: disabledPsApproval,
           tooltipsConfig: {
             placement: 'bottom',
-            title: disabled ? '请在下方列表中选择【待审批】状态的申请' : '',
+            title: disabledPsApproval ? '请在下方列表中选择【待审批】状态的申请' : '',
           },
         });
         break;
@@ -252,14 +347,14 @@ const EnvModals = observer((props) => {
           {
             name: formatMessage({ id: 'infra.add.member' }),
             icon: 'person_add-o',
-            handler: openAdd,
+            handler: () => { openAdd('project'); },
             display: true,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
           },
           {
             name: formatMessage({ id: 'infra.add.outsideMember' }),
             icon: 'person_add-o',
-            handler: openAddOutside,
+            handler: () => { openAdd('nonProject'); },
             display: true,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
           },
@@ -267,14 +362,26 @@ const EnvModals = observer((props) => {
             name: formatMessage({ id: 'infra.operate.export.permission' }),
             icon: 'get_app-o',
             handler: () => setExportModalVisible(true),
-            permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-member'],
+            display: true,
+            permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
+          },
+          {
+            name: formatMessage({ id: 'infra.button.batch.sync' }),
+            icon: 'sync',
+            handler: handleSyncOpenModal,
+            display: true,
+            permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
           },
           {
             name: formatMessage({ id: 'infra.button.batch.delete' }),
             icon: 'delete',
-            handler: handleDelete,
+            handler: openDeleteModal,
+            display: true,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
             disabled: psSetDs.selected.length === 0,
+            tooltipsConfig: {
+              title: psSetDs.selected.length === 0 ? '请在列表中勾选需要删除的用户' : '',
+            },
           },
         );
         break;
@@ -310,15 +417,17 @@ const EnvModals = observer((props) => {
   }
 
   return (
-    <Header>
-      <HeaderButtons items={getButtons()} />
-      <ExportAuthority
-        formatMessage={formatMessage}
-        exportModalVisible={exportModalVisible}
-        setExportModalVisible={setExportModalVisible}
-        psSetDs={psSetDs}
-      />
-    </Header>
+      <Header>
+        <HeaderButtons items={getButtons()} />
+        {
+          hasPermission && <ExportAuthority
+            formatMessage={formatMessage}
+            exportModalVisible={exportModalVisible}
+            setExportModalVisible={setExportModalVisible}
+            psSetDs={psSetDs}
+          />
+        }
+      </Header>
   );
 });
 
