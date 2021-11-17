@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.gitlab4j.api.models.Group;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTaskCodeConstants;
@@ -151,7 +152,12 @@ public class RdmMemberChangeSagaHandler {
                         rdmMember.setProjectId(projectId);
                         List<RdmMember> rdmMembers = rdmMemberRepository.select(rdmMember);
                         rdmMembers.forEach(rdmMember1 -> {
-                            gitlabProjectApi.removeMember(rdmMember1.getGlProjectId(), rdmMember1.getGlUserId());
+                            if (StringUtils.equalsIgnoreCase(rdmMember1.getType(), AuthorityTypeEnum.GROUP.getValue())) {
+                                gitlabGroupApi.removeMember(rdmMember1.getgGroupId(), rdmMember1.getGlUserId());
+                            }
+                            if (StringUtils.equalsIgnoreCase(rdmMember1.getType(), AuthorityTypeEnum.PROJECT.getValue())) {
+                                gitlabProjectApi.removeMember(rdmMember1.getGlProjectId(), rdmMember1.getGlUserId());
+                            }
                         });
                     }
                     // 删除团队成员, 删除权限
