@@ -12,11 +12,11 @@ import { LabelLayoutType } from 'choerodon-ui/pro/lib/form/Form';
 import { siteOpenApi } from '@choerodon/master';
 import './index.less';
 import { MIDDLE } from '@/common/getModalWidth';
-import ApprovePswForm from '../approve-psw-form/index';
+import ApprovePswForm from '../approve-psw-form';
 
 const approvePswFormKey = Modal.key();
 
-const SaaSForm = () => {
+const ApproveFormContent = () => {
   const {
     prefixCls,
     emailApproveDataSet,
@@ -37,16 +37,15 @@ const SaaSForm = () => {
           refresh()
           return true;
         }
-        Modal.open({
-          key: approvePswFormKey,
-          title: '请输入密码',
-          children: <ApprovePswForm refresh={refresh} captcha={emailApproveDataSet.current?.get('captcha')} email={emailApproveDataSet.current?.get('email')} id={emailApproveDataSet.current?.get('user_id')} />,
-          style: {
-            width: MIDDLE,
-          },
-          okText: '保存',
-        });
-        console.log(123)
+          Modal.open({
+            key: approvePswFormKey,
+            title: '请输入密码',
+            children: <ApprovePswForm refresh={refresh} captcha={emailApproveDataSet.current?.get('captcha')} email={emailApproveDataSet.current?.get('email')} id={emailApproveDataSet.current?.get('user_id')} />,
+            style: {
+              width: MIDDLE,
+            },
+            okText: '保存',
+          });
         return true;
       } catch (error) {
         console.log(error);
@@ -90,4 +89,4 @@ const SaaSForm = () => {
   );
 };
 
-export default observer(SaaSForm);
+export default observer(ApproveFormContent);
