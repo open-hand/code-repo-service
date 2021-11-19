@@ -11,6 +11,7 @@ import { usPsManagerStore } from './stores';
 import GitLabSetting from './gitlab-setting';
 import SvnSetting from './svn-setting';
 import ProdSetting from './prod-setting';
+import ThirdPartServiceBind from './third-part-service-bind';
 import './index.less';
 
 const PsManager = observer(() => {
@@ -44,6 +45,13 @@ const PsManager = observer(() => {
           tabKey="prodSetting"
           route="/rducm/personal-setting/product"
           component={ProdSetting}
+          alwaysShow
+        />
+        <PageTab
+          title="第三方服务绑定"
+          tabKey="thirdPartServiceBind"
+          route="/rducm/personal-setting/thirdPartServiceBind"
+          component={ThirdPartServiceBind}
           alwaysShow
         />
       </PageWrap>
