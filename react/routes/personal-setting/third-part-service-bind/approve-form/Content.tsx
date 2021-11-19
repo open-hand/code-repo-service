@@ -2,7 +2,7 @@ import {
   Form, TextField, Modal, message,
 } from 'choerodon-ui/pro';
 import { omit } from 'lodash';
-import React, { } from 'react';
+import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { CaptchaField } from '@choerodon/components/lib/index.js';
 import { Icon } from 'choerodon-ui';
@@ -21,8 +21,14 @@ const ApproveFormContent = () => {
     prefixCls,
     emailApproveDataSet,
     modal,
-    refresh
+    refresh,
+    email
   } = useSaaSApproveFormStore();
+
+  useEffect(() => {
+    emailApproveDataSet?.reset()
+    emailApproveDataSet?.current?.set('email',email)
+  }, [])
 
   const emailApproveDataSetSubmit = async () => {
     const res = await emailApproveDataSet.validate();

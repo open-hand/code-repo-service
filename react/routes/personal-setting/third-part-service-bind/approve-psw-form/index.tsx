@@ -2,7 +2,7 @@ import {
   Form, Password,
   DataSet, message,
 } from 'choerodon-ui/pro';
-import React, { useMemo } from 'react';
+import React, { useMemo,useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import { LabelLayoutType } from 'choerodon-ui/pro/lib/form/Form';
 import ApprovePswDs from './approvePswDs';
@@ -14,6 +14,10 @@ const ApprovePswForm = (props:any) => {
   } = props;
 
   const approvePswDs = useMemo(() => new DataSet(ApprovePswDs()), []);
+
+  useEffect(() => {
+    approvePswDs?.reset()
+  }, [])
 
   modal.handleOk(async () => {
     const checkRes = await approvePswDs?.validate();
