@@ -186,6 +186,7 @@ public class RdmMemberChangeSagaHandler {
         if (CollectionUtils.isEmpty(rdmMembers)) {
             return;
         }
+
         rdmMembers.forEach((m) -> {
             // <2.1> 判断新增或更新
             boolean isExists;
