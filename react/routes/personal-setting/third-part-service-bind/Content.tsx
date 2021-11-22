@@ -1,5 +1,5 @@
 import {
-    Button, Modal
+    Button, Modal,message
 } from 'choerodon-ui/pro';
 import React, { useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
@@ -9,11 +9,14 @@ import { Page, Content, Breadcrumb } from '@choerodon/boot';
 import logo from './assets/logo.svg';
 import { StatusTag } from "@choerodon/components";
 import { ButtonColor } from 'choerodon-ui/pro/lib/button/enum';
-import ApproveForm from './approveForm'
+import ApproveForm from './approve-form'
 import { MIDDLE } from '@/common/getModalWidth';
 import { siteOpenApi } from '@choerodon/master';
 import { inject } from 'mobx-react';
 import { cloneDeep } from 'lodash';
+import { injectIntl } from 'react-intl';
+
+const ApproveFormKey = Modal.key()
 
 const PageContent = (props: any) => {
 
@@ -48,15 +51,14 @@ const PageContent = (props: any) => {
                 await siteOpenApi.removeBind({
                     user_id: AppState.getUserId
                 })
+                message.success('解绑汉得焱牛开放平台成功！')
                 getIfBindOpenPlatform()
             } catch (error) {
                 console.log(error)
             }
-
-
         } else {
             Modal.open({
-                key: ApproveForm,
+                key: ApproveFormKey,
                 title: '认证绑定',
                 children: <ApproveForm refresh={getIfBindOpenPlatform} />,
                 style: {
@@ -94,4 +96,4 @@ const PageContent = (props: any) => {
     );
 };
 
-export default inject('AppState')(observer(PageContent));
+export default injectIntl(inject('AppState')(observer(PageContent)));

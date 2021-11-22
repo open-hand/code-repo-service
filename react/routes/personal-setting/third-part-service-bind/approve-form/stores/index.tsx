@@ -11,6 +11,7 @@ interface ContextProps {
     organizationId: string,
     modal: any,
     refresh:any
+    email: string
 }
 
 const Store = createContext({} as ContextProps);
@@ -42,7 +43,8 @@ export const StoreProvider = injectIntl(inject('AppState')((props: any) => {
      emailApproveDataSet,
      organizationId,
      modal,
-     refresh
+     refresh,
+     email: getUserInfo.email
    };
 
    return (
