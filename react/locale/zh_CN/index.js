@@ -448,4 +448,4 @@ const zhCN = {
   ...infraCommon,
 };
 
-export default zhCN;
+export {zhCN};
