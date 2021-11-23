@@ -46,10 +46,6 @@ public class RdmMemberAssembler {
     private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
-    @Autowired
-    private RdmMemberRepository rdmMemberRepository;
-    @Autowired
-    private RdmMemberMapper rdmMemberMapper;
 
     /**
      * 将GitlabMemberBatchDTO转换为List<RdmMember>
@@ -82,6 +78,10 @@ public class RdmMemberAssembler {
         List<RdmMember> rdmMembers = new ArrayList<>();
         for (Long repositoryId : rdmMemberBatchDTO.getRepositoryIds()) {
             for (RdmMemberBatchDTO.GitlabMemberCreateDTO member : rdmMemberBatchDTO.getMembers()) {
+                if (rdmMemberBatchDTO.getBaseRole()) {
+                    member.setGlAccessLevel(rdmMemberBatchDTO.getGlAccessLevel());
+                    member.setGlExpiresAt(rdmMemberBatchDTO.getGlExpiresAt());
+                }
                 RdmMember rdmMember = ConvertUtils.convertObject(member, RdmMember.class);
                 rdmMember.setOrganizationId(organizationId);
                 rdmMember.setProjectId(projectId);

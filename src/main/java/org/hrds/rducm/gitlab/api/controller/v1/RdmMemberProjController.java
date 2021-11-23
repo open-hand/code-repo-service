@@ -109,9 +109,9 @@ public class RdmMemberProjController extends BaseController {
     @PostMapping("/batch-add/group")
     public ResponseEntity<Void> batchAddGroupMembers(@PathVariable Long organizationId,
                                                      @PathVariable Long projectId,
-                                                     @RequestBody List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOs) {
-        validObject(gitlabMemberCreateDTOs);
-        rdmMemberAppService.batchAddGroupMembers(organizationId, projectId, gitlabMemberCreateDTOs);
+                                                     @RequestBody RdmMemberBatchDTO rdmMemberBatchDTO) {
+        validObject(rdmMemberBatchDTO);
+        rdmMemberAppService.batchAddGroupMembers(organizationId, projectId, rdmMemberBatchDTO);
         return Results.created(null);
     }
 
