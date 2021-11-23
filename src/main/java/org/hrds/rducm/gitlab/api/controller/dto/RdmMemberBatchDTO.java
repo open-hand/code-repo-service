@@ -19,6 +19,16 @@ public class RdmMemberBatchDTO {
     @Encrypt
     private List<Long> repositoryIds;
 
+    @ApiModelProperty("基于何种角色添加")
+    private Boolean baseRole;
+
+    @ApiModelProperty(value = ApiInfoConstants.GL_ACCESS_LEVEL, required = true)
+    private Integer glAccessLevel;
+
+    @ApiModelProperty(ApiInfoConstants.GL_EXPIRES_AT)
+    private Date glExpiresAt;
+
+
     @NotEmpty
     @Valid
     @ApiModelProperty("新增成员信息")
@@ -100,5 +110,30 @@ public class RdmMemberBatchDTO {
     public RdmMemberBatchDTO setMembers(List<GitlabMemberCreateDTO> members) {
         this.members = members;
         return this;
+    }
+
+
+    public Boolean getBaseRole() {
+        return baseRole;
+    }
+
+    public void setBaseRole(Boolean baseRole) {
+        this.baseRole = baseRole;
+    }
+
+    public Integer getGlAccessLevel() {
+        return glAccessLevel;
+    }
+
+    public void setGlAccessLevel(Integer glAccessLevel) {
+        this.glAccessLevel = glAccessLevel;
+    }
+
+    public Date getGlExpiresAt() {
+        return glExpiresAt;
+    }
+
+    public void setGlExpiresAt(Date glExpiresAt) {
+        this.glExpiresAt = glExpiresAt;
     }
 }
