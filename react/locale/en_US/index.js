@@ -232,4 +232,4 @@ const enUS = {
   'apptag.table': 'Tag list',
 
 };
-export default enUS;
+export {enUS};
