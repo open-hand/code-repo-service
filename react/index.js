@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
-import { inject } from 'mobx-react';
-import { asyncRouter, asyncLocaleProvider, nomatch } from '@choerodon/boot';
+import { useRouteMatch } from 'react-router';
+import { asyncRouter, asyncLocaleProvider, nomatch, useCurrentLanguage } from '@choerodon/master';
 import { ModalContainer } from 'choerodon-ui/pro';
 
 import './index.less';
@@ -14,7 +14,9 @@ const codeManagement = asyncRouter(() => import('./routes/code-lib/code-manageme
 const codeLibAudit = asyncRouter(() => import('./routes/code-lib/code-lib-audit'));
 
 
-function RDUCMIndex({ match, AppState: { currentLanguage: language } }) {
+function RDUCMIndex() {
+  const language = useCurrentLanguage();
+  const match = useRouteMatch();
   const IntlProviderAsync = asyncLocaleProvider(language, () => import(`./locale/${language}`));
   return (
     <IntlProviderAsync>
@@ -31,4 +33,4 @@ function RDUCMIndex({ match, AppState: { currentLanguage: language } }) {
   );
 }
 
-export default inject('AppState')(RDUCMIndex);
+export default RDUCMIndex;
