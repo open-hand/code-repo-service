@@ -20,6 +20,39 @@ const PsManager = observer(() => {
     intl: { formatMessage },
   } = usPsManagerStore();
 
+  const pageTabArr = [
+    <PageTab
+          // title="代码库（GITLAB）设置"
+      title={formatMessage({ id: 'infra.personal.message.gitLabSetting' })}
+      tabKey="gitLabSetting"
+      route="/rducm/personal-setting/gitlab"
+      component={GitLabSetting}
+      alwaysShow
+    />,
+    <PageTab
+          // title="文档库（SVN）设置"
+      title={formatMessage({ id: 'infra.personal.message.svnSetting' })}
+      tabKey="svnSetting"
+      route="/rducm/personal-setting/svn"
+      component={SvnSetting}
+      alwaysShow
+    />,
+    <PageTab
+      title={formatMessage({ id: 'infra.personal.message.prodSetting' })}
+      tabKey="prodSetting"
+      route="/rducm/personal-setting/product"
+      component={ProdSetting}
+      alwaysShow
+    />,
+    has('base-pro:thirdPartServiceBind') && <PageTab
+      title="第三方服务绑定"
+      tabKey="thirdPartServiceBind"
+      route="/rducm/personal-setting/thirdPartServiceBind"
+      component={ThirdPartServiceBind}
+      alwaysShow
+    />,
+  ].filter(Boolean);
+
   return (
     // <Page service={detailPermissions} >
     <Page
@@ -27,38 +60,7 @@ const PsManager = observer(() => {
       className="c7n-infra-personal-setting"
     >
       <PageWrap noHeader={['gitLabSetting', 'svnSetting']}>
-        <PageTab
-          // title="代码库（GITLAB）设置"
-          title={formatMessage({ id: 'infra.personal.message.gitLabSetting' })}
-          tabKey="gitLabSetting"
-          route="/rducm/personal-setting/gitlab"
-          component={GitLabSetting}
-          alwaysShow
-        />
-        <PageTab
-          // title="文档库（SVN）设置"
-          title={formatMessage({ id: 'infra.personal.message.svnSetting' })}
-          tabKey="svnSetting"
-          route="/rducm/personal-setting/svn"
-          component={SvnSetting}
-          alwaysShow
-        />
-        <PageTab
-          title={formatMessage({ id: 'infra.personal.message.prodSetting' })}
-          tabKey="prodSetting"
-          route="/rducm/personal-setting/product"
-          component={ProdSetting}
-          alwaysShow
-        />
-        {has('base-pro:thirdPartServiceBind') && (
-          <PageTab
-            title="第三方服务绑定"
-            tabKey="thirdPartServiceBind"
-            route="/rducm/personal-setting/thirdPartServiceBind"
-            component={ThirdPartServiceBind}
-            alwaysShow
-          />
-        )}
+        {pageTabArr}
       </PageWrap>
     </Page>
   );
