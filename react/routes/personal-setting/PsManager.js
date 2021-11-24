@@ -5,13 +5,14 @@
  * @copyright 2020 ® HAND
  */
 import React from 'react';
-import { mount, has } from '@choerodon/inject';
+import { has } from '@choerodon/inject';
 import { PageWrap, PageTab, Page } from '@choerodon/boot';
 import { observer } from 'mobx-react-lite';
 import { usPsManagerStore } from './stores';
 import GitLabSetting from './gitlab-setting';
 import SvnSetting from './svn-setting';
 import ProdSetting from './prod-setting';
+import ThirdPartServiceBind from './third-part-service-bind';
 import './index.less';
 
 const PsManager = observer(() => {
@@ -54,7 +55,7 @@ const PsManager = observer(() => {
             title="第三方服务绑定"
             tabKey="thirdPartServiceBind"
             route="/rducm/personal-setting/thirdPartServiceBind"
-            component={mount('base-pro:thirdPartServiceBind'), {}}
+            component={ThirdPartServiceBind}
             alwaysShow
           />
         )}
