@@ -473,22 +473,6 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         return memberAudits;
     }
 
-//    private RdmMember getProjectDbRdmMember(List<RdmMember> dbMembers, GitlabMember gitlabMember) {
-//        if (gitlabMember.getUserId() == null || gitlabMember.getAccessLevel() == null) {
-//            return null;
-//        }
-//        if (CollectionUtils.isEmpty(dbMembers)) {
-//            return null;
-//        }
-//        List<RdmMember> rdmMembers = dbMembers.stream().filter(RdmMember::getSyncGitlabFlag)
-//                .filter(rdmMember -> rdmMember.getUserId() != null)
-//                .filter(rdmMember -> rdmMember.getGlAccessLevel() != null)
-//                .filter(rdmMember -> rdmMember.getUserId().longValue() == gitlabMember.getUserId()).collect(Collectors.toList());
-//        if (CollectionUtils.isEmpty(rdmMembers)) {
-//            return null;
-//        }
-//        return rdmMembers.get(0);
-//    }
 
 
     private RdmMember getDbRdmMember(List<RdmMember> dbMembers, GitlabMember gitlabMember) {

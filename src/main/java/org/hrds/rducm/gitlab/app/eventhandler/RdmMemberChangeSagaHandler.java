@@ -249,7 +249,8 @@ public class RdmMemberChangeSagaHandler {
             record.setgGroupId(groupMemberPayload.getgGroupId());
             RdmMember rdmMember = rdmMemberMapper.selectOne(record);
             if (Objects.isNull(rdmMember)) {
-                throw new CommonException("error.rdmMember.is.null");
+                logger.warn("rdmMember not exist,userId={},groupId={}", gitlabMemberCreateDTO.getUserId(), groupMemberPayload.getgGroupId());
+                return;
             }
             try {
                 Member groupApiMember = gitlabGroupApi.getMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId());

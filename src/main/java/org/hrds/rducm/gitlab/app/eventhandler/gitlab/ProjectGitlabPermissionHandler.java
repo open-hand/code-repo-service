@@ -63,7 +63,7 @@ public class ProjectGitlabPermissionHandler extends AbstractGitlabPermissionHand
             projectGlMember = queryProjectGlMember(rdmMemberAuditRecord);
         }
         if (projectGlMember == null) {
-            LOGGER.warn("group member not exist user id is {}", rdmMemberAuditRecord.getUserId());
+            LOGGER.warn("project member not exist user id is {}", rdmMemberAuditRecord.getUserId());
         }
 
         permissionProcessorMap.get(role + PERMISSION_PROCESSOR).repairProjectPermissionByRole(projectGlMember, dbRdmMember, rdmMemberAuditRecord);
