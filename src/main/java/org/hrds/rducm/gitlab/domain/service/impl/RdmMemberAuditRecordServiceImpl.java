@@ -170,8 +170,12 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
 
     private List<RdmMemberAuditRecord> batchCompareMembersByProjectId(Long organizationId, Long projectId) {
         // 获取组织管理员, 存入ThreadLocal备用
+        List<C7nUserVO> result = new ArrayList<>();
         List<C7nUserVO> orgAdministrators = c7NBaseServiceFacade.listOrgAdministrator(organizationId);
-        threadLocal.set(orgAdministrators);
+        List<C7nUserVO> roots = c7NBaseServiceFacade.listRoot();
+        result.addAll(orgAdministrators);
+        result.addAll(roots);
+        threadLocal.set(result);
         List<RdmMemberAuditRecord> rdmMemberAuditRecords = compareMembersByProjectId(organizationId, projectId);
         threadLocal.remove();
         return rdmMemberAuditRecords;
@@ -474,7 +478,6 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
     }
 
 
-
     private RdmMember getDbRdmMember(List<RdmMember> dbMembers, GitlabMember gitlabMember) {
 
         if (gitlabMember.getUserId() == null || gitlabMember.getAccessLevel() == null) {
@@ -493,7 +496,6 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         }
         return rdmMembers.get(0);
     }
-
 
 
     /**

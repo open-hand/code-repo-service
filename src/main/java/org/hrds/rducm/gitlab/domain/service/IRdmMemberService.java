@@ -206,4 +206,7 @@ public interface IRdmMemberService {
 
 
     void syncGroupMemberFromGitlab(RdmMember dbMember);
+
+    void updateGroupMemberToGitLab(Integer gGroupId, Integer glUserId, Integer accessLevel, Date expiresAt);
+
 }

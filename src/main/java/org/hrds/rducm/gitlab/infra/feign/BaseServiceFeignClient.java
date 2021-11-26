@@ -255,4 +255,7 @@ public interface BaseServiceFeignClient {
             @ApiParam(value = "角色标签", required = true)
             @PathVariable("role_lable") String roleLable);
 
+    @ApiOperation(value = "查询平台下所有的root")
+    @GetMapping(value = "/v1/users/root")
+    ResponseEntity<List<C7nUserVO>> listRoot();
 }

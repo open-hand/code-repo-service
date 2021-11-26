@@ -676,8 +676,11 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         Group group = gitlabGroupApi.getGroup(rdmMember.getgGroupId());
         AssertUtils.notNull(group, "error.gitlab.group.not.exist", gitlabMemberCreateDTO.getgGroupId());
 
+        //TODO  手动审计补偿
+        iRdmMemberService.updateGroupMemberToGitLab(group.getId(), rdmMember.getGlUserId(), gitlabMemberCreateDTO.getGlAccessLevel(), gitlabMemberCreateDTO.getGlExpiresAt());
+
         //删除添加
-        iRdmMemberService.tryRemoveAndAddGroupMemberToGitlab(group.getId(), rdmMember.getGlUserId(), gitlabMemberCreateDTO.getGlAccessLevel(), gitlabMemberCreateDTO.getGlExpiresAt());
+//        iRdmMemberService.tryRemoveAndAddGroupMemberToGitlab(group.getId(), rdmMember.getGlUserId(), gitlabMemberCreateDTO.getGlAccessLevel(), gitlabMemberCreateDTO.getGlExpiresAt());
 
         //跟新数据库
         rdmMember.setSyncGitlabFlag(true);
