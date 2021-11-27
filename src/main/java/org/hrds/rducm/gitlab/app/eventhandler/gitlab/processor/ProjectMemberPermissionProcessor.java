@@ -11,6 +11,7 @@ import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupFixApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectFixApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
+import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -102,7 +103,20 @@ public class ProjectMemberPermissionProcessor implements RolePermissionProcessor
             }
 
         } else {
-            gitlabProjectFixApi.addMember(dbRdmMember.getGlProjectId(), dbRdmMember.getGlUserId(), dbRdmMember.getGlAccessLevel(), dbRdmMember.getGlExpiresAt());
+            // 查询这个用户 在全局层有没有同步成功的权限，如果有  先删除，再添加
+            RdmMember groupRdmMember = new RdmMember();
+            groupRdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+            groupRdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
+            groupRdmMember.setUserId(rdmMemberAuditRecord.getUserId());
+            groupRdmMember.setgGroupId(rdmMemberAuditRecord.getgGroupId());
+            RdmMember rdmMember = rdmMemberRepository.selectOne(groupRdmMember);
+            if (rdmMember != null && rdmMember.getSyncGitlabFlag()) {
+                gitlabGroupFixApi.removeMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId());
+                gitlabProjectFixApi.addMember(dbRdmMember.getGlProjectId(), dbRdmMember.getGlUserId(), dbRdmMember.getGlAccessLevel(), dbRdmMember.getGlExpiresAt());
+                gitlabGroupFixApi.addMember(rdmMember.getgGroupId(), rdmMember.getGlUserId(), rdmMember.getGlAccessLevel(), rdmMember.getGlExpiresAt());
+            } else {
+                gitlabProjectFixApi.addMember(dbRdmMember.getGlProjectId(), dbRdmMember.getGlUserId(), dbRdmMember.getGlAccessLevel(), dbRdmMember.getGlExpiresAt());
+            }
         }
     }
 

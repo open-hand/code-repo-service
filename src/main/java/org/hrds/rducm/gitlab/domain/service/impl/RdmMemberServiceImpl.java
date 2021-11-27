@@ -649,6 +649,30 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         return this.addGroupMemberToGitlab(gGroupId, glUserId, accessLevel, expiresAt);
     }
 
+    @Override
+    public void updateGroupMemberToGitLab(Integer gGroupId, Integer glUserId, Integer accessLevel, Date expiresAt) {
+        Member glMember = gitlabGroupApi.getMember(gGroupId, glUserId);
+        if (glMember != null) {
+            if (glMember.getAccessLevel().toValue() >= RdmAccessLevel.OWNER.toValue()) {
+                throw new CommonException("error.not.allow.remove.owner", glMember.getName());
+            }
+            try {
+                gitlabGroupApi.updateMember(gGroupId, glUserId, accessLevel, expiresAt);
+            } catch (GitlabClientException e) {
+                throw new CommonException("error.member.not.allow.change", e, glMember.getName());
+            }
+        } else {
+            if (glMember.getAccessLevel().toValue() >= RdmAccessLevel.OWNER.toValue()) {
+                throw new CommonException("error.not.allow.remove.owner", glMember.getName());
+            }
+            try {
+                this.addGroupMemberToGitlab(gGroupId, glUserId, accessLevel, expiresAt);
+            } catch (GitlabClientException e) {
+                throw new CommonException("error.member.not.allow.change", e, glMember.getName());
+            }
+        }
+    }
+
     private Member addGroupMemberToGitlab(Integer gGroupId, Integer glUserId, Integer accessLevel, Date expiresAt) {
         // 调用gitlab api添加成员
         return gitlabGroupApi.addMember(gGroupId, glUserId, accessLevel, expiresAt);

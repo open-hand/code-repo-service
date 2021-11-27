@@ -320,4 +320,11 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
         List<C7nUserVO> c7nUserVOS = FeignUtils.handleResponseEntity(responseEntity);
         return c7nUserVOS;
     }
+
+    @Override
+    public List<C7nUserVO> listRoot() {
+        ResponseEntity<List<C7nUserVO>> listResponseEntity = baseServiceFeignClient.listRoot();
+        List<C7nUserVO> c7nUserVOS = FeignUtils.handleResponseEntity(listResponseEntity);
+        return c7nUserVOS;
+    }
 }

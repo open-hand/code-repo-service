@@ -66,6 +66,10 @@ public class GitlabGroupApi {
                     .getGroupApi()
                     .removeMember(glGroupId, glUserId);
         } catch (GitLabApiException e) {
+            // Gitlab查询到不存在的资源会返回404
+            if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                return;
+            }
             throw new GitlabClientException(e, e.getMessage());
         }
     }
