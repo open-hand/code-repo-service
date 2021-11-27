@@ -228,4 +228,7 @@ public interface C7nBaseServiceFacade {
     Long getOrganizationId(Long projectId);
 
     List<C7nUserVO> listCustomGitlabOwnerLableUser(Long projectId, String roleLabel);
+
+    List<C7nUserVO> listRoot();
+
 }
