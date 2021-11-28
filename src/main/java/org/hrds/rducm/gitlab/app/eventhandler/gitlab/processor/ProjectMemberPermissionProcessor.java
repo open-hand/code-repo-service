@@ -115,7 +115,7 @@ public class ProjectMemberPermissionProcessor implements RolePermissionProcessor
                 gitlabGroupFixApi.removeMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId());
                 //删除完组的权限后，要把项目层的已同步成功的挨个加上
                 RdmMember projectRdmMember = new RdmMember();
-                projectRdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+                projectRdmMember.setType(AuthorityTypeEnum.PROJECT.getValue());
                 projectRdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
                 projectRdmMember.setUserId(rdmMemberAuditRecord.getUserId());
                 projectRdmMember.setSyncGitlabFlag(Boolean.TRUE);
