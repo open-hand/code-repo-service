@@ -127,7 +127,7 @@ public class NonProjectMemberPermissionProcessor implements RolePermissionProces
                         List<RdmMember> rdmMembers = rdmMemberRepository.select(projectRdmMember);
                         if (!CollectionUtils.isEmpty(rdmMembers)) {
                             rdmMembers.forEach(rdmMember1 -> {
-                                gitlabProjectFixApi.updateMember(rdmMember1.getGlProjectId(), rdmMember1.getGlUserId(), rdmMember1.getGlAccessLevel(), rdmMember1.getGlExpiresAt());
+                                gitlabProjectFixApi.addMember(rdmMember1.getGlProjectId(), rdmMember1.getGlUserId(), rdmMember1.getGlAccessLevel(), rdmMember1.getGlExpiresAt());
                             });
                         }
                         gitlabGroupFixApi.addMember(groupMember.getgGroupId(), groupMember.getGlUserId(), groupMember.getGlAccessLevel(), groupMember.getGlExpiresAt());
