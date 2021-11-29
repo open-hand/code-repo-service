@@ -22,6 +22,7 @@ import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.admin.GitlabAdminApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
 import org.hrds.rducm.gitlab.infra.client.gitlab.model.GitlabMember;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.core.base.BaseConstants;
@@ -206,6 +207,12 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                                                                  Long projectId) {
 
         List<RdmMemberAuditRecord> rdmMemberAuditRecords = new ArrayList<>();
+        //项目如果停用则不需审计
+        C7nProjectVO c7nProjectVO = c7NBaseServiceFacade.detailC7nProject(projectId);
+        if (c7nProjectVO == null || !c7nProjectVO.getEnabled()) {
+            return rdmMemberAuditRecords;
+        }
+
         //查询项目下有gitlab  owner标签的人
 //        List<C7nUserVO> gitlabOwners = c7NBaseServiceFacade.listCustomGitlabOwnerLableUser(projectId, "GITLAB_OWNER");
         // 获取项目下应用服务组的id
