@@ -275,9 +275,11 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
     @Override
     public Map<Long, Long> listBuiltInActiveC7nAppServiceIdsMapOnProjectLevel(Long projectId) {
         List<C7nAppServiceVO> list = this.listC7nAppServiceOnProjectLevel(projectId);
-        //过滤掉外部仓库
+        //过滤掉外部仓库,停用仓库，失败仓库
         if (!CollectionUtils.isEmpty(list)) {
             return list.stream().filter(c7nAppServiceVO -> c7nAppServiceVO.getExternalConfigId() == null)
+                    .filter(C7nAppServiceVO::getActive)
+                    .filter(c7nAppServiceVO -> !c7nAppServiceVO.getFail())
                     .collect(HashMap::new, (m, v) ->
                             m.put(v.getId(), v.getGitlabProjectId()), HashMap::putAll);
         } else {

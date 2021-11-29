@@ -47,8 +47,8 @@ public class C7nAppServiceVO {
 //    @ApiModelProperty("sonarqube地址")
 //    private String sonarUrl;
 
-//    @ApiModelProperty("应用服务是否失败，如果已同步且这个值为true说明应用服务创建失败")
-//    private Boolean fail;
+    @ApiModelProperty("应用服务是否失败，如果已同步且这个值为true说明应用服务创建失败")
+    private Boolean fail;
 
 
     @ApiModelProperty("应用服务数据库纪录的版本号")
@@ -271,6 +271,14 @@ public class C7nAppServiceVO {
     public C7nAppServiceVO setUpdateLoginName(String updateLoginName) {
         this.updateLoginName = updateLoginName;
         return this;
+    }
+
+    public Boolean getFail() {
+        return fail;
+    }
+
+    public void setFail(Boolean fail) {
+        this.fail = fail;
     }
 
     @Override

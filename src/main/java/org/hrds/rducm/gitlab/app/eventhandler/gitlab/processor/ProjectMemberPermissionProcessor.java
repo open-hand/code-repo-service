@@ -99,7 +99,33 @@ public class ProjectMemberPermissionProcessor implements RolePermissionProcessor
         if (projectGlMember != null) {
             //对照项目层的权限，更新为数据库权限
             if (projectGlMember.getAccessLevel().value != dbRdmMember.getGlAccessLevel()) {
-                gitlabProjectFixApi.updateMember(dbRdmMember.getGlProjectId(), dbRdmMember.getGlUserId(), dbRdmMember.getGlAccessLevel(), dbRdmMember.getGlExpiresAt());
+                RdmMember groupRdmMember = new RdmMember();
+                groupRdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+                groupRdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
+                groupRdmMember.setUserId(rdmMemberAuditRecord.getUserId());
+                groupRdmMember.setgGroupId(rdmMemberAuditRecord.getgGroupId());
+                groupRdmMember.setSyncGitlabFlag(Boolean.TRUE);
+                RdmMember rdmMember = rdmMemberRepository.selectOne(groupRdmMember);
+                if (rdmMember != null) {
+                    gitlabGroupFixApi.removeMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId());
+                    //删除完组的权限后，要把项目层的已同步成功的挨个加上
+                    RdmMember projectRdmMember = new RdmMember();
+                    projectRdmMember.setType(AuthorityTypeEnum.PROJECT.getValue());
+                    projectRdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
+                    projectRdmMember.setUserId(rdmMemberAuditRecord.getUserId());
+                    projectRdmMember.setSyncGitlabFlag(Boolean.TRUE);
+                    List<RdmMember> rdmMembers = rdmMemberRepository.select(projectRdmMember);
+                    if (!CollectionUtils.isEmpty(rdmMembers)) {
+                        rdmMembers.forEach(rdmMember1 -> {
+                            gitlabProjectFixApi.addMember(rdmMember1.getGlProjectId(), rdmMember1.getGlUserId(), rdmMember1.getGlAccessLevel(), rdmMember1.getGlExpiresAt());
+                        });
+                    }
+                    gitlabGroupFixApi.addMember(rdmMember.getgGroupId(), rdmMember.getGlUserId(), rdmMember.getGlAccessLevel(), rdmMember.getGlExpiresAt());
+
+                } else {
+                    gitlabProjectFixApi.updateMember(dbRdmMember.getGlProjectId(), dbRdmMember.getGlUserId(), dbRdmMember.getGlAccessLevel(), dbRdmMember.getGlExpiresAt());
+
+                }
             }
 
         } else {
@@ -109,10 +135,22 @@ public class ProjectMemberPermissionProcessor implements RolePermissionProcessor
             groupRdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
             groupRdmMember.setUserId(rdmMemberAuditRecord.getUserId());
             groupRdmMember.setgGroupId(rdmMemberAuditRecord.getgGroupId());
+            groupRdmMember.setSyncGitlabFlag(Boolean.TRUE);
             RdmMember rdmMember = rdmMemberRepository.selectOne(groupRdmMember);
-            if (rdmMember != null && rdmMember.getSyncGitlabFlag()) {
+            if (rdmMember != null) {
                 gitlabGroupFixApi.removeMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId());
-                gitlabProjectFixApi.addMember(dbRdmMember.getGlProjectId(), dbRdmMember.getGlUserId(), dbRdmMember.getGlAccessLevel(), dbRdmMember.getGlExpiresAt());
+                //删除完组的权限后，要把项目层的已同步成功的挨个加上
+                RdmMember projectRdmMember = new RdmMember();
+                projectRdmMember.setType(AuthorityTypeEnum.PROJECT.getValue());
+                projectRdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
+                projectRdmMember.setUserId(rdmMemberAuditRecord.getUserId());
+                projectRdmMember.setSyncGitlabFlag(Boolean.TRUE);
+                List<RdmMember> rdmMembers = rdmMemberRepository.select(projectRdmMember);
+                if (!CollectionUtils.isEmpty(rdmMembers)) {
+                    rdmMembers.forEach(rdmMember1 -> {
+                        gitlabProjectFixApi.addMember(rdmMember1.getGlProjectId(), rdmMember1.getGlUserId(), rdmMember1.getGlAccessLevel(), rdmMember1.getGlExpiresAt());
+                    });
+                }
                 gitlabGroupFixApi.addMember(rdmMember.getgGroupId(), rdmMember.getGlUserId(), rdmMember.getGlAccessLevel(), rdmMember.getGlExpiresAt());
             } else {
                 gitlabProjectFixApi.addMember(dbRdmMember.getGlProjectId(), dbRdmMember.getGlUserId(), dbRdmMember.getGlAccessLevel(), dbRdmMember.getGlExpiresAt());
