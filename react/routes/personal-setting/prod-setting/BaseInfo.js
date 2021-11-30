@@ -16,7 +16,8 @@ const createKey = Modal.key();
 function BaseInfo() {
   const context = usPsManagerStore();
   const {
-    useSettingStore, intl, intlPrefix, AppState,
+    useSettingStore, intl, intlPrefix, AppState, formatClient,
+    formatCommon,
   } = context;
   const {
     organizationId, imageUrl, id, realName,
@@ -71,24 +72,21 @@ function BaseInfo() {
           </div>
           <div className={`${prefixCls}-login-info`}>
             <div>{realName}</div>
-            <div style={{ fontSize: 13, fontWeight: 'bold' }}>{intl.formatMessage({ id: 'userName' })}：{loginName}</div>
+            <div style={{ fontSize: 13, fontWeight: 'bold' }}>{formatCommon({ id: 'username' })}：{loginName}</div>
           </div>
         </div>
         <div className={`${prefixCls}-info-container`}>
-
           <div className={`${prefixCls}-info-container-account`}>
-            <div>
-              <div>
-                <span className={`${prefixCls}-info-container-account-title`}>{intl.formatMessage({ id: 'infra.personal.model.createdAt' })}</span>
-                <span className={`${prefixCls}-info-container-account-content`}>{creationDate}</span>
+              <div >
+                <span className={`${prefixCls}-info-container-account-title`}>{formatCommon({ id: 'creationTime' })}</span>
+                <span className={`${prefixCls}-info-container-account-content`} style={{marginRight:29}}>{creationDate}</span>
               </div>
               {pwdUpdateFlag !== 1 && (
-                <div>
-                  <span className={`${prefixCls}-info-container-account-title`} style={{ marginRight: '.95rem' }}>{intl.formatMessage({ id: 'infra.personal.model.initPassword' })}</span>
+                <div >
+                  <span className={`${prefixCls}-info-container-account-title`} style={{ lineHeight:'32px'}}>{formatClient({ id: 'artifact.initialPassword' })}</span>
                   <Password value={password} />
                 </div>
               )}
-            </div>
           </div>
         </div>
       </React.Fragment>
@@ -99,7 +97,7 @@ function BaseInfo() {
   function handleUpdatePassword() {
     Modal.open({
       key: createKey,
-      title: intl.formatMessage({ id: 'user.changepwd.header.title' }),
+      title: formatClient({ id: 'modifyPassword' }),
       style: {
         width: 380,
       },
@@ -117,7 +115,7 @@ function BaseInfo() {
           refresh={loadEnablePwd}
         />
       ),
-      okText: intl.formatMessage({ id: 'save' }),
+      okText: formatCommon({ id: 'save' }),
       onOk: () => {
         modalRef.current.handleSubmit();
         return false;
@@ -142,7 +140,7 @@ function BaseInfo() {
         <HeaderButtons
           showClassName={false}
           items={([{
-            name: intl.formatMessage({ id: 'user.changepwd.header.title' }),
+            name: formatClient({ id: 'modifyPassword' }),
             icon: 'mode_edit',
             display: true,
             handler: handleUpdatePassword.bind(this),
@@ -156,8 +154,8 @@ function BaseInfo() {
           <Empty
             // loading={getLoading}
             pic={empty}
-            title={intl.formatMessage({ id: 'infra.changepwd.message.prod.noContent.title' })}
-            description={intl.formatMessage({ id: 'infra.changepwd.message.prod.noContent.desc' })}
+            title={formatClient({ id: 'artifactnone' })}
+            description={formatClient({ id: 'artifactnoneContent' })}
           />
         </Content>
       ) :

@@ -12,7 +12,8 @@ const resetGitlabKey = Modal.key();
 
 function BaseInfo() {
   const context = usPsManagerStore();
-  const { UserInfoStore, intl, prefixCls } = context;
+  const { UserInfoStore, intl, prefixCls,formatClient,
+    formatCommon, } = context;
   const [enablePwd, setEnablePwd] = useState({});
   const [gitLabInfo, setGitLabInfo] = useState({});
   // const [isFailed, setFileFlag] = useState(false);
@@ -65,7 +66,7 @@ function BaseInfo() {
       <Badge
         status={v === 'active' ? 'success' : 'error'}
         text={
-          v === 'active' ? intl.formatMessage({ id: 'active' }) : intl.formatMessage({ id: 'disable' })
+          v === 'active' ? formatCommon({ id: 'enable' }) : formatCommon({ id: 'disable' })
         }
       />
     );
@@ -77,7 +78,7 @@ function BaseInfo() {
     }
   }
   function handleCopy() {
-    Choerodon.prompt(intl.formatMessage({ id: 'success.copy' }));
+    Choerodon.prompt(formatCommon({ id: 'copy.success' }));
   }
   async function handleResetGitlab(modal) {
     modal.update({
@@ -154,28 +155,16 @@ function BaseInfo() {
           </div>
           <div className={`${prefixCls}-login-info`}>
             <div>{glName}</div>
-            <div>{intl.formatMessage({ id: 'status' })}: {enableRender(glState)}</div>
-            <div style={{ fontSize: 13, fontWeight: 'bold' }}>{intl.formatMessage({ id: 'userName' })}：{glUsername}</div>
+            <div>{formatCommon({ id: 'states' })}: {enableRender(glState)}</div>
+            <div style={{ fontSize: 13, fontWeight: 'bold' }}>{formatCommon({ id: 'username' })}：{glUsername}</div>
           </div>
         </div>
-        <div className={`${prefixCls}-info-container`}>
+        <div className={`${prefixCls}-info-container`} style={{paddingLeft:178,lineHeight:'24px'}}>
           <div className={`${prefixCls}-info-container-account`}>
-            <div>
               <div>
-                <span className="gitlab-user-info-info-container-account-title">{intl.formatMessage({ id: 'infra.personal.model.glWebUrl' })}</span>
+                <span className="gitlab-user-info-info-container-account-title">{formatClient({ id: 'homepage' })}</span>
                 <a href={glWebUrl} rel="nofollow me noopener noreferrer" target="_blank" className={`${prefixCls}-info-container-account-content`}>{glWebUrl}</a>
               </div>
-              {/* <div>
-                <span className="gitlab-user-info-info-container-account-title">{intl.formatMessage({ id: 'infra.personal.model.createdAt' })}</span>
-                <span style={{ marginLeft: '.43rem' }} className={`${prefixCls}-info-container-account-content`}>{glCreatedAt}</span>
-              </div>
-              { !resetPasswordFlag && !isFailed && (
-                <div>
-                  <span className="gitlab-user-info-info-container-account-title">{intl.formatMessage({ id: 'infra.personal.model.initPassword' })}</span>
-                  <Password style={{ marginLeft: '.33rem' }} value={initPassword} className="psw-border" />
-                </div>
-              )} */}
-            </div>
           </div>
         </div>
       </React.Fragment>
@@ -219,12 +208,12 @@ function BaseInfo() {
           <HeaderButtons
             showClassName={false}
             items={([{
-              name: intl.formatMessage({ id: 'infra.personal.operate.updatePassword' }),
+              name: formatClient({ id: 'resetPsw' }),
               icon: 'mode_edit',
               display: true,
               handler: handleUpdateStore.bind(this),
             }, {
-              name: intl.formatMessage({ id: 'infra.personal.operate.resetPassword' }),
+              name: formatClient({ id: 'editPsw' }),
               icon: 'swap_horiz',
               display: true,
               handler: openResetGitlab,

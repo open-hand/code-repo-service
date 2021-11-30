@@ -232,4 +232,6 @@ const enUS = {
   'apptag.table': 'Tag list',
 
 };
-export {enUS};
+export { enUS };
+
+export * from './personalSetting';

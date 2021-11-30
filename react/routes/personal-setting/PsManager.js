@@ -17,35 +17,33 @@ import './index.less';
 
 const PsManager = observer(() => {
   const {
-    intl: { formatMessage },
+    formatClient,
   } = usPsManagerStore();
 
   const pageTabArr = [
     <PageTab
-          // title="代码库（GITLAB）设置"
-      title={formatMessage({ id: 'infra.personal.message.gitLabSetting' })}
+      title={formatClient({ id: 'code' })}
       tabKey="gitLabSetting"
       route="/rducm/personal-setting/gitlab"
       component={GitLabSetting}
       alwaysShow
     />,
     <PageTab
-          // title="文档库（SVN）设置"
-      title={formatMessage({ id: 'infra.personal.message.svnSetting' })}
+      title={formatClient({ id: 'svn' })}
       tabKey="svnSetting"
       route="/rducm/personal-setting/svn"
       component={SvnSetting}
       alwaysShow
     />,
     <PageTab
-      title={formatMessage({ id: 'infra.personal.message.prodSetting' })}
+      title={formatClient({ id: 'artifact' })}
       tabKey="prodSetting"
       route="/rducm/personal-setting/product"
       component={ProdSetting}
       alwaysShow
     />,
     has('base-pro:thirdPartServiceBind') && <PageTab
-      title="第三方服务绑定"
+      title={formatClient({ id: 'artifact' })}
       tabKey="thirdPartServiceBind"
       route="/rducm/personal-setting/thirdPartServiceBind"
       component={ThirdPartServiceBind}
