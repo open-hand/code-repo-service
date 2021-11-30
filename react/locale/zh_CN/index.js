@@ -448,4 +448,6 @@ const zhCN = {
   ...infraCommon,
 };
 
-export {zhCN};
+export { zhCN };
+
+export * from './personalSetting';

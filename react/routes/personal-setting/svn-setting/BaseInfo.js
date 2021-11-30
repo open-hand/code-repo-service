@@ -14,7 +14,8 @@ const createKey = Modal.key();
 function BaseInfo() {
   const context = usPsManagerStore();
   const {
-    SvnInfoStore, intl, intlPrefix, prefixCls, AppState,
+    SvnInfoStore, intl, intlPrefix, prefixCls, AppState, formatClient,
+    formatCommon,
   } = context;
   const { organizationId, imageUrl, loginName } = AppState.userInfo;
   const [loading, setLoading] = useState(false);
@@ -68,7 +69,7 @@ function BaseInfo() {
           </div>
           <div className={`${prefixCls}-login-info`}>
             <div>{name}</div>
-            <div style={{ fontSize: 13, fontWeight: 'bold' }}>{intl.formatMessage({ id: 'userName' })}：{userName}</div>
+            <div style={{ fontSize: 13, fontWeight: 'bold' }}>{formatCommon({ id: 'username' })}：{userName}</div>
           </div>
         </div>
         <div className={`${prefixCls}-info-container`}>
@@ -76,12 +77,12 @@ function BaseInfo() {
           <div className={`${prefixCls}-info-container-account`}>
             <div>
               <div>
-                <span className={`${prefixCls}-info-container-account-title`}>{intl.formatMessage({ id: 'infra.personal.model.createdAt' })}</span>
-                <span className={`${prefixCls}-info-container-account-content`}>{creationDate}</span>
+                <span className={`${prefixCls}-info-container-account-title`}>{formatCommon({ id: 'creationTime' })}</span>
+                <span className={`${prefixCls}-info-container-account-content`} style={{ marginRight: 29 }}>{creationDate}</span>
               </div>
               {enablePwd.pwdUpdateFlag !== 1 && (
                 <div>
-                  <span className={`${prefixCls}-info-container-account-title`} style={{ marginRight: '.95rem' }}>{intl.formatMessage({ id: 'infra.personal.model.initPassword' })}</span>
+                  <span className={`${prefixCls}-info-container-account-title`} style={{ lineHeight: '32px' }}>{formatClient({ id: 'artifact.initialPassword' })}</span>
                   <Password value={userPassword} />
                 </div>
               )}
@@ -105,7 +106,7 @@ function BaseInfo() {
   function handleUpdatePassword() {
     Modal.open({
       key: createKey,
-      title: intl.formatMessage({ id: 'user.changepwd.header.title' }),
+      title: formatClient({ id: 'modifyPassword' }),
       style: {
         width: 380,
       },
@@ -122,7 +123,7 @@ function BaseInfo() {
           setEnablePwd={setEnablePwd}
         />
       ),
-      okText: intl.formatMessage({ id: 'save' }),
+      okText: formatCommon({ id: 'save' }),
       onOk: handlePasswordChange,
       footer: (okBtn, cancelBtn) => (
         <div>
@@ -147,7 +148,7 @@ function BaseInfo() {
           <HeaderButtons
             showClassName={false}
             items={([{
-              name: intl.formatMessage({ id: 'user.changepwd.header.title' }),
+              name: formatClient({ id: 'modifyPassword' }),
               icon: 'mode_edit',
               display: true,
               handler: handleUpdatePassword.bind(this),
@@ -161,8 +162,8 @@ function BaseInfo() {
             <Empty
               // loading={getLoading}
               pic={empty}
-              title={intl.formatMessage({ id: 'infra.changepwd.message.svn.noContent.title' })}
-              description={intl.formatMessage({ id: 'infra.changepwd.message.svn.noContent.desc' })}
+              title={formatClient({ id: 'svnnone' })}
+              description={formatClient({ id: 'svnnoneContent' })}
             />
           </Content>
         ) :
