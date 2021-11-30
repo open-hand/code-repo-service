@@ -2,7 +2,7 @@
 import map from 'lodash/map';
 // import getTablePostData from '@/utils/getTablePostData';
 const intlPrefix = 'infra.codeManage';
-export default ((formatMessage, projectId, repositoryId) => ({
+export default ((formatMessage, projectId, repositoryId, format) => ({
   autoQuery: false,
   selection: false,
   paging: false,
@@ -15,12 +15,11 @@ export default ((formatMessage, projectId, repositoryId) => ({
           const data = JSON.parse(resp);
           if (data && data.failed) {
             return data;
-          } else {
-            return map(data, item => ({
-              ...item,
-              createAccessLevel: `L${item.createAccessLevels[0].accessLevel}`,
-            }));
           }
+          return map(data, item => ({
+            ...item,
+            createAccessLevel: `L${item.createAccessLevels[0].accessLevel}`,
+          }));
         } catch (e) {
           return resp;
         }
@@ -50,13 +49,13 @@ export default ((formatMessage, projectId, repositoryId) => ({
       name: 'name',
       type: 'string',
       required: true,
-      label: formatMessage({ id: `${intlPrefix}.tag.protected` }),
+      label: format({ id: 'ProtectedTag' }),
     }, // 受保护的标记
     {
       name: 'createAccessLevel',
       type: 'string',
       required: true,
-      label: formatMessage({ id: `${intlPrefix}.allow.create` }),
+      label: format({ id: 'AllowedCreate' }),
       textField: 'meaning',
       valueField: 'value',
       lookupCode: 'RDUCM.PT_TAG_ACCESS_LEVEL',

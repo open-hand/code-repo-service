@@ -19,6 +19,7 @@ export default (
   organizationId,
   projectId,
   repositoryIds,
+  format,
 ) => ({
   autoQuery: true,
   selection: 'multiple',
@@ -115,12 +116,12 @@ export default (
     {
       name: 'repositoryName',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.service` }),
+      label: format({ id: 'ApplicationService' }),
     }, // 服务名称
     {
       name: 'roleNames',
       type: 'string',
-      label: formatMessage({ id: 'projectRole' }),
+      label: format({ id: 'ProjectRole' }),
     }, // 项目角色
     {
       name: 'glAccessLevelList',
@@ -130,7 +131,7 @@ export default (
       lookupCode: 'RDUCM.ACCESS_LEVEL',
       label: (
         <Tips
-          title={formatMessage({ id: `${intlPrefix}.permission` })}
+          title={format({ id: 'Permission' })}
           helpText={
             <div>
               权限逻辑：
@@ -158,17 +159,17 @@ export default (
     {
       name: 'glExpiresAt',
       type: 'date',
-      label: formatMessage({ id: `${intlPrefix}.expiresAt` }),
+      label: format({ id: 'ExpirationDate' }),
     }, // 过期时间
     {
       name: 'createdByName',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.creationBy` }),
+      label: format({ id: 'Creator' }),
     }, // 创建人
     {
       name: 'lastUpdateDate',
       type: 'dateTime',
-      label: formatMessage({ id: 'updateDate' }),
+      label: format({ id: 'UpdateTime' }),
     }, // 更新时间
   ],
   queryFields: [

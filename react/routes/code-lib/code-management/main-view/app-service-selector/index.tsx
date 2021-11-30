@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useFormatMessage } from "@choerodon/master";
 import { Form, Select } from "choerodon-ui/pro";
 
 import {
@@ -18,6 +19,8 @@ const prefixCls = "c7ncd-codeAppSelector";
 const AppSelector = (props: any) => {
   const { showAllOption = false } = props;
   const { branchServiceDs, branchAppId, setBranchApp } = usPsManagerStore();
+
+  const format = useFormatMessage('c7ncd.codeLibManagement');
 
   function handleSelect(value: string) {
     setBranchApp(value);
@@ -65,7 +68,7 @@ const AppSelector = (props: any) => {
         value={branchAppId}
         onChange={handleSelect}
         colSpan={3}
-        prefix="应用服务："
+        prefix={`${format({ id: 'ApplicationService' })}:`}
         className={`${prefixCls}-select`}
       >
         {renderOpts()}

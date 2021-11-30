@@ -2,7 +2,7 @@
 import map from 'lodash/map';
 // import getTablePostData from '@/utils/getTablePostData';
 const intlPrefix = 'infra.codeManage';
-export default ((formatMessage, projectId, repositoryId) => ({
+export default ((formatMessage, projectId, repositoryId, format) => ({
   autoQuery: false,
   selection: false,
   paging: false,
@@ -15,13 +15,12 @@ export default ((formatMessage, projectId, repositoryId) => ({
           const data = JSON.parse(resp);
           if (data && data.failed) {
             return data;
-          } else {
-            return map(data, item => ({
-              ...item,
-              pushAccessLevel: `L${item.pushAccessLevels[0].accessLevel}`,
-              mergeAccessLevel: `L${item.mergeAccessLevels[0].accessLevel}`,
-            }));
           }
+          return map(data, item => ({
+            ...item,
+            pushAccessLevel: `L${item.pushAccessLevels[0].accessLevel}`,
+            mergeAccessLevel: `L${item.mergeAccessLevels[0].accessLevel}`,
+          }));
         } catch (e) {
           return resp;
         }
@@ -51,23 +50,22 @@ export default ((formatMessage, projectId, repositoryId) => ({
       name: 'name',
       type: 'string',
       required: true,
-      label: formatMessage({ id: `${intlPrefix}.branch.protected` }),
+      label: format({ id: 'ProtectedBranch' }),
       // textField: 'name',
       // valueField: 'name',
-      // lookupUrl: `/rducm/v1/projects/${projectId}/gitlab/repositories/${repositoryId}/branches?excludeProtectedFlag=true`,
     }, // 受保护的分支
     {
       name: 'pushAccessLevel',
       type: 'string',
       required: true,
-      label: formatMessage({ id: `${intlPrefix}.allow.push` }),
+      label: format({ id: 'AllowedPush' }),
       lookupCode: 'RDUCM.PT_BRANCH_ACCESS_LEVEL',
     }, // 允许合并
     {
       name: 'mergeAccessLevel',
       type: 'string',
       required: true,
-      label: formatMessage({ id: `${intlPrefix}.allow.merge` }),
+      label: format({ id: 'AllowedMerge' }),
       lookupCode: 'RDUCM.PT_BRANCH_ACCESS_LEVEL',
     }, // 允许推送
   ],

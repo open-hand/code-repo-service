@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import { observer } from "mobx-react-lite";
 import { Content, TabPage, Page, Choerodon } from "@choerodon/boot";
+import { useFormatMessage } from "@choerodon/master";
 import { CustomTabs } from "@choerodon/components";
 import { Row, Col, Icon, Tooltip } from "choerodon-ui";
 import CodeManagerHeader from "../../header";
@@ -25,6 +26,8 @@ const PsAll = () => {
   const { customTabsData, psAllStore, formatMessage } = usePermissionStore();
 
   const { setSelectedTab, selectedTabkey } = psAllStore;
+
+  const format = useFormatMessage('c7ncd.codeLibManagement');
 
   const psMap = new Map([
     ["psSet", <PSsetTable />],
@@ -83,9 +86,7 @@ const PsAll = () => {
                       style={{ marginRight: ".03rem", marginBottom: ".04rem" }}
                     />
                     <span>
-                      {formatMessage({
-                        id: `${intlPrefixAudit}.model.executionDate`,
-                      })}
+                      {format({ id: 'AuditDate' })}
                       <span className="c7n-infra-code-management-ps-audit-tip-text-date">
                         {renderTime()}
                       </span>
@@ -94,9 +95,7 @@ const PsAll = () => {
                   <Col span={12}>
                     <Icon type="compare" style={{ marginRight: ".03rem" }} />
                     <span>
-                      {formatMessage({
-                        id: `${intlPrefixAudit}.model.diffCount`,
-                      })}
+                      {format({ id: 'DifferenceData' })}
                       <span className="c7n-infra-code-management-ps-audit-tip-text-number">
                         {psAuditDs.totalCount || 0}
                       </span>

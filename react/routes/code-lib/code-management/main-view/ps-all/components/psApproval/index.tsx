@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Page, Action } from "@choerodon/boot";
+import { useFormatMessage } from "@choerodon/master";
 import { Table, Modal, Icon, Tooltip } from "choerodon-ui/pro";
 import { observer } from "mobx-react-lite";
 import { StatusTag } from "@choerodon/components";
@@ -22,6 +23,8 @@ const PsApproval = observer(() => {
     organizationId,
     projectId,
   } = usPsManagerStore();
+
+  const format = useFormatMessage('c7ncd.codeLibManagement');
 
   useEffect(()=>{
     psApprovalDs.query();
@@ -131,7 +134,7 @@ const PsApproval = observer(() => {
         <StatusTag
           type="default"
           colorCode={record.value.toUpperCase()}
-          name={formatMessage({ id: `infra.approval.${res}` })}
+          name={format({ id: res })}
         />
         {approvalMessage && (
           <Tooltip title={approvalMessage}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import Tips from '@/components/new-tips';
 
-export default ((intlPrefix, formatMessage, organizationId, projectId) => ({
+export default ((intlPrefix, formatMessage, organizationId, projectId, format) => ({
   autoQuery: false,
   selection: false,
   pageSize: 10,
@@ -25,17 +25,17 @@ export default ((intlPrefix, formatMessage, organizationId, projectId) => ({
     {
       name: 'roleNames',
       type: 'string',
-      label: formatMessage({ id: 'projectRole' }),
+      label: format({ id: 'ProjectRole' }),
     }, // 项目角色
     {
       name: 'authorizedRepositoryCount',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.authorizedCount` }),
+      label: format({ id: 'NumberServices' }),
     },
     {
       name: 'allRepositoryCount',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.allCount` }),
+      label: format({ id: 'AllServices' }),
     },
     {
       name: 'authorizedRate',

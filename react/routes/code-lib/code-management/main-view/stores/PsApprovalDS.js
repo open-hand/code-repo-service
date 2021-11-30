@@ -2,7 +2,7 @@
 import { map } from 'lodash';
 import CodeManagerApis from '../../apis';
 
-export default ((intlPrefix, formatMessage, organizationId, projectId, branchAppId) => ({
+export default ((intlPrefix, formatMessage, organizationId, projectId, branchAppId, format) => ({
   autoQuery: false,
   selection: 'multiple',
   pageSize: 10,
@@ -59,12 +59,12 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchApp
     {
       name: 'repositoryName',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.service` }),
+      label: format({ id: 'ApplicationService' }),
     },
     {
       name: 'applicantType',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.applyType` }),
+      label: format({ id: 'Type' }),
       lookupCode: 'RDUCM.APPLICANT_TYPE',
       textField: 'meaning',
       valueField: 'value',
@@ -80,7 +80,7 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchApp
     {
       name: 'accessLevel',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.applyPermission` }),
+      label: format({ id: 'PermissionType' }),
       lookupCode: 'RDUCM.ACCESS_LEVEL',
       textField: 'meaning',
       valueField: 'value',
@@ -88,7 +88,7 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchApp
     {
       name: 'applicantDate',
       type: 'dateTime',
-      label: formatMessage({ id: `${intlPrefix}.applyDate` }),
+      label: format({ id: 'ApplicationDate' }),
     },
     {
       name: 'approvalDate',
