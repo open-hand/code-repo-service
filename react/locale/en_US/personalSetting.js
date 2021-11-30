@@ -15,6 +15,15 @@ const personalSetting = {
   'c7ncd.personal-setting.artifactnoneContent': 'After the warehouse administrator assigns wip permissions to the user, the wIP account is automatically created. The path is project > WIP Management > Details > Permission Assignment TAB.',
   'c7ncd.personal-setting.artifact.initialPassword': 'Initial password',
   'c7ncd.personal-setting.modifyPassword': 'ModifyPassword',
+
+  // 第三方服务的，写在base-pro
+  'c7ncd.personal-setting.third.bindStatus': 'Is binding',
+  'c7ncd.personal-setting.third.notBindStatus': 'unbounded',
+  'c7ncd.personal-setting.third.bind': 'Binding',
+  'c7ncd.personal-setting.third.unBind': 'unbundling',
+  'c7ncd.personal-setting.third.hand.title': 'Kingnew',
+  'c7ncd.personal-setting.third.hand.desc': 'After binding to the open platform, you can submit the work order and view the details of the work order on the open platform.',
+
 };
 
 export { personalSetting };
