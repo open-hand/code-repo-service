@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback } from "react";
 import { Page, Action, Choerodon } from "@choerodon/boot";
+import { useFormatMessage } from "@choerodon/master";
 import { Table, Modal } from "choerodon-ui/pro";
 import { Tooltip, Row, Col, Icon, message } from "choerodon-ui";
 import { observer } from "mobx-react-lite";
@@ -27,6 +28,8 @@ const PsAudit = observer(() => {
     executionDate,
     setExecutionDate,
   } = usPsManagerStore();
+
+  const format = useFormatMessage('c7ncd.codeLibManagement');
 
   const refresh = useCallback(() => {
     psAuditDs.query();
@@ -97,7 +100,7 @@ const PsAudit = observer(() => {
         service: [
           "choerodon.code.project.infra.code-lib-management.ps.project-owner",
         ],
-        text: formatMessage({ id: "fix" }),
+        text: format({ id: 'Repair' }),
         action: () => openDelete(record),
       },
     ];

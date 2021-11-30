@@ -2,6 +2,7 @@
 import React, { createContext, useCallback, useContext, useMemo } from "react";
 import { DataSet } from "choerodon-ui/pro";
 import { injectIntl } from "react-intl";
+import { useFormatMessage } from "@choerodon/master";
 import { inject } from "mobx-react";
 import { DataSetSelection } from "choerodon-ui/pro/lib/data-set/enum";
 import useStore, { MainStoreProps } from "./useStore";
@@ -45,6 +46,8 @@ export const StoreProvider = injectIntl(
 
       const { hasMemberPermission, hasPermission } = usPsManagerStore();
 
+      const format = useFormatMessage('c7ncd.codeLibManagement');
+
       const getCustomsTabData = useCallback(() => {
         let customTabsData: {
           tip?: any;
@@ -52,9 +55,9 @@ export const StoreProvider = injectIntl(
           value: string;
         }[] = [];
         if (hasPermission) {
-          customTabsData = [psSetTabData, psApprovalTabData, psAuditTabData];
+          customTabsData = [psSetTabData(format), psApprovalTabData(format), psAuditTabData(format)];
         } else if (!hasPermission && hasMemberPermission) {
-          customTabsData = [psSetTabData, applyViewTabData]
+          customTabsData = [psSetTabData(format), applyViewTabData]
         }
         return customTabsData;
       }, [hasPermission, hasMemberPermission]);

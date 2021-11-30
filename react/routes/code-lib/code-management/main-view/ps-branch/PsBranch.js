@@ -7,6 +7,7 @@
 /* eslint-disable */
 import React, { useEffect } from 'react';
 import { Page, Action } from '@choerodon/boot';
+import { useFormatMessage } from "@choerodon/master";
 import { Table, Modal, Form, Select } from 'choerodon-ui/pro';
 import { observer } from 'mobx-react-lite';
 import { map } from 'lodash';
@@ -33,6 +34,8 @@ const PsBranch = observer(() => {
     hasPermission,
     branchServiceDs,
   } = usPsManagerStore();
+
+  const format = useFormatMessage('c7ncd.codeLibManagement');
 
   function refreshBranch() {
     branchDs.query();
@@ -68,10 +71,10 @@ const PsBranch = observer(() => {
     }
   }
 
-  function renderAction(type) {
+  function  renderAction(type) {
     const actionData = [{
       service: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
-      text: formatMessage({ id: `${intlPrefix}.cancel.protected` }),
+      text: format({ id: 'Unprotect' }),
       action: () => handleDelete(type),
     }];
     return <Action data={actionData} />;
@@ -190,7 +193,7 @@ const PsBranch = observer(() => {
         </Form>
       </div>
       <div>
-        <div className="ps-branch-tips-title">{formatMessage({ id: `${intlPrefix}.branch.protected.set` })}</div>
+        <div className="ps-branch-tips-title">{format({ id: 'ProtectedBranchSetting' })}</div>
         <Table dataSet={branchDs} queryBar="none" filter={handleTableFilter} pagination={false}>
           <Column name="name" renderer={renderBranchName} width={315} help="受保护的分支可以设置允许往此分支上合并或推送代码的特定角色" />
           <Column renderer={() => renderAction('branch')} width={70} />
@@ -199,7 +202,7 @@ const PsBranch = observer(() => {
         </Table>
       </div>
       <div>
-        <div className="ps-branch-tips-title" style={{ marginTop: '0.16rem' }}>{formatMessage({ id: `${intlPrefix}.tag.protected.set` })}</div>
+        <div className="ps-branch-tips-title" style={{ marginTop: '0.16rem' }}>{format({ id: 'ProtectedTagSetting' })}</div>
         <Table dataSet={tagDs} queryBar="none" filter={handleTableFilter} pagination={false} >
           <Column name="name" renderer={renderTagName} width={315} help="受保护的标记可以设置允许创建或更新此标记的特定角色" />
           <Column renderer={() => renderAction('tag')} width={70} />

@@ -1,5 +1,5 @@
 export default (({
-  formatMessage, organizationId, projectId, setBranchApp,
+  formatMessage, organizationId, projectId, setBranchApp, format,
 }) => ({
   paging: false,
   autoQuery: true,
@@ -13,7 +13,7 @@ export default (({
     {
       name: 'repositoryIds',
       type: 'string',
-      label: formatMessage({ id: 'infra.service' }),
+      label: format({ id: 'ApplicationService' }),
     }, // 保护分支、标记的【应用服务】查询条件
   ],
   events: {

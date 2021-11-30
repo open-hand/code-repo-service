@@ -7,6 +7,7 @@
 /* eslint-disable */
 import React, { useEffect } from 'react';
 import { Page } from '@choerodon/boot';
+import { useFormatMessage } from "@choerodon/master";
 import { Table, Modal, DataSet } from 'choerodon-ui/pro';
 import { Slider } from 'choerodon-ui';
 import { observer } from 'mobx-react-lite';
@@ -33,6 +34,8 @@ const PsSet = observer(() => {
     AppState: { currentMenuType: { id: projectId, organizationId } },
 
   } = usPsManagerStore();
+
+  const format = useFormatMessage('c7ncd.codeLibManagement');
 
   function refresh() {
     securityAuditDs.query();
@@ -136,7 +139,7 @@ const PsSet = observer(() => {
         <Column name="roleNames" renderer={renderRole} />
         <Column name="authorizedRepositoryCount" />
         <Column name="allRepositoryCount" />
-        <Column header={<Tips title={formatMessage({ id: `${intlPrefix}.authorizedRate` })} helpText={formatMessage({ id: `${intlPrefix}.authorizedRateTips` })} />} name="authorizedRate" renderer={renderLevel} width={150} />
+        <Column header={<Tips title={format({ id: 'PercentageServices' })} helpText={formatMessage({ id: `${intlPrefix}.authorizedRateTips` })} />} name="authorizedRate" renderer={renderLevel} width={150} />
       </Table>
     </Page>
   );

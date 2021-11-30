@@ -6,7 +6,7 @@ import Tips from '@/components/new-tips';
 
 const intlPrefix = 'infra.codeManage';
 
-export default ((formatMessage, organizationId, projectId, branchServiceDs) => ({
+export default ((formatMessage, organizationId, projectId, branchServiceDs, format) => ({
   autoQuery: false,
   selection: false,
   pageSize: 10,
@@ -20,42 +20,42 @@ export default ((formatMessage, organizationId, projectId, branchServiceDs) => (
     {
       name: 'repositoryName',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.repositoryName` }),
+      label: format({ id: 'ServiceName' }),
     },
     {
       name: 'managerCount',
       type: 'number',
-      label: <Tips title={formatMessage({ id: `${intlPrefix}.develop.managerCount` })} helpText={formatMessage({ id: `${intlPrefix}.develop.managerCountTips` })} />,
+      label: <Tips title={format({ id: 'ManagementMembers' })} helpText={formatMessage({ id: `${intlPrefix}.develop.managerCountTips` })} />,
     },
     {
       name: 'developerCount',
       type: 'number',
-      label: formatMessage({ id: `${intlPrefix}.develop.allMember` }),
+      label: format({ id: 'DevelopmentMembers' }),
     },
     {
       name: 'defaultBranch',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.default.branch` }),
+      label: format({ id: 'DefaultBranch' }),
     },
     {
       name: 'visibility',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.lib.visible` }),
+      label: format({ id: 'Visibility' }),
     },
     {
       name: 'lastCommittedDate',
       type: 'dateTime',
-      label: formatMessage({ id: `${intlPrefix}.last.commit` }),
+      label: format({ id: 'LastCommit' }),
     },
     {
       name: 'openedMergeRequestCount',
       type: 'number',
-      label: formatMessage({ id: `${intlPrefix}.wait.handle.number` }),
+      label: format({ id: 'MergeRequests' }),
     },
     {
       name: 'repositoryCreationDate',
       type: 'dateTime',
-      label: formatMessage({ id: `${intlPrefix}.creationDate` }),
+      label: format({ id: 'CreationDate' }),
     },
   ],
   queryFields: [

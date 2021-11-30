@@ -3,7 +3,7 @@
 import { map } from 'lodash';
 import Apis from '../../apis';
 
-export default ((intlPrefix, formatMessage, organizationId, projectId, branchAppId) => ({
+export default ((intlPrefix, formatMessage, organizationId, projectId, branchAppId, format) => ({
   autoQuery: false,
   selection: 'multiple',
   pageSize: 10,
@@ -48,29 +48,29 @@ export default ((intlPrefix, formatMessage, organizationId, projectId, branchApp
     {
       name: 'repositoryName',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.service` }),
+      label: format({ id: 'ApplicationService' }),
     }, // 服务名称
     {
       name: 'accessLevel',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.permission` }),
+      label: format({ id: 'Permission' }),
       lookupCode: 'RDUCM.ACCESS_LEVEL',
     },
     {
       name: 'expiresAt',
       type: 'date',
-      label: formatMessage({ id: `${intlPrefix}.expiresAt` }),
+      label: format({ id: 'ExpirationDate' }),
     }, // 过期日期
     {
       name: 'glAccessLevel',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.glAccessLevel` }),
+      label: format({ id: 'PermissionGitLab' }),
       lookupCode: 'RDUCM.ACCESS_LEVEL',
     },
     {
       name: 'glExpiresAt',
       type: 'date',
-      label: formatMessage({ id: `${intlPrefix}.glExpiresAt` }),
+      label: format({ id: 'ExpirationDateGitLab' }),
     }, // 过期日期
     {
       name: 'syncGitlabFlag',
