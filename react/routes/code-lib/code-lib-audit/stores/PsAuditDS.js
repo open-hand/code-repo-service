@@ -2,9 +2,7 @@
 // import { axios } from '@choerodon/boot';
 import { map } from 'lodash';
 
-const intlPrefix = 'infra';
-
-export default ((formatMessage, organizationId) => ({
+export default ((formatClient, formatCommon, organizationId) => ({
   autoQuery: false,
   selection: false,
   pageSize: 10,
@@ -39,44 +37,44 @@ export default ((formatMessage, organizationId) => ({
     {
       name: 'realName',
       type: 'string',
-      label: formatMessage({ id: 'userName' }),
+      label: formatCommon({ id: 'username' }),
     }, // 用户名
     {
       name: 'loginName',
       type: 'string',
-      label: formatMessage({ id: 'loginName' }),
+      label: formatCommon({ id: 'account' }),
     }, // 登录名
     {
       name: 'project',
       type: 'object',
-      label: formatMessage({ id: 'projectName' }),
+      label: formatClient({ id: 'audit.projectName' }),
     },
     {
       name: 'repositoryName',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.service` }),
+      label: formatClient({ id: 'audit.applicationServices' }),
     }, // 服务名称
     {
       name: 'accessLevel',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.permission` }),
+      label: formatClient({ id: 'audit.permissions' }),
       lookupCode: 'RDUCM.ACCESS_LEVEL',
     },
     {
       name: 'expiresAt',
       type: 'date',
-      label: formatMessage({ id: `${intlPrefix}.expiresAt` }),
+      label: formatClient({ id: 'audit.expirationDate' }),
     }, // 过期日期
     {
       name: 'glAccessLevel',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.glAccessLevel` }),
+      label: formatClient({ id: 'audit.gitlabPermissions' }),
       lookupCode: 'RDUCM.ACCESS_LEVEL',
     },
     {
       name: 'glExpiresAt',
       type: 'date',
-      label: formatMessage({ id: `${intlPrefix}.glExpiresAt` }),
+      label: formatClient({ id: 'audit.gitlabOverdue' }),
     }, // 过期日期
     {
       name: 'syncGitlabFlag',
@@ -97,7 +95,7 @@ export default ((formatMessage, organizationId) => ({
     {
       name: 'repositoryName',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.service` }),
+      label: formatClient({ id: 'audit.applicationServices' }),
     }, // 服务名称
   ],
 }));

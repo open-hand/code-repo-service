@@ -1,5 +1,6 @@
 // stores/index.js
 import React, { createContext, useMemo, useContext } from 'react';
+import { useFormatCommon, useFormatMessage } from '@choerodon/master';
 import { DataSet } from 'choerodon-ui/pro';
 import { inject } from 'mobx-react';
 import { injectIntl } from 'react-intl';
@@ -21,23 +22,27 @@ export const TabKeyEnum = {
   PSAUDIT: 'psAudit',
 };
 
-export const intlPrefix = 'infra.codelib.audit';
+export const intlPrefix = 'c7ncd.code-lib-org';
 
 export const StoreProvider = injectIntl(inject('AppState')((props) => {
   const {
     AppState,
-    intl,
     children,
   } = props;
   const { id: userId } = AppState.userInfo;
   const { organizationId } = AppState.currentMenuType;
-  const { formatMessage } = intl;
-  
-  const optLogDs = useMemo(() => new DataSet(optLogDataSet(intlPrefix, formatMessage, organizationId)), [formatMessage, organizationId]);
-  const projectListDs = useMemo(() => new DataSet(projectListDataSet(organizationId, userId)), [formatMessage]);
+
+  const formatCommon = useFormatCommon();
+  const formatClient = useFormatMessage(intlPrefix);
+
+  const optLogDs = useMemo(() =>
+    new DataSet(optLogDataSet(formatClient, formatCommon, organizationId)), [organizationId]);
+  const projectListDs = useMemo(() => new DataSet(projectListDataSet(organizationId, userId)), []);
   // 权限查看
-  const psViewDs = useMemo(() => new DataSet(psViewDataSet(intlPrefix, formatMessage, organizationId)), [formatMessage, organizationId]);
-  const psAuditDs = useMemo(() => new DataSet(PsAuditDS(formatMessage, organizationId)), [formatMessage, organizationId]);
+  const psViewDs = useMemo(() =>
+    new DataSet(psViewDataSet(formatClient, formatCommon, organizationId)), [organizationId]);
+  const psAuditDs = useMemo(() =>
+    new DataSet(PsAuditDS(formatClient, formatCommon, organizationId)), [organizationId]);
 
   const value = {
     ...props,
@@ -48,6 +53,8 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
     timeLineStore: useTimeLineStore(),
     organizationId,
     psAuditDs,
+    formatCommon,
+    formatClient,
   };
   return (
     <Store.Provider value={value}>
