@@ -321,6 +321,7 @@ const EnvModals = observer((props) => {
           name: '批量修复',
           icon: 'person_add-o',
           handler: handleBatchFixModalOpen,
+          permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
           display: true,
           disabled: disabledPsAudit,
           tooltipsConfig: {
