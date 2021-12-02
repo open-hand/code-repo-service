@@ -16,12 +16,15 @@ import moment from 'moment';
 import UserAvatar from '@/components/user-avatar';
 import './index.less';
 
-import { TabKeyEnum } from '../stores';
+import { TabKeyEnum,useStore } from '../stores';
 
 const intlPrefix = 'infra.codeManage.ps';
 
 const { Column } = Table;
-const PsAudit = ({ psAuditDs, formatMessage, activeProject, activeTabKey, organizationId }) => {
+const PsAudit = ({ psAuditDs, activeProject, activeTabKey, organizationId }) => {
+
+  const {formatClient} = useStore();
+
   const [executionDate, setExecutionDate] = useState(undefined);
   async function fetchExecutionDate() {
     const projectId = activeProject.id === 'all' ? undefined : activeProject.id;
@@ -60,7 +63,7 @@ const PsAudit = ({ psAuditDs, formatMessage, activeProject, activeTabKey, organi
   }
 
   function renderTime() {
-    const date = isNil(executionDate) ? formatMessage({ id: 'none' }) : (
+    const date = isNil(executionDate) ? '无' : (
       <Tooltip
         title={executionDate}
       >
@@ -132,11 +135,11 @@ const PsAudit = ({ psAuditDs, formatMessage, activeProject, activeTabKey, organi
         <Row className="c7n-infra-code-management-org-tip-text">
           <Col span={8}>
             <Icon type="date_range" style={{ marginRight: '.03rem', marginBottom: '.04rem' }} />
-            <span>{formatMessage({ id: `${intlPrefix}.model.executionDate` })}<span className="c7n-infra-code-management-org-tip-text-date">{renderTime()}</span></span>
+            <span>{formatClient({ id: `audit.totalVarianceData` })}<span className="c7n-infra-code-management-org-tip-text-date">{renderTime()}</span></span>
           </Col>
           <Col span={8}>
             <Icon type="compare" style={{ marginRight: '.03rem' }} />
-            <span>{formatMessage({ id: `${intlPrefix}.model.diffCount` })}<span className="c7n-infra-code-management-org-tip-text-number">{psAuditDs.totalCount || 0}</span></span>
+            <span>{formatClient({ id: `audit.auditExecutionDate` })}<span className="c7n-infra-code-management-org-tip-text-number">{psAuditDs.totalCount || 0}</span></span>
           </Col>
         </Row>
       </div>

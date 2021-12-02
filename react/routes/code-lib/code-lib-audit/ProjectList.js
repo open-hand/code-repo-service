@@ -1,8 +1,8 @@
+/*eslint-disable*/
 import React, { useCallback } from 'react';
 import { Icon } from 'choerodon-ui';
 import { observer } from 'mobx-react-lite';
 import { Spin, TextField } from 'choerodon-ui/pro';
-import { intlPrefix } from './stores';
 
 const imgStyle = {
   width: '18px',
@@ -23,7 +23,9 @@ const iconStyle = {
   border: '1px solid rgba(104,135,232,1)',
 };
 
-const ProjectList = ({ formatMessage, projectListDs, activeProject, onClickProject }) => {
+const ProjectList = ({
+  projectListDs, activeProject, onClickProject,
+}) => {
   const record = projectListDs.toJSONData();
 
   const handleSearch = useCallback((e) => {
@@ -34,9 +36,8 @@ const ProjectList = ({ formatMessage, projectListDs, activeProject, onClickProje
   const getProjectIcon = useCallback((imageUrl, name) => {
     if (imageUrl) {
       return <img src={imageUrl} alt="" style={imgStyle} />;
-    } else {
-      return <div style={iconStyle}>{name[0]}</div>;
     }
+    return <div style={iconStyle}>{name[0]}</div>;
   });
 
   const projectList = () => {
@@ -55,12 +56,12 @@ const ProjectList = ({ formatMessage, projectListDs, activeProject, onClickProje
       <li
         key="all"
         className={activeProject.id === 'all' ? 'project-active' : ''}
-        onClick={() => onClickProject({ id: 'all', name: formatMessage({ id: `${intlPrefix}.view.allProject`, defaultMessage: '所有项目' }) })}
+        onClick={() => onClickProject({ id: 'all', name: '所有项目' })}
       >
         <span className="project-all-icon">
           <Icon type="project_filled" style={{ color: 'rgba(255, 255, 255, 1)', fontSize: '0.14rem' }} />
         </span>
-        <span>{formatMessage({ id: `${intlPrefix}.view.allProject`, defaultMessage: '所有项目' })}</span>
+        <span>所有项目</span>
       </li>);
     return liArr;
   };
@@ -71,7 +72,7 @@ const ProjectList = ({ formatMessage, projectListDs, activeProject, onClickProje
         <TextField
           style={{ width: '200px' }}
           prefix={<Icon type="search" style={{ fontSize: '0.2rem' }} />}
-          placeholder={formatMessage({ id: 'infra.filter' })}
+          placeholder="请输入搜索条件"
           onKeyUp={handleSearch}
         />
       </div>

@@ -16,7 +16,6 @@ const { Option } = Select;
 
 const OperationLogTab = () => {
   const {
-    intl: { formatMessage },
     listViewDs,
     overStores,
     branchServiceDs,

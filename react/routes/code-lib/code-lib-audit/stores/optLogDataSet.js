@@ -1,4 +1,5 @@
-export default (intlPrefix, formatMessage, organizationId) => ({
+// eslint-disable-next-line import/no-anonymous-default-export
+export default (formatClient, formatCommon, organizationId) => ({
   autoQuery: false,
   selection: false,
   pageSize: 10,
@@ -13,28 +14,28 @@ export default (intlPrefix, formatMessage, organizationId) => ({
     {
       name: 'projectId',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.model.projectId` }),
+      label: formatClient({ id: 'log.project' }),
     },
     {
       name: 'opUserName',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.model.opUserName` }),
+      label: formatClient({ id: 'log.operator' }),
     },
     {
       name: 'opType',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.model.opType` }),
+      label: '操作类型',
       lookupCode: 'RDUCM.OPERATION_OP_TYPE',
     },
     {
       name: 'opContent',
       type: 'string',
-      label: formatMessage({ id: `${intlPrefix}.model.opContent` }),
+      label: '操作内容',
     },
     {
       name: 'opDate',
       type: 'dateTime',
-      label: formatMessage({ id: `${intlPrefix}.model.opDate` }),
+      label: '操作日期',
     },
   ],
   queryFields: [
@@ -42,13 +43,13 @@ export default (intlPrefix, formatMessage, organizationId) => ({
       name: 'startDate',
       type: 'date',
       max: 'endDate',
-      label: formatMessage({ id: `${intlPrefix}.model.startDate` }),
+      label: '开始日期',
     },
     {
       name: 'endDate',
       type: 'date',
       min: 'startDate',
-      label: formatMessage({ id: `${intlPrefix}.model.endDate` }),
+      label: '结束日期',
     },
   ],
 });

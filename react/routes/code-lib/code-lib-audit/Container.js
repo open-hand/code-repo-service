@@ -1,6 +1,6 @@
 /* eslint-disable import/first */
 /**
- * 代码库-项目层
+ * 代码库-组织层
  * @author JZH <zhihao.jiang@hand-china.com>
  * @creationDate 2020/3/26
  * @copyright 2020 ® HAND
@@ -26,21 +26,20 @@ const Container = () => {
   const [activeTabKey, setActiveTabKey] = useState(TabKeyEnum.PSVIEW);
   const [activeProject, setActiveProject] = useState({});
   const {
-    intlPrefix,
-    intl: { formatMessage },
     optLogDs,
     psViewDs,
     projectListDs,
     timeLineStore,
     psAuditDs,
     organizationId,
+    formatClient,
   } = useStore();
   const Modal = useModal();
   const refresh = () => {
     projectListDs.query().then(() => {
       setActiveProject({
         id: 'all',
-        name: formatMessage({ id: `${intlPrefix}.view.allProject`, defaultMessage: '所有项目' }),
+        name: formatClient({ id: 'permission.allProject' }),
       });
     });
   };
@@ -54,24 +53,25 @@ const Container = () => {
   };
 
   const projectListProps = useMemo(() => ({
-    formatMessage, projectListDs, activeProject, onClickProject,
-  }), [formatMessage, projectListDs, activeProject]);
+    projectListDs, activeProject, onClickProject,
+  }), [projectListDs, activeProject]);
   const psViewProps = useMemo(() => ({
-    psViewDs, activeProject, formatMessage, activeTabKey,
-  }), [activeProject, psViewDs, formatMessage, activeTabKey]);
+    psViewDs, activeProject, activeTabKey,
+  }), [activeProject, psViewDs, activeTabKey]);
   const optLogProps = useMemo(() => ({
-    formatMessage, optLogDs, timeLineStore, activeProject, activeTabKey,
+    optLogDs, timeLineStore, activeProject, activeTabKey,
   }), [activeProject, optLogDs, timeLineStore, activeTabKey]);
   const exportAuthorityProps = useMemo(() => ({
-    formatMessage, activeProject, psViewDs,
+    activeProject, psViewDs,
   }), [activeProject, psViewDs]);
 
   const psAuditProps = useMemo(() => ({
-    psAuditDs, activeProject, formatMessage, activeTabKey, organizationId,
-  }), [activeProject, psAuditDs, formatMessage, activeTabKey, organizationId]);
+    psAuditDs, activeProject, activeTabKey, organizationId,
+  }), [activeProject, psAuditDs, activeTabKey, organizationId]);
+
   const openExportModal = useCallback(() => {
     Modal.open({
-      title: formatMessage({ id: 'exportModal.confirm.title', defaultMessage: '权限导出确认' }),
+      title: '权限导出确认',
       children: <ExportAuthority {...exportAuthorityProps} />,
     });
   }, []);
@@ -85,7 +85,7 @@ const Container = () => {
         <HeaderButtons
           showClassName={false}
           items={([{
-            name: formatMessage({ id: 'exportAuth', defaultMessage: '导出权限' }),
+            name: formatClient({ id: 'permission.permissionToExport' }),
             icon: 'get_app-o',
             display: true,
             handler: () => openExportModal(),
@@ -106,19 +106,20 @@ const Container = () => {
             animated={false}
             onChange={newActiveKey => setActiveTabKey(newActiveKey)}
           >
-            <TabPane tab={formatMessage({ id: `${intlPrefix}.view.psView` })} key={TabKeyEnum.PSVIEW}>
+            <TabPane tab={formatClient({ id: 'permission.permission' })} key={TabKeyEnum.PSVIEW}>
               <PSView {...psViewProps} />
             </TabPane>
             <TabPane
-              tab={<Tips
-                helpText={formatMessage({ id: 'infra.codeManage.ps.message.psAudit.tips' })}
-                title={formatMessage({ id: 'infra.codeManage.ps.message.psAudit' })}
-              />}
+              tab={
+                <Tips
+                  helpText={formatClient({ id: 'audit.tips' })}
+                  title={formatClient({ id: 'permission.permission' })}
+                />}
               key={TabKeyEnum.PSAUDIT}
             >
               <PsAudit {...psAuditProps} />
             </TabPane>
-            <TabPane tab={formatMessage({ id: `${intlPrefix}.view.optLog`, defaultMessage: '操作日志' })} key={TabKeyEnum.OPTLOG}>
+            <TabPane tab={formatClient({ id: 'log.log' })} key={TabKeyEnum.OPTLOG}>
               <TimeLine {...optLogProps} />
             </TabPane>
           </Tabs>

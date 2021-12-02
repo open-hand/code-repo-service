@@ -26,8 +26,8 @@ class ExportAuthority extends Component {
    * 输出 excel
    */
   exportExcel = () => {
+    const { modal } = this.props;
     const organizationId = AppState.currentMenuType.id;
-    const { formatMessage, modal } = this.props;
     this.setState({
       loading: true,
     });
@@ -43,7 +43,7 @@ class ExportAuthority extends Component {
         const fileName = '权限记录.xlsx';
         FileSaver.saveAs(blob, fileName);
 
-        Choerodon.prompt(formatMessage({ id: 'success.export', defaultMessage: '导出成功' }));
+        Choerodon.prompt('导出成功');
         modal.update({ closable: false });
       }).finally(() => {
         this.setState({
@@ -54,14 +54,13 @@ class ExportAuthority extends Component {
 
   render() {
     const organizationName = AppState.currentMenuType.name;
-    const { formatMessage } = this.props;
     return (
       <div style={{ margin: '10px 0' }}>
-        {formatMessage({ id: 'infra.docManage.message.confirm.export' })}
+        确定导出
         {' '}
         <span style={{ fontWeight: 500 }}>{organizationName}</span>
         {' '}
-        {formatMessage({ id: 'dir.path.permission' }, { dirData: '' })}
+        的权限
       </div>
     );
   }

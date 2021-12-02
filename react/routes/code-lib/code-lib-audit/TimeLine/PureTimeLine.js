@@ -2,7 +2,6 @@ import React, { useCallback } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Icon, Button } from 'choerodon-ui';
 import { Spin } from 'choerodon-ui/pro';
-import { intlPrefix } from './../stores';
 
 const imgStyle = {
   width: '18px',
@@ -21,7 +20,9 @@ const iconStyle = {
   textAlign: 'center',
 };
 
-const TimeLine = ({ formatMessage, isMore, opEventTypeLookupData, loadData, optLogDs }) => {
+const TimeLine = ({
+  isMore, opEventTypeLookupData, loadData, optLogDs,
+}) => {
   const record = optLogDs.current && optLogDs.toData();
 
 
@@ -59,17 +60,15 @@ const TimeLine = ({ formatMessage, isMore, opEventTypeLookupData, loadData, optL
   const getProjectIcon = useCallback((imageUrl, name) => {
     if (imageUrl) {
       return <img src={imageUrl} alt="" style={imgStyle} />;
-    } else {
-      return <div style={iconStyle}>{name[0]}</div>;
     }
+    return <div style={iconStyle}>{name[0]}</div>;
   });
 
   const getUserIcon = (imageUrl, name) => {
     if (imageUrl) {
       return <img src={imageUrl} alt="" />;
-    } else {
-      return <div className="code-lib-audit-optlog-timeLine-card-content-text-div-icon">{name[0]}</div>;
     }
+    return <div className="code-lib-audit-optlog-timeLine-card-content-text-div-icon">{name[0]}</div>;
   };
 
   function renderData() {
@@ -77,7 +76,9 @@ const TimeLine = ({ formatMessage, isMore, opEventTypeLookupData, loadData, optL
       <ul>
         {
           record.map((item, index) => {
-            const { id, opDate, opEventType, opContent, repositoryImageUrl, repositoryName, opUserImageUrl, project } = item;
+            const {
+ id, opDate, opEventType, opContent, repositoryImageUrl, repositoryName, opUserImageUrl, project,
+} = item;
             const [date, time] = opDate.split(' ');
             return (
               <li key={id}>
@@ -85,7 +86,10 @@ const TimeLine = ({ formatMessage, isMore, opEventTypeLookupData, loadData, optL
                   <div className="code-lib-audit-optlog-timeLine-card-header">
                     <div className="code-lib-audit-optlog-timeLine-card-header-icon">
                       <div style={{ display: 'flex' }}>
-                        <Icon type={getOpEventTypeMeaning(opEventType).icon} style={getOpEventTypeMeaning(opEventType).style} />
+                        <Icon
+                          type={getOpEventTypeMeaning(opEventType).icon}
+                          style={getOpEventTypeMeaning(opEventType).style}
+                        />
                         <span className="code-lib-audit-optlog-timeLine-card-header-title">{getOpEventTypeMeaning(opEventType).meaning}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', marginLeft: '32px' }}>
@@ -131,13 +135,14 @@ const TimeLine = ({ formatMessage, isMore, opEventTypeLookupData, loadData, optL
             (
               <div className="code-lib-audit-optlog-timeLine-no-content">
                 <span>
-                  {formatMessage({ id: `${intlPrefix}.view.noLog`, defaultMessage: '暂无操作记录' })}
+                  暂无操作记录
                 </span>
               </div>)
         }
         {isMore &&
+          // eslint-disable-next-line react/jsx-no-bind
           <Button type="primary" onClick={loadMoreOptsRecord}>
-            {formatMessage({ id: `${intlPrefix}.view.loadMore`, defaultMessage: '加载更多' })}
+            加载更多
           </Button>}
       </div>
     </Spin>
