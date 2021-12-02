@@ -7,6 +7,7 @@ import { message } from 'choerodon-ui';
 import { Modal } from 'choerodon-ui/pro';
 import { useUnmount } from 'ahooks';
 import { Header, Choerodon, axios, HeaderButtons } from '@choerodon/boot';
+import { useFormatMessage } from '@choerodon/master';
 import BatchApprove from './batch-approval';
 import AddMember from './add-member';
 import AddBranch from './add-branch';
@@ -46,6 +47,8 @@ const EnvModals = observer((props) => {
     branchServiceDs,
     applyViewDs,
   } = usPsManagerStore();
+
+  const format = useFormatMessage('c7ncd.codeLibManagement');
 
   const {
     hasPermission,
@@ -192,7 +195,7 @@ const EnvModals = observer((props) => {
   function openDeleteModal() {
     Modal.open({
       key: deleteKey,
-      title: formatMessage({ id: 'infra.button.batch.delete' }),
+      title: format({ id: 'BatchDelete' }),
       children: '确认要删除选中的用户对应的代码库权限吗？',
       okText: formatMessage({ id: 'delete' }),
       onOk: handleDelete,
@@ -217,7 +220,7 @@ const EnvModals = observer((props) => {
 
   function handleSyncOpenModal() {
     Modal.open({
-      title: formatMessage({ id: 'infra.button.batch.sync' }),
+      title: format({ id: 'SyncAll' }),
       children: '确认将全部【未同步】状态用户的代码权限与GitLab仓库内用户的权限进行同步吗？',
       onOk: handleSync,
       key: SyncKey,
@@ -313,12 +316,12 @@ const EnvModals = observer((props) => {
     switch (type) {
       case 'psAudit':
         buttonData.unshift({
-          name: '手动审计',
+          name: format({ id: 'ManualAudit' }),
           icon: 'playlist_add_check',
           handler: handleBatchAuditModalOpen,
           permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
         }, {
-          name: '批量修复',
+          name: format({ id: 'BatchRepair' }),
           icon: 'person_add-o',
           handler: handleBatchFixModalOpen,
           display: true,
@@ -331,7 +334,7 @@ const EnvModals = observer((props) => {
         break;
       case 'psApproval':
         buttonData.unshift({
-          name: '批量审批',
+          name: format({ id: 'BatchApprove' }),
           icon: 'playlist_add_check',
           handler: () => handlerBatchApprove(psApprovalDs, refresh),
           display: true,
@@ -345,35 +348,35 @@ const EnvModals = observer((props) => {
       case 'psSet':
         buttonData.unshift(
           {
-            name: formatMessage({ id: 'infra.add.member' }),
+            name: format({ id: 'AssignforMember' }),
             icon: 'person_add-o',
             handler: () => { openAdd('project'); },
             display: true,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
           },
           {
-            name: formatMessage({ id: 'infra.add.outsideMember' }),
+            name: format({ id: 'AssignforExternalMember' }),
             icon: 'person_add-o',
             handler: () => { openAdd('nonProject'); },
             display: true,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
           },
           {
-            name: formatMessage({ id: 'infra.operate.export.permission' }),
+            name: format({ id: 'ExportPermission' }),
             icon: 'get_app-o',
             handler: () => setExportModalVisible(true),
             display: true,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
           },
           {
-            name: formatMessage({ id: 'infra.button.batch.sync' }),
+            name: format({ id: 'SyncAll' }),
             icon: 'sync',
             handler: handleSyncOpenModal,
             display: true,
             permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
           },
           {
-            name: formatMessage({ id: 'infra.button.batch.delete' }),
+            name: format({ id: 'BatchDelete' }),
             icon: 'delete',
             handler: openDeleteModal,
             display: true,
@@ -396,14 +399,14 @@ const EnvModals = observer((props) => {
         break;
       case 'psBranch':
         buttonData.unshift({
-          name: formatMessage({ id: 'infra.add.branch' }),
+          name: format({ id: 'NewProtectedBranch' }),
           icon: 'playlist_add',
           handler: openBranch,
           display: true,
           disabled: !branchAppId,
           permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
         }, {
-          name: formatMessage({ id: 'infra.add.tag' }),
+          name: format({ id: 'NewProtectedTag' }),
           icon: 'playlist_add',
           handler: openTag,
           display: true,
@@ -417,9 +420,9 @@ const EnvModals = observer((props) => {
   }
 
   return (
-      <Header>
-        <HeaderButtons items={getButtons()} />
-        {
+    <Header>
+      <HeaderButtons items={getButtons()} />
+      {
           hasPermission && <ExportAuthority
             formatMessage={formatMessage}
             exportModalVisible={exportModalVisible}
@@ -427,7 +430,7 @@ const EnvModals = observer((props) => {
             psSetDs={psSetDs}
           />
         }
-      </Header>
+    </Header>
   );
 });
 

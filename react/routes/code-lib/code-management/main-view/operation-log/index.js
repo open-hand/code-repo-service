@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { observer } from 'mobx-react-lite';
-import { Header, Content, HeaderButtons } from '@choerodon/boot';
-import { DatePicker, Tooltip } from 'choerodon-ui';
+import { TabPage, Header, Page, Content, HeaderButtons } from '@choerodon/boot';
+import { useFormatMessage } from '@choerodon/master';
+import { Button, DatePicker, Tooltip } from 'choerodon-ui';
 import { Stores, Select } from 'choerodon-ui/pro';
 
 import CodeManagerHeader from '../../header';
@@ -19,6 +20,8 @@ const OperationLogTab = () => {
     overStores,
     branchServiceDs,
   } = usPsManagerStore();
+
+  const format = useFormatMessage('c7ncd.codeLibManagement');
 
   const [isMore, setLoadMoreBtn] = useState(false);
   const [opEventTypeLookupData, setOpEventTypeLookupData] = useState([]);
@@ -84,8 +87,7 @@ const OperationLogTab = () => {
       >
         <div className="code-lib-opreation-log-search">
           <Select
-            // placeholder={formatMessage({ id: 'infra.codelib.audit.model.service' })}
-            placeholder="应用服务"
+            placeholder={format({ id: 'ApplicationService' })}
             onChange={val => handleSearch({ repositoryIds: val })}
               // eslint-disable-next-line
             clearButton={true}
@@ -108,7 +110,7 @@ const OperationLogTab = () => {
               }
           </Select>
           <RangePicker onChange={(_, dateString) => handleSearch({ startDate: dateString[0] ? `${dateString[0]} 00:00:00` : '', endDate: dateString[1] ? `${dateString[1]} 23:59:59` : '' })} />
-          <Select placeholder="操作类型" onChange={value => handleSearch({ opEventTypes: value })} style={{ marginLeft: '0.12rem' }}>
+          <Select placeholder={format({ id: 'OperationType' })} onChange={value => handleSearch({ opEventTypes: value })} style={{ marginLeft: '0.12rem' }}>
             {
                 opEventTypeLookupData.map(o => (
                   <Option key={o.value} value={o.value}>{o.meaning}</Option>

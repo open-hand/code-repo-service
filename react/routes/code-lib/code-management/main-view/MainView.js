@@ -6,6 +6,7 @@
  */
 import React, { useCallback, useEffect, useState } from 'react';
 import { PageWrap, PageTab, Page } from '@choerodon/boot';
+import { useFormatMessage } from '@choerodon/master';
 import { observer } from 'mobx-react-lite';
 import { usPsManagerStore } from './stores';
 import PsSet from './ps-set';
@@ -23,10 +24,12 @@ const MainView = observer(() => {
     hasPermission,
   } = usPsManagerStore();
 
+  const format = useFormatMessage('c7ncd.codeLibManagement');
+
   const renderPageWrap = useCallback(() => {
     let pageWrap = (
       <PageTab
-        title={formatMessage({ id: `${intlPrefix}.permission` })}
+        title={format({ id: 'Permission' })}
         tabKey="permission"
         route="/rducm/code-lib-management/permission"
         component={PsAll}
@@ -36,35 +39,35 @@ const MainView = observer(() => {
     if (hasPermission) {
       pageWrap = [
         <PageTab
-          title={formatMessage({ id: `${intlPrefix}.permission` })}
+          title={format({ id: 'Permission' })}
           tabKey="permission"
           route="/rducm/code-lib-management/permission"
           component={PsAll}
           alwaysShow
         />,
         <PageTab
-          title={formatMessage({ id: 'infra.codeManage.ps.message.securityAudit' })}
+          title={format({ id: 'SafeAudit' })}
           tabKey="securityAudit"
           route="/rducm/code-lib-management/security"
           component={SecurityAudit}
           alwaysShow
         />,
         <PageTab
-          title={formatMessage({ id: 'infra.codeManage.ps.message.psBranch' })}
+          title={format({ id: 'ProtectedBranchTag' })}
           tabKey="psBranch"
           route="/rducm/code-lib-management/branch"
           component={PsBranch}
           alwaysShow
         />,
         <PageTab
-          title={formatMessage({ id: 'infra.codeManage.ps.message.operationLog' })}
+          title={format({ id: 'OperationLog' })}
           tabKey="operationLog"
           route="/rducm/code-lib-management/log"
           component={OperationLog}
           alwaysShow
         />,
         <PageTab
-          title={formatMessage({ id: `${intlPrefix}.psOverView` })}
+          title={format({ id: 'Overview' })}
           tabKey="psOverView"
           route="/rducm/code-lib-management/view"
           component={PsOverView}

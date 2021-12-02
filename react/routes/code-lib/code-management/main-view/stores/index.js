@@ -3,6 +3,7 @@ import React, { createContext, useContext, useMemo, useEffect, useState, useCall
 import { inject } from 'mobx-react';
 import { injectIntl } from 'react-intl';
 import { DataSet } from 'choerodon-ui/pro';
+import { useFormatMessage } from "@choerodon/master";
 import { useCheckPermission } from '@/utils/index';
 import { checkPermission } from '@/utils';
 import queryString from 'querystring';
@@ -37,6 +38,8 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
     hasPermission,
     hasMemberPermission,
   } = useManagementStore();
+  const format = useFormatMessage('c7ncd.codeLibManagement');
+
   const { appServiceIds } = queryString.parse(location.search);
 
   const [branchAppId, setBranchApp] = useState(undefined);
@@ -44,22 +47,22 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
 
   const intlPrefix = 'infra';
   const branchServiceDs = useMemo(() => new DataSet(BranchServiceDs({
-    formatMessage, organizationId, projectId, setBranchApp,
+    formatMessage, organizationId, projectId, setBranchApp, format,
   })), [projectId, organizationId]); // 分支/标签的应用服务下拉框数据
 
-  const psSetDs = useMemo(() => new DataSet(PsSetDataSet(intlPrefix, formatMessage, organizationId, projectId, appServiceIds || branchAppId)), [formatMessage, projectId, branchAppId, appServiceIds]);
+  const psSetDs = useMemo(() => new DataSet(PsSetDataSet(intlPrefix, formatMessage, organizationId, projectId, appServiceIds || branchAppId, format)), [formatMessage, projectId, branchAppId, appServiceIds]);
   const applyViewDs = useMemo(() => new DataSet(ApplyViewDS(intlPrefix, formatMessage, organizationId, projectId, branchAppId)), [formatMessage, projectId, branchAppId]);
-  const psApprovalDs = useMemo(() => new DataSet(PsApprovalDS(intlPrefix, formatMessage, organizationId, projectId, branchAppId)), [formatMessage, projectId, branchAppId]);
-  const psAuditDs = useMemo(() => new DataSet(PsAuditDS(intlPrefix, formatMessage, organizationId, projectId, branchAppId)), [formatMessage, projectId, branchAppId]);
+  const psApprovalDs = useMemo(() => new DataSet(PsApprovalDS(intlPrefix, formatMessage, organizationId, projectId, branchAppId, format)), [formatMessage, projectId, branchAppId]);
+  const psAuditDs = useMemo(() => new DataSet(PsAuditDS(intlPrefix, formatMessage, organizationId, projectId, branchAppId, format)), [formatMessage, projectId, branchAppId]);
 
-  const branchDs = useMemo(() => new DataSet(BranchDataSet(formatMessage, projectId, branchAppId)), [formatMessage, projectId, branchAppId]);
-  const tagDs = useMemo(() => new DataSet(TagDataSet(formatMessage, projectId, branchAppId)), [formatMessage, projectId, branchAppId]);
-  const psOverViewDs = useMemo(() => new DataSet(PsOverViewDataSet(formatMessage, organizationId, projectId, branchServiceDs)), [formatMessage, projectId, branchServiceDs]);
+  const branchDs = useMemo(() => new DataSet(BranchDataSet(formatMessage, projectId, branchAppId, format)), [formatMessage, projectId, branchAppId]);
+  const tagDs = useMemo(() => new DataSet(TagDataSet(formatMessage, projectId, branchAppId, format)), [formatMessage, projectId, branchAppId]);
+  const psOverViewDs = useMemo(() => new DataSet(PsOverViewDataSet(formatMessage, organizationId, projectId, branchServiceDs, format)), [formatMessage, projectId, branchServiceDs]);
 
   const listViewDs = useMemo(() => new DataSet(ListViewDataSet(formatMessage, organizationId, projectId)), [formatMessage, projectId]); // 操作日志
   const overStores = useStore();
 
-  const securityAuditDs = useMemo(() => new DataSet(SecurityAuditDS(intlPrefix, formatMessage, organizationId, projectId)), [formatMessage, projectId]);
+  const securityAuditDs = useMemo(() => new DataSet(SecurityAuditDS(intlPrefix, formatMessage, organizationId, projectId, format)), [formatMessage, projectId]);
 
   const value = {
     ...props,
