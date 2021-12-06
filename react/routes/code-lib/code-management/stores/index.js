@@ -14,7 +14,7 @@ export function useManagementStore() {
 export const StoreProvider = injectIntl(inject('AppState')((props) => {
   const {
     children,
-    AppState: { currentMenuType: { projectId, organizationId, type } },
+    AppState: { currentMenuType: { projectId, type }, getUserId },
   } = props;
 
   const [hasMemberPermission, sethasMemberPermission] = useState(false);
@@ -33,7 +33,7 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
   const managementStore = useStore(tabs);
 
   const init = useCallback(async () => {
-    const codePermissions = localStorage.getItem('codePermissions');
+    const codePermissions = localStorage.getItem(`codePermissions-${getUserId}`);
     if (codePermissions) {
       try {
         const {
@@ -50,12 +50,12 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
       const hasPermission1 = await checkPermission({ projectId, code: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'], resourceType: type });
       sethasMemberPermission(hasMemberPermission1);
       sethasPermission(hasPermission1);
-      localStorage.setItem('codePermissions', JSON.stringify({
+      localStorage.setItem(`codePermissions-${getUserId}`, JSON.stringify({
         localMemberPermission: hasMemberPermission1,
         localOwnerPermission: hasPermission1,
       }));
     }
-  }, [projectId, type]);
+  }, [type, getUserId]);
 
   useEffect(() => {
     init();
