@@ -32,6 +32,7 @@ const codeLibOrgTabLog = {
   'c7ncd.code-lib-org.log.startDate': '开始日期',
   'c7ncd.code-lib-org.log.endDate': '结束日期',
   'c7ncd.code-lib-org.log.operationType': '操作类型',
+  'c7ncd.code-lib-org.log.noOperationRecord': '暂无操作记录',
 };
 
 export { codeLibOrgTabPermission, codeLibOrgTabAudit, codeLibOrgTabLog };

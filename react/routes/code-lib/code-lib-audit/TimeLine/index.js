@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useFormatMessage } from '@choerodon/master';
 import { observer } from 'mobx-react-lite';
 import { DatePicker } from 'choerodon-ui';
 import { Stores, Select } from 'choerodon-ui/pro';
@@ -12,6 +13,7 @@ const { Option } = Select;
 const TimeLine = ({
   activeProject, timeLineStore, optLogDs, activeTabKey,
 }) => {
+  const formatClient = useFormatMessage('c7ncd.code-lib-org');
   const [isMore, setLoadMoreBtn] = useState(false);
   const [opEventTypeLookupData, setOpEventTypeLookupData] = useState([]);
 
@@ -62,7 +64,7 @@ const TimeLine = ({
     <div className="code-lib-audit-optlog-timeline-container">
       <div className="code-lib-audit-optlog-search">
         <RangePicker onChange={(_, dateString) => handleSearch({ startDate: dateString[0] ? `${dateString[0]} 00:00:00` : '', endDate: dateString[1] ? `${dateString[1]} 23:59:59` : '' })} />
-        <Select multiple maxTagCount={1} onChange={value => handleSearch({ opEventTypes: (value || []).join(',') })} style={{ marginLeft: '0.12rem' }} placeholder="操作类型">
+        <Select multiple maxTagCount={1} onChange={value => handleSearch({ opEventTypes: (value || []).join(',') })} style={{ marginLeft: '0.12rem' }} placeholder={formatClient({ id: 'log.operationType' })}>
           {
             opEventTypeLookupData.map(o => (
               <Option key={o.value} value={o.value}>{o.meaning}</Option>

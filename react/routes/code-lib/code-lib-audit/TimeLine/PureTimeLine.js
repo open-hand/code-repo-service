@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { useFormatMessage } from '@choerodon/master';
 import { observer } from 'mobx-react-lite';
 import { Icon, Button } from 'choerodon-ui';
 import { Spin } from 'choerodon-ui/pro';
@@ -25,6 +26,7 @@ const TimeLine = ({
 }) => {
   const record = optLogDs.current && optLogDs.toData();
 
+  const formatClient = useFormatMessage('c7ncd.code-lib-org');
 
   const getOpEventTypeMeaning = useCallback((code) => {
     let icon;
@@ -135,7 +137,7 @@ const TimeLine = ({
             (
               <div className="code-lib-audit-optlog-timeLine-no-content">
                 <span>
-                  暂无操作记录
+                  {formatClient({ id: 'log.noOperationRecord' })}
                 </span>
               </div>)
         }
