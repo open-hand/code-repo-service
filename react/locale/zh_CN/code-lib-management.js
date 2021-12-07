@@ -56,6 +56,7 @@ const codeLibManagement = {
   'c7ncd.codeLibManagement.ApplyforPermission': '权限申请',
   'c7ncd.codeLibManagement.Username': '用户名',
   'c7ncd.codeLibManagement.LoginName': '登录名',
+  'c7ncd.codeLibManagement.Status': '状态',
 
 };
 

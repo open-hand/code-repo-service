@@ -101,12 +101,12 @@ const ApplyView = observer(() => {
       queryBar={"bar" as TableQueryBarType}
       queryFieldsLimit={3}
     >
-      <Column name="repositoryName" width={250} />
+      <Column header={formatMessage({ id: 'c7ncd.codeLibManagement.ApplicationService' })} name="repositoryName" width={250} />
       <Column renderer={renderAction} width={70} />
-      <Column name="applicantType" />
-      <Column name="accessLevel" />
-      <Column name="approvalState" renderer={renderStatus} />
-      <Column name="applicantDate" />
+      <Column header={formatMessage({ id: 'c7ncd.codeLibManagement.Type' })} name="applicantType" />
+      <Column header={formatMessage({ id: 'c7ncd.codeLibManagement.PermissionType' })} name="accessLevel" />
+      <Column header={formatMessage({ id: 'c7ncd.codeLibManagement.Status' })} name="approvalState" renderer={renderStatus} />
+      <Column header={formatMessage({ id: 'c7ncd.codeLibManagement.ApplicationDate' })} name="applicantDate" />
     </Table>
   );
 });
