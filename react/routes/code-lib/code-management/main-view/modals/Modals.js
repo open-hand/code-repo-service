@@ -391,7 +391,7 @@ const EnvModals = observer((props) => {
         break;
       case 'applyView':
         buttonData.unshift({
-          name: formatMessage({ id: 'infra.permission.request' }),
+          name: format({ id: 'ApplyforPermission' }),
           icon: 'person_add-o',
           handler: openRequest,
           display: true,
