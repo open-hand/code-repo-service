@@ -569,24 +569,43 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             }
         });
     }
+//
+//    @Override
+//    @Transactional(rollbackFor = Exception.class)
+//    @Saga(code = SagaTopicCodeConstants.BATCH_ADD_GROUP_MEMBER, description = "批量添加项目下gitlab group成员", inputSchemaClass = GroupMemberPayload.class, inputSchema = "{}")
+//    public void batchAddGroupMembers(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
+//        //查询项目下的group
+//        C7nDevopsProjectVO c7nDevopsProjectVO = c7NDevOpsServiceFacade.detailDevopsProjectById(projectId);
+//        checkIamProject(c7nDevopsProjectVO);
+//        //校验是否已经存在
+//        checkGroupPermissionExist(projectId, rdmMemberBatchDTO.getMembers());
+//
+//        //检验这个gitlab group id 能不能查到group, 因为有些人手动删了group，自己又新建了group
+//        Group group = gitlabGroupApi.getGroup(Integer.valueOf(String.valueOf(c7nDevopsProjectVO.getGitlabGroupId())));
+//        checkProjectGroup(c7nDevopsProjectVO, group);
+//        //持久化到数据库
+//        persistenceMemberToDB(rdmMemberBatchDTO, organizationId, projectId, group.getId());
+//        //发送saga
+//        sendAddGroupMemberSaga(projectId, rdmMemberBatchDTO.getMembers(), c7nDevopsProjectVO);
+//    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @Saga(code = SagaTopicCodeConstants.BATCH_ADD_GROUP_MEMBER, description = "批量添加项目下gitlab group成员", inputSchemaClass = GroupMemberPayload.class, inputSchema = "{}")
-    public void batchAddGroupMembers(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
+    public void batchAddGroupMembers(Long organizationId, Long projectId, List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOS) {
         //查询项目下的group
         C7nDevopsProjectVO c7nDevopsProjectVO = c7NDevOpsServiceFacade.detailDevopsProjectById(projectId);
         checkIamProject(c7nDevopsProjectVO);
         //校验是否已经存在
-        checkGroupPermissionExist(projectId, rdmMemberBatchDTO.getMembers());
+        checkGroupPermissionExist(projectId, gitlabMemberCreateDTOS);
 
         //检验这个gitlab group id 能不能查到group, 因为有些人手动删了group，自己又新建了group
         Group group = gitlabGroupApi.getGroup(Integer.valueOf(String.valueOf(c7nDevopsProjectVO.getGitlabGroupId())));
         checkProjectGroup(c7nDevopsProjectVO, group);
         //持久化到数据库
-        persistenceMemberToDB(rdmMemberBatchDTO, organizationId, projectId, group.getId());
+        persistenceMemberToDB(gitlabMemberCreateDTOS, organizationId, projectId, group.getId());
         //发送saga
-        sendAddGroupMemberSaga(projectId, rdmMemberBatchDTO.getMembers(), c7nDevopsProjectVO);
+        sendAddGroupMemberSaga(projectId, gitlabMemberCreateDTOS, c7nDevopsProjectVO);
     }
 
     private void checkGroupPermissionExist(Long projectId, List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOS) {
@@ -634,14 +653,42 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                 });
     }
 
-    private void persistenceMemberToDB(RdmMemberBatchDTO rdmMemberBatchDTO, Long organizationId, Long projectId, Integer groupId) {
+//    private void persistenceMemberToDB(RdmMemberBatchDTO rdmMemberBatchDTO, Long organizationId, Long projectId, Integer groupId) {
+//        List<RdmMember> rdmMembers = new ArrayList<>();
+//        //将用户id转换为Gitlab用户Id
+//        rdmMemberBatchDTO.getMembers().forEach(gitlabMemberCreateDTO -> {
+//            if (rdmMemberBatchDTO.getBaseRole()) {
+//                gitlabMemberCreateDTO.setGlAccessLevel(rdmMemberBatchDTO.getGlAccessLevel());
+//                gitlabMemberCreateDTO.setGlExpiresAt(gitlabMemberCreateDTO.getGlExpiresAt());
+//            }
+//            Integer glUserId = c7NBaseServiceFacade.userIdToGlUserId(gitlabMemberCreateDTO.getUserId());
+//            if (Objects.isNull(glUserId)) {
+//                return;
+//            }
+//            gitlabMemberCreateDTO.setgUserId(glUserId);
+//
+//            //插入数据库
+//            RdmMember rdmMember = new RdmMember();
+//            rdmMember.setOrganizationId(organizationId);
+//            rdmMember.setProjectId(projectId);
+//            rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+//            // 设置gitlab项目id和用户id
+//            rdmMember.setGlUserId(glUserId);
+//            rdmMember.setgGroupId(groupId);
+//            rdmMember.setUserId(gitlabMemberCreateDTO.getUserId());
+//            rdmMember.setSyncGitlabFlag(false);
+//            rdmMember.setGlAccessLevel(null);
+//            rdmMember.setGlExpiresAt(null);
+//            rdmMembers.add(rdmMember);
+//        });
+//        //批量插入数据库
+//        rdmMemberRepository.batchInsert(rdmMembers);
+//    }
+
+    private void persistenceMemberToDB(List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOS, Long organizationId, Long projectId, Integer groupId) {
         List<RdmMember> rdmMembers = new ArrayList<>();
         //将用户id转换为Gitlab用户Id
-        rdmMemberBatchDTO.getMembers().forEach(gitlabMemberCreateDTO -> {
-            if (rdmMemberBatchDTO.getBaseRole()) {
-                gitlabMemberCreateDTO.setGlAccessLevel(rdmMemberBatchDTO.getGlAccessLevel());
-                gitlabMemberCreateDTO.setGlExpiresAt(gitlabMemberCreateDTO.getGlExpiresAt());
-            }
+        gitlabMemberCreateDTOS.forEach(gitlabMemberCreateDTO -> {
             Integer glUserId = c7NBaseServiceFacade.userIdToGlUserId(gitlabMemberCreateDTO.getUserId());
             if (Objects.isNull(glUserId)) {
                 return;
@@ -665,6 +712,8 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         //批量插入数据库
         rdmMemberRepository.batchInsert(rdmMembers);
     }
+
+
 
 
     @Override

@@ -189,6 +189,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         threadLocal.set(orgAdministrators);
 
         // <1> 获取组织下所有项目
+        // TODO: 2021/12/7
         Set<Long> projectIds = c7NBaseServiceFacade.listProjectIds(organizationId);
 
         List<RdmMemberAuditRecord> list = projectIds.stream()
