@@ -17,10 +17,10 @@ const personalSetting = {
   'c7ncd.personal-setting.modifyPassword': '修改密码',
 
   // 第三方服务的，写在base-pro
-  'c7ncd.personal-setting.bindStatus': '已绑定',
-  'c7ncd.personal-setting.notBindStatus': '未绑定',
-  'c7ncd.personal-setting.bind': '绑定',
-  'c7ncd.personal-setting.unBind': '解绑',
+  'c7ncd.personal-setting.third.bindStatus': '已绑定',
+  'c7ncd.personal-setting.third.notBindStatus': '未绑定',
+  'c7ncd.personal-setting.third.bind': '绑定',
+  'c7ncd.personal-setting.third.unBind': '解绑',
   'c7ncd.personal-setting.third.hand.title': '汉得焱牛开放平台',
   'c7ncd.personal-setting.third.hand.desc': '绑定开放平台后，您可以提交工单，并进入开放平台查看工单详情。',
 };
