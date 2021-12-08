@@ -33,13 +33,12 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
         if (!checkStatus(rdmMemberAuditRecord)) {
             return;
         }
-        //2.获得当前权限的层级
-        //3.获得当前审计数据用户的角色
+        //2.获得当前审计数据用户的角色
         C7nUserVO c7nUserVO = c7nBaseServiceFacade.detailC7nUserOnProjectLevel(rdmMemberAuditRecord.getProjectId(), rdmMemberAuditRecord.getUserId());
         String role = getUserRole(c7nUserVO);
-        //4.根据用户角色来修复数据
+        //3.根据用户角色来修复数据
         permissionRepair(role, rdmMemberAuditRecord);
-        // 5. 回写数据
+        // 4. 回写数据
         rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
     }
 

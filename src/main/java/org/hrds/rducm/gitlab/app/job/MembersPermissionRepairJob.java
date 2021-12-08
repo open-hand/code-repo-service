@@ -107,30 +107,4 @@ public class MembersPermissionRepairJob {
     }
 
 
-    //    @TimedTask(name = "membersPermissionRepairTimeTask",
-//            description = "代码库成员权限修复定时任务",
-//            params = {@TaskParam(name = "repairOrganizationId", value = "1009")},
-//            triggerType = TriggerTypeEnum.CRON_TRIGGER,
-//            cronExpression = "0 0 3 * * ?")
-    public void membersPermissionRepairTimeTask(Map<String, Object> param) {
-        // <> 获取组织
-        long repairOrganizationId = 0L;
-        if (param.containsKey("repairOrganizationId") && Objects.nonNull(param.get("repairOrganizationId"))) {
-            repairOrganizationId = Long.parseLong(param.get("repairOrganizationId").toString());
-        }
-        logger.debug("参数组织id为[{}]", repairOrganizationId);
-
-        logger.info("开始修复");
-        StopWatch stopWatch = new StopWatch();
-
-        stopWatch.start("组织" + repairOrganizationId);
-        logger.info("开始修复组织[{}]的数据", repairOrganizationId);
-
-        iMemberPermissionRepairService.repairMemberPermission(repairOrganizationId);
-
-        stopWatch.stop();
-        logger.info("修复组织[{}]的数据结束, 耗时[{}]ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
-
-        logger.info("结束修复, 耗时[{}]s, \n{}", stopWatch.getTotalTimeSeconds(), stopWatch.prettyPrint());
-    }
 }

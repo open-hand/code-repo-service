@@ -22,6 +22,7 @@ import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.admin.GitlabAdminApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
 import org.hrds.rducm.gitlab.infra.client.gitlab.model.GitlabMember;
+import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
@@ -185,13 +186,11 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
 
     private List<RdmMemberAuditRecord> compareMembersByOrganizationId(Long organizationId) {
         // 获取组织管理员, 存入ThreadLocal备用
-        List<C7nUserVO> orgAdministrators = c7NBaseServiceFacade.listOrgAdministrator(organizationId);
-        threadLocal.set(orgAdministrators);
-
-        // <1> 获取组织下所有项目
-        // TODO: 2021/12/7
-        Set<Long> projectIds = c7NBaseServiceFacade.listProjectIds(organizationId);
-
+        List<C7nUserVO> result = queryOrgAdminAndRoot(organizationId);
+        threadLocal.set(result);
+        //获取所有启用项目的项目Id
+        Set<Long> projectIds = c7NBaseServiceFacade.listActiveProjectIds(organizationId);
+        threadLocal.set(result);
         List<RdmMemberAuditRecord> list = projectIds.stream()
                 .map(projectId -> {
                     return compareMembersByProjectId(organizationId, projectId);
@@ -202,6 +201,17 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         threadLocal.remove();
 
         return list;
+    }
+
+    private List<C7nUserVO> queryOrgAdminAndRoot(Long organizationId) {
+        List<C7nUserVO> result = new ArrayList<>();
+        // 获取组织管理员和root, 存入ThreadLocal备用
+        List<C7nUserVO> orgAdministrators = c7NBaseServiceFacade.listOrgAdministrator(organizationId);
+        //查询平台内的root用户
+        List<C7nUserVO> roots = c7NBaseServiceFacade.listRoot();
+        result.addAll(orgAdministrators);
+        result.addAll(roots);
+        return result;
     }
 
     private List<RdmMemberAuditRecord> compareMembersByProjectId(Long organizationId,
@@ -265,7 +275,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         //查询数据库的权限
         RdmMember rdmMember = new RdmMember();
         rdmMember.setgGroupId(appGroupId);
-        rdmMember.setType("group");
+        rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
         rdmMember.setProjectId(projectId);
         List<RdmMember> dbMembers = memberRepository.select(rdmMember);
         if (!CollectionUtils.isEmpty(dbMembers)) {

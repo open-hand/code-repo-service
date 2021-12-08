@@ -327,4 +327,20 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
         List<C7nUserVO> c7nUserVOS = FeignUtils.handleResponseEntity(listResponseEntity);
         return c7nUserVOS;
     }
+
+    @Override
+    public Set<Long> listActiveProjectIds(Long organizationId) {
+        Set<Long> projectIds;
+        List<C7nProjectVO> c7nProjectVOS = queryProjectsByOrganizationId(organizationId);
+        projectIds = c7nProjectVOS.stream().filter(C7nProjectVO::getEnabled).map(C7nProjectVO::getId).collect(Collectors.toSet());
+        return projectIds;
+    }
+
+    @Override
+    public List<C7nProjectVO> queryProjectsByOrganizationId(Long organizationId) {
+        ResponseEntity<List<C7nProjectVO>> responseEntity = baseServiceFeignClient.listProjectsByOrgId(organizationId);
+        return FeignUtils.handleResponseEntity(responseEntity);
+    }
+
+
 }

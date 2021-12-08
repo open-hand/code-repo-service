@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.app.eventhandler.gitlab.processor;
 
-import java.util.Objects;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
