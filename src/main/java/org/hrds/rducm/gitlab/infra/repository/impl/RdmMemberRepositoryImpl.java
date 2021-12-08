@@ -4,6 +4,7 @@ import org.hrds.rducm.gitlab.domain.aggregate.MemberAuthDetailAgg;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
+import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
 import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
@@ -38,7 +39,7 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
         rdmMember.setProjectId(projectId);
         rdmMember.setRepositoryId(repositoryId);
         rdmMember.setUserId(userId);
-        return this.selectOne(rdmMember);
+        return rdmMemberMapper.selectOne(rdmMember);
     }
 
     @Override
@@ -68,6 +69,21 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
     }
 
     @Override
+    public int deleteByProjectIdAndUserIdAndAccessLevel(Long organizationId, Long projectId, Long userId, Integer glAccessLevel) {
+        AssertUtils.notNull(organizationId, "organizationId not null");
+        AssertUtils.notNull(projectId, "projectId not null");
+        AssertUtils.notNull(userId, "userId not null");
+        AssertUtils.isTrue(glAccessLevel == AccessLevel.OWNER.value, "glAccessLevel not owner");
+
+        RdmMember param = new RdmMember();
+        param.setOrganizationId(organizationId);
+        param.setProjectId(projectId);
+        param.setUserId(userId);
+        param.setGlAccessLevel(glAccessLevel);
+        return this.delete(param);
+    }
+
+    @Override
     public void deleteByOrganizationIdAndUserId(Long organizationId, Long userId) {
         AssertUtils.notNull(organizationId, "organizationId not null");
         AssertUtils.notNull(userId, "userId not null");
@@ -76,7 +92,7 @@ public class RdmMemberRepositoryImpl extends BaseRepositoryImpl<RdmMember> imple
         param.setOrganizationId(organizationId);
         param.setUserId(userId);
         List<RdmMember> rdmMembers = rdmMemberMapper.select(param);
-        if (!CollectionUtils.isEmpty(rdmMembers)){
+        if (!CollectionUtils.isEmpty(rdmMembers)) {
             rdmMembers.forEach(rdmMember -> {
                 rdmMemberMapper.deleteByPrimaryKey(rdmMember.getId());
             });

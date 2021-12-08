@@ -93,7 +93,7 @@ public class ProjectMemberPermissionProcessor implements RolePermissionProcessor
         //这里只考虑项目层级的权限，组层级的在组层级上修复
         if (dbRdmMember == null || !dbRdmMember.getSyncGitlabFlag()) {
             // 如果dbMember为null 或者同步失败 移除gitlab权限
-            gitlabGroupFixApi.removeMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId());
+            gitlabProjectFixApi.removeMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId());
             return;
         }
         if (projectGlMember != null) {

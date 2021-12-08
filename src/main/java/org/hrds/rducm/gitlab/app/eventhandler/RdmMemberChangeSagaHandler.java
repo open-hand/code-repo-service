@@ -37,6 +37,7 @@ import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
 import org.hrds.rducm.gitlab.infra.constant.RepoConstants;
 import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
@@ -352,7 +353,7 @@ public class RdmMemberChangeSagaHandler {
                         RoleLabelEnum roleLabelEnum = Optional.ofNullable(EnumUtils.getEnum(RoleLabelEnum.class, roleType)).orElseThrow(IllegalArgumentException::new);
                         switch (roleLabelEnum) {
                             case PROJECT_MEMBER:
-                                // 设置角色为项目成员, 删除权限
+                                // 设置角色为项目成员, 删除权限  项目成员只删除Owner
                                 handleProjectMemberOnProjectLevel(organizationId, projectId, userId);
                                 break;
                             case PROJECT_ADMIN:
@@ -476,8 +477,8 @@ public class RdmMemberChangeSagaHandler {
         // 3种情况; 无->项目成员 项目成员->项目成员 项目管理员->项目成员
         // 项目成员->项目成员 这种情况无法识别
 
-        // 删除该成员权限
-        rdmMemberRepository.deleteByProjectIdAndUserId(organizationId, projectId, userId);
+        // 删除该成员权限   只删除根据角色变化的成员权限（Owner）
+        rdmMemberRepository.deleteByProjectIdAndUserIdAndAccessLevel(organizationId, projectId, userId, AccessLevel.OWNER.value);
 
         // 是否是组织管理员
         boolean isOrgAdmin = c7nBaseServiceFacade.checkIsOrgAdmin(organizationId, userId);
