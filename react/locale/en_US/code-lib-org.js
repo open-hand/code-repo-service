@@ -1,6 +1,7 @@
 // ~~代码库管理
 const codeLibOrgTabPermission = {
   'c7ncd.code-lib-org.permission.allProject': 'All Project',
+  'c7ncd.code-lib-org.list.search': 'Search',
   'c7ncd.code-lib-org.permission.permission': 'Permission',
   'c7ncd.code-lib-org.permission.permissionToExport': 'Export',
   'c7ncd.code-lib-org.permission.projectName': 'Project Name',

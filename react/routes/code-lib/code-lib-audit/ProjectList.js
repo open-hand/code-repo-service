@@ -3,7 +3,8 @@ import React, { useCallback } from 'react';
 import { Icon } from 'choerodon-ui';
 import { observer } from 'mobx-react-lite';
 import { Spin, TextField } from 'choerodon-ui/pro';
-
+import { useStore } from './stores'
+ 
 const imgStyle = {
   width: '18px',
   height: '18px',
@@ -26,6 +27,11 @@ const iconStyle = {
 const ProjectList = ({
   projectListDs, activeProject, onClickProject,
 }) => {
+
+  const {
+    formatClient,
+  } = useStore();
+
   const record = projectListDs.toJSONData();
 
   const handleSearch = useCallback((e) => {
@@ -72,7 +78,7 @@ const ProjectList = ({
         <TextField
           style={{ width: '200px' }}
           prefix={<Icon type="search" style={{ fontSize: '0.2rem' }} />}
-          placeholder="请输入搜索条件"
+          placeholder= { formatClient({id: 'list.search'})}
           onKeyUp={handleSearch}
         />
       </div>
