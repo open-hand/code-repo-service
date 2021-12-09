@@ -394,7 +394,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         // 查询属于gProject下的成员
         RdmMember rdmMember = new RdmMember();
         rdmMember.setGlProjectId(glProjectId);
-        rdmMember.setType("project");
+        rdmMember.setType(AuthorityTypeEnum.PROJECT.getValue());
         List<RdmMember> dbMembers = memberRepository.select(rdmMember);
         //去掉不在项目内的平台管理员
         List<C7nUserVO> orgAdmins = threadLocal.get();

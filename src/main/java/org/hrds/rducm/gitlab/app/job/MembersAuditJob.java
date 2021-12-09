@@ -1,10 +1,6 @@
 package org.hrds.rducm.gitlab.app.job;
 
-import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
-import io.choerodon.asgard.schedule.annotation.TaskParam;
-import io.choerodon.asgard.schedule.annotation.TimedTask;
-import io.choerodon.asgard.schedule.enums.TriggerTypeEnum;
 
 import java.util.List;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
@@ -18,7 +14,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StopWatch;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 成员审计定时任务
