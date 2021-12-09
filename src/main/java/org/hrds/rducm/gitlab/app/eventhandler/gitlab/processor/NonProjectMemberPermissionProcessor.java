@@ -109,27 +109,12 @@ public class NonProjectMemberPermissionProcessor implements RolePermissionProces
                 if (!Objects.isNull(rdmMember.getGlAccessLevel()) && rdmMember.getGlAccessLevel() < 50 && projectGlMember.getAccessLevel().value.intValue() < 50) {
                     //有一些项目对应的组的id和他实际在gitlab上的组的id不一致，这里跟新会400
                     //在添加权限之前需要判断组的权限有没有
-                    RdmMember groupRdmMember = new RdmMember();
-                    groupRdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
-                    groupRdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
-                    groupRdmMember.setUserId(rdmMemberAuditRecord.getUserId());
-                    groupRdmMember.setgGroupId(rdmMemberAuditRecord.getgGroupId());
-                    groupRdmMember.setSyncGitlabFlag(Boolean.TRUE);
-                    RdmMember groupMember = rdmMemberRepository.selectOne(groupRdmMember);
+                    RdmMember groupMember = queryRdmMember(rdmMemberAuditRecord);
                     if (groupMember != null) {
                         gitlabGroupFixApi.removeMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId());
                         //删除完组的权限后，要把项目层的已同步成功的挨个加上
-                        RdmMember projectRdmMember = new RdmMember();
-                        projectRdmMember.setType(AuthorityTypeEnum.PROJECT.getValue());
-                        projectRdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
-                        projectRdmMember.setUserId(rdmMemberAuditRecord.getUserId());
-                        projectRdmMember.setSyncGitlabFlag(Boolean.TRUE);
-                        List<RdmMember> rdmMembers = rdmMemberRepository.select(projectRdmMember);
-                        if (!CollectionUtils.isEmpty(rdmMembers)) {
-                            rdmMembers.forEach(rdmMember1 -> {
-                                gitlabProjectFixApi.addMember(rdmMember1.getGlProjectId(), rdmMember1.getGlUserId(), rdmMember1.getGlAccessLevel(), rdmMember1.getGlExpiresAt());
-                            });
-                        }
+                        List<RdmMember> rdmMembers = queryRdmMembers(rdmMemberAuditRecord);
+                        addProjectMembers(rdmMembers);
                         gitlabGroupFixApi.addMember(groupMember.getgGroupId(), groupMember.getGlUserId(), groupMember.getGlAccessLevel(), groupMember.getGlExpiresAt());
                     } else {
                         gitlabProjectFixApi.updateMember(rdmMemberAuditRecord.getGlProjectId(), rdmMemberAuditRecord.getGlUserId(), rdmMember.getGlAccessLevel(), rdmMember.getGlExpiresAt());
@@ -144,27 +129,12 @@ public class NonProjectMemberPermissionProcessor implements RolePermissionProces
                 // 如果在choerodon是同步成功的 权限小于50，则按照choerodon来修复权限
                 if (rdmMember.getSyncGitlabFlag() && rdmMember.getGlAccessLevel() < 50) {
                     //在添加权限之前需要判断组的权限有没有
-                    RdmMember groupRdmMember = new RdmMember();
-                    groupRdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
-                    groupRdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
-                    groupRdmMember.setUserId(rdmMemberAuditRecord.getUserId());
-                    groupRdmMember.setgGroupId(rdmMemberAuditRecord.getgGroupId());
-                    groupRdmMember.setSyncGitlabFlag(Boolean.TRUE);
-                    RdmMember groupMember = rdmMemberRepository.selectOne(groupRdmMember);
+                    RdmMember groupMember = queryRdmMember(rdmMemberAuditRecord);
                     if (groupMember != null) {
                         gitlabGroupFixApi.removeMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId());
                         //删除完组的权限后，要把项目层的已同步成功的挨个加上
-                        RdmMember projectRdmMember = new RdmMember();
-                        projectRdmMember.setType(AuthorityTypeEnum.PROJECT.getValue());
-                        projectRdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
-                        projectRdmMember.setUserId(rdmMemberAuditRecord.getUserId());
-                        projectRdmMember.setSyncGitlabFlag(Boolean.TRUE);
-                        List<RdmMember> rdmMembers = rdmMemberRepository.select(projectRdmMember);
-                        if (!CollectionUtils.isEmpty(rdmMembers)) {
-                            rdmMembers.forEach(rdmMember1 -> {
-                                gitlabProjectFixApi.addMember(rdmMember1.getGlProjectId(), rdmMember1.getGlUserId(), rdmMember1.getGlAccessLevel(), rdmMember1.getGlExpiresAt());
-                            });
-                        }
+                        List<RdmMember> rdmMembers = queryRdmMembers(rdmMemberAuditRecord);
+                        addProjectMembers(rdmMembers);
                         gitlabGroupFixApi.addMember(groupMember.getgGroupId(), groupMember.getGlUserId(), groupMember.getGlAccessLevel(), groupMember.getGlExpiresAt());
                     } else {
                         gitlabProjectFixApi.addMember(rdmMemberAuditRecord.getGlProjectId(), rdmMemberAuditRecord.getGlUserId(), rdmMember.getGlAccessLevel(), rdmMember.getGlExpiresAt());
@@ -177,5 +147,32 @@ public class NonProjectMemberPermissionProcessor implements RolePermissionProces
                 }
             }
         }
+    }
+
+    private void addProjectMembers(List<RdmMember> rdmMembers) {
+        if (!CollectionUtils.isEmpty(rdmMembers)) {
+            rdmMembers.forEach(rdmMember1 -> {
+                gitlabProjectFixApi.addMember(rdmMember1.getGlProjectId(), rdmMember1.getGlUserId(), rdmMember1.getGlAccessLevel(), rdmMember1.getGlExpiresAt());
+            });
+        }
+    }
+
+    private List<RdmMember> queryRdmMembers(RdmMemberAuditRecord rdmMemberAuditRecord) {
+        RdmMember projectRdmMember = new RdmMember();
+        projectRdmMember.setType(AuthorityTypeEnum.PROJECT.getValue());
+        projectRdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
+        projectRdmMember.setUserId(rdmMemberAuditRecord.getUserId());
+        projectRdmMember.setSyncGitlabFlag(Boolean.TRUE);
+        return rdmMemberRepository.select(projectRdmMember);
+    }
+
+    private RdmMember queryRdmMember(RdmMemberAuditRecord rdmMemberAuditRecord) {
+        RdmMember groupRdmMember = new RdmMember();
+        groupRdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+        groupRdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
+        groupRdmMember.setUserId(rdmMemberAuditRecord.getUserId());
+        groupRdmMember.setgGroupId(rdmMemberAuditRecord.getgGroupId());
+        groupRdmMember.setSyncGitlabFlag(Boolean.TRUE);
+        return rdmMemberRepository.selectOne(groupRdmMember);
     }
 }

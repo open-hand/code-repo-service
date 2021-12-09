@@ -387,9 +387,20 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         List<GitlabMember> gitlabProjectMembers = getGitlabProjectMembers(glProjectId);
         //剔除有group权限的gitlabMember
         Map<Long, GitlabMember> gitlabMemberMap = gitlabGroupMemberList.stream().collect(Collectors.toMap(GitlabMember::getUserId, Function.identity()));
+        List<GitlabMember> reGitlabProjectMembers = new ArrayList<>();
         if (!CollectionUtils.isEmpty(gitlabProjectMembers)) {
-            gitlabProjectMembers = gitlabProjectMembers.stream().filter(gitlabMember -> !(gitlabMemberMap.get(gitlabMember.getUserId()) != null && gitlabMemberMap.get(gitlabMember.getUserId()).getAccessLevel().value == gitlabMember.getAccessLevel().value)).collect(Collectors.toList());
+            gitlabProjectMembers.forEach(gitlabMember -> {
+                //选出
+                if (!(gitlabMemberMap.get(gitlabMember.getUserId()) != null
+                        && gitlabMemberMap.get(gitlabMember.getUserId()).getAccessLevel().value == gitlabMember.getAccessLevel().value)) {
+                    reGitlabProjectMembers.add(gitlabMember);
+                    gitlabMemberMap.put(gitlabMember.getUserId(), null);
+                } else {
+                    gitlabMemberMap.put(gitlabMember.getUserId(), null);
+                }
+            });
         }
+        gitlabProjectMembers = reGitlabProjectMembers;
 
         // 查询属于gProject下的成员
         RdmMember rdmMember = new RdmMember();

@@ -108,6 +108,9 @@ public class GitlabProjectFixApi {
             } else if (e.getHttpStatus() == HttpStatus.BAD_REQUEST.value()) {
                 LOGGER.info(">>>>>>>>>>>>>>>Bad Request:{},{},{}>>>>>>>>>>>>>>>>>", (Integer) projectIdOrPath, userId, accessLevel);
                 return null;
+            } else if (e.getHttpStatus() == HttpStatus.CONFLICT.value()) {
+                LOGGER.info("Member already exists");
+                return null;
             } else {
                 throw new GitlabClientException(e, e.getMessage());
 
