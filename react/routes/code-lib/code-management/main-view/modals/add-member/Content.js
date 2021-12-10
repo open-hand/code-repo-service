@@ -40,9 +40,9 @@ export default observer(() => {
     }
   });
 
-  function handleAddPath() {
+  const handleAddPath = () => {
     pathListDs.create();
-  }
+  };
 
   function handleRemovePath(removeRecord) {
     pathListDs.remove(removeRecord);
@@ -75,6 +75,8 @@ export default observer(() => {
 
   function getClusterOptionProp(record, pathRecord) {
     const userId = pathRecord.get('userId');
+    // console.log(pathRecord);
+    // console.log(userId);
     if (!userId) {
       return { disabled: true };
     }
@@ -85,10 +87,10 @@ export default observer(() => {
     };
   }
 
-  function levelOptionsFilter(record) {
+  const levelOptionsFilter = (record) => {
     const flag = !(Number(record.data.value.substring(1)) >= 50);
     return flag;
-  }
+  };
   const AccessLevelOptionRenderer = (record, text, value, pathRecord) => {
     const userId = pathRecord.get('userId');
     const { boolean, selectedGroupAccessLevel } = groupAccessLevelCompare(
@@ -165,6 +167,7 @@ export default observer(() => {
           });
         }
       });
+      // console.log(existArr);
       await userOptions.query();
       userOptions.appendData(existArr);
     }
@@ -219,6 +222,7 @@ export default observer(() => {
             searchable
             colSpan={4}
             optionsFilter={userFilter}
+            onChange={(value) => { console.log(value); }}
             searchMatcher={({ record, text, textField }) =>
               searchMatcher({ record, text, textField })
             }
@@ -235,6 +239,7 @@ export default observer(() => {
               )
             }
           />
+          {/* 权限 */}
           <Select
             name="glAccessLevel"
             colSpan={4}

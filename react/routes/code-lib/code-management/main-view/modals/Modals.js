@@ -324,7 +324,7 @@ const EnvModals = observer((props) => {
           name: format({ id: 'BatchRepair' }),
           icon: 'person_add-o',
           handler: handleBatchFixModalOpen,
-          permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
+          permissions: ['choerodon.code.project.infra.code-lib-management.ps.batchAuditFix'],
           display: true,
           disabled: disabledPsAudit,
           tooltipsConfig: {
