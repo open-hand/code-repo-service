@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.infra.enums;
 
-import javax.xml.bind.annotation.XmlType;
 
 /**
  * @author ying.xie@hand-china.com
