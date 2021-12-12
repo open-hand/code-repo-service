@@ -43,7 +43,7 @@ const PsManager = observer(() => {
       alwaysShow
     />,
     has('base-pro:thirdPartServiceBind') && <PageTab
-      title={formatClient({ id: 'artifact' })}
+      title={formatClient({ id: 'Third' })}
       tabKey="thirdPartServiceBind"
       route="/rducm/personal-setting/thirdPartServiceBind"
       component={ThirdPartServiceBind}

@@ -1,3 +1,9 @@
+/*
+ * @Author: isaac
+ * @LastEditors: isaac
+ * @Description:
+ * i made my own lucky
+ */
 const codeLibManagement = {
   'c7ncd.codeLibManagement.Permission': 'Permission',
   'c7ncd.codeLibManagement.PermissionAssignment': 'Permission Assignment',
@@ -53,6 +59,10 @@ const codeLibManagement = {
   'c7ncd.codeLibManagement.LastCommit': 'Last Commit',
   'c7ncd.codeLibManagement.MergeRequests': 'Merge Requests',
   'c7ncd.codeLibManagement.CreationDate': 'Creation Date',
+  'c7ncd.codeLibManagement.ApplyforPermission': 'Apply for Permission',
+  'c7ncd.codeLibManagement.Username': 'Username',
+  'c7ncd.codeLibManagement.LoginName': 'Login Name',
+  'c7ncd.codeLibManagement.Status': 'Status',
 };
 
 export { codeLibManagement };

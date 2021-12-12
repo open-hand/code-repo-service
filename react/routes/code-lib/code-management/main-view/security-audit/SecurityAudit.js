@@ -131,11 +131,16 @@ const PsSet = observer(() => {
         className="code-lib-management-security-audio"
       >
         <Column
+          header={format({ id: 'Username' })}
           name="realName"
           renderer={renderName}
           width={200}
         />
-        <Column name="loginName" renderer={renderLoginName} />
+        <Column
+          header={format({ id: 'LoginName' })}
+          name="loginName" 
+          renderer={renderLoginName}
+        />
         <Column name="roleNames" renderer={renderRole} />
         <Column name="authorizedRepositoryCount" />
         <Column name="allRepositoryCount" />

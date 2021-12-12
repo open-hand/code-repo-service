@@ -1,3 +1,9 @@
+/*
+ * @Author: isaac
+ * @LastEditors: isaac
+ * @Description: 
+ * i made my own lucky
+ */
 /* eslint-disable max-len */
 import React, { createContext, useCallback, useContext, useMemo } from "react";
 import { DataSet } from "choerodon-ui/pro";
@@ -57,7 +63,10 @@ export const StoreProvider = injectIntl(
         if (hasPermission) {
           customTabsData = [psSetTabData(format), psApprovalTabData(format), psAuditTabData(format)];
         } else if (!hasPermission && hasMemberPermission) {
-          customTabsData = [psSetTabData(format), applyViewTabData]
+          customTabsData = [psSetTabData(format), {
+            ...applyViewTabData,
+            name: format({ id: 'ApplyforPermission' })
+          }]
         }
         return customTabsData;
       }, [hasPermission, hasMemberPermission]);

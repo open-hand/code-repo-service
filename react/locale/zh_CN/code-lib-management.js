@@ -53,6 +53,11 @@ const codeLibManagement = {
   'c7ncd.codeLibManagement.LastCommit': '最近一次提交',
   'c7ncd.codeLibManagement.MergeRequests': '待处理合并请求数',
   'c7ncd.codeLibManagement.CreationDate': '创建日期',
+  'c7ncd.codeLibManagement.ApplyforPermission': '权限申请',
+  'c7ncd.codeLibManagement.Username': '用户名',
+  'c7ncd.codeLibManagement.LoginName': '登录名',
+  'c7ncd.codeLibManagement.Status': '状态',
+
 };
 
 export { codeLibManagement };

@@ -1,6 +1,7 @@
 // ~~代码库管理
 const codeLibOrgTabPermission = {
   'c7ncd.code-lib-org.permission.allProject': '所有项目',
+  'c7ncd.code-lib-org.list.search': '请输入搜索条件',
   'c7ncd.code-lib-org.permission.permission': '权限查看',
   'c7ncd.code-lib-org.permission.permissionToExport': '导出权限',
   'c7ncd.code-lib-org.permission.projectName': '项目名称',
@@ -32,6 +33,7 @@ const codeLibOrgTabLog = {
   'c7ncd.code-lib-org.log.startDate': '开始日期',
   'c7ncd.code-lib-org.log.endDate': '结束日期',
   'c7ncd.code-lib-org.log.operationType': '操作类型',
+  'c7ncd.code-lib-org.log.noOperationRecord': '暂无操作记录',
 };
 
 export { codeLibOrgTabPermission, codeLibOrgTabAudit, codeLibOrgTabLog };

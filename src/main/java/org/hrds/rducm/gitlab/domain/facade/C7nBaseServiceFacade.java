@@ -231,4 +231,8 @@ public interface C7nBaseServiceFacade {
 
     List<C7nUserVO> listRoot();
 
+    Set<Long> listActiveProjectIds(Long organizationId);
+
+    //查询组织下的所有项目
+    List<C7nProjectVO> queryProjectsByOrganizationId(Long organizationId);
 }

@@ -324,7 +324,7 @@ const EnvModals = observer((props) => {
           name: format({ id: 'BatchRepair' }),
           icon: 'person_add-o',
           handler: handleBatchFixModalOpen,
-          permissions: ['choerodon.code.project.infra.code-lib-management.ps.project-owner'],
+          permissions: ['choerodon.code.project.infra.code-lib-management.ps.batchAuditFix'],
           display: true,
           disabled: disabledPsAudit,
           tooltipsConfig: {
@@ -391,7 +391,7 @@ const EnvModals = observer((props) => {
         break;
       case 'applyView':
         buttonData.unshift({
-          name: formatMessage({ id: 'infra.permission.request' }),
+          name: format({ id: 'ApplyforPermission' }),
           icon: 'person_add-o',
           handler: openRequest,
           display: true,
