@@ -494,7 +494,8 @@ public class RdmMemberChangeSagaHandler {
 
     private void handleProjectAdminOnProjectLevel(Long organizationId, Long projectId, Long userId) {
         // <> 删除该成员权限
-        rdmMemberRepository.deleteByProjectIdAndUserId(organizationId, projectId, userId);
+        // 删除该成员权限   只删除根据角色变化的成员权限（Owner）
+        rdmMemberRepository.deleteByProjectIdAndUserIdAndAccessLevel(organizationId, projectId, userId, AccessLevel.OWNER.value);
 
         // <> 插入该成员Owner权限
         insertProjectOwner(organizationId, projectId, userId);
