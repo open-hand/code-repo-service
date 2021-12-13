@@ -228,4 +228,11 @@ public interface C7nBaseServiceFacade {
     Long getOrganizationId(Long projectId);
 
     List<C7nUserVO> listCustomGitlabOwnerLableUser(Long projectId, String roleLabel);
+    /**
+     * 查询启用组织
+     *
+     * @return List<C7nTenantVO>
+     */
+    List<C7nTenantVO> queryActiveOrganizations();
+
 }

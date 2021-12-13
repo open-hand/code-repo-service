@@ -9,7 +9,10 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.hrds.rducm.gitlab.api.controller.dto.MemberAuditRecordQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.RdmMemberAuditRecordViewDTO;
+import org.hrds.rducm.gitlab.app.eventhandler.gitlab.ProjectGitlabPermissionHandler;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
+import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
+import org.hrds.rducm.gitlab.domain.repository.RdmMemberAuditRecordRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.infra.constant.KeyEncryptConstants;
 import org.hzero.core.base.BaseController;
@@ -33,7 +36,9 @@ public class RdmMemberAuditRecordProjController extends BaseController {
     @Autowired
     private IRdmMemberAuditRecordService iRdmMemberAuditRecordService;
     @Autowired
-    private RdmMemberAuditAppService rdmMemberAuditAppService;
+    private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
+    @Autowired
+    private ProjectGitlabPermissionHandler projectGitlabPermissionHandler;
 
     @ApiOperation(value = "查询权限审计结果")
     @ApiImplicitParams({
@@ -56,7 +61,8 @@ public class RdmMemberAuditRecordProjController extends BaseController {
                                       @PathVariable Long projectId,
                                       @Encrypt @PathVariable Long id,
                                       @Encrypt @RequestParam Long repositoryId) {
-        rdmMemberAuditAppService.auditFix(organizationId, projectId, repositoryId, id);
+        RdmMemberAuditRecord memberAuditRecord = rdmMemberAuditRecordRepository.selectByPrimaryKey(id);
+        projectGitlabPermissionHandler.gitlabPermissionRepair(memberAuditRecord);
         return Results.success();
     }
 }

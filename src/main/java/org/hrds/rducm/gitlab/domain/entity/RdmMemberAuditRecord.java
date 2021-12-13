@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -86,6 +87,16 @@ public class RdmMemberAuditRecord extends AuditDomain {
     //
     // getter/setter
     // ------------------------------------------------------------------------------
+    @Transient
+    private Integer gGroupId;
+
+    public Integer getgGroupId() {
+        return gGroupId;
+    }
+
+    public void setgGroupId(Integer gGroupId) {
+        this.gGroupId = gGroupId;
+    }
 
     public Long getId() {
         return id;
