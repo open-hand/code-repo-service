@@ -5,6 +5,7 @@ import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 import org.hrds.rducm.gitlab.api.controller.dto.*;
 import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hzero.export.vo.ExportParam;
 
 import javax.servlet.http.HttpServletResponse;
@@ -148,4 +149,6 @@ public interface RdmMemberAppService {
      * @param repositoryId
      */
     List<RdmMember> batchValidMember(Long organizationId, Long projectId, Long repositoryId);
+
+    void insertGroupMember(RdmMemberAuditRecord rdmMemberAuditRecord);
 }

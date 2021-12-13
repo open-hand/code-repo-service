@@ -19,11 +19,13 @@ import org.hrds.rducm.gitlab.app.async.RdmMemberQueryHelper;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
+import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.facade.C7nDevOpsServiceFacade;
 import org.hrds.rducm.gitlab.domain.repository.RdmMemberRepository;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
+import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
@@ -556,5 +558,24 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         iRdmMemberService.insertMemberBefore(rdmMember);
     }
 
+    @Override
+    public void insertGroupMember(RdmMemberAuditRecord rdmMemberAuditRecord) {
+        RdmMember rdmMember = new RdmMember();
+        rdmMember.setSyncGitlabFlag(true);
+        rdmMember.setGlAccessLevel(AccessLevel.OWNER.toValue());
+        rdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
+        rdmMember.setUserId(rdmMemberAuditRecord.getUserId());
+        rdmMember.setOrganizationId(rdmMemberAuditRecord.getOrganizationId());
+        rdmMember.setGlProjectId(rdmMemberAuditRecord.getGlProjectId());
+        rdmMember.setGlUserId(rdmMemberAuditRecord.getGlUserId());
+        rdmMember.setRepositoryId(rdmMemberAuditRecord.getRepositoryId());
+        RdmMember record = new RdmMember();
+        record.setUserId(rdmMemberAuditRecord.getUserId());
+        record.setRepositoryId(rdmMemberAuditRecord.getRepositoryId());
+        record.setProjectId(rdmMemberAuditRecord.getProjectId());
+        if (CollectionUtils.isEmpty(rdmMemberRepository.select(record))) {
+            rdmMemberRepository.insert(record);
+        }
+    }
 
 }
