@@ -1,5 +1,5 @@
 import { Choerodon } from '@choerodon/boot';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import {
   Form,
@@ -75,8 +75,6 @@ export default observer(() => {
 
   function getClusterOptionProp(record, pathRecord) {
     const userId = pathRecord.get('userId');
-    // console.log(pathRecord);
-    // console.log(userId);
     if (!userId) {
       return { disabled: true };
     }
@@ -114,71 +112,76 @@ export default observer(() => {
       </Tooltip>
     );
   };
-  const userFilter = (record) => {
+
+  const userFilter = (record, pathRecord) => {
     const lev = formDs.current.get('permissionsLevel');
-    const exist = some(
-      pathListDs.created,
-      r => r.get('userId') === record.get('userId'),
-    );
+
+    let exist = false; // 除去当前选中，是否已经选过
+
+    pathListDs.created.forEach((item) => {
+      if (record.get('userId') === item.get('userId') && item.get('userId') !== pathRecord.get('userId')) {
+        exist = true;
+      }
+    });
+
     if (exist) {
-      // 前面已经选过了
       return false;
     }
-    if (lev === 'applicationService') {
-      return true;
-    }
-    if (record.get('groupAccessLevel')) {
-      // 已经有全局权限了
+    // 已经有全局权限了不能继续分配只能修改
+    if (lev === 'allProject' && record.get('groupAccessLevel')) {
       return false;
     }
     return true;
   };
-  function searchMatcher({ record, text, textField }) {
-    const exist = some(
-      pathListDs.created,
-      r => r.get('userId') === record.get('userId'),
-    );
-    const nameMatching =
-      record.get(textField).indexOf(text) !== -1 ||
-      record.get('loginName').indexOf(text) !== -1;
+  const userSearchMatcher = ({ record, text, textField }) => {
     if (openType === 'project') {
-      // 项目内部成员
+      const exist = some(
+        pathListDs.created,
+        r => r.get('userId') === record.get('userId'),
+      );
+      const nameMatching =
+        record.get(textField).indexOf(text) !== -1 ||
+        record.get('loginName').indexOf(text) !== -1;
+      // 项目内部成员 列表中搜索满足不存在并且名字匹配
       return !exist && nameMatching;
     }
-    return !exist;
-  }
-  const queryUser = debounce(async (str) => {
+    return true;
+  };
+  const queryOuterUser = debounce(async (str) => {
     userOptions.setQueryParameter('name', str);
     userOptions.setQueryParameter('type', openType);
     if (str !== '') {
-      const existArr = []; // 公用的一个userOptions。防止重新获取后之前的value匹配不到
+      const userOptionExistArr = []; // userOptions为公用。 将之前选过的用户添加到搜索后的数组防止重新获取后之前的value匹配不到
       pathListDs.created.forEach((record) => {
         if (record.get('userId')) {
-          let loginName;
           userOptions.forEach((userRecord) => {
             if (userRecord.get('userId') === record.get('userId')) {
-              loginName = userRecord.get('loginName');
+              userOptionExistArr.push(userRecord);
             }
-          });
-          existArr.push({
-            userId: record.getField('userId').getValue(),
-            realName: record.getField('userId').getText(),
-            loginName,
           });
         }
       });
-      // console.log(existArr);
       await userOptions.query();
-      userOptions.appendData(existArr);
+      const pushArr = [];
+      userOptionExistArr.forEach((existItem) => {
+        if (
+          !userOptions.some(userOptionRecord =>
+            userOptionRecord.get('userId') === existItem.get('userId'))
+        ) {
+          pushArr.push(existItem);
+        }
+      });
+      userOptions.appendData(pushArr);
     }
   }, 500);
 
   const handleUserSearch = (e) => {
     e.persist();
     if (openType === 'project') {
+      // 分配内部成员的权限不支持远程搜索用户
       return;
     }
-    queryUser(e.target.value);
+    queryOuterUser(e.target.value);
   };
   const optionRenderer = ({ text, textField, record }) => (
     <Tooltip title={record.get('repositoryCode')} placement="left">
@@ -187,7 +190,6 @@ export default observer(() => {
       </span>
     </Tooltip>
   );
-  // console.log(formDs?.current?.get('permissionsLevel'));
   return (
     <div style={{ width: '5.12rem' }}>
       <Form dataSet={formDs} columns={1}>
@@ -210,7 +212,7 @@ export default observer(() => {
           />
         )}
       </Form>
-      {map(pathListDs.data, pathRecord => (
+      {map(pathListDs.records, pathRecord => (
         <Form
           record={pathRecord}
           columns={13}
@@ -221,11 +223,8 @@ export default observer(() => {
             name="userId"
             searchable
             colSpan={4}
-            optionsFilter={userFilter}
-            onChange={(value) => { console.log(value); }}
-            searchMatcher={({ record, text, textField }) =>
-              searchMatcher({ record, text, textField })
-            }
+            optionsFilter={record => userFilter(record, pathRecord)}
+            searchMatcher={userSearchMatcher}
             onInput={(e) => {
               handleUserSearch(e);
             }}
