@@ -105,27 +105,14 @@ public class RdmMemberProjController extends BaseController {
     }
 
 
-    // TODO: 2021/12/8 wx
-//    @ApiOperation(value = "项目下批量分配应用服务组的权限")
-//    @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.PROJECT_OWNER})
-//    @PostMapping("/batch-add/group")
-//    public ResponseEntity<Void> batchAddGroupMembers(@PathVariable Long organizationId,
-//                                                     @PathVariable Long projectId,
-//                                                     @RequestBody RdmMemberBatchDTO rdmMemberBatchDTO) {
-//        validObject(rdmMemberBatchDTO);
-//        rdmMemberAppService.batchAddGroupMembers(organizationId, projectId, rdmMemberBatchDTO);
-//        return Results.created(null);
-//    }
-
-
     @ApiOperation(value = "项目下批量分配应用服务组的权限")
     @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.PROJECT_OWNER})
     @PostMapping("/batch-add/group")
     public ResponseEntity<Void> batchAddGroupMembers(@PathVariable Long organizationId,
                                                      @PathVariable Long projectId,
-                                                     @RequestBody List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOs) {
-        validObject(gitlabMemberCreateDTOs);
-        rdmMemberAppService.batchAddGroupMembers(organizationId, projectId, gitlabMemberCreateDTOs);
+                                                     @RequestBody RdmMemberBatchDTO rdmMemberBatchDTO) {
+        validObject(rdmMemberBatchDTO);
+        rdmMemberAppService.batchAddGroupMembers(organizationId, projectId, rdmMemberBatchDTO);
         return Results.created(null);
     }
 
