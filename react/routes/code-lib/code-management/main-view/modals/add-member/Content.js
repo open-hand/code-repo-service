@@ -133,6 +133,13 @@ export default observer(() => {
   };
 
   // permission 模式下的user渲染 和disable
+
+  const getuserIdOptionProp = ({ record }) => ({
+    disabled:
+        record.get('groupAccessLevel') >=
+        Number(formDs?.current?.get('glAccessLevel')?.substring(1)),
+  });
+
   const userOptionRendererModePermission = (record, text) => {
     let str;
     if (
@@ -149,12 +156,6 @@ export default observer(() => {
       </Tooltip>
     );
   };
-
-  const getuserIdOptionProp = ({ record }) => ({
-    disabled:
-        record.get('groupAccessLevel') >=
-        Number(formDs?.current?.get('glAccessLevel')?.substring(1)),
-  });
 
   const userFilter = (record, pathRecord) => {
     const lev = formDs.current.get('permissionsLevel');
@@ -353,7 +354,7 @@ export default observer(() => {
         map(UserPathListDS.records, pathRecord => (
           <Form
             record={pathRecord}
-            columns={1}
+            columns={13}
             key={pathRecord.id}
             className="code-lib-management-add-member"
           >
@@ -361,7 +362,7 @@ export default observer(() => {
               name="userId"
               disabled={!formDs?.current?.get('glAccessLevel')}
               searchable
-              colSpan={1}
+              colSpan={12}
               optionsFilter={record => userFilter(record, pathRecord)}
               searchMatcher={userSearchMatcher}
               optionRenderer={({ record, text }) =>
@@ -373,6 +374,18 @@ export default observer(() => {
               }}
               addonAfter={openType === 'project' ? null : addonAfter}
             />
+            {UserPathListDS.length > 1 ? (
+              <Button
+                funcType="flat"
+                icon="delete"
+                style={{
+                  marginTop: '8px',
+                }}
+                onClick={() => handleRemovePath(pathRecord)}
+              />
+            ) : (
+              <span />
+            )}
           </Form>
         ))}
 
