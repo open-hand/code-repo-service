@@ -640,7 +640,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         rdmMemberBatchDTO.getMembers().forEach(gitlabMemberCreateDTO -> {
             if (rdmMemberBatchDTO.getBaseRole()) {
                 gitlabMemberCreateDTO.setGlAccessLevel(rdmMemberBatchDTO.getGlAccessLevel());
-                gitlabMemberCreateDTO.setGlExpiresAt(gitlabMemberCreateDTO.getGlExpiresAt());
+                gitlabMemberCreateDTO.setGlExpiresAt(rdmMemberBatchDTO.getGlExpiresAt());
             }
             Integer glUserId = c7NBaseServiceFacade.userIdToGlUserId(gitlabMemberCreateDTO.getUserId());
             if (Objects.isNull(glUserId)) {
