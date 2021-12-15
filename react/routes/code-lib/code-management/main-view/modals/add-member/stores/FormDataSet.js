@@ -41,24 +41,23 @@ export default ({
   branchServiceDs,
   currentBranchAppId,
 }) => {
+  const setRequired = (DS, bool, fieldNameArr) => {
+    DS.created.forEach((item) => {
+      fieldNameArr.forEach((name) => {
+        if (item.getField(name)) {
+          item.getField(name).set('required', bool);
+        }
+      });
+    });
+  };
   const requireChange = (value) => {
     if (value === 'permission') {
-      pathListDs.created.forEach((item) => {
-        item.getField('glAccessLevel').set('required', false);
-        item.getField('userId').set('required', false);
-      });
-      UserPathListDS.created.forEach((item) => {
-        item.getField('userId').set('required', true);
-      });
+      setRequired(pathListDs, false, ['glAccessLevel', 'userId']);
+      setRequired(UserPathListDS, true, ['userId']);
     }
     if (value === 'simple') {
-      pathListDs.created.forEach((item) => {
-        item.getField('glAccessLevel').set('required', true);
-        item.getField('userId').set('required', true);
-      });
-      UserPathListDS.created.forEach((item) => {
-        item.getField('userId').set('required', false);
-      });
+      setRequired(pathListDs, true, ['glAccessLevel', 'userId']);
+      setRequired(UserPathListDS, false, ['userId']);
     }
   };
   return {
@@ -125,12 +124,13 @@ export default ({
         textField: 'meaning',
         valueField: 'value',
         lookupCode: 'RDUCM.ACCESS_LEVEL',
-        ignore: ({ dataSet }) =>
-          (dataSet.current.get('addingMode') === 'permission'
-            ? 'never'
-            : 'always'),
-        required: ({ dataSet }) =>
-          (dataSet.current.get('addingMode') === 'permission'),
+        computedProps: {
+          ignore: ({ dataSet }) =>
+            (dataSet.current.get('addingMode') === 'permission'
+              ? 'never'
+              : 'always'),
+          required: ({ dataSet }) => dataSet.current.get('addingMode') === 'permission',
+        },
       },
       // 过期日期
       {
@@ -157,7 +157,12 @@ export default ({
           });
         }
         if (name === 'addingMode') {
-          requireChange(value);
+          requireChange(value, dataSet);
+        }
+        if (name === 'glAccessLevel') {
+          UserPathListDS.created.forEach((item) => {
+            item.reset();
+          });
         }
       },
     },
@@ -206,8 +211,8 @@ export default ({
               repositoryIds,
               members: permissionMembers,
               baseRole: true,
-              glAccessLevel: dataSet.current.get('glAccessLevel'),
-              glExpiresAt: dataSet.current.get('glExpiresAt'),
+              glAccessLevel: Number(dataSet?.current?.get('glAccessLevel')?.substring(1)),
+              glExpiresAt: dataSet?.current?.get('glExpiresAt'),
             },
           };
         }
@@ -225,8 +230,8 @@ export default ({
             method: 'post',
             data: {
               baseRole: true,
-              glAccessLevel: dataSet.current.get('glAccessLevel'),
-              glExpiresAt: dataSet.current.get('glExpiresAt'),
+              glAccessLevel: Number(dataSet?.current?.get('glAccessLevel')?.substring(1)),
+              glExpiresAt: dataSet?.current?.get('glExpiresAt'),
               members: permissionMembers,
             },
           };
