@@ -329,7 +329,8 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
         if (CollectionUtils.isEmpty(c7nTenantVOS)) {
             return Collections.EMPTY_LIST;
         } else {
-            return c7nTenantVOS.stream().filter(c7nTenantVO -> c7nTenantVO.getEnabledFlag() == BaseConstants.Flag.NO).collect(Collectors.toList());
+            return c7nTenantVOS.stream().filter(c7nTenantVO -> (c7nTenantVO.getEnabledFlag() == BaseConstants.Flag.YES
+                    && c7nTenantVO.getTenantId() != BaseConstants.DEFAULT_TENANT_ID)).collect(Collectors.toList());
 
         }
     }
