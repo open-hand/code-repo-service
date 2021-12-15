@@ -1,6 +1,8 @@
 package org.hrds.rducm.gitlab.app.eventhandler.gitlab;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
@@ -11,6 +13,7 @@ import org.hrds.rducm.gitlab.infra.enums.UserRoleEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Created by wangxiang on 2021/8/26
@@ -20,13 +23,8 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
     @Autowired
     private C7nBaseServiceFacade c7nBaseServiceFacade;
 
-
     @Autowired
     private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
-
-    @Autowired
-    private GitlabGroupFixApi gitlabGroupFixApi;
-
 
     @Autowired
     private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
@@ -41,7 +39,7 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
 
         //2.获得当前审计数据用户的角色
         C7nUserVO c7nUserVO = c7nBaseServiceFacade.detailC7nUserOnProjectLevel(rdmMemberAuditRecord.getProjectId(), rdmMemberAuditRecord.getUserId());
-        String role = getUserRole(c7nUserVO);
+        String role = getUserRole(rdmMemberAuditRecord.getProjectId(), c7nUserVO);
         //3.根据用户角色来修复数据
         permissionRepair(role, rdmMemberAuditRecord);
         // 4. 回写数据
@@ -65,7 +63,7 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
 
     protected abstract void permissionRepair(String role, RdmMemberAuditRecord rdmMemberAuditRecord);
 
-    private String getUserRole(C7nUserVO c7nUserVO) {
+    private String getUserRole(Long projectId, C7nUserVO c7nUserVO) {
         if (c7nUserVO == null) {
             return UserRoleEnum.NON_PROJECT_MEMBER.getValue();
         }
@@ -76,6 +74,15 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
             } else if (c7nUserVO.isProjectAdmin()) {
                 return UserRoleEnum.PROJECT_ADMIN.getValue();
             } else {
+                //项目成员和自定义角色在这里处理，
+                //这里看用户的gitlab标签是不是有，如果有则是自定义的Owner，如果不是则按项目成员的角色处理
+                List<C7nUserVO> gitlabOwners = c7nBaseServiceFacade.listCustomGitlabOwnerLableUser(projectId, "GITLAB_OWNER");
+                if (CollectionUtils.isEmpty(gitlabOwners)) {
+                    return UserRoleEnum.PROJECT_MEMBER.getValue();
+                }
+                if (gitlabOwners.stream().map(C7nUserVO::getId).collect(Collectors.toList()).contains(c7nUserVO.getId())) {
+                    return UserRoleEnum.PROJECT_ADMIN.getValue();
+                }
                 return UserRoleEnum.PROJECT_MEMBER.getValue();
             }
         } else {
