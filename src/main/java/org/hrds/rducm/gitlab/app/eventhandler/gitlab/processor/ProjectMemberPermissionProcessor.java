@@ -81,10 +81,8 @@ public class ProjectMemberPermissionProcessor implements RolePermissionProcessor
                 removeGroupMemberAndAddProjectMember(rdmMemberAuditRecord);
                 return;
             }
-            gitlabProjectFixApi.updateMember(dbRdmMember.getGlProjectId(), dbRdmMember.getGlUserId(), dbRdmMember.getGlAccessLevel(), dbRdmMember.getGlExpiresAt());
-        } else {
-            gitlabProjectFixApi.addMember(dbRdmMember.getGlProjectId(), dbRdmMember.getGlUserId(), dbRdmMember.getGlAccessLevel(), dbRdmMember.getGlExpiresAt());
         }
+        gitlabProjectFixApi.addMember(dbRdmMember.getGlProjectId(), dbRdmMember.getGlUserId(), dbRdmMember.getGlAccessLevel(), dbRdmMember.getGlExpiresAt());
     }
 
     private void removeGroupMemberAndAddProjectMember(RdmMemberAuditRecord rdmMemberAuditRecord) {

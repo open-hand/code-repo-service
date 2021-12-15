@@ -54,16 +54,12 @@ public class NonProjectMemberPermissionProcessor implements RolePermissionProces
             //在添加权限之前需要判断组的权限有没有
             RdmMember groupMember = getRdmMember(rdmMemberAuditRecord);
             if (groupMember != null) {
-                if (groupGlMember != null) {
-                    gitlabGroupFixApi.removeMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId());
-                    addProjectPermission(rdmMemberAuditRecord);
-                    return;
-                }
+                gitlabGroupFixApi.removeMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId());
+                addProjectPermission(rdmMemberAuditRecord);
             } else {
                 gitlabProjectFixApi.addMember(rdmMemberAuditRecord.getGlProjectId(), rdmMemberAuditRecord.getGlUserId(), rdmMember.getGlAccessLevel(), rdmMember.getGlExpiresAt());
             }
-        }
-        else {
+        } else {
             rdmMemberRepository.deleteByPrimaryKey(rdmMember);
         }
     }

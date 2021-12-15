@@ -337,7 +337,8 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         if (dbMember != null) {
             memberAudit.setUserId(dbMember.getUserId())
                     .setAccessLevel(dbMember.getGlAccessLevel())
-                    .setExpiresAt(dbMember.getGlExpiresAt());
+                    .setExpiresAt(dbMember.getGlExpiresAt())
+                    .setGlUserId(dbMember.getGlUserId());
         }
 
         return memberAudit;
