@@ -272,15 +272,19 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         gitlabGroupMembers.addAll(gitlabMembers);
         //查询数据库的权限
         List<RdmMember> dbMembers = getGroupMember(projectId, appGroupId, AuthorityTypeEnum.GROUP.getValue());
-        if (!CollectionUtils.isEmpty(dbMembers)) {
-            List<C7nUserVO> orgAdmins = threadLocal.get();
-            if (!CollectionUtils.isEmpty(orgAdmins)) {
-                List<Long> orgAdminIds = orgAdmins.stream().map(C7nUserVO::getId).collect(Collectors.toList());
-                //排除choerodon和gitlab里面的组织管理员用户id,和gitlab root
+
+        List<C7nUserVO> orgAdmins = threadLocal.get();
+        if (!CollectionUtils.isEmpty(orgAdmins)) {
+            List<Long> orgAdminIds = orgAdmins.stream().map(C7nUserVO::getId).collect(Collectors.toList());
+            //排除choerodon和gitlab里面的组织管理员用户id,和gitlab root
+            if (!CollectionUtils.isEmpty(gitlabMembers)) {
                 gitlabMembers = gitlabMembers.stream().filter(gitlabMember -> !(orgAdminIds.contains(gitlabMember.getUserId()) || gitlabMember.getId() == 1)).collect(Collectors.toList());
+            }
+            if (!CollectionUtils.isEmpty(dbMembers)) {
                 dbMembers = dbMembers.stream().filter(rdmMember1 -> !orgAdminIds.contains(rdmMember1.getUserId())).collect(Collectors.toList());
             }
         }
+
         //对比两边的权限
         List<RdmMemberAuditRecord> rdmMemberAuditRecords = compareGroupMembersAndReturnAudit(organizationId, projectId, dbMembers, gitlabMembers, appGroupId);
 
@@ -394,15 +398,19 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         List<RdmMember> dbMembers = getRdmMembers(glProjectId);
 
         //去掉不在项目内的平台管理员
-        if (!CollectionUtils.isEmpty(dbMembers)) {
-            List<C7nUserVO> orgAdmins = threadLocal.get();
-            if (!CollectionUtils.isEmpty(orgAdmins)) {
-                List<Long> orgAdminIds = orgAdmins.stream().map(C7nUserVO::getId).collect(Collectors.toList());
-                //排除choerodon和gitlab里面的组织管理员用户id,和gitlab root
+
+        List<C7nUserVO> orgAdmins = threadLocal.get();
+        if (!CollectionUtils.isEmpty(orgAdmins)) {
+            List<Long> orgAdminIds = orgAdmins.stream().map(C7nUserVO::getId).collect(Collectors.toList());
+            //排除choerodon和gitlab里面的组织管理员用户id,和gitlab root
+            if (CollectionUtils.isEmpty(gitlabProjectMembers)) {
                 gitlabProjectMembers = gitlabProjectMembers.stream().filter(gitlabMember -> !(orgAdminIds.contains(gitlabMember.getUserId()) || gitlabMember.getId() == 1)).collect(Collectors.toList());
+            }
+            if (!CollectionUtils.isEmpty(dbMembers)) {
                 dbMembers = dbMembers.stream().filter(rdmMember1 -> !orgAdminIds.contains(rdmMember1.getUserId())).collect(Collectors.toList());
             }
         }
+
 
         return compareProjectMembersAndReturnAudit(organizationId, projectId, repositoryId, glProjectId, dbMembers, gitlabProjectMembers, appGroupId);
     }
