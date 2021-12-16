@@ -68,8 +68,8 @@ public class ProjectMemberPermissionProcessor implements RolePermissionProcessor
                     removeGroupMemberAndAddProjectMember(rdmMemberAuditRecord);
                     return;
                 }
+                gitlabProjectFixApi.updateMember(rdmMember.getGlProjectId(), rdmMember.getGlUserId(), rdmMember.getGlAccessLevel(), rdmMember.getGlExpiresAt());
             }
-            gitlabProjectFixApi.updateMember(dbRdmMember.getGlProjectId(), dbRdmMember.getGlUserId(), dbRdmMember.getGlAccessLevel(), dbRdmMember.getGlExpiresAt());
         }
     }
 
@@ -81,8 +81,8 @@ public class ProjectMemberPermissionProcessor implements RolePermissionProcessor
                 removeGroupMemberAndAddProjectMember(rdmMemberAuditRecord);
                 return;
             }
+            gitlabProjectFixApi.addMember(rdmMember.getGlProjectId(), rdmMember.getGlUserId(), rdmMember.getGlAccessLevel(), rdmMember.getGlExpiresAt());
         }
-        gitlabProjectFixApi.addMember(dbRdmMember.getGlProjectId(), dbRdmMember.getGlUserId(), dbRdmMember.getGlAccessLevel(), dbRdmMember.getGlExpiresAt());
     }
 
     private void removeGroupMemberAndAddProjectMember(RdmMemberAuditRecord rdmMemberAuditRecord) {

@@ -46,17 +46,17 @@ public class ProjectGitlabPermissionHandler extends AbstractGitlabPermissionHand
     @Override
     public void permissionRepair(String role, RdmMemberAuditRecord rdmMemberAuditRecord) {
         RdmMember dbRdmMember = getDbRdmMember(rdmMemberAuditRecord);
-        if (rdmMemberAuditRecord.getGlUserId() == null && dbRdmMember == null) {
-            rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
-            //如果choerodon为null 直接删除这个账户
-            if (rdmMemberAuditRecord.getGlProjectId() != null && rdmMemberAuditRecord.getGlUserId() != null) {
-                gitlabProjectFixApi.removeMember(rdmMemberAuditRecord.getGlProjectId(), rdmMemberAuditRecord.getGlUserId());
-            }
-            return;
-        }
         Member projectGlMember = null;
         if (rdmMemberAuditRecord.getGlUserId() != null) {
             projectGlMember = queryProjectGlMember(rdmMemberAuditRecord);
+        }
+        if (dbRdmMember == null && projectGlMember != null) {
+            rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
+            //如果choerodon为null 直接删除这个账户
+            if (rdmMemberAuditRecord.getGlProjectId() != null) {
+                gitlabProjectFixApi.removeMember(rdmMemberAuditRecord.getGlProjectId(), projectGlMember.getId());
+            }
+            return;
         }
         Integer glGroupId = Math.toIntExact(rdmMemberAuditRecord.getgGroupId());
         Member groupGlMember = queryGroupGlMember(glGroupId, rdmMemberAuditRecord.getGlUserId());
