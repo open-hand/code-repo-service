@@ -40,7 +40,7 @@ public class MembersAuditJob {
         // <> 获取组织
         logger.info("开始审计");
         //查询所有的组织
-        List<C7nTenantVO> c7nTenantVOS = c7nBaseServiceFacade.listAllOrgs();
+        List<C7nTenantVO> c7nTenantVOS = c7nBaseServiceFacade.queryActiveOrganizations();
         if (CollectionUtils.isEmpty(c7nTenantVOS)){
             logger.info("平台内无组织");
             return;
