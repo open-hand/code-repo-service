@@ -73,7 +73,7 @@ public class ProjectAdminPermissionProcessor implements RolePermissionProcessor 
             gitlabGroupFixApi.addMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId(), AccessLevel.OWNER.toValue(), null);
         } else if (!groupGlMember.getAccessLevel().toValue().equals(AccessLevel.OWNER.toValue())) {
             // 更新
-            gitlabGroupFixApi.updateMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId(), AccessLevel.OWNER.toValue(), null);
+            removeAndAddGitlabMember(rdmMemberAuditRecord);
         }
     }
 
@@ -107,5 +107,12 @@ public class ProjectAdminPermissionProcessor implements RolePermissionProcessor 
         record.setProjectId(rdmMemberAuditRecord.getProjectId());
         record.setUserId(rdmMemberAuditRecord.getUserId());
         return rdmMemberRepository.selectOne(record);
+    }
+
+    private void removeAndAddGitlabMember(RdmMemberAuditRecord rdmMemberAuditRecord) {
+        gitlabGroupFixApi.removeMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId());
+        //删除完组的权限后，要把项目层的已同步成功的挨个加上
+        addProjectPermission(rdmMemberAuditRecord);
+        gitlabGroupFixApi.addMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId(), AccessLevel.OWNER.toValue(), null);
     }
 }
