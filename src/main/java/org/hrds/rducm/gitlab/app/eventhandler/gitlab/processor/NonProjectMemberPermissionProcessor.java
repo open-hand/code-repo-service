@@ -50,10 +50,9 @@ public class NonProjectMemberPermissionProcessor implements RolePermissionProces
     }
 
     private void handgProjectMemberNotExist(Member groupGlMember, RdmMember rdmMember, RdmMemberAuditRecord rdmMemberAuditRecord) {
-        if (rdmMember.getSyncGitlabFlag() && rdmMember.getGlAccessLevel() < 50) {
+        if (rdmMember.getSyncGitlabFlag()) {
             //在添加权限之前需要判断组的权限有没有
-            RdmMember groupMember = getRdmMember(rdmMemberAuditRecord);
-            if (groupMember != null) {
+            if (groupGlMember != null) {
                 gitlabGroupFixApi.removeMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId());
                 addProjectPermission(rdmMemberAuditRecord);
             } else {
@@ -65,18 +64,15 @@ public class NonProjectMemberPermissionProcessor implements RolePermissionProces
     }
 
     private void handgProjectMemberExist(Member projectGlMember, Member groupGlMember, RdmMember rdmMember, RdmMemberAuditRecord rdmMemberAuditRecord) {
-        if (!Objects.isNull(rdmMember.getGlAccessLevel()) && rdmMember.getGlAccessLevel() < 50 && projectGlMember.getAccessLevel().value.intValue() < 50) {
+        if (!Objects.isNull(rdmMember.getGlAccessLevel())) {
             //有一些项目对应的组的id和他实际在gitlab上的组的id不一致，这里跟新会400
             //在添加权限之前需要判断组的权限有没有
-            RdmMember member = getRdmMember(rdmMemberAuditRecord);
-            if (member != null) {
-                if (groupGlMember != null) {
-                    gitlabGroupFixApi.removeMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId());
-                    addProjectPermission(rdmMemberAuditRecord);
-                    return;
-                }
+            if (groupGlMember != null) {
+                gitlabGroupFixApi.removeMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId());
+                addProjectPermission(rdmMemberAuditRecord);
+                return;
             }
-            gitlabProjectFixApi.updateMember(rdmMemberAuditRecord.getGlProjectId(), rdmMemberAuditRecord.getGlUserId(), rdmMember.getGlAccessLevel(), rdmMember.getGlExpiresAt());
+            gitlabProjectFixApi.updateMember(rdmMember.getGlProjectId(), rdmMember.getGlUserId(), rdmMember.getGlAccessLevel(), rdmMember.getGlExpiresAt());
         } else {
             rdmMember.setGlAccessLevel(projectGlMember.getAccessLevel().value);
             rdmMemberRepository.updateByPrimaryKey(rdmMember);
@@ -85,9 +81,13 @@ public class NonProjectMemberPermissionProcessor implements RolePermissionProces
 
     private void syncToDb(Member projectGlMember, RdmMember rdmMember) {
         if (!rdmMember.getSyncGitlabFlag() || Objects.isNull(rdmMember.getGlAccessLevel())) {
-            rdmMember.setGlAccessLevel(projectGlMember.getAccessLevel().value);
-            rdmMember.setSyncGitlabFlag(Boolean.TRUE);
-            rdmMemberRepository.updateByPrimaryKey(rdmMember);
+            if (rdmMember.getGlAccessLevel().intValue() < 50) {
+                rdmMember.setGlAccessLevel(projectGlMember.getAccessLevel().value);
+                rdmMember.setSyncGitlabFlag(Boolean.TRUE);
+                rdmMemberRepository.updateByPrimaryKey(rdmMember);
+            } else {
+            }
+
         }
     }
 
@@ -111,16 +111,13 @@ public class NonProjectMemberPermissionProcessor implements RolePermissionProces
         List<RdmMember> rdmMembers = rdmMemberRepository.select(projectRdmMember);
         if (!CollectionUtils.isEmpty(rdmMembers)) {
             rdmMembers.forEach(rdmMember1 -> {
+                if (rdmMember1.getGlProjectId() == null) {
+                    return;
+                }
                 gitlabProjectFixApi.addMember(rdmMember1.getGlProjectId(), rdmMember1.getGlUserId(), rdmMember1.getGlAccessLevel(), rdmMember1.getGlExpiresAt());
             });
         }
     }
 
-    private RdmMember getRdmMember(RdmMemberAuditRecord rdmMemberAuditRecord) {
-        RdmMember groupRdmMember = new RdmMember();
-        groupRdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
-        groupRdmMember.setUserId(rdmMemberAuditRecord.getUserId());
-        groupRdmMember.setSyncGitlabFlag(Boolean.TRUE);
-        return rdmMemberRepository.selectOne(groupRdmMember);
-    }
+
 }

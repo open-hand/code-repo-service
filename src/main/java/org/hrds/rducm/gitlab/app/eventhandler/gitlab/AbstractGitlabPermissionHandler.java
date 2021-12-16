@@ -34,9 +34,9 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
         if (!checkStatus(rdmMemberAuditRecord)) {
             return;
         }
-        checkGroup(rdmMemberAuditRecord);
-        //获得组的id
-
+        if (!checkGroup(rdmMemberAuditRecord)) {
+            return;
+        }
         //2.获得当前审计数据用户的角色
         C7nUserVO c7nUserVO = c7nBaseServiceFacade.detailC7nUserOnProjectLevel(rdmMemberAuditRecord.getProjectId(), rdmMemberAuditRecord.getUserId());
         String role = getUserRole(rdmMemberAuditRecord.getProjectId(), c7nUserVO);
@@ -46,19 +46,20 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
         rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
     }
 
-    private void checkGroup(RdmMemberAuditRecord rdmMemberAuditRecord) {
+    private boolean checkGroup(RdmMemberAuditRecord rdmMemberAuditRecord) {
         C7nDevopsProjectVO c7nDevopsProjectVO = c7NDevOpsServiceFacade.detailDevopsProjectById(rdmMemberAuditRecord.getProjectId());
         if (c7nDevopsProjectVO == null) {
             rdmMemberAuditRecordRepository.deleteByPrimaryKey(rdmMemberAuditRecord.getId());
-            return;
+            return false;
         }
         Integer glGroupId = Math.toIntExact(c7nDevopsProjectVO.getGitlabGroupId());
         // gitlab 上组不存在
         if (glGroupId == null) {
             rdmMemberAuditRecordRepository.deleteByPrimaryKey(rdmMemberAuditRecord.getId());
-            return;
+            return false;
         }
         rdmMemberAuditRecord.setgGroupId(glGroupId);
+        return true;
     }
 
     protected abstract void permissionRepair(String role, RdmMemberAuditRecord rdmMemberAuditRecord);
@@ -98,20 +99,8 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
             rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
             return Boolean.FALSE;
         }
-        Integer glUserId = rdmMemberAuditRecord.getGlUserId();
+        Integer glUserId = getGlUserId(rdmMemberAuditRecord, userId);
         if (Objects.isNull(glUserId)) {
-            rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
-            return Boolean.FALSE;
-        }
-
-        Integer glProjectId = rdmMemberAuditRecord.getGlProjectId();
-        // gitlab的项目id 不存在
-        if (glProjectId == null) {
-            rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
-            return Boolean.FALSE;
-        }
-        C7nDevopsProjectVO c7nDevopsProjectVO = c7NDevOpsServiceFacade.detailDevopsProjectById(rdmMemberAuditRecord.getProjectId());
-        if (c7nDevopsProjectVO == null) {
             rdmMemberAuditRecordRepository.updateSyncTrueByPrimaryKeySelective(rdmMemberAuditRecord);
             return Boolean.FALSE;
         }
@@ -127,4 +116,13 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
     protected abstract RdmMember getDbRdmMember(RdmMemberAuditRecord rdmMemberAuditRecord);
 
 
+    private Integer getGlUserId(RdmMemberAuditRecord rdmMemberAuditRecord, Long userId) {
+        if (rdmMemberAuditRecord.getGlUserId() == null) {
+            Integer toGlUserId = c7nBaseServiceFacade.userIdToGlUserId(userId);
+            rdmMemberAuditRecord.setGlUserId(toGlUserId);
+            return toGlUserId;
+        } else {
+            return rdmMemberAuditRecord.getGlUserId();
+        }
+    }
 }

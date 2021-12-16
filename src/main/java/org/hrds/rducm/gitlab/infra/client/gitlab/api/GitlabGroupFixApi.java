@@ -36,6 +36,9 @@ public class GitlabGroupFixApi {
     }
 
     public Member addMember(Object groupIdOrPath, Integer userId, Integer accessLevel, Date expiresAt) {
+        if (groupIdOrPath == null || userId == null) {
+            return null;
+        }
         try {
             return gitlab4jClient.getGitLabApi()
                     .getGroupApi()
@@ -51,6 +54,9 @@ public class GitlabGroupFixApi {
     }
 
     public Member updateMember(Object groupIdOrPath, Integer userId, Integer accessLevel, Date expiresAt) {
+        if (groupIdOrPath == null || userId == null) {
+            return null;
+        }
         try {
             if (expiresAt == null) {
                 return gitlab4jClient.getGitLabApi()
@@ -75,6 +81,9 @@ public class GitlabGroupFixApi {
     }
 
     public void removeMember(Integer glGroupId, Integer glUserId) {
+        if (glGroupId == null || glUserId == glUserId) {
+            return;
+        }
         try {
             gitlab4jClient.getGitLabApi()
                     .getGroupApi()

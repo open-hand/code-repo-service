@@ -62,27 +62,22 @@ public class ProjectMemberPermissionProcessor implements RolePermissionProcessor
 
     private void handgProjectMemberExist(Member projectGlMember, Member groupGlMember, RdmMember dbRdmMember, RdmMemberAuditRecord rdmMemberAuditRecord) {
         if (projectGlMember.getAccessLevel().value != dbRdmMember.getGlAccessLevel()) {
-            RdmMember rdmMember = getRdmMember(rdmMemberAuditRecord);
-            if (rdmMember != null) {
-                if (groupGlMember != null) {
-                    removeGroupMemberAndAddProjectMember(rdmMemberAuditRecord);
-                    return;
-                }
-                gitlabProjectFixApi.updateMember(rdmMember.getGlProjectId(), rdmMember.getGlUserId(), rdmMember.getGlAccessLevel(), rdmMember.getGlExpiresAt());
+            if (groupGlMember != null) {
+                removeGroupMemberAndAddProjectMember(rdmMemberAuditRecord);
+                return;
             }
+            gitlabProjectFixApi.updateMember(dbRdmMember.getGlProjectId(), dbRdmMember.getGlUserId(), dbRdmMember.getGlAccessLevel(), dbRdmMember.getGlExpiresAt());
         }
     }
 
     private void handgProjectMemberNotExist(Member groupGlMember, RdmMember dbRdmMember, RdmMemberAuditRecord rdmMemberAuditRecord) {
         // 查询这个用户 在全局层有没有同步成功的权限，
-        RdmMember rdmMember = getRdmMember(rdmMemberAuditRecord);
-        if (rdmMember != null) {
-            if (groupGlMember != null) {
-                removeGroupMemberAndAddProjectMember(rdmMemberAuditRecord);
-                return;
-            }
-            gitlabProjectFixApi.addMember(rdmMember.getGlProjectId(), rdmMember.getGlUserId(), rdmMember.getGlAccessLevel(), rdmMember.getGlExpiresAt());
+        if (groupGlMember != null) {
+            removeGroupMemberAndAddProjectMember(rdmMemberAuditRecord);
+            return;
         }
+        gitlabProjectFixApi.addMember(dbRdmMember.getGlProjectId(), dbRdmMember.getGlUserId(), dbRdmMember.getGlAccessLevel(), dbRdmMember.getGlExpiresAt());
+
     }
 
     private void removeGroupMemberAndAddProjectMember(RdmMemberAuditRecord rdmMemberAuditRecord) {
@@ -98,6 +93,9 @@ public class ProjectMemberPermissionProcessor implements RolePermissionProcessor
         List<RdmMember> rdmMembers = rdmMemberRepository.select(projectRdmMember);
         if (!CollectionUtils.isEmpty(rdmMembers)) {
             rdmMembers.forEach(rdmMember1 -> {
+                if (rdmMember1.getGlProjectId() == null) {
+                    return;
+                }
                 gitlabProjectFixApi.addMember(rdmMember1.getGlProjectId(), rdmMember1.getGlUserId(), rdmMember1.getGlAccessLevel(), rdmMember1.getGlExpiresAt());
             });
         }

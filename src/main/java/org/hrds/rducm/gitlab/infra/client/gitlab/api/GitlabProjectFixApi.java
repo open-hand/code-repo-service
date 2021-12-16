@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.infra.client.gitlab.api;
 
-import java.io.DataInput;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -99,12 +98,21 @@ public class GitlabProjectFixApi {
     }
 
     public Member addMember(Object projectIdOrPath, Integer userId, Integer accessLevel, Date expiresAt) {
+        if (projectIdOrPath == null || userId == null) {
+            return null;
+        }
         try {
             return gitlab4jClient.getGitLabApi()
                     .getProjectApi()
                     .addMember(projectIdOrPath, userId, accessLevel, expiresAt);
         } catch (GitLabApiException e) {
             if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                return null;
+            } else if (e.getHttpStatus() == HttpStatus.BAD_REQUEST.value()) {
+                LOGGER.info(">>>>>>>>>>>>>>>Bad Request:{},{},{}>>>>>>>>>>>>>>>>>", (Integer) projectIdOrPath, userId, accessLevel);
+                return null;
+            } else if (e.getHttpStatus() == HttpStatus.CONFLICT.value()) {
+                LOGGER.info("Member already exists");
                 return null;
             } else {
                 throw new GitlabClientException(e, e.getMessage());
@@ -114,6 +122,9 @@ public class GitlabProjectFixApi {
     }
 
     public Member updateMember(Object projectIdOrPath, Integer userId, Integer accessLevel, Date expiresAt) {
+        if (projectIdOrPath == null || userId == null) {
+            return null;
+        }
         try {
             if (expiresAt == null) {
                 return gitlab4jClient.getGitLabApi()
@@ -138,6 +149,9 @@ public class GitlabProjectFixApi {
     }
 
     public void removeMember(Integer projectId, Integer userId) {
+        if (projectId == null || userId == null) {
+            return;
+        }
         try {
             gitlab4jClient.getGitLabApi()
                     .getProjectApi()
@@ -162,6 +176,9 @@ public class GitlabProjectFixApi {
      * @return Project
      */
     public Project getProject(Integer projectId) {
+        if (projectId == null) {
+            return null;
+        }
         try {
             return gitlab4jClient.getGitLabApi()
                     .getProjectApi()

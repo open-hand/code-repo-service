@@ -574,7 +574,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         record.setRepositoryId(rdmMemberAuditRecord.getRepositoryId());
         record.setProjectId(rdmMemberAuditRecord.getProjectId());
         if (CollectionUtils.isEmpty(rdmMemberRepository.select(record))) {
-            rdmMemberRepository.insert(record);
+            rdmMemberRepository.insert(rdmMember);
         }
     }
 
