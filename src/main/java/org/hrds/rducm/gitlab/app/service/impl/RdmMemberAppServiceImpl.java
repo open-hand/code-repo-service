@@ -579,7 +579,6 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         checkIamProject(c7nDevopsProjectVO);
         //校验是否已经存在
         checkGroupPermissionExist(projectId, rdmMemberBatchDTO.getMembers());
-
         //检验这个gitlab group id 能不能查到group, 因为有些人手动删了group，自己又新建了group
         Group group = gitlabGroupApi.getGroup(Integer.valueOf(String.valueOf(c7nDevopsProjectVO.getGitlabGroupId())));
         checkProjectGroup(c7nDevopsProjectVO, group);
@@ -638,10 +637,6 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         List<RdmMember> rdmMembers = new ArrayList<>();
         //将用户id转换为Gitlab用户Id
         rdmMemberBatchDTO.getMembers().forEach(gitlabMemberCreateDTO -> {
-            if (rdmMemberBatchDTO.getBaseRole()) {
-                gitlabMemberCreateDTO.setGlAccessLevel(rdmMemberBatchDTO.getGlAccessLevel());
-                gitlabMemberCreateDTO.setGlExpiresAt(rdmMemberBatchDTO.getGlExpiresAt());
-            }
             Integer glUserId = c7NBaseServiceFacade.userIdToGlUserId(gitlabMemberCreateDTO.getUserId());
             if (Objects.isNull(glUserId)) {
                 return;

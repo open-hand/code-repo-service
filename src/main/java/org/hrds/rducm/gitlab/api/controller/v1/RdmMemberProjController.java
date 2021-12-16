@@ -100,11 +100,7 @@ public class RdmMemberProjController extends BaseController {
     public ResponseEntity<?> batchAddMembers(@PathVariable Long organizationId,
                                              @PathVariable Long projectId,
                                              @RequestBody RdmMemberBatchDTO rdmMemberBatchDTO) {
-        if (rdmMemberBatchDTO.getBaseRole()) {
-            AssertUtils.notNull(rdmMemberBatchDTO.getGlAccessLevel(), "error.glAccessLevel.not.null");
-        } else {
-            validObject(rdmMemberBatchDTO);
-        }
+        validObject(rdmMemberBatchDTO);
         rdmMemberAppService.batchAddOrUpdateMembers(organizationId, projectId, rdmMemberBatchDTO);
         return Results.created(null);
     }
@@ -117,7 +113,7 @@ public class RdmMemberProjController extends BaseController {
                                                      @PathVariable Long projectId,
                                                      @RequestBody RdmMemberBatchDTO rdmMemberBatchDTO) {
 
-        AssertUtils.notNull(rdmMemberBatchDTO.getGlAccessLevel(), "error.glAccessLevel.not.null");
+        validObject(rdmMemberBatchDTO);
         rdmMemberAppService.batchAddGroupMembers(organizationId, projectId, rdmMemberBatchDTO);
         return Results.created(null);
     }
