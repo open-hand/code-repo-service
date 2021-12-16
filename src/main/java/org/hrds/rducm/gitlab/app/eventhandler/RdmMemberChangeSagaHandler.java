@@ -496,7 +496,13 @@ public class RdmMemberChangeSagaHandler {
         // <> 删除该成员权限
         // 删除该成员权限   只删除根据角色变化的成员权限（Owner）
         rdmMemberRepository.deleteByProjectIdAndUserIdAndAccessLevel(organizationId, projectId, userId, AccessLevel.OWNER.value);
-
+        //删除全局层面的角色
+        RdmMember param = new RdmMember();
+        param.setOrganizationId(organizationId);
+        param.setProjectId(projectId);
+        param.setUserId(userId);
+        param.setType(AuthorityTypeEnum.GROUP.getValue());
+        rdmMemberRepository.delete(param);
         // <> 插入该成员Owner权限
         insertProjectOwner(organizationId, projectId, userId);
     }
