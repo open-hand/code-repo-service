@@ -52,6 +52,11 @@ export default observer(() => {
 
   const handleAddPath = () => {
     currentPathListDs.create();
+    if (currentPathListDs === UserPathListDS) {
+      currentPathListDs.forEach((item) => {
+        item.getField('userId').set('required', true);
+      });
+    }
   };
 
   function handleRemovePath(removeRecord) {
