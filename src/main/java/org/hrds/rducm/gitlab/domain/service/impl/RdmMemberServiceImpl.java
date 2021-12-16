@@ -433,8 +433,10 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     @Transactional(rollbackFor = Exception.class)
     public void syncMemberFromGitlab(RdmMember param) {
         // <1> 获取Gitlab成员, 并更新数据库
-        Integer glUserId = Objects.requireNonNull(param.getGlUserId());
-        Member glMember = gitlabProjectApi.getMember(Objects.requireNonNull(param.getGlProjectId()), glUserId);
+        if (param.getGlProjectId() == null && param.getGlUserId() == null) {
+            rdmMemberRepository.deleteByPrimaryKey(param.getId());
+        }
+        Member glMember = gitlabProjectApi.getMember(param.getGlProjectId(), param.getGlUserId());
         // 理论上只会查询到一个成员
         if (glMember == null) {
             // 移除数据库成员
@@ -624,8 +626,10 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     @Override
     public void syncGroupMemberFromGitlab(RdmMember dbMember) {
         // <1> 获取Gitlab成员, 并更新数据库
-        Integer glUserId = Objects.requireNonNull(dbMember.getGlUserId());
-        Member glMember = gitlabGroupApi.getMember(Objects.requireNonNull(dbMember.getgGroupId()), glUserId);
+        if (dbMember.getGlUserId() == null && dbMember.getgGroupId() == null) {
+            rdmMemberRepository.deleteByPrimaryKey(dbMember.getId());
+        }
+        Member glMember = gitlabGroupApi.getMember(dbMember.getgGroupId(), dbMember.getGlUserId());
         // 理论上只会查询到一个成员
         if (glMember == null) {
             // 移除数据库成员
