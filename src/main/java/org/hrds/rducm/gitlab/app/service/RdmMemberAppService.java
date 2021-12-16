@@ -155,7 +155,7 @@ public interface RdmMemberAppService {
 
     void allSync(Long organizationId, Long projectId);
 
-    void batchAddGroupMembers(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO);
+    void batchAddGroupMembers(Long organizationId, Long projectId, List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOS);
 
     void updateGroupMember(Long organizationId, Long projectId, RdmMemberBatchDTO.GitlabMemberCreateDTO gitlabMemberCreateDTO, Long rducmGitlabMemberId);
 
