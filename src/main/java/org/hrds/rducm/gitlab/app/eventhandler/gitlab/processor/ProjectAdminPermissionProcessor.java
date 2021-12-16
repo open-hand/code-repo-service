@@ -67,21 +67,19 @@ public class ProjectAdminPermissionProcessor implements RolePermissionProcessor 
     }
 
     private void updateGitlabGroupMemberWithOwner(Member groupGlMember, RdmMemberAuditRecord rdmMemberAuditRecord) {
-        RdmMember rdmMember = queryRdmMember(rdmMemberAuditRecord);
         if (groupGlMember == null) {
             // 添加
-            removeAndAddGitlabMember(rdmMemberAuditRecord, rdmMember);
+            addGitlabMember(rdmMemberAuditRecord);
+            gitlabGroupFixApi.addMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId(), AccessLevel.OWNER.toValue(), null);
         } else if (!groupGlMember.getAccessLevel().toValue().equals(AccessLevel.OWNER.toValue())) {
             // 更新
             gitlabGroupFixApi.updateMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId(), AccessLevel.OWNER.toValue(), null);
         }
     }
 
-    private void removeAndAddGitlabMember(RdmMemberAuditRecord rdmMemberAuditRecord, RdmMember rdmMember) {
-        gitlabGroupFixApi.removeMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId());
+    private void addGitlabMember(RdmMemberAuditRecord rdmMemberAuditRecord) {
         //删除完组的权限后，要把项目层的已同步成功的挨个加上
         addProjectPermission(rdmMemberAuditRecord);
-        gitlabGroupFixApi.addMember(rdmMemberAuditRecord.getgGroupId(), rdmMemberAuditRecord.getGlUserId(), AccessLevel.OWNER.toValue(), null);
     }
 
     private void addProjectPermission(RdmMemberAuditRecord rdmMemberAuditRecord) {
@@ -101,17 +99,6 @@ public class ProjectAdminPermissionProcessor implements RolePermissionProcessor 
         projectRdmMember.setSyncGitlabFlag(Boolean.TRUE);
         return rdmMemberRepository.select(projectRdmMember);
     }
-
-    private RdmMember queryRdmMember(RdmMemberAuditRecord rdmMemberAuditRecord) {
-        RdmMember groupRdmMember = new RdmMember();
-        groupRdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
-        groupRdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
-        groupRdmMember.setUserId(rdmMemberAuditRecord.getUserId());
-        groupRdmMember.setgGroupId(rdmMemberAuditRecord.getgGroupId());
-        groupRdmMember.setSyncGitlabFlag(Boolean.TRUE);
-        return rdmMemberRepository.selectOne(groupRdmMember);
-    }
-
 
     private RdmMember getDbRdmMember(RdmMemberAuditRecord rdmMemberAuditRecord) {
         RdmMember record = new RdmMember();
