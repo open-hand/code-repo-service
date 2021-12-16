@@ -12,6 +12,7 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nTenantVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.util.FeignUtils;
 import org.hrds.rducm.gitlab.infra.util.TypeUtil;
+import org.hzero.core.base.BaseConstants;
 import org.hzero.core.util.AssertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -342,5 +343,15 @@ public class C7NBaseServiceFacadeImpl implements C7nBaseServiceFacade {
         return FeignUtils.handleResponseEntity(responseEntity);
     }
 
+    @Override
+    public List<C7nTenantVO> queryActiveOrganizations() {
+        List<C7nTenantVO> c7nTenantVOS = listAllOrgs();
+        if (CollectionUtils.isEmpty(c7nTenantVOS)) {
+            return Collections.EMPTY_LIST;
+        } else {
+            return c7nTenantVOS.stream().filter(c7nTenantVO -> (c7nTenantVO.getEnabledFlag() == BaseConstants.Flag.YES
+                    && c7nTenantVO.getTenantId() != BaseConstants.DEFAULT_TENANT_ID)).collect(Collectors.toList());
 
+        }
+    }
 }
