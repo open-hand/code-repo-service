@@ -805,7 +805,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         rdmMember.setUserId(rdmMemberAuditRecord.getUserId());
         rdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
         rdmMember.setGlAccessLevel(AccessLevel.OWNER.toValue());
-        if (CollectionUtils.isEmpty(rdmMemberRepository.select(record))) {
+        if (CollectionUtils.isEmpty(rdmMemberRepository.select(rdmMember))) {
             rdmMemberRepository.insert(record);
         }
 
