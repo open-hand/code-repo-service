@@ -174,7 +174,6 @@ export default ({
         const addingMode = dataSet.current.get('addingMode');
 
         let members;
-        let permissionMembers;
 
         if (addingMode === 'simple') {
           members = (postData.members || []).map(i => ({
@@ -184,14 +183,16 @@ export default ({
           }));
         }
         if (addingMode === 'permission') {
-          permissionMembers = (postData.permissionMembers || []).map(i => ({
+          members = (postData.permissionMembers || []).map(i => ({
             userId: i.userId,
+            glAccessLevel: Number(dataSet?.current?.get('glAccessLevel')?.substring(1)),
+            glExpiresAt: dataSet?.current?.get('glExpiresAt'),
           }));
         }
 
         const url = `/rducm/v1/organizations/${organizationId}/projects/${projectId}/gitlab/repositories/members/batch-add`;
 
-        if (permissionValue === 'applicationService' && addingMode === 'simple') { // 应用服务普通添加
+        if (permissionValue === 'applicationService') { // 应用服务添加
           return {
             url,
             method: 'post',
@@ -202,38 +203,12 @@ export default ({
             },
           };
         }
-        if (permissionValue === 'applicationService' && addingMode === 'permission') { // 应用服务基于权限添加
-          return {
-            url,
-            method: 'post',
-            data: {
-              allMemberFlag: false,
-              repositoryIds,
-              members: permissionMembers,
-              baseRole: true,
-              glAccessLevel: Number(dataSet?.current?.get('glAccessLevel')?.substring(1)),
-              glExpiresAt: dataSet?.current?.get('glExpiresAt'),
-            },
-          };
-        }
 
-        if (permissionValue === 'allProject' && addingMode === 'simple') {
-          return {// 项目全局
+        if (permissionValue === 'allProject') {
+          return {// 项目全局普通添加
             url: `${url}/group`,
             method: 'post',
             data: members,
-          };
-        }
-        if (permissionValue === 'allProject' && addingMode === 'permission') {
-          return {// 项目全局
-            url: `${url}/group`,
-            method: 'post',
-            data: {
-              baseRole: true,
-              glAccessLevel: Number(dataSet?.current?.get('glAccessLevel')?.substring(1)),
-              glExpiresAt: dataSet?.current?.get('glExpiresAt'),
-              members: permissionMembers,
-            },
           };
         }
         return true;
