@@ -12,7 +12,7 @@
 
     <groupId>org.hrds.rducm</groupId>
     <artifactId>code-repo-service</artifactId>
-    <version>1.0.14-SNAPSHOT</version>
+    <version>1.0.14.RELEASE</version>
     <name>code-repo-service</name>
 
     <dependencies>
