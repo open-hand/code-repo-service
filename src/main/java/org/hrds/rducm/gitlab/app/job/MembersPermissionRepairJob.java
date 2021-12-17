@@ -2,13 +2,7 @@ package org.hrds.rducm.gitlab.app.job;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-
-import io.choerodon.asgard.schedule.annotation.JobParam;
 import io.choerodon.asgard.schedule.annotation.JobTask;
-import io.choerodon.asgard.schedule.annotation.TaskParam;
-import io.choerodon.asgard.schedule.annotation.TimedTask;
-import io.choerodon.asgard.schedule.enums.TriggerTypeEnum;
 
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
 import org.hrds.rducm.gitlab.domain.service.IMemberPermissionRepairService;

@@ -37,7 +37,8 @@ public class ProjectMemberPermissionProcessor implements RolePermissionProcessor
     @Override
     public void repairProjectPermissionByRole(Member projectGlMember, Member groupGlMember, RdmMember dbRdmMember, RdmMemberAuditRecord rdmMemberAuditRecord) {
         if (dbRdmMember == null || !dbRdmMember.getSyncGitlabFlag()) {
-            if (handDbMemberIsNull(projectGlMember, groupGlMember, rdmMemberAuditRecord)) return;
+            handDbMemberIsNull(projectGlMember, groupGlMember, rdmMemberAuditRecord);
+            return;
         }
         if (projectGlMember != null) {
             //对照项目层的权限，更新为数据库权限

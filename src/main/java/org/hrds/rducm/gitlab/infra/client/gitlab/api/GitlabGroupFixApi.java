@@ -81,7 +81,7 @@ public class GitlabGroupFixApi {
     }
 
     public void removeMember(Integer glGroupId, Integer glUserId) {
-        if (glGroupId == null || glUserId == glUserId) {
+        if (glGroupId == null || glUserId == null) {
             return;
         }
         try {
