@@ -261,6 +261,12 @@ export default observer(() => {
     </Tooltip>
   );
 
+  const pathListDsUserChange = (pathRecord) => {
+    if (formDs?.current?.get('addingMode') === 'simple') {
+      pathRecord.init('glAccessLevel', '');
+    }
+  };
+
   return (
     <div style={{ width: '5.12rem' }}>
       <Form dataSet={formDs} columns={1}>
@@ -314,6 +320,7 @@ export default observer(() => {
               colSpan={4}
               optionsFilter={record => userFilter(record, pathRecord)}
               searchMatcher={userSearchMatcher}
+              onChange={() => { pathListDsUserChange(pathRecord); }}
               onInput={(e) => {
                 handleUserSearch(e);
               }}
