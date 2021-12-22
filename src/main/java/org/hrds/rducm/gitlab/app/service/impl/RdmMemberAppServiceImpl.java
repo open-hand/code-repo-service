@@ -748,7 +748,16 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         record.setGlUserId(rdmMemberAuditRecord.getGlUserId());
         record.setType(AuthorityTypeEnum.GROUP.getValue());
         record.setgGroupId(rdmMemberAuditRecord.getgGroupId());
-        rdmMemberRepository.insert(record);
+
+        RdmMember rdmMember = new RdmMember();
+        rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+        rdmMember.setUserId(rdmMemberAuditRecord.getUserId());
+        rdmMember.setProjectId(rdmMemberAuditRecord.getProjectId());
+        rdmMember.setGlAccessLevel(AccessLevel.OWNER.toValue());
+        if (CollectionUtils.isEmpty(rdmMemberRepository.select(rdmMember))) {
+            rdmMemberRepository.insert(record);
+        }
+
     }
 
 
