@@ -317,7 +317,6 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
         m.setSyncGitlabFlag(true);
         m.setSyncGitlabDate(new Date());
         m.setSyncGitlabErrorMsg(null);
-        m.setObjectVersionNumber(null);
         rdmMemberRepository.updateOptional(m, fields);
     }
 
