@@ -208,12 +208,12 @@ function BaseInfo() {
           <HeaderButtons
             showClassName={false}
             items={([{
-              name: formatClient({ id: 'resetPsw' }),
+              name: formatClient({ id: 'editPsw' }),
               icon: 'mode_edit',
               display: true,
               handler: handleUpdateStore.bind(this),
             }, {
-              name: formatClient({ id: 'editPsw' }),
+              name: formatClient({ id: 'resetPsw' }),
               icon: 'swap_horiz',
               display: true,
               handler: openResetGitlab,
