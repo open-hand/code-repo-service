@@ -1,6 +1,5 @@
 package org.hrds.rducm.gitlab.infra.feign.fallback;
 
-import feign.hystrix.FallbackFactory;
 import io.choerodon.core.domain.Page;
 import io.choerodon.core.exception.CommonException;
 import org.hrds.rducm.gitlab.infra.feign.DevOpsServiceFeignClient;
@@ -9,6 +8,7 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nGlUserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 

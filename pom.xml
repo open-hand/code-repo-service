@@ -7,12 +7,12 @@
     <parent>
         <groupId>io.choerodon</groupId>
         <artifactId>choerodon-framework-parent</artifactId>
-        <version>1.1.0.RELEASE</version>
+        <version>1.2.0-SNAPSHOT</version>
     </parent>
 
     <groupId>org.hrds.rducm</groupId>
     <artifactId>code-repo-service</artifactId>
-    <version>1.2.0-alpha.4.RELEASE</version>
+    <version>1.2.0-SNAPSHOT</version>
     <name>code-repo-service</name>
 
     <dependencies>
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-gitlab4j-api</artifactId>
-            <version>0.17.1.RELEASE</version>
+            <version>1.2.0-SNAPSHOT</version>
         </dependency>
         <!-- end -->
 
@@ -141,11 +141,6 @@
         <dependency>
             <groupId>io.choerodon</groupId>
             <artifactId>choerodon-starter-asgard</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
         </dependency>
         <!-- end -->
     </dependencies>

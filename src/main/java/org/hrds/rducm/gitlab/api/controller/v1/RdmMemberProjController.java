@@ -20,6 +20,7 @@ import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.constant.ApiInfoConstants;
 import org.hzero.core.base.BaseController;
+import org.hzero.core.util.AssertUtils;
 import org.hzero.core.util.Results;
 import org.hzero.export.vo.ExportParam;
 import org.hzero.starter.keyencrypt.core.Encrypt;
@@ -105,19 +106,6 @@ public class RdmMemberProjController extends BaseController {
     }
 
 
-    // TODO: 2021/12/8 wx
-//    @ApiOperation(value = "项目下批量分配应用服务组的权限")
-//    @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.PROJECT_OWNER})
-//    @PostMapping("/batch-add/group")
-//    public ResponseEntity<Void> batchAddGroupMembers(@PathVariable Long organizationId,
-//                                                     @PathVariable Long projectId,
-//                                                     @RequestBody RdmMemberBatchDTO rdmMemberBatchDTO) {
-//        validObject(rdmMemberBatchDTO);
-//        rdmMemberAppService.batchAddGroupMembers(organizationId, projectId, rdmMemberBatchDTO);
-//        return Results.created(null);
-//    }
-
-
     @ApiOperation(value = "项目下批量分配应用服务组的权限")
     @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.PROJECT_OWNER})
     @PostMapping("/batch-add/group")
@@ -157,8 +145,8 @@ public class RdmMemberProjController extends BaseController {
     @Permission(level = ResourceLevel.ORGANIZATION, roles = {InitRoleCode.PROJECT_OWNER})
     @GetMapping("/group/{user_id}")
     public ResponseEntity<RdmMember> getGroupMember(@PathVariable Long organizationId,
-                                               @PathVariable Long projectId,
-                                               @Encrypt @PathVariable(value = "user_id") Long userId) {
+                                                    @PathVariable Long projectId,
+                                                    @Encrypt @PathVariable(value = "user_id") Long userId) {
 
 
         return Results.success(rdmMemberAppService.getGroupMember(organizationId, projectId, userId));

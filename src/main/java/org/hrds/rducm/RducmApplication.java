@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class RducmApplication {
 
     public static void main(String[] args) {
+        
         SpringApplication.run(RducmApplication.class, args);
     }
 }
