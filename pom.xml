@@ -39,6 +39,8 @@
         <dependency>
             <groupId>org.hzero.starter</groupId>
             <artifactId>hzero-starter-mybatis-mapper</artifactId>
+            <!--临时解决  将来删除-->
+            <version>1.8.2.BETA</version>
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>org.hzero.starter</groupId>-->
