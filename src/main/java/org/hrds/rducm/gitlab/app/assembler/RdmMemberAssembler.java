@@ -78,11 +78,10 @@ public class RdmMemberAssembler {
         List<RdmMember> rdmMembers = new ArrayList<>();
         for (Long repositoryId : rdmMemberBatchDTO.getRepositoryIds()) {
             for (RdmMemberBatchDTO.GitlabMemberCreateDTO member : rdmMemberBatchDTO.getMembers()) {
-                // TODO: 2021/12/8 wx
-//                if (rdmMemberBatchDTO.getBaseRole()) {
-//                    member.setGlAccessLevel(rdmMemberBatchDTO.getGlAccessLevel());
-//                    member.setGlExpiresAt(rdmMemberBatchDTO.getGlExpiresAt());
-//                }
+                if (rdmMemberBatchDTO.getBaseRole()) {
+                    member.setGlAccessLevel(rdmMemberBatchDTO.getGlAccessLevel());
+                    member.setGlExpiresAt(rdmMemberBatchDTO.getGlExpiresAt());
+                }
                 RdmMember rdmMember = ConvertUtils.convertObject(member, RdmMember.class);
                 rdmMember.setOrganizationId(organizationId);
                 rdmMember.setProjectId(projectId);

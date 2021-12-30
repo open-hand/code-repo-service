@@ -20,7 +20,7 @@ public class RdmMemberBatchDTO {
     private List<Long> repositoryIds;
 
     @ApiModelProperty("基于何种角色添加")
-    private Boolean baseRole;
+    private Boolean baseRole = false;
 
     @ApiModelProperty(value = ApiInfoConstants.GL_ACCESS_LEVEL, required = true)
     private Integer glAccessLevel;

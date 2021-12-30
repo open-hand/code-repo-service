@@ -258,6 +258,8 @@ public class RdmMemberChangeSagaHandler {
                 Member groupApiMember = gitlabGroupApi.getMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId());
                 if (!Objects.isNull(groupApiMember)) {
                     gitlabGroupApi.removeMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId());
+                    //加上项目层的权限
+                    addProjectPermission(rdmMember);
                 }
                 Member member = gitlabGroupApi.addMember(groupMemberPayload.getgGroupId(), gitlabMemberCreateDTO.getgUserId(), gitlabMemberCreateDTO.getGlAccessLevel(), gitlabMemberCreateDTO.getGlExpiresAt());
                 //回写数据库
@@ -265,11 +267,25 @@ public class RdmMemberChangeSagaHandler {
             } catch (Exception e) {
                 // 回写数据库错误消息
                 logger.error(e.getMessage(), e);
-                record.setSyncGitlabErrorMsg(e.getMessage());
-                rdmMemberRepository.updateOptional(record, RdmMember.FIELD_SYNC_GITLAB_ERROR_MSG);
+                rdmMember.setSyncGitlabErrorMsg(e.getMessage());
+                rdmMemberRepository.updateOptional(rdmMember, RdmMember.FIELD_SYNC_GITLAB_ERROR_MSG);
             }
 
         });
+    }
+
+    private void addProjectPermission(RdmMember rdmMember) {
+        RdmMember member = new RdmMember();
+        member.setUserId(rdmMember.getUserId());
+        member.setProjectId(rdmMember.getProjectId());
+        member.setType(AuthorityTypeEnum.PROJECT.getValue());
+        member.setSyncGitlabFlag(Boolean.TRUE);
+        List<RdmMember> rdmMembers = rdmMemberMapper.select(member);
+        if (!CollectionUtils.isEmpty(rdmMembers)) {
+            rdmMembers.forEach(rdmMember1 -> {
+                gitlabProjectApi.addMember(rdmMember1.getGlProjectId(), rdmMember1.getGlProjectId(), rdmMember1.getGlAccessLevel(), rdmMember1.getGlExpiresAt());
+            });
+        }
     }
 
 
