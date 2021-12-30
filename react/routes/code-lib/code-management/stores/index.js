@@ -54,7 +54,7 @@ export const StoreProvider = injectIntl(inject('AppState')((props) => {
         localOwnerPermission: hasPermission1,
       }));
     }
-  }, [type, getUserId, projectId]);
+  }, [type, projectId, getUserInfo]);
 
   useEffect(() => {
     init();
