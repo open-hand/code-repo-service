@@ -38,4 +38,6 @@ public interface RdmMemberMapper extends BaseMapper<RdmMember> {
     List<RdmMember> groupMemberByUserId(@Param("projectId") Long projectId, @Param("userIds") List<Long> userIds);
 
     List<RdmMember> selectProjectMemberByUserIds(@Param("projectId") Long projectId, @Param("userIds") Set<Long> userIds, @Param("type") String type);
+
+    void deleteByIds(@Param("ids") List<Long> ids);
 }
