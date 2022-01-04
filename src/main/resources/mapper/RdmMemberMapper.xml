@@ -92,7 +92,7 @@
         AND
           rgm.type = #{type,jdbcType=VARCHAR}
         AND rgm.sync_gitlab_flag=1
-        AND rgm.project_id=#{projectId,jdbcType=BIGINT}
+
 
         <if test="userIds!=null and userIds.size > 0">
             and rgm.user_id in
@@ -101,4 +101,15 @@
             </foreach>
         </if>
     </select>
+
+    <delete id="deleteByIds">
+        <if test="ids != null and ids.size() != 0">
+            DELETE FROM rducm_gitlab_member
+            where id IN
+            <foreach collection="ids" item="id" index="index"
+                     open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+    </delete>
 </mapper>
