@@ -206,7 +206,7 @@ public class RdmMemberAssembler {
                 viewDTO.setRepositoryName(PROJECT_OVERALL);
             }
             if (org.apache.commons.lang3.StringUtils.equalsIgnoreCase(viewDTO.getType(), AuthorityTypeEnum.PROJECT.getValue())) {
-                viewDTO.setGroupAccessLevel(longIntegerMap.get(viewDTO.getId()));
+                viewDTO.setGroupAccessLevel(longIntegerMap.get(viewDTO.getUserId()));
             }
         }
 
