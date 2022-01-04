@@ -92,6 +92,7 @@
         AND
           rgm.type = #{type,jdbcType=VARCHAR}
         AND rgm.sync_gitlab_flag=1
+        AND rgm.project_id=#{projectId,jdbcType=BIGINT}
 
         <if test="userIds!=null and userIds.size > 0">
             and rgm.user_id in
