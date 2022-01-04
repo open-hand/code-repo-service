@@ -46,6 +46,8 @@ public class RdmMemberAssembler {
     private C7nDevOpsServiceFacade c7NDevOpsServiceFacade;
     @Autowired
     private C7nBaseServiceFacade c7NBaseServiceFacade;
+    @Autowired
+    private RdmMemberMapper rdmMemberMapper;
 
     /**
      * 将GitlabMemberBatchDTO转换为List<RdmMember>
@@ -169,15 +171,13 @@ public class RdmMemberAssembler {
             c7nProjectVOMap = c7NBaseServiceFacade.listProjectsByIdsToMap(projectIds);
         }
         //查询项目下的全局权限
-//        Map<Long, Integer> longIntegerMap = new HashMap<>();
-//        if (!Objects.isNull(projectId)) {
-//            List<RdmMember> rdmMembers = rdmMemberMapper.selectProjectMemberByUserIds(projectId, userIds, AuthorityTypeEnum.GROUP.getValue());
-//            List<RdmMember> rdmMembers = rdmMemberRepository(condition);
-//            if (!CollectionUtils.isEmpty(rdmMembers)) {
-//                //
-//                longIntegerMap = rdmMembers.stream().collect(Collectors.toMap(RdmMember::getUserId, RdmMember::getGlAccessLevel));
-//            }
-//        }
+        Map<Long, Integer> longIntegerMap = new HashMap<>();
+        if (!Objects.isNull(projectId)) {
+            List<RdmMember> rdmMembers = rdmMemberMapper.selectProjectMemberByUserIds(projectId, userIds, AuthorityTypeEnum.GROUP.getValue());
+            if (!CollectionUtils.isEmpty(rdmMembers)) {
+                longIntegerMap = rdmMembers.stream().collect(Collectors.toMap(RdmMember::getUserId, RdmMember::getGlAccessLevel));
+            }
+        }
 
         // 填充数据
         for (RdmMemberViewDTO viewDTO : rdmMemberViewDTOS.getContent()) {
@@ -206,7 +206,7 @@ public class RdmMemberAssembler {
                 viewDTO.setRepositoryName(PROJECT_OVERALL);
             }
             if (org.apache.commons.lang3.StringUtils.equalsIgnoreCase(viewDTO.getType(), AuthorityTypeEnum.PROJECT.getValue())) {
-                viewDTO.setGroupAccessLevel(viewDTO.getGroupAccessLevel());
+                viewDTO.setGroupAccessLevel(longIntegerMap.get(viewDTO.getId()));
             }
         }
 
