@@ -351,6 +351,9 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         // 获取数据库成员
         RdmMember dbMember = rdmMemberRepository.selectByPrimaryKey(memberId);
 
+        //校验group层权限
+        checkGroupAccessLevel(param, dbMember);
+
         param.setGlProjectId(dbMember.getGlProjectId());
         param.setGlUserId(dbMember.getGlUserId());
         param.setUserId(dbMember.getUserId());
@@ -375,6 +378,20 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         // <4> 发送事件
         iRdmMemberService.publishMemberEvent(param, MemberEvent.EventType.UPDATE_MEMBER);
+    }
+
+    private void checkGroupAccessLevel(RdmMember param, RdmMember dbMember) {
+        RdmMember groupMember = new RdmMember();
+        groupMember.setUserId(dbMember.getUserId());
+        groupMember.setProjectId(dbMember.getProjectId());
+        groupMember.setType(AuthorityTypeEnum.GROUP.getValue());
+        groupMember.setSyncGitlabFlag(Boolean.TRUE);
+        RdmMember rdmMember = rdmMemberRepository.selectOne(groupMember);
+        if (rdmMember != null) {
+            if (rdmMember.getGlAccessLevel() >= param.getGlAccessLevel()) {
+                throw new CommonException("error.should.be.higher.than.owner.inherited.membership.from.group");
+            }
+        }
     }
 
     @Override
@@ -661,8 +678,6 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         //批量插入数据库
         rdmMemberRepository.batchInsert(rdmMembers);
     }
-
-
 
 
     @Override
