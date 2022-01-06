@@ -269,9 +269,9 @@ export default observer(() => {
 
   return (
     <div style={{ width: '5.12rem' }}>
-      <Form dataSet={formDs} columns={1}>
-        <SelectBox name="permissionsLevel" />
-        <SelectBox name="addingMode" />
+      <Form dataSet={formDs} columns={2}>
+        <SelectBox colSpan={2} name="permissionsLevel" />
+        <SelectBox colSpan={2} name="addingMode" />
 
         {formDs?.current?.get('permissionsLevel') === 'applicationService' && (
           <Select
@@ -292,10 +292,11 @@ export default observer(() => {
         )}
 
         {formDs?.current?.get('addingMode') === 'permission' && (
-          <Select name="glAccessLevel" optionsFilter={levelOptionsFilter} />
+          <Select colSpan={1} name="glAccessLevel" optionsFilter={levelOptionsFilter} />
         )}
         {formDs?.current?.get('addingMode') === 'permission' && (
           <DatePicker
+            colSpan={1}
             popupCls="code-lib-management-add-member-dayPicker"
             name="glExpiresAt"
             min={moment()
