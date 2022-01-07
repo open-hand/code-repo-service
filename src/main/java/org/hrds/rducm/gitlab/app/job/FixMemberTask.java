@@ -123,6 +123,9 @@ public class FixMemberTask {
                     if (!CollectionUtils.isEmpty(c7nUserVOS)) {
                         //查询项目组的
                         Long appGroupIdByProjectId = c7nDevOpsServiceFacade.getAppGroupIdByProjectId(projectId);
+                        if (appGroupIdByProjectId == null) {
+                            return;
+                        }
                         c7nUserVOS.forEach(c7nUserVO -> {
                             RdmMember record = new RdmMember();
                             record.setType(AuthorityTypeEnum.GROUP.getValue());
