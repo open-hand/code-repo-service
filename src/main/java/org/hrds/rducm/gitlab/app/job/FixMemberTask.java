@@ -104,8 +104,6 @@ public class FixMemberTask {
 
 
     @JobTask(maxRetryCount = 3, code = "fixMemberPermissionData", description = "用户权限数据修复")
-    @TimedTask(name = "fixMemberPermissionData", description = "用户权限数据修复", oneExecution = true,
-            repeatCount = 0, repeatInterval = 1, repeatIntervalUnit = QuartzDefinition.SimpleRepeatIntervalUnit.HOURS, params = {})
     public void fixMemberPermissionData(Map<String, Object> map) {
         //1.原来所有的owner的权限统统改为group
         List<C7nTenantVO> c7nTenantVOS = c7nBaseServiceFacade.listAllOrgs();
