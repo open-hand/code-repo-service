@@ -104,8 +104,6 @@ public class FixMemberTask {
 
 
     @JobTask(maxRetryCount = 3, code = "fixMemberPermissionData", description = "用户权限数据修复")
-    @TimedTask(name = "fixMemberPermissionData", description = "用户权限数据修复", oneExecution = true,
-            repeatCount = 0, repeatInterval = 1, repeatIntervalUnit = QuartzDefinition.SimpleRepeatIntervalUnit.HOURS, params = {})
     public void fixMemberPermissionData(Map<String, Object> map) {
         //1.原来所有的owner的权限统统改为group
         List<C7nTenantVO> c7nTenantVOS = c7nBaseServiceFacade.listAllOrgs();
@@ -123,6 +121,9 @@ public class FixMemberTask {
                     if (!CollectionUtils.isEmpty(c7nUserVOS)) {
                         //查询项目组的
                         Long appGroupIdByProjectId = c7nDevOpsServiceFacade.getAppGroupIdByProjectId(projectId);
+                        if (appGroupIdByProjectId == null) {
+                            return;
+                        }
                         c7nUserVOS.forEach(c7nUserVO -> {
                             RdmMember record = new RdmMember();
                             record.setType(AuthorityTypeEnum.GROUP.getValue());
