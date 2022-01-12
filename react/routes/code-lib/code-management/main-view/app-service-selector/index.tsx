@@ -22,19 +22,19 @@ const AppSelector = (props: any) => {
 
   const format = useFormatMessage('c7ncd.codeLibManagement');
 
-  function handleSelect(value: string) {
-    setBranchApp(value);
+  function handleSelect(value: any) {
+    setBranchApp(value.repositoryId);
   }
 
   function renderOpts() {
     const res = map(
       branchServiceDs.toData(),
-      ({ repositoryId, repositoryName, repositoryCode,externalConfigId}) => (
-        <Option value={repositoryId} key={repositoryId}  disabled={Boolean(externalConfigId)}>
+      ({ repositoryId, repositoryName, repositoryCode, externalConfigId }) => (
+        <Option value={repositoryId} key={repositoryId} disabled={Boolean(externalConfigId)}>
           <Tooltip title={externalConfigId ? '外置GitLab代码仓库的应用服务不支持配置' : ''}>
-          {`${repositoryName}(${repositoryCode})`}
+            {`${repositoryName}(${repositoryCode})`}
           </Tooltip>
-         
+
         </Option>
       )
     );
@@ -50,8 +50,36 @@ const AppSelector = (props: any) => {
 
   useEffect(() => {
     branchServiceDs.current?.set('repositoryIds', 'all');
-    handleSelect('all');
-  }, [branchServiceDs.current]);
+    setBranchApp('all')
+  }, []);
+
+  const renderOption = ({ record, value }: any) => {
+    const externalConfigId = record?.get('externalConfigId')
+    const repositoryName = record?.get('repositoryName')
+    const repositoryCode = record?.get('repositoryCode')
+    return (
+      <Tooltip
+        title={externalConfigId ? "外置GitLab代码仓库的应用服务不支持配置" : ""}
+      >
+        {`${repositoryName}${value !== 'all' ? (repositoryCode) : ''}`}
+      </Tooltip>
+    );
+  };
+
+  const onOption = ({ record }: any) => {
+    const externalConfigId = record?.get('externalConfigId')
+    return ({
+      disabled: Boolean(externalConfigId),
+    });
+  };
+
+  const optionsFilter = (record:any)=> {
+    let flag = true
+    if(record?.get('repositoryId') === 'all' && !showAllOption) {
+      flag =  false
+    }
+    return flag
+  }
 
   return (
     <Form
@@ -70,8 +98,11 @@ const AppSelector = (props: any) => {
         colSpan={3}
         prefix={`${format({ id: 'ApplicationService' })}:`}
         className={`${prefixCls}-select`}
+        optionRenderer={renderOption}
+        onOption={onOption}
+        optionsFilter={optionsFilter}
       >
-        {renderOpts()}
+        {/* {renderOpts()} */}
       </Select>
     </Form>
   );

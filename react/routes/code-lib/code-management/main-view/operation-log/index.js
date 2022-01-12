@@ -63,6 +63,35 @@ const OperationLogTab = () => {
   const timeLineProps = useMemo(() => ({
     isMore, opEventTypeLookupData, loadData, listViewDs,
   }), [isMore, opEventTypeLookupData, loadData, listViewDs]);
+
+  const renderOption = ({ record }) => {
+    const externalConfigId = record?.get('externalConfigId');
+    const repositoryName = record?.get('repositoryName');
+    return (
+      <Tooltip
+        title={externalConfigId ? '外置GitLab代码仓库的应用服务不支持配置' : ''}
+      >
+        {repositoryName}
+      </Tooltip>
+    );
+  };
+
+  const onOption = ({ record }) => {
+    const externalConfigId = record?.get('externalConfigId');
+    return ({
+      disabled: Boolean(externalConfigId),
+    });
+  };
+
+  const optionsFilter = (record) => {
+    let flag = true;
+    if (record?.get('repositoryId') === 'all') {
+      flag = false;
+    }
+    return flag;
+  };
+
+
   return (
     <div style={{
       height: '100%',
@@ -87,15 +116,19 @@ const OperationLogTab = () => {
       >
         <div className="code-lib-opreation-log-search">
           <Select
+            name="repositoryIds"
             placeholder={format({ id: 'ApplicationService' })}
-            onChange={val => handleSearch({ repositoryIds: val })}
+            onChange={val => handleSearch({ repositoryIds: val.repositoryId })}
               // eslint-disable-next-line
-            clearButton={true}
+            clearButton={false}
             dataSet={branchServiceDs}
             searchable
             style={{ maxWidth: '2.85rem', marginRight: '0.12rem' }}
+            optionRenderer={renderOption}
+            onOption={onOption}
+            optionsFilter={optionsFilter}
           >
-            {
+            {/* {
                 branchServiceDs.toData().map(o => (
                   <Option
                     key={o.repositoryId}
@@ -107,7 +140,7 @@ const OperationLogTab = () => {
                     </Tooltip>
                   </Option>
                 ))
-              }
+              } */}
           </Select>
           <RangePicker onChange={(_, dateString) => handleSearch({ startDate: dateString[0] ? `${dateString[0]} 00:00:00` : '', endDate: dateString[1] ? `${dateString[1]} 23:59:59` : '' })} />
           <Select placeholder={format({ id: 'OperationType' })} onChange={value => handleSearch({ opEventTypes: value })} style={{ marginLeft: '0.12rem' }}>

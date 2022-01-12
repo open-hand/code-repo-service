@@ -80,7 +80,6 @@ const TimeLine = ({
             const {
               id, opDate, opEventType, opContent, repositoryName, opUserImageUrl, opUserName, repositoryImageUrl,
             } = item;
-            console.log(item);
             const [date, time] = opDate.split(' ');
             return (
               <li key={id}>
