@@ -1,6 +1,10 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.Map;
+import java.util.function.Function;
 import org.gitlab4j.api.models.ProtectedBranch;
+import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchAccessLevelDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.ProtectedBranchDTO;
@@ -11,6 +15,7 @@ import org.hrds.rducm.gitlab.domain.service.IRdmBranchService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProtectedBranchesApi;
 import org.hrds.rducm.gitlab.infra.util.AssertExtensionUtils;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
+import org.hzero.core.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,7 +53,9 @@ public class RdmBranchAppServiceImpl implements RdmBranchAppService {
         Integer glProjectId = c7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
 
         List<ProtectedBranch> protectedBranches = rdmBranchRepository.getProtectedBranchesFromGitlab(glProjectId);
-        List<ProtectedBranchDTO> protectedBranchDTOS = ConvertUtils.convertList(protectedBranches, ProtectedBranchDTO.class);
+        String protectedBranchesJson = JsonUtils.toJson(protectedBranches);
+        List<ProtectedBranchDTO> protectedBranchDTOS = JsonUtils.fromJson(protectedBranchesJson, new TypeReference<List<ProtectedBranchDTO>>() {
+        });
         // 排序
         return protectedBranchDTOS.stream().sorted(Comparator.comparing(ProtectedBranchDTO::getName)).collect(Collectors.toList());
     }
