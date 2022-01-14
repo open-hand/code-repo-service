@@ -251,6 +251,14 @@ export default observer(() => {
     </Tooltip>
   );
 
+  const repositoryIdsFilter = (record) => {
+    let flag = true;
+    if (record?.get('repositoryId') === 'all') {
+      flag = false;
+    }
+    return flag;
+  };
+
   const addonAfter = (
     <Tooltip
       title={formatMessage({
@@ -285,6 +293,7 @@ export default observer(() => {
               record.get(textField).indexOf(text) !== -1
             }
             optionRenderer={repositoryOptionRenderer}
+            optionsFilter={repositoryIdsFilter}
             maxTagPlaceholder={restValues => `+${restValues.length}...`}
             dropdownMenuStyle={{ width: '5.12rem' }}
             colSpan={6}
