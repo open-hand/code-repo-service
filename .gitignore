@@ -70,5 +70,4 @@ config-local.js
 application-default.yml
 temp/
 
-
 !/src/main/java/org/hrds/rducm/gitlab/api/controller/v1/TestController.java
