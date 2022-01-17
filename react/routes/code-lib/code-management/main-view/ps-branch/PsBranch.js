@@ -44,7 +44,7 @@ const PsBranch = observer(() => {
   }
 
   useEffect(() => {
-    if (branchAppId) {
+    if (branchAppId && branchAppId!=='all') {
       refreshBranch();
       refreshTag();
     }
