@@ -93,7 +93,7 @@ const AppSelector = (props: any) => {
         clearButton={false}
         dataSet={branchServiceDs}
         name="repositoryIds"
-        value={branchAppId}
+        // value={branchAppId}
         onChange={handleSelect}
         colSpan={3}
         prefix={`${format({ id: 'ApplicationService' })}:`}
