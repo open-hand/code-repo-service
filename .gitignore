@@ -48,6 +48,7 @@ Thumbs.db
 # dev properties
 src/main/resources/application-dev.yml
 src/main/resources/application-remote.yml
+src/main/java/org/hrds/rducm/gitlab/api/controller/v1/TestController.java
 
 init-local-database-dev.sh
 
@@ -69,5 +70,5 @@ config-local.js
 /.history
 application-default.yml
 temp/
-!/src/main/java/org/hrds/rducm/gitlab/api/controller/v1/TestController.java
+
 
