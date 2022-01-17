@@ -87,8 +87,10 @@ const EnvModals = observer((props) => {
         psSetDs.query();
         break;
       case 'psBranch':
-        branchDs.query();
-        tagDs.query();
+        if (branchServiceDs?.current?.get('repositoryIds')) {
+          branchDs.query();
+          tagDs.query();
+        }
         break;
       case 'psView':
         psOverViewDs.query();
