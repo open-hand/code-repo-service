@@ -403,7 +403,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         if (!CollectionUtils.isEmpty(orgAdmins)) {
             List<Long> orgAdminIds = orgAdmins.stream().map(C7nUserVO::getId).collect(Collectors.toList());
             //排除choerodon和gitlab里面的组织管理员用户id,和gitlab root
-            if (CollectionUtils.isEmpty(gitlabProjectMembers)) {
+            if (!CollectionUtils.isEmpty(gitlabProjectMembers)) {
                 gitlabProjectMembers = gitlabProjectMembers.stream().filter(gitlabMember -> !(orgAdminIds.contains(gitlabMember.getUserId()) || gitlabMember.getId() == 1)).collect(Collectors.toList());
             }
             if (!CollectionUtils.isEmpty(dbMembers)) {
