@@ -278,6 +278,7 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
         //过滤掉外部仓库,停用仓库，失败仓库
         if (!CollectionUtils.isEmpty(list)) {
             return list.stream().filter(c7nAppServiceVO -> c7nAppServiceVO.getExternalConfigId() == null)
+                    .filter(c7nAppServiceVO -> c7nAppServiceVO.getActive() != null && c7nAppServiceVO.getFail() != null)
                     .filter(C7nAppServiceVO::getActive)
                     .filter(c7nAppServiceVO -> !c7nAppServiceVO.getFail())
                     .collect(HashMap::new, (m, v) ->
