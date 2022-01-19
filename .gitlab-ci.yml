@@ -1,1 +1,3 @@
-include: https://api.choerodon.com.cn/devops/v1/projects/1488/ci_contents/pipelines/c08ff875-d639-4796-9a9d-05026cf18038/content.yaml
+include: https://api.choerodon.com.cn/devops/v1/projects/261899051275677696/ci_contents/pipelines/788ef9c1-cb28-4e88-b275-e771f75e9d4e/content.yaml
+
+#include: https://api.choerodon.com.cn/devops/v1/projects/1488/ci_contents/pipelines/c08ff875-d639-4796-9a9d-05026cf18038/content.yaml
