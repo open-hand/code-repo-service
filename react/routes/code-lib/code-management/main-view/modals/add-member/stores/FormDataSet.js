@@ -87,10 +87,10 @@ export default ({
         label: formatMessage({ id: `${intlPrefix}.service` }),
         textField: 'repositoryName',
         valueField: 'repositoryId',
-        options: branchServiceDs,
-        defaultValue: branchServiceDs.find(record => record.get('repositoryId') === currentBranchAppId)
+        options: branchServiceDs?.current?.getField('repositoryIds')?.options,
+        defaultValue: branchServiceDs?.current?.getField('repositoryIds')?.options.find(record => record.get('repositoryId') === currentBranchAppId) && currentBranchAppId !== 'all'
           ? [
-            branchServiceDs
+            branchServiceDs?.current?.getField('repositoryIds')?.options
               .find(record => record.get('repositoryId') === currentBranchAppId)
               ?.toData(),
           ]

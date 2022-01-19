@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.gitlab4j.api.models.ProtectedTag;
 import org.gitlab4j.api.models.Tag;
 import org.hrds.rducm.gitlab.api.controller.dto.tag.ProtectedTagDTO;
@@ -12,6 +13,7 @@ import org.hrds.rducm.gitlab.domain.service.IRdmTagService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabTagsApi;
 import org.hrds.rducm.gitlab.infra.util.AssertExtensionUtils;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
+import org.hzero.core.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +52,12 @@ public class RdmTagAppServiceImpl implements RdmTagAppService {
         Integer glProjectId = c7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
         List<ProtectedTag> protectedTags = rdmTagRepository.getProtectedTagsFromGitlab(glProjectId);
 
-        return ConvertUtils.convertList(protectedTags, ProtectedTagDTO.class)
+        String protectedTagsJson = JsonUtils.toJson(protectedTags);
+        List<ProtectedTagDTO> protectedTagDTOS = JsonUtils.fromJson(protectedTagsJson, new TypeReference<List<ProtectedTagDTO>>() {
+        });
+
+
+        return protectedTagDTOS
                 .stream()
                 .sorted(Comparator.comparing(ProtectedTagDTO::getName))
                 .collect(Collectors.toList());

@@ -39,6 +39,8 @@ import org.hrds.rducm.gitlab.infra.feign.vo.C7nRoleVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
+import org.hrds.rducm.gitlab.infra.util.GitlabPermissionUtils;
+import org.hrds.rducm.gitlab.infra.util.PageInfoUtil;
 import org.hzero.core.base.BaseConstants;
 import org.hzero.mybatis.domian.Condition;
 import org.hzero.mybatis.util.Sqls;
@@ -78,6 +80,8 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
     private GitlabGroupApi gitlabGroupApi;
     @Autowired
     private RdmMemberMapper rdmMemberMapper;
+    @Autowired
+    private GitlabPermissionUtils gitlabPermissionUtils;
 
     @Override
     public Page<MemberAuthDetailViewDTO> pageMembersRepositoryAuthorized(Long organizationId, Long projectId, PageRequest pageRequest, BaseUserQueryDTO queryDTO) {
@@ -169,32 +173,97 @@ public class RdmMemberServiceImpl implements IRdmMemberService {
                                                         Long projectId,
                                                         Long userId,
                                                         PageRequest pageRequest) {
+
+
+        // 代码库id
+        Set<Long> repositoryIds = new HashSet<>();
+        RdmMember userGroupPermission = gitlabPermissionUtils.getUserGroupPermission(userId, projectId);
+        if (userGroupPermission.getGlAccessLevel() == null) {
+            return getRdmMemberViewDTOS(organizationId, projectId, userId, pageRequest, repositoryIds);
+
+        } else {
+            Page<RdmMember> page = getRdmMembers(organizationId, projectId, userId, pageRequest);
+            //查询项目下所有的应用服务
+            if (!CollectionUtils.isEmpty(page.getContent())) {
+                return getRdmMemberViewDTOS(projectId, userId, repositoryIds, page);
+            } else {
+                return getRdmMemberViewDTOS(projectId, pageRequest, userGroupPermission);
+            }
+        }
+
+    }
+
+    private Page<RdmMemberViewDTO> getRdmMemberViewDTOS(Long projectId, PageRequest pageRequest, RdmMember userGroupPermission) {
+        List<C7nAppServiceVO> c7nAppServiceVOS = c7NDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId);
+        Page<C7nAppServiceVO> pageFromList = PageInfoUtil.createPageFromList(c7nAppServiceVOS, pageRequest);
+        Page<RdmMemberViewDTO> pageReturn = ConvertUtils.convertPage(pageFromList, (v) -> {
+            RdmMemberViewDTO rdmMemberViewDTO = new RdmMemberViewDTO();
+            rdmMemberViewDTO.setGlAccessLevel(userGroupPermission.getGlAccessLevel());
+            rdmMemberViewDTO.setRepositoryName(v.getName());
+            rdmMemberViewDTO.setLastUpdateDate(userGroupPermission.getLastUpdateDate());
+            rdmMemberViewDTO.setCreationDate(userGroupPermission.getCreationDate());
+            return rdmMemberViewDTO;
+        });
+        return pageReturn;
+    }
+
+    private Page<RdmMemberViewDTO> getRdmMemberViewDTOS(Long projectId, Long userId, Set<Long> repositoryIds, Page<RdmMember> page) {
+        page.getContent().forEach(rdmMember -> {
+            if (rdmMember.getRepositoryId() != null) {
+                repositoryIds.add(rdmMember.getRepositoryId());
+            }
+        });
+
+        List<C7nAppServiceVO> c7nAppServiceVOS = c7NDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId);
+        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(c7nAppServiceVOS)) {
+            // 获取应用服务信息
+            c7nAppServiceVOMap = c7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
+        }
+        Map<Long, C7nAppServiceVO> finalC7nAppServiceVOMap = c7nAppServiceVOMap;
+        Page<RdmMemberViewDTO> pageReturn = ConvertUtils.convertPage(page, (v) -> {
+            RdmMemberViewDTO viewDTO = ConvertUtils.convertObject(v, RdmMemberViewDTO.class);
+            C7nAppServiceVO c7nAppServiceVO = finalC7nAppServiceVOMap.get(v.getRepositoryId());
+            if (c7nAppServiceVO != null) {
+                viewDTO.setRepositoryName(c7nAppServiceVO.getName());
+                viewDTO.setGlAccessLevel(gitlabPermissionUtils.getUserRepositoryAccessLevel(userId, projectId, c7nAppServiceVO.getId()));
+            }
+            return viewDTO;
+        });
+        return pageReturn;
+    }
+
+    private Page<RdmMemberViewDTO> getRdmMemberViewDTOS(Long organizationId, Long projectId, Long userId, PageRequest pageRequest, Set<Long> repositoryIds) {
+        Page<RdmMember> page = getRdmMembers(organizationId, projectId, userId, pageRequest);
+        if (CollectionUtils.isEmpty(page.getContent())) {
+            return new Page<>();
+        }
+        page.getContent().forEach(v -> {
+            if (v.getRepositoryId() != null) {
+                repositoryIds.add(v.getRepositoryId());
+            }
+        });
+        Map<Long, C7nAppServiceVO> longC7nAppServiceVOMap = c7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
+        Page<RdmMemberViewDTO> pageReturn = ConvertUtils.convertPage(page, (v) -> {
+            RdmMemberViewDTO viewDTO = ConvertUtils.convertObject(v, RdmMemberViewDTO.class);
+            C7nAppServiceVO c7nAppServiceVO = longC7nAppServiceVOMap.get(v.getRepositoryId());
+            if (c7nAppServiceVO != null) {
+                viewDTO.setRepositoryName(c7nAppServiceVO.getName());
+            }
+            return viewDTO;
+        });
+        return pageReturn;
+    }
+
+    private Page<RdmMember> getRdmMembers(Long organizationId, Long projectId, Long userId, PageRequest pageRequest) {
         RdmMember condition = new RdmMember();
         condition.setOrganizationId(organizationId);
         condition.setProjectId(projectId);
         condition.setUserId(userId);
+        condition.setType(AuthorityTypeEnum.PROJECT.getValue());
+        condition.setSyncGitlabFlag(Boolean.TRUE);
 
-        Page<RdmMember> page = PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.select(condition));
-
-        // 代码库id
-        Set<Long> repositoryIds = new HashSet<>();
-
-        page.getContent().forEach(v -> {
-            repositoryIds.add(v.getRepositoryId());
-        });
-
-        // 获取应用服务信息
-        Map<Long, C7nAppServiceVO> c7nAppServiceVOMap = c7NDevOpsServiceFacade.listC7nAppServiceToMap(repositoryIds);
-
-
-        Page<RdmMemberViewDTO> pageReturn = ConvertUtils.convertPage(page, (v) -> {
-            RdmMemberViewDTO viewDTO = ConvertUtils.convertObject(v, RdmMemberViewDTO.class);
-
-            viewDTO.setRepositoryName(c7nAppServiceVOMap.get(v.getRepositoryId()).getName());
-            return viewDTO;
-        });
-
-        return pageReturn;
+        return PageHelper.doPageAndSort(pageRequest, () -> rdmMemberRepository.select(condition));
     }
 
     @Override
