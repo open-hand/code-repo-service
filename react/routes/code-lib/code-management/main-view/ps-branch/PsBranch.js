@@ -44,10 +44,15 @@ const PsBranch = observer(() => {
   }
 
   useEffect(() => {
-    if (branchAppId) {
+    if (branchAppId && branchAppId!=='all') {
       refreshBranch();
       refreshTag();
     }
+    if(branchAppId==='all') {
+      branchServiceDs.current?.set('repositoryIds', undefined);
+      setBranchApp(undefined)
+    }
+
   }, [branchAppId]);
 
   function handleDelete(type) {
@@ -220,7 +225,7 @@ const PsBranch = observer(() => {
             searchable
             clearButton={false}
             name="repositoryIds"
-            value={branchAppId}
+            // value={branchAppId}
             onChange={handleSelect}
             colSpan={3}
             optionRenderer={renderOption}

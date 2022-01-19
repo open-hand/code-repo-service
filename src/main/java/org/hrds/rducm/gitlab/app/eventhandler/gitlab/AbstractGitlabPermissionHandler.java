@@ -75,6 +75,9 @@ public abstract class AbstractGitlabPermissionHandler implements GitlabPermissio
     }
 
     private boolean checkStatus(RdmMemberAuditRecord rdmMemberAuditRecord) {
+        if (rdmMemberAuditRecord.getSyncFlag()) {
+            return Boolean.FALSE;
+        }
         Long userId = rdmMemberAuditRecord.getUserId();
         //如果userId为null 猪齿鱼导入用户失败，导致猪齿鱼里没有这个用户
         if (Objects.isNull(userId)) {
