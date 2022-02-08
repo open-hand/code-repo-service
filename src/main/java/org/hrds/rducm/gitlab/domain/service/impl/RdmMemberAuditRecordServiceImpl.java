@@ -5,6 +5,7 @@ import io.choerodon.core.iam.ResourceLevel;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
+import java.time.ZoneId;
 import java.util.function.Function;
 import org.apache.commons.collections.MapUtils;
 import org.gitlab4j.api.models.Member;
@@ -312,8 +313,15 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                     isDifferent = true;
                 }
                 if (!Objects.equals(gitlabMember.getExpiresAt(), rdmMember.getGlExpiresAt())) {
-                    // 如果ExpiresAt不相等, 说明不一致
-                    isDifferent = true;
+                    // 如果ExpiresAt不相等, 说明不一致 ,并且不考虑过期的权限
+                    if (rdmMember.getGlExpiresAt() != null
+                            && rdmMember.getGlExpiresAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                            .isBefore(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())) {
+                        isDifferent = false;
+                    } else {
+                        isDifferent = true;
+
+                    }
                 }
                 if (!Objects.equals(gitlabMember.getType(), rdmMember.getType())) {
                     isDifferent = true;
@@ -488,8 +496,15 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                     isDifferent = false;
                 }
                 if (!Objects.equals(gitlabMember.getExpiresAt(), rdmMember.getGlExpiresAt())) {
-                    // 如果ExpiresAt不相等, 说明不一致
-                    isDifferent = true;
+                    // 如果ExpiresAt不相等, 说明不一致 ,并且不考虑过期的权限
+                    if (rdmMember.getGlExpiresAt() != null
+                            && rdmMember.getGlExpiresAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                            .isBefore(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())) {
+                        isDifferent = false;
+                    } else {
+                        isDifferent = true;
+
+                    }
                 }
                 if (!Objects.equals(gitlabMember.getType(), rdmMember.getType())) {
                     isDifferent = true;
