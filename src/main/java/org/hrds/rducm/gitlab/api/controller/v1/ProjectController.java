@@ -144,7 +144,8 @@ public class ProjectController extends BaseController {
                             .setOrganizationId(u.getOrganizationId())
                             .setRealName(u.getRealName())
                             .setImageUrl(u.getImageUrl())
-                            .setProjectMember(u.getProjectMember());
+                            .setProjectMember(u.getProjectMember())
+                            .setLdap(u.getLdap());
 
                     return baseC7NUserViewDTO;
                 }).collect(Collectors.toList());
