@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -49,7 +50,7 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
     private Map<String, GitlabPermissionHandler> permissionRepairMap;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public void repairMemberPermission(Long organizationId) {
         List<RdmMemberAuditRecord> records = rdmMemberAuditRecordRepository
                 .selectByCondition(Condition.builder(RdmMemberAuditRecord.class)
