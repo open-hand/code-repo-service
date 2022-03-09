@@ -47,7 +47,7 @@ public class MemberAuditServiceImpl implements IMemberAuditService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.NESTED)
     public void auditMembersByOrganizationId(Long organizationId) {
         // <1> 保存审计记录
         Date startDate = new Date();

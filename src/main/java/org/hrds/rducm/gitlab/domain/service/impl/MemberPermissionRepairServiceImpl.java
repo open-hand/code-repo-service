@@ -50,7 +50,7 @@ public class MemberPermissionRepairServiceImpl implements IMemberPermissionRepai
     private Map<String, GitlabPermissionHandler> permissionRepairMap;
 
     @Override
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.NESTED)
     public void repairMemberPermission(Long organizationId) {
         List<RdmMemberAuditRecord> records = rdmMemberAuditRecordRepository
                 .selectByCondition(Condition.builder(RdmMemberAuditRecord.class)
