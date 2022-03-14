@@ -47,4 +47,12 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member.groovy') {
          """)
     }
 
+    changeSet(author: 'wx', id: '2022-03-09-add-index'){
+        sql("""
+         ALTER TABLE `rducm_gitlab_member` ADD UNIQUE  uk_type_user_id_group ( 
+                   `project_id`, `type`, `user_id`, `g_group_id` 
+          ) 
+        """)
+    }
+
 }

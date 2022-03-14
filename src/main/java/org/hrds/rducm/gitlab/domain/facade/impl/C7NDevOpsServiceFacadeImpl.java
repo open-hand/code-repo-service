@@ -215,13 +215,20 @@ public class C7NDevOpsServiceFacadeImpl implements C7nDevOpsServiceFacade {
 
     @Override
     public C7nDevopsProjectVO detailDevopsProjectById(Long projectId) {
-        ResponseEntity<List<C7nDevopsProjectVO>> responseEntity = devOpsServiceFeignClient.listDevopsProjectByIds(projectId, Sets.newHashSet(projectId));
-
-        List<C7nDevopsProjectVO> c7nDevopsProjectVOS = FeignUtils.handleResponseEntity(responseEntity);
-        if (c7nDevopsProjectVOS.isEmpty()) {
+        if (projectId == null) {
             return null;
-        } else {
-            return c7nDevopsProjectVOS.get(0);
+        }
+        try {
+            ResponseEntity<List<C7nDevopsProjectVO>> responseEntity = devOpsServiceFeignClient.listDevopsProjectByIds(projectId, Sets.newHashSet(projectId));
+            List<C7nDevopsProjectVO> c7nDevopsProjectVOS = FeignUtils.handleResponseEntity(responseEntity);
+            if (c7nDevopsProjectVOS.isEmpty()) {
+                return null;
+            } else {
+                return c7nDevopsProjectVOS.get(0);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return null;
         }
     }
 

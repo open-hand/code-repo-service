@@ -35,35 +35,6 @@ public class MembersPermissionRepairJob {
     @Autowired
     private C7nBaseServiceFacade c7nBaseServiceFacade;
 
-    /**
-     * 成员权限修复任务
-     */
-    @JobTask(maxRetryCount = 3,
-            code = "membersPermissionRepairJob",
-            description = "代码库成员权限修复任务",
-            params = {@JobParam(name = "repairOrganizationId", description = "待修复组织id")})
-    public void membersPermissionRepairJob(Map<String, Object> param) {
-        // <> 获取组织
-        long repairOrganizationId = 0L;
-        if (param.containsKey("repairOrganizationId") && Objects.nonNull(param.get("repairOrganizationId"))) {
-            repairOrganizationId = Long.parseLong(param.get("repairOrganizationId").toString());
-        }
-        logger.debug("参数组织id为[{}]", repairOrganizationId);
-
-        logger.info("开始修复");
-        StopWatch stopWatch = new StopWatch();
-
-        stopWatch.start("组织" + repairOrganizationId);
-        logger.info("开始修复组织[{}]的数据", repairOrganizationId);
-
-        iMemberPermissionRepairService.repairMemberPermission(repairOrganizationId);
-
-        stopWatch.stop();
-        logger.info("修复组织[{}]的数据结束, 耗时[{}]ms", stopWatch.getLastTaskName(), stopWatch.getLastTaskTimeMillis());
-
-        logger.info("结束修复, 耗时[{}]s, \n{}", stopWatch.getTotalTimeSeconds(), stopWatch.prettyPrint());
-    }
-
 
     @JobTask(maxRetryCount = 3,
             code = "membersPermissionRepairNewJob",
@@ -78,6 +49,7 @@ public class MembersPermissionRepairJob {
         logger.info("开始修复");
         StopWatch stopWatch = new StopWatch();
         stopWatch.start("membersPermissionRepairNewJob");
+        //JobTask 封装了事务，修复每一个组织的数据启用嵌套事务，子事务不影响父级事务，父级事务影响子集事务，子事务之间相互独立
         c7nTenantVOS.forEach(c7nTenantVO -> {
             iMemberPermissionRepairService.repairMemberPermission(c7nTenantVO.getTenantId());
         });
