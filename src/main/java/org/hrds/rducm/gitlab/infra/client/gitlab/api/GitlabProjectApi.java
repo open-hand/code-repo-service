@@ -75,6 +75,7 @@ public class GitlabProjectApi {
     private Member getProjectMember(Integer projectId, Integer userId) {
         try {
             List<Integer> userIds = new ArrayList<>();
+            userIds.add(userId);
             // 需要查询所有成员
             List<Member> allMembers = gitlab4jClient.getGitLabApi()
                     .getProjectApi()
