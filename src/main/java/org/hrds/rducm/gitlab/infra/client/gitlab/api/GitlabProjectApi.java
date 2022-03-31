@@ -62,7 +62,7 @@ public class GitlabProjectApi {
      */
     public Member getAllMember(Integer projectId, Integer userId) {
         try {
-            return gitlab4jClient.getGitLabApi().getProjectApi().getMember(projectId, userId);
+            return gitlab4jClient.getGitLabApi().getProjectApi().getMember(projectId, userId, true);
         } catch (GitLabApiException e) {
             throw new GitlabClientException(e, e.getMessage());
         }
