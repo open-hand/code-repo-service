@@ -30,7 +30,7 @@ public class GitlabRepositoryApi {
     public List<Tag> getTags(Integer projectId) {
         try {
             return gitlab4jClient.getGitLabApi()
-                    .getRepositoryApi()
+                    .getTagsApi()
                     .getTags(projectId);
         } catch (GitLabApiException e) {
             throw new GitlabClientException(e, e.getMessage());

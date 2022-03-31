@@ -62,26 +62,7 @@ public class GitlabProjectApi {
      */
     public Member getAllMember(Integer projectId, Integer userId) {
         try {
-            User glUser = gitlab4jClient.getGitLabApi().getUserApi().getUser(userId);
-            return this.getAllMember(projectId, Objects.requireNonNull(glUser.getUsername()));
-        } catch (GitLabApiException e) {
-            throw new GitlabClientException(e, e.getMessage());
-        }
-    }
-
-    /**
-     * 获取项目所有成员, 包括继承的成员
-     *
-     * @param projectId
-     * @return
-     */
-    public List<Member> getAllMembers(Integer projectId) {
-        try {
-            // 需要查询所有成员
-            return gitlab4jClient.getGitLabApi()
-                    .getProjectApi()
-                    .getAllMembers(projectId, GitlabClientConstants.DEFAULT_PER_PAGE, null)
-                    .all();
+            return gitlab4jClient.getGitLabApi().getProjectApi().getMember(projectId, userId);
         } catch (GitLabApiException e) {
             throw new GitlabClientException(e, e.getMessage());
         }
@@ -148,38 +129,6 @@ public class GitlabProjectApi {
             } else {
                 throw new GitlabClientException(e, e.getMessage());
             }
-        }
-    }
-
-    /* private方法 */
-
-    /**
-     * 获取项目单个成员, 包括继承的成员
-     * 由于当前Gitlab版本不支持
-     *
-     * @param projectId
-     * @param userName  用户名
-     * @return
-     */
-    private Member getAllMember(Integer projectId, String userName) {
-        try {
-            // 需要查询所有成员
-            List<Member> allMembers = gitlab4jClient.getGitLabApi()
-                    .getProjectApi()
-                    .getAllMembers(projectId, userName);
-            if (allMembers.isEmpty()) {
-                return null;
-            } else if (allMembers.size() == 1) {
-                return allMembers.get(0);
-            } else {
-                // 获取username匹配的那个成员
-                return allMembers.stream()
-                        .filter(member -> member.getUsername().equals(userName))
-                        .findFirst()
-                        .orElse(null);
-            }
-        } catch (GitLabApiException e) {
-            throw new GitlabClientException(e, e.getMessage());
         }
     }
 }
