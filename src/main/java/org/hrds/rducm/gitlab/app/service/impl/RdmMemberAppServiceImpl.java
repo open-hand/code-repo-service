@@ -11,6 +11,7 @@ import io.choerodon.mybatis.domain.AuditDomain;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
+import java.time.LocalDateTime;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.api.controller.dto.*;
 import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
@@ -261,6 +262,8 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Saga(code = SagaTopicCodeConstants.BATCH_ADD_GITLAB_MEMBER,
             description = "批量添加用户的应用服务权限", inputSchema = "{}")
     public void batchAddOrUpdateMembers(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
+
+        handleExpires(rdmMemberBatchDTO);
         // <0> 校验入参 + 转换
         List<RdmMember> rdmMembers = rdmMemberAssembler.rdmMemberBatchDTOToRdmMembers(organizationId, projectId, rdmMemberBatchDTO);
 
@@ -284,6 +287,31 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                 });
 
 
+    }
+
+    private void handleExpires(RdmMemberBatchDTO rdmMemberBatchDTO) {
+        if (rdmMemberBatchDTO != null) {
+            if (!CollectionUtils.isEmpty(rdmMemberBatchDTO.getMembers())) {
+                rdmMemberBatchDTO.getMembers().forEach(gitlabMemberCreateDTO -> {
+                    gitlabMemberCreateDTO.setGlExpiresAt(getExpires(gitlabMemberCreateDTO.getGlExpiresAt()));
+                });
+            }
+        }
+
+    }
+
+
+    private Date getExpires(Date glExpiresAt) {
+        if (glExpiresAt == null) {
+            return null;
+        }
+        LocalDateTime now = LocalDateTime.now();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(glExpiresAt);
+        calendar.set(Calendar.HOUR_OF_DAY, now.getHour());
+        calendar.set(Calendar.MINUTE, now.getMinute());
+        calendar.set(Calendar.SECOND, now.getSecond());
+        return calendar.getTime();
     }
 
     @Override
