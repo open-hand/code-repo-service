@@ -309,7 +309,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
             }
             if (!CollectionUtils.isEmpty(rdmMemberBatchDTO.getMembers())) {
                 rdmMemberBatchDTO.getMembers().forEach(gitlabMemberCreateDTO -> {
-                    gitlabMemberCreateDTO.setGlExpiresAt(getExpires(rdmMemberBatchDTO.getGlExpiresAt()));
+                    gitlabMemberCreateDTO.setGlExpiresAt(getExpires(gitlabMemberCreateDTO.getGlExpiresAt()));
                 });
             }
         }
@@ -317,6 +317,9 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     }
 
     private Date getExpires(Date glExpiresAt) {
+        if (glExpiresAt == null) {
+            return null;
+        }
         LocalDateTime now = LocalDateTime.now();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(glExpiresAt);
