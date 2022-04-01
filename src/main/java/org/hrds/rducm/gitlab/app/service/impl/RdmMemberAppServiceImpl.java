@@ -12,6 +12,7 @@ import io.choerodon.mybatis.domain.AuditDomain;
 import io.choerodon.mybatis.pagehelper.PageHelper;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
 
+import java.time.LocalDateTime;
 import org.gitlab4j.api.models.Group;
 import org.gitlab4j.api.models.Member;
 import org.hrds.rducm.gitlab.api.controller.dto.*;
@@ -274,6 +275,8 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Saga(code = SagaTopicCodeConstants.BATCH_ADD_GITLAB_MEMBER,
             description = "批量添加用户的应用服务权限", inputSchema = "{}")
     public void batchAddOrUpdateMembers(Long organizationId, Long projectId, RdmMemberBatchDTO rdmMemberBatchDTO) {
+        //处理过期时间
+        handleExpires(rdmMemberBatchDTO);
         // <0> 校验入参 + 转换
         List<RdmMember> rdmMembers = rdmMemberAssembler.rdmMemberBatchDTOToRdmMembers(organizationId, projectId, rdmMemberBatchDTO);
 
@@ -297,6 +300,30 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
                 });
 
 
+    }
+
+    private void handleExpires(RdmMemberBatchDTO rdmMemberBatchDTO) {
+        if (rdmMemberBatchDTO != null) {
+            if (rdmMemberBatchDTO.getGlExpiresAt() != null) {
+                rdmMemberBatchDTO.setGlExpiresAt(getExpires(rdmMemberBatchDTO.getGlExpiresAt()));
+            }
+            if (!CollectionUtils.isEmpty(rdmMemberBatchDTO.getMembers())) {
+                rdmMemberBatchDTO.getMembers().forEach(gitlabMemberCreateDTO -> {
+                    gitlabMemberCreateDTO.setGlExpiresAt(getExpires(rdmMemberBatchDTO.getGlExpiresAt()));
+                });
+            }
+        }
+
+    }
+
+    private Date getExpires(Date glExpiresAt) {
+        LocalDateTime now = LocalDateTime.now();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(glExpiresAt);
+        calendar.set(Calendar.HOUR_OF_DAY, now.getHour());
+        calendar.set(Calendar.MINUTE, now.getMinute());
+        calendar.set(Calendar.SECOND, now.getSecond());
+        return calendar.getTime();
     }
 
     @Override
@@ -591,6 +618,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Transactional(rollbackFor = Exception.class)
     @Saga(code = SagaTopicCodeConstants.BATCH_ADD_GROUP_MEMBER, description = "批量添加项目下gitlab group成员", inputSchemaClass = GroupMemberPayload.class, inputSchema = "{}")
     public void batchAddGroupMembers(Long organizationId, Long projectId, List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOS) {
+        handleGroupExpires(gitlabMemberCreateDTOS);
         //查询项目下的group
         C7nDevopsProjectVO c7nDevopsProjectVO = c7NDevOpsServiceFacade.detailDevopsProjectById(projectId);
         checkIamProject(c7nDevopsProjectVO);
@@ -604,6 +632,15 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         persistenceMemberToDB(gitlabMemberCreateDTOS, organizationId, projectId, group.getId());
         //发送saga
         sendAddGroupMemberSaga(projectId, gitlabMemberCreateDTOS, c7nDevopsProjectVO);
+    }
+
+    private void handleGroupExpires(List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOS) {
+        if (CollectionUtils.isEmpty(gitlabMemberCreateDTOS)) {
+            return;
+        }
+        gitlabMemberCreateDTOS.forEach(gitlabMemberCreateDTO -> {
+            gitlabMemberCreateDTO.setGlExpiresAt(getExpires(gitlabMemberCreateDTO.getGlExpiresAt()));
+        });
     }
 
     private void checkGroupPermissionExist(Long projectId, List<RdmMemberBatchDTO.GitlabMemberCreateDTO> gitlabMemberCreateDTOS) {
