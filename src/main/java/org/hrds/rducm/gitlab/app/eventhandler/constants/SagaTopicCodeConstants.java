@@ -68,6 +68,8 @@ public class SagaTopicCodeConstants {
      * 项目下修复成员
      */
     public static final String PROJECT_BATCH_AUDIT_FIX = "project-batch-audit-fix";
+    //创建项目
+    public static final String PROJECT_CREATE = "iam-create-project";
 
 
     private SagaTopicCodeConstants() {

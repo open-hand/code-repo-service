@@ -121,6 +121,42 @@ public class RdmMemberChangeSagaHandler {
         return gitlabGroupMemberVOList;
     }
 
+
+    @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_CREATE_MEMBER_ROLE,
+            description = "创建项目为项目创建",
+            sagaCode = SagaTopicCodeConstants.PROJECT_CREATE,
+            maxRetryCount = 3, seq = 10)
+    public List<GitlabGroupMemberVO> handleCreateProjectMemberRoleEvent(String payload) {
+        final List<GitlabGroupMemberVO> gitlabGroupMemberVOList = gson.fromJson(payload,
+                new TypeToken<List<GitlabGroupMemberVO>>() {
+                }.getType());
+        logger.info("payload:\n{}", gson.toJson(gitlabGroupMemberVOList));
+        createProjectMemberRole(gitlabGroupMemberVOList);
+        logger.info("update user role end");
+        return gitlabGroupMemberVOList;
+    }
+
+    private void createProjectMemberRole(List<GitlabGroupMemberVO> gitlabGroupMemberVOList) {
+        gitlabGroupMemberVOList.stream()
+                .filter(gitlabGroupMemberVO -> gitlabGroupMemberVO.getResourceType().equals(ResourceLevel.PROJECT.value()))
+                .forEach(gitlabGroupMemberVO -> {
+                    Long projectId = gitlabGroupMemberVO.getResourceId();
+                    Long userId = gitlabGroupMemberVO.getUserId();
+                    Long organizationId = c7nBaseServiceFacade.getOrganizationId(projectId);
+                    List<String> userMemberRoleList = gitlabGroupMemberVO.getRoleLabels();
+                    if (!CollectionUtils.isEmpty(userMemberRoleList) && userMemberRoleList.contains("GITLAB_OWNER")) {
+                        // 设置角色为项目管理员, 设置默认Owner权限
+                        handleProjectAdminOnProjectLevel(organizationId, projectId, userId);
+                        //在gitlab上分配权限
+                        Long appGroupIdByProjectId = c7nDevOpsServiceFacade.getAppGroupIdByProjectId(projectId);
+                        Integer usglUserId = c7nBaseServiceFacade.userIdToGlUserId(userId);
+                        if (appGroupIdByProjectId != null && usglUserId != null) {
+                            Member member = gitlabGroupApi.addMember(appGroupIdByProjectId, usglUserId, AccessLevel.OWNER.value, null);
+                        }
+                    }
+                });
+    }
+
     /**
      * 删除角色同步事件
      * 删除用户成员在这里
