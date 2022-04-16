@@ -37,6 +37,7 @@ import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupFixApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
 import org.hrds.rducm.gitlab.infra.constant.RepoConstants;
@@ -93,6 +94,8 @@ public class RdmMemberChangeSagaHandler {
     @Autowired
     private GitlabGroupApi gitlabGroupApi;
     @Autowired
+    private GitlabGroupFixApi gitlabGroupFixApi;
+    @Autowired
     private RdmMemberMapper rdmMemberMapper;
     @Autowired
     private Map<String, GitlabPermissionHandler> permissionRepairMap;
@@ -147,7 +150,7 @@ public class RdmMemberChangeSagaHandler {
             Long appGroupIdByProjectId = c7nDevOpsServiceFacade.getAppGroupIdByProjectId(projectId);
             Integer usglUserId = c7nBaseServiceFacade.userIdToGlUserId(userId);
             if (appGroupIdByProjectId != null && usglUserId != null) {
-                Member member = gitlabGroupApi.addMember(appGroupIdByProjectId, usglUserId, AccessLevel.OWNER.value, null);
+                Member member = gitlabGroupFixApi.addMember(Math.toIntExact(appGroupIdByProjectId), usglUserId, AccessLevel.OWNER.value, null);
             }
         }
     }
