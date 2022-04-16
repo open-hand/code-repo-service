@@ -153,7 +153,10 @@ public class RdmMemberChangeSagaHandler {
             Long appGroupIdByProjectId = c7nDevOpsServiceFacade.getAppGroupIdByProjectId(projectId);
             Integer usglUserId = c7nBaseServiceFacade.userIdToGlUserId(userId);
             if (appGroupIdByProjectId != null && usglUserId != null) {
-                Member member = gitlabAdminApi.addGroupMember(Math.toIntExact(appGroupIdByProjectId), usglUserId, AccessLevel.OWNER.value, null);
+                Member groupMember = gitlabAdminApi.getGroupMember(Math.toIntExact(appGroupIdByProjectId), usglUserId);
+                if (groupMember == null) {
+                    Member member = gitlabAdminApi.addGroupMember(Math.toIntExact(appGroupIdByProjectId), usglUserId, AccessLevel.OWNER.value, null);
+                }
             }
         }
     }
