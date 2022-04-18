@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.infra.client.gitlab.api.admin;
 
+import java.util.Date;
 import org.gitlab4j.api.GitLabApiException;
 import org.gitlab4j.api.models.Group;
 import org.gitlab4j.api.models.Member;
@@ -110,7 +111,6 @@ public class GitlabAdminApi {
     }
 
 
-
     public Group getGroup(Integer appGroupId) {
         try {
             Group group = gitlab4jClient.getAdminGitLabApi()
@@ -123,6 +123,20 @@ public class GitlabAdminApi {
                 return null;
             }
             throw new GitlabClientException(e, e.getMessage());
+        }
+    }
+
+    public Member addGroupMember(Object groupIdOrPath, Integer userId, Integer accessLevel, Date expiresAt) {
+        try {
+            return gitlab4jClient.getAdminGitLabApi()
+                    .getGroupApi()
+                    .addMember(groupIdOrPath, userId, accessLevel, expiresAt);
+        } catch (GitLabApiException e) {
+            if (e.getHttpStatus() == HttpStatus.NOT_FOUND.value()) {
+                return null;
+            } else {
+                throw new GitlabClientException(e, e.getMessage());
+            }
         }
     }
 }

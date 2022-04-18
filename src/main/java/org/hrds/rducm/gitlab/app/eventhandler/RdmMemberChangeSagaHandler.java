@@ -22,6 +22,7 @@ import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.gitlab.GitlabPermissionHandler;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.GitlabGroupMemberVO;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.ProjectAuditPayload;
+import org.hrds.rducm.gitlab.app.eventhandler.payload.ProjectEvent;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAuditAppService;
 import org.hrds.rducm.gitlab.domain.entity.MemberAuditLog;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
@@ -36,7 +37,9 @@ import org.hrds.rducm.gitlab.domain.service.IRdmMemberAuditRecordService;
 import org.hrds.rducm.gitlab.domain.service.IRdmMemberService;
 import org.hrds.rducm.gitlab.infra.audit.event.MemberEvent;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabGroupFixApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabProjectApi;
+import org.hrds.rducm.gitlab.infra.client.gitlab.api.admin.GitlabAdminApi;
 import org.hrds.rducm.gitlab.infra.client.gitlab.model.AccessLevel;
 import org.hrds.rducm.gitlab.infra.constant.RepoConstants;
 import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
@@ -92,11 +95,15 @@ public class RdmMemberChangeSagaHandler {
     @Autowired
     private GitlabGroupApi gitlabGroupApi;
     @Autowired
+    private GitlabGroupFixApi gitlabGroupFixApi;
+    @Autowired
     private RdmMemberMapper rdmMemberMapper;
     @Autowired
     private Map<String, GitlabPermissionHandler> permissionRepairMap;
     @Autowired
     private RdmMemberAuditRecordRepository rdmMemberAuditRecordRepository;
+    @Autowired
+    private GitlabAdminApi gitlabAdminApi;
 
 
     /**
@@ -119,6 +126,36 @@ public class RdmMemberChangeSagaHandler {
 
         logger.info("update user role end");
         return gitlabGroupMemberVOList;
+    }
+
+
+    @SagaTask(code = SagaTaskCodeConstants.CODE_REPO_CREATE_MEMBER_ROLE,
+            description = "创建项目为项目创建",
+            sagaCode = SagaTopicCodeConstants.PROJECT_CREATE,
+            maxRetryCount = 3, seq = 2)
+    public String handleCreateProjectMemberRoleEvent(String payload) {
+        ProjectEvent projectEvent = gson.fromJson(payload, ProjectEvent.class);
+        logger.info("payload:\n{}", payload);
+        createProjectMemberRole(projectEvent);
+        logger.info("update user role end");
+        return payload;
+    }
+
+    private void createProjectMemberRole(ProjectEvent projectEvent) {
+        List<String> roleLabels = projectEvent.getRoleLabels();
+        if (!CollectionUtils.isEmpty(roleLabels) && roleLabels.contains("GITLAB_OWNER")) {
+            Long projectId = projectEvent.getProjectId();
+            Long userId = projectEvent.getUserId();
+            Long organizationId = c7nBaseServiceFacade.getOrganizationId(projectId);
+            // 设置角色为项目管理员, 设置默认Owner权限
+            handleProjectAdminOnProjectLevel(organizationId, projectId, userId);
+            //在gitlab上分配权限
+            Long appGroupIdByProjectId = c7nDevOpsServiceFacade.getAppGroupIdByProjectId(projectId);
+            Integer usglUserId = c7nBaseServiceFacade.userIdToGlUserId(userId);
+            if (appGroupIdByProjectId != null && usglUserId != null) {
+                Member member = gitlabAdminApi.addGroupMember(Math.toIntExact(appGroupIdByProjectId), usglUserId, AccessLevel.OWNER.value, null);
+            }
+        }
     }
 
     /**
@@ -555,25 +592,28 @@ public class RdmMemberChangeSagaHandler {
                 && !CollectionUtils.isEmpty(c7nProjectVO.getCategories())
                 && c7nProjectVO.getCategories().stream().map(ProjectCategoryVO::getCode).collect(Collectors.toList()).contains(N_DEVOPS)) {
             Long appGroupIdByProjectId = c7nDevOpsServiceFacade.getAppGroupIdByProjectId(projectId);
-            RdmMember rdmMember = new RdmMember();
-            rdmMember.setUserId(userId);
-            rdmMember.setGlAccessLevel(RdmAccessLevel.OWNER.value);
-            rdmMember.setSyncGitlabFlag(Boolean.TRUE);
-            rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
-            rdmMember.setOrganizationId(organizationId);
-            rdmMember.setGlUserId(glUserId);
-            rdmMember.setgGroupId(appGroupIdByProjectId.intValue());
-            rdmMember.setProjectId(projectId);
-            rdmMember.setSyncGitlabDate(new Date());
+            if (appGroupIdByProjectId != null) {
+                RdmMember rdmMember = new RdmMember();
+                rdmMember.setUserId(userId);
+                rdmMember.setGlAccessLevel(RdmAccessLevel.OWNER.value);
+                rdmMember.setSyncGitlabFlag(Boolean.TRUE);
+                rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+                rdmMember.setOrganizationId(organizationId);
+                rdmMember.setGlUserId(glUserId);
+                rdmMember.setgGroupId(appGroupIdByProjectId.intValue());
+                rdmMember.setProjectId(projectId);
+                rdmMember.setSyncGitlabDate(new Date());
 
-            RdmMember exists = new RdmMember();
-            exists.setProjectId(projectId);
-            exists.setUserId(userId);
-            exists.setType(AuthorityTypeEnum.GROUP.getValue());
-            exists.setGlAccessLevel(RdmAccessLevel.OWNER.value);
-            if (CollectionUtils.isEmpty(rdmMemberMapper.select(exists))) {
-                rdmMemberMapper.insert(rdmMember);
+                RdmMember exists = new RdmMember();
+                exists.setProjectId(projectId);
+                exists.setUserId(userId);
+                exists.setType(AuthorityTypeEnum.GROUP.getValue());
+                exists.setGlAccessLevel(RdmAccessLevel.OWNER.value);
+                if (CollectionUtils.isEmpty(rdmMemberMapper.select(exists))) {
+                    rdmMemberMapper.insert(rdmMember);
+                }
             }
+
         }
 
     }

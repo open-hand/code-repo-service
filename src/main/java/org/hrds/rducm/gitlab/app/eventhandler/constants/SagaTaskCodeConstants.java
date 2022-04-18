@@ -11,7 +11,7 @@ public class SagaTaskCodeConstants {
      * 更新角色同步事件
      */
     public static final String CODE_REPO_UPDATE_MEMBER_ROLE = "codeRepoUpdateMemberRole";
-
+    public static final String CODE_REPO_CREATE_MEMBER_ROLE = "codeRepoCreateMemberRole";
     /**
      * 删除角色同步事件
      */
