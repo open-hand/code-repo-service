@@ -374,6 +374,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateMember(Long memberId, RdmMemberUpdateDTO rdmMemberUpdateDTO) {
+        handleUpdateExpires(rdmMemberUpdateDTO);
         // <0> 转换
         final RdmMember param = ConvertUtils.convertObject(rdmMemberUpdateDTO, RdmMember.class);
         param.setId(memberId);
@@ -408,6 +409,11 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
         // <4> 发送事件
         iRdmMemberService.publishMemberEvent(param, MemberEvent.EventType.UPDATE_MEMBER);
+    }
+    private void handleUpdateExpires(RdmMemberUpdateDTO rdmMemberUpdateDTO) {
+        if (rdmMemberUpdateDTO != null) {
+            rdmMemberUpdateDTO.setGlExpiresAt(getExpires(rdmMemberUpdateDTO.getGlExpiresAt()));
+        }
     }
 
     private void checkGroupAccessLevel(RdmMember param, RdmMember dbMember) {
