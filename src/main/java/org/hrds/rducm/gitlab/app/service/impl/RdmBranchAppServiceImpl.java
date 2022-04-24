@@ -1,10 +1,12 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.Map;
-import java.util.function.Function;
 import org.gitlab4j.api.models.ProtectedBranch;
-import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchAccessLevelDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.BranchQueryDTO;
 import org.hrds.rducm.gitlab.api.controller.dto.branch.ProtectedBranchDTO;
@@ -18,11 +20,6 @@ import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.core.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class RdmBranchAppServiceImpl implements RdmBranchAppService {

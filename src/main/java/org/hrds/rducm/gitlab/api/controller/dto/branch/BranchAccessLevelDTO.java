@@ -1,21 +1,22 @@
 package org.hrds.rducm.gitlab.api.controller.dto.branch;
 
 import io.swagger.annotations.ApiModelProperty;
+import org.gitlab4j.api.models.AccessLevel;
 import org.gitlab4j.api.utils.JacksonJson;
 
 public class BranchAccessLevelDTO {
     @ApiModelProperty("权限值")
-    private AccessLevelDTO accessLevel;
+    private AccessLevel accessLevel;
     @ApiModelProperty("权限描述")
     private String accessLevelDescription;
     private Integer userId;
     private Integer groupId;
 
-    public AccessLevelDTO getAccessLevel() {
+    public AccessLevel getAccessLevel() {
         return accessLevel;
     }
 
-    public BranchAccessLevelDTO setAccessLevel(AccessLevelDTO accessLevel) {
+    public BranchAccessLevelDTO setAccessLevel(AccessLevel accessLevel) {
         this.accessLevel = accessLevel;
         return this;
     }
