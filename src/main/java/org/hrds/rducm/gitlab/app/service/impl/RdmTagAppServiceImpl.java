@@ -1,6 +1,11 @@
 package org.hrds.rducm.gitlab.app.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.gitlab4j.api.models.ProtectedTag;
 import org.gitlab4j.api.models.Tag;
 import org.hrds.rducm.gitlab.api.controller.dto.tag.ProtectedTagDTO;
@@ -13,14 +18,9 @@ import org.hrds.rducm.gitlab.domain.service.IRdmTagService;
 import org.hrds.rducm.gitlab.infra.client.gitlab.api.GitlabTagsApi;
 import org.hrds.rducm.gitlab.infra.util.AssertExtensionUtils;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
-import org.hzero.core.util.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import org.springframework.util.CollectionUtils;
 
 @Service
 public class RdmTagAppServiceImpl implements RdmTagAppService {
@@ -52,15 +52,25 @@ public class RdmTagAppServiceImpl implements RdmTagAppService {
         Integer glProjectId = c7NDevOpsServiceFacade.repositoryIdToGlProjectId(repositoryId);
         List<ProtectedTag> protectedTags = rdmTagRepository.getProtectedTagsFromGitlab(glProjectId);
 
-        String protectedTagsJson = JsonUtils.toJson(protectedTags);
-        List<ProtectedTagDTO> protectedTagDTOS = JsonUtils.fromJson(protectedTagsJson, new TypeReference<List<ProtectedTagDTO>>() {
-        });
-
-
-        return protectedTagDTOS
-                .stream()
-                .sorted(Comparator.comparing(ProtectedTagDTO::getName))
-                .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(protectedTags)) {
+            return new ArrayList<>();
+        }
+        // 转换结构并返回
+       return protectedTags.stream().map(v -> {
+            ProtectedTagDTO protectedTagDTO = new ProtectedTagDTO();
+            protectedTagDTO.setName(v.getName());
+            List<ProtectedTag.CreateAccessLevel> createAccessLevels = v.getCreateAccessLevels();
+            if (!CollectionUtils.isEmpty(createAccessLevels)) {
+                protectedTagDTO.setCreateAccessLevels(createAccessLevels.stream().map(al -> {
+                    ProtectedTagDTO.CreateAccessLevelDTO createAccessLevelDTO = new ProtectedTagDTO.CreateAccessLevelDTO();
+                    createAccessLevelDTO.setAccessLevel(al.getAccess_level());
+                    createAccessLevelDTO.setAccessLevelDescription(al.getAccessLevelDescription());
+                    return createAccessLevelDTO;
+                }).collect(Collectors.toList()));
+            }
+            return protectedTagDTO;
+        }).sorted(Comparator.comparing(ProtectedTagDTO::getName))
+               .collect(Collectors.toList());
     }
 
     @Override

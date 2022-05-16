@@ -1,24 +1,24 @@
 package org.hrds.rducm.gitlab.api.controller.dto.tag;
 
-import io.swagger.annotations.ApiModelProperty;
-import org.gitlab4j.api.utils.JacksonJson;
-import org.hrds.rducm.gitlab.api.controller.dto.branch.AccessLevelDTO;
-
 import java.util.List;
+
+import io.swagger.annotations.ApiModelProperty;
+import org.gitlab4j.api.models.AccessLevel;
+import org.gitlab4j.api.utils.JacksonJson;
 
 public class ProtectedTagDTO {
 
     public static class CreateAccessLevelDTO {
         @ApiModelProperty("权限值")
-        private AccessLevelDTO accessLevel;
+        private AccessLevel accessLevel;
         @ApiModelProperty("权限描述")
         private String accessLevelDescription;
 
-        public AccessLevelDTO getAccessLevel() {
+        public AccessLevel getAccessLevel() {
             return accessLevel;
         }
 
-        public void setAccessLevel(AccessLevelDTO accessLevel) {
+        public void setAccessLevel(AccessLevel accessLevel) {
             this.accessLevel = accessLevel;
         }
 
