@@ -1,6 +1,6 @@
 # code-repo-service
 
-Gateway of Choerodon.
+Code repo service of Choerodon.
 
 ## Installing the Chart
 
