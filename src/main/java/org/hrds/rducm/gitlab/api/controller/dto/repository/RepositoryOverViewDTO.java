@@ -33,6 +33,9 @@ public class RepositoryOverViewDTO {
     private Date repositoryCreationDate;
     @ApiModelProperty(value = "Gitlab代码库id")
     private Integer glProjectId;
+    @Encrypt
+    @ApiModelProperty("外部仓库配置id")
+    private Long externalConfigId;
 
     public Long getRepositoryId() {
         return repositoryId;
@@ -121,6 +124,15 @@ public class RepositoryOverViewDTO {
 
     public RepositoryOverViewDTO setGlProjectId(Integer glProjectId) {
         this.glProjectId = glProjectId;
+        return this;
+    }
+
+    public Long getExternalConfigId() {
+        return externalConfigId;
+    }
+
+    public RepositoryOverViewDTO setExternalConfigId(Long externalConfigId) {
+        this.externalConfigId = externalConfigId;
         return this;
     }
 }

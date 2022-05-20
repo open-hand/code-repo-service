@@ -2,6 +2,7 @@ package org.hrds.rducm.gitlab.domain.service.impl;
 
 import io.choerodon.core.domain.Page;
 import io.choerodon.mybatis.pagehelper.domain.PageRequest;
+
 import org.gitlab4j.api.Constants;
 import org.gitlab4j.api.models.Commit;
 import org.gitlab4j.api.models.Project;
@@ -47,13 +48,14 @@ public class RdmRepositoryServiceImpl implements IRdmRepositoryService {
         Page<RepositoryOverViewDTO> repositoryOverViewDTOPageInfo = ConvertUtils.convertPage(c7nRepositories, s -> new RepositoryOverViewDTO()
                 .setRepositoryId(s.getId())
                 .setRepositoryName(s.getName())
+                .setExternalConfigId(s.getExternalConfigId())
                 .setGlProjectId(Optional.ofNullable(s.getGitlabProjectId()).map(Long::intValue).orElse(null)));
 
         // <2> 封装展示参数
         repositoryOverViewDTOPageInfo.getContent().forEach(repo -> {
             Integer glProjectId = repo.getGlProjectId();
 
-            if (glProjectId == null) {
+            if (glProjectId == null || repo.getExternalConfigId() != null) {
                 return;
             }
 
