@@ -3,8 +3,12 @@ package org.hrds.rducm.gitlab.app.eventhandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import io.choerodon.asgard.saga.annotation.SagaTask;
 import io.choerodon.core.exception.CommonException;
+
+import java.util.*;
+import java.util.function.Function;
 import org.hrds.rducm.gitlab.app.adapter.DateTypeAdapter;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTaskCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
@@ -26,11 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.util.CollectionUtils;
 
@@ -128,6 +127,7 @@ public class RdmRepositorySagaHandler {
 
     /**
      * 应用市场导入应用服务
+     *
      * @param data
      * @return
      */
@@ -174,7 +174,7 @@ public class RdmRepositorySagaHandler {
         rdmMemberRepository.deleteByRepositoryId(organizationId, projectId, repositoryId);
         //如果没有应用服务了删除权限，如果有则不删除
         List<C7nAppServiceVO> c7nAppServiceVOS = c7nDevOpsServiceFacade.listC7nAppServiceOnProjectLevel(projectId);
-        if (CollectionUtils.isEmpty(c7nAppServiceVOS)){
+        if (CollectionUtils.isEmpty(c7nAppServiceVOS)) {
             RdmMember param = new RdmMember();
             param.setOrganizationId(organizationId);
             param.setProjectId(projectId);
@@ -246,7 +246,20 @@ public class RdmRepositorySagaHandler {
         List<C7nUserVO> c7nUserVOS = c7nBaseServiceFacade.listC7nUsersOnProjectLevel(projectId);
         // 获取组织管理员
         List<C7nUserVO> orgAdmins = c7nBaseServiceFacade.listOrgAdministrator(organizationId);
-        Map<Long, C7nUserVO> orgAdminsMap = orgAdmins.stream().collect(Collectors.toMap(C7nUserVO::getId, v -> v));
+
+        //拥有GITLAB_OWNER标签的项目成员
+        List<C7nUserVO> gitlabOwners = c7nBaseServiceFacade.listCustomGitlabOwnerLableUser(projectId, "GITLAB_OWNER");
+        Map<Long, C7nUserVO> orgAdminsMap = new HashMap<>();
+        Map<Long, C7nUserVO> gitlabOwnersMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(orgAdmins)) {
+            orgAdminsMap = orgAdmins.stream().collect(Collectors.toMap(C7nUserVO::getId, v -> v));
+        }
+        if (!CollectionUtils.isEmpty(gitlabOwners)) {
+            gitlabOwnersMap = gitlabOwners.stream().collect(Collectors.toMap(C7nUserVO::getId, Function.identity()));
+        }
+        // 获取需初始化的用户
+        Map<Long, C7nUserVO> finalOrgAdminsMap = orgAdminsMap;
+        Map<Long, C7nUserVO> finalGitlabOwnersMap = gitlabOwnersMap;
 
         // 获取需初始化的用户
         List<C7nUserVO> result = c7nUserVOS.stream()
@@ -255,8 +268,9 @@ public class RdmRepositorySagaHandler {
                     // 是否是项目管理员
                     boolean isProjectAdmin = vo.getRoles().stream().anyMatch(r -> r.getCode().equals(IamRoleCodeEnum.PROJECT_OWNER.getCode()));
                     // 是否是组织管理员
-                    boolean isOrgAdmin = orgAdminsMap.containsKey(vo.getId());
-                    return isProjectAdmin || isOrgAdmin;
+                    boolean isOrgAdmin = finalOrgAdminsMap.containsKey(vo.getId());
+                    boolean isGitLabOwner = finalGitlabOwnersMap.containsKey(vo.getId());
+                    return isProjectAdmin || isOrgAdmin || isGitLabOwner;
                 }).collect(Collectors.toList());
 
         result.forEach(r -> {
