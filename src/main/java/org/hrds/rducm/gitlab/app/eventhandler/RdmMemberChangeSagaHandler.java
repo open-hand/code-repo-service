@@ -450,8 +450,14 @@ public class RdmMemberChangeSagaHandler {
                         switch (roleLabelEnum) {
                             case TENANT_MEMBER:
                                 // 如果角色变为组织成员
+                                //判断一下之前组织层是不是管理员的角色  如果不是  直接跳过
+                                Set<String> previousRoleLabels = gitlabGroupMemberVO.getPreviousRoleLabels();
+                                if (CollectionUtils.isEmpty(previousRoleLabels) || !previousRoleLabels.contains("TENANT_ADMIN")) {
+                                    break;
+                                }
                                 handleRemoveOrgAdmin(organizationId, userId);
                                 break;
+
                             case TENANT_ADMIN:
                                 // 添加组织管理员角色
                                 // 1. 删除该组织下的权限

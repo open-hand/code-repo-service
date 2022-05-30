@@ -39,6 +39,17 @@ public class GitlabGroupMemberVO {
     @ApiModelProperty("已经删除角色的标签")
     private Set<String> deleteRoleLabels;
 
+    @ApiModelProperty("之前的角色")
+    private Set<String> previousRoleLabels;
+
+    public Set<String> getPreviousRoleLabels() {
+        return previousRoleLabels;
+    }
+
+    public void setPreviousRoleLabels(Set<String> previousRoleLabels) {
+        this.previousRoleLabels = previousRoleLabels;
+    }
+
     public Set<String> getDeleteRoleLabels() {
         return deleteRoleLabels;
     }
