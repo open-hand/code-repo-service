@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StopWatch;
@@ -152,6 +153,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public List<RdmMemberAuditRecord> batchCompareProject(Long organizationId, Long projectId) {
         // <0> 删除原有数据
         rdmMemberAuditRecordRepository.delete(new RdmMemberAuditRecord().setProjectId(projectId));
@@ -312,6 +314,9 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                     // 如果AccessLevel不相等, 说明不一致
                     isDifferent = true;
                 }
+                if (!Objects.equals(gitlabMember.getType(), rdmMember.getType())) {
+                    isDifferent = true;
+                }
                 if (!Objects.equals(gitlabMember.getExpiresAt(), rdmMember.getGlExpiresAt())) {
                     // 如果ExpiresAt不相等, 说明不一致 ,并且不考虑过期的权限
                     if (rdmMember.getGlExpiresAt() != null
@@ -322,9 +327,6 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                         isDifferent = true;
 
                     }
-                }
-                if (!Objects.equals(gitlabMember.getType(), rdmMember.getType())) {
-                    isDifferent = true;
                 }
                 dbMembers.remove(rdmMember);
             } else {
@@ -495,6 +497,9 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                 if (Objects.isNull(rdmMember.getGlAccessLevel()) && Objects.isNull(gitlabMember.getAccessLevel().value)) {
                     isDifferent = false;
                 }
+                if (!Objects.equals(gitlabMember.getType(), rdmMember.getType())) {
+                    isDifferent = true;
+                }
                 if (!Objects.equals(gitlabMember.getExpiresAt(), rdmMember.getGlExpiresAt())) {
                     // 如果ExpiresAt不相等, 说明不一致 ,并且不考虑过期的权限
                     if (rdmMember.getGlExpiresAt() != null
@@ -505,9 +510,6 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
                         isDifferent = true;
 
                     }
-                }
-                if (!Objects.equals(gitlabMember.getType(), rdmMember.getType())) {
-                    isDifferent = true;
                 }
                 dbMembers.remove(rdmMember);
 

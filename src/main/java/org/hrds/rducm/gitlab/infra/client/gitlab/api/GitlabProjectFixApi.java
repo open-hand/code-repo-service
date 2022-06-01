@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.infra.client.gitlab.api;
 
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -42,6 +43,11 @@ public class GitlabProjectFixApi {
 
     public Member addMember(Object projectIdOrPath, Integer userId, Integer accessLevel, Date expiresAt) {
         try {
+            if (expiresAt != null
+                    && expiresAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                    .isBefore(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())) {
+                return null;
+            }
             return gitlab4jClient.getGitLabApi()
                     .getProjectApi()
                     .addMember(projectIdOrPath, userId, accessLevel, expiresAt);
@@ -68,6 +74,11 @@ public class GitlabProjectFixApi {
                         .getProjectApi()
                         .updateMember((Integer) projectIdOrPath, userId, accessLevel);
             } else {
+                if (expiresAt != null
+                        && expiresAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                        .isBefore(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())) {
+                    return null;
+                }
                 return gitlab4jClient.getGitLabApi()
                         .getProjectApi()
                         .updateMember(projectIdOrPath, userId, accessLevel, expiresAt);

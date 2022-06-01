@@ -1,5 +1,6 @@
 package org.hrds.rducm.gitlab.infra.client.gitlab.api;
 
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -60,6 +61,12 @@ public class GitlabGroupFixApi {
 
     public Member addMember(Object groupIdOrPath, Integer userId, Integer accessLevel, Date expiresAt) {
         try {
+
+            if (expiresAt != null
+                    && expiresAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                    .isBefore(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())) {
+                return null;
+            }
             return gitlab4jClient.getGitLabApi()
                     .getGroupApi()
                     .addMember(groupIdOrPath, userId, accessLevel, expiresAt);
@@ -80,6 +87,11 @@ public class GitlabGroupFixApi {
                         .getGroupApi()
                         .updateMember(groupIdOrPath, userId, accessLevel);
             } else {
+                if (expiresAt != null
+                        && expiresAt.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()
+                        .isBefore(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime())) {
+                    return null;
+                }
                 return gitlab4jClient.getGitLabApi()
                         .getGroupApi()
                         .updateMember(groupIdOrPath, userId, accessLevel, expiresAt);
