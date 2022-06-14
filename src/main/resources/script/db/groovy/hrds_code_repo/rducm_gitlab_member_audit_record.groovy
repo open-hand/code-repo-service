@@ -46,4 +46,10 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member_audit_record.g
          """)
     }
 
+    changeSet(author: 'wx', id: '2022-06-14-add-index') {
+        sql("""
+           ALTER TABLE rducm_gitlab_member_audit_record ADD INDEX index_pro_id_org_id (project_id,organization_id)
+         """)
+    }
+
 }
