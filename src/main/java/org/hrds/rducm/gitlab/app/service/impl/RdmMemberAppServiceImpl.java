@@ -20,6 +20,7 @@ import org.hrds.rducm.gitlab.api.controller.dto.export.MemberExportDTO;
 import org.hrds.rducm.gitlab.app.assembler.RdmMemberAssembler;
 import org.hrds.rducm.gitlab.app.async.RdmMemberQueryHelper;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
+import org.hrds.rducm.gitlab.app.eventhandler.payload.ProjectPayload;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.entity.RdmMemberAuditRecord;
@@ -36,6 +37,8 @@ import org.hrds.rducm.gitlab.infra.enums.AuthorityTypeEnum;
 import org.hrds.rducm.gitlab.infra.enums.RdmAccessLevel;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nDevopsProjectVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nProjectVO;
+import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
 import org.hrds.rducm.gitlab.infra.util.ConvertUtils;
 import org.hzero.core.base.AopProxy;
@@ -410,6 +413,7 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
         // <4> 发送事件
         iRdmMemberService.publishMemberEvent(param, MemberEvent.EventType.UPDATE_MEMBER);
     }
+
     private void handleUpdateExpires(RdmMemberUpdateDTO rdmMemberUpdateDTO) {
         if (rdmMemberUpdateDTO != null) {
             rdmMemberUpdateDTO.setGlExpiresAt(getExpires(rdmMemberUpdateDTO.getGlExpiresAt()));
@@ -821,6 +825,56 @@ public class RdmMemberAppServiceImpl implements RdmMemberAppService, AopProxy<Rd
 
     }
 
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void handleUpdateMemberPermission(ProjectPayload projectPayload) {
+        //拥有GITLAB_OWNER标签的项目成员
+        List<C7nUserVO> gitlabOwners = c7NBaseServiceFacade.listCustomGitlabOwnerLableUser(projectPayload.getProjectId(), "GITLAB_OWNER");
+        if (CollectionUtils.isEmpty(gitlabOwners)) {
+            return;
+        }
+        C7nProjectVO c7nProjectVO = c7NBaseServiceFacade.detailC7nProject(projectPayload.getProjectId());
+        if (c7nProjectVO == null) {
+            return;
+        }
+        C7nDevopsProjectVO c7nDevopsProjectVO = c7NDevOpsServiceFacade.detailDevopsProjectById(projectPayload.getProjectId());
+        if (c7nDevopsProjectVO == null) {
+            return;
+        }
+        gitlabOwners.forEach(c7nUserVO -> {
+            List<RdmMember> members = getRdmMembers(projectPayload, c7nUserVO);
+            if (CollectionUtils.isEmpty(members)) {
+                insertGroupMember(projectPayload, c7nProjectVO, c7nDevopsProjectVO, c7nUserVO);
+            }
+        });
+    }
+
+    private void insertGroupMember(ProjectPayload projectPayload, C7nProjectVO c7nProjectVO, C7nDevopsProjectVO c7nDevopsProjectVO, C7nUserVO c7nUserVO) {
+        RdmMember record = new RdmMember();
+        record.setSyncGitlabFlag(true);
+        record.setGlAccessLevel(AccessLevel.OWNER.toValue());
+        record.setProjectId(projectPayload.getProjectId());
+        record.setUserId(c7nUserVO.getId());
+        record.setOrganizationId(c7nProjectVO.getOrganizationId());
+        Integer integer = c7NBaseServiceFacade.userIdToGlUserId(c7nUserVO.getId());
+        if (integer == null) {
+            return;
+        }
+        record.setGlUserId(integer);
+        record.setType(AuthorityTypeEnum.GROUP.getValue());
+        record.setgGroupId(c7nDevopsProjectVO.getGitlabGroupId().intValue());
+        rdmMemberRepository.insert(record);
+    }
+
+    private List<RdmMember> getRdmMembers(ProjectPayload projectPayload, C7nUserVO c7nUserVO) {
+        RdmMember rdmMember = new RdmMember();
+        rdmMember.setType(AuthorityTypeEnum.GROUP.getValue());
+        rdmMember.setUserId(c7nUserVO.getId());
+        rdmMember.setProjectId(projectPayload.getProjectId());
+        rdmMember.setGlAccessLevel(AccessLevel.OWNER.toValue());
+        return rdmMemberRepository.select(rdmMember);
+    }
 
     /**
      * 批量预新增或修改, 使用一个新事务

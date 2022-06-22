@@ -46,6 +46,8 @@ public class SagaTaskCodeConstants {
 
     public static final String BATCH_ADD_GROUP_MEMBERS = "batchAddGroupMembers";
 
+    public static final String CODE_UPDATE_MEMBER_PERMISSION="codeUpdateMemberPermission";
+
 
     private SagaTaskCodeConstants() {
     }

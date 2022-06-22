@@ -9,11 +9,13 @@ import io.choerodon.core.exception.CommonException;
 
 import java.util.*;
 import java.util.function.Function;
+import org.hrds.rducm.gitlab.api.controller.vo.ProjectCategoryVO;
 import org.hrds.rducm.gitlab.app.adapter.DateTypeAdapter;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTaskCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.constants.SagaTopicCodeConstants;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.AppServiceImportPayload;
 import org.hrds.rducm.gitlab.app.eventhandler.payload.DevOpsAppServicePayload;
+import org.hrds.rducm.gitlab.app.eventhandler.payload.ProjectPayload;
 import org.hrds.rducm.gitlab.app.service.RdmMemberAppService;
 import org.hrds.rducm.gitlab.domain.entity.RdmMember;
 import org.hrds.rducm.gitlab.domain.facade.C7nBaseServiceFacade;
@@ -23,7 +25,6 @@ import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
-import org.hzero.core.util.AssertUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,16 @@ public class RdmRepositorySagaHandler {
 
     private static final Gson gson = new Gson();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    /**
+     * devops项目类型
+     */
+    private static final String DEVOPS = "N_DEVOPS";
+
+    /**
+     * 运维项目类型
+     */
+    private static final String OPERATIONS = "N_OPERATIONS";
 
     @Autowired
     private C7nBaseServiceFacade c7nBaseServiceFacade;
@@ -228,6 +239,31 @@ public class RdmRepositorySagaHandler {
 
         return data;
     }
+
+    /**
+     * 更新项目事件，为项目更新组
+     */
+    @SagaTask(code = SagaTaskCodeConstants.CODE_UPDATE_MEMBER_PERMISSION,
+            description = "变更项目为用户跟新权限数据",
+            sagaCode = SagaTopicCodeConstants.IAM_UPDATE_PROJECT,
+            maxRetryCount = 3,
+            seq = 2)
+    public String handleUpdateMemberPermission(String msg) {
+        logger.info(">>>>>>>>>start sync project devops category,playLoad={}", msg);
+        ProjectPayload projectPayload = gson.fromJson(msg, ProjectPayload.class);
+        //不包含devops项目类型不做同步
+        if (CollectionUtils.isEmpty(projectPayload.getProjectCategoryVOS())) {
+            return msg;
+        }
+        if (projectPayload.getProjectCategoryVOS().stream().map(ProjectCategoryVO::getCode).noneMatch(s -> DEVOPS.equals(s) || s.equals(OPERATIONS))) {
+            return msg;
+        }
+        rdmMemberAppService.handleUpdateMemberPermission(projectPayload);
+        logger.info(">>>>>>>>>end sync project devops category<<<<<<<<<<");
+        return msg;
+    }
+
+
 
     /**
      * 创建应用服务有3个来源, 都需要初始化代码库权限

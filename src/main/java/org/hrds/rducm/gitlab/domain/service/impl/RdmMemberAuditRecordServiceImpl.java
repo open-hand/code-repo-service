@@ -397,18 +397,18 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         if (project == null) {
             return Collections.emptyList();
         }
-
-        // 查询gitlab所有成员 这里的查询所有的成员 能将group有角色，而project没有角色的用户查询出来，如果project也有角色，将返回两条数据
-        List<GitlabMember> gitlabProjectMembers = getGitlabProjectMembers(glProjectId);
-        //剔除有group权限的gitlabMember
-        List<GitlabMember> reGitlabProjectMembers = excludeGroupMember(gitlabGroupMemberList, gitlabProjectMembers);
-        gitlabProjectMembers = reGitlabProjectMembers;
-
         // 查询属于gProject下的成员
         List<RdmMember> dbMembers = getRdmMembers(glProjectId);
+        // 查询gitlab所有成员 这里的查询所有的成员 能将group有角色，而project没有角色的用户查询出来，如果project也有角色，将返回两条数据
+        List<GitlabMember> gitlabProjectMembers = getGitlabProjectMembers(glProjectId);
+        //剔除有group权限的gitlabMember，
+        List<GitlabMember> reGitlabProjectMembers = excludeGroupMember(gitlabGroupMemberList, gitlabProjectMembers);
+        //如果组的权限高于项目的权限则跳过  不纳入审计范围。
+        excludeProjectMember(gitlabGroupMemberList, reGitlabProjectMembers, dbMembers);
+        gitlabProjectMembers = reGitlabProjectMembers;
+
 
         //去掉不在项目内的平台管理员
-
         List<C7nUserVO> orgAdmins = threadLocal.get();
         if (!CollectionUtils.isEmpty(orgAdmins)) {
             List<Long> orgAdminIds = orgAdmins.stream().map(C7nUserVO::getId).collect(Collectors.toList());
@@ -419,10 +419,26 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
             if (!CollectionUtils.isEmpty(dbMembers)) {
                 dbMembers = dbMembers.stream().filter(rdmMember1 -> !orgAdminIds.contains(rdmMember1.getUserId())).collect(Collectors.toList());
             }
+
         }
 
 
         return compareProjectMembersAndReturnAudit(organizationId, projectId, repositoryId, glProjectId, dbMembers, gitlabProjectMembers, appGroupId);
+    }
+
+    private void excludeProjectMember(Set<GitlabMember> gitlabGroupMemberList, List<GitlabMember> reGitlabProjectMembers, List<RdmMember> dbMembers) {
+        Map<Long, GitlabMember> gitlabMemberMap = gitlabGroupMemberList.stream().collect(Collectors.toMap(GitlabMember::getUserId, Function.identity()));
+        Set<Long> userIds = new HashSet<>();
+        if (!CollectionUtils.isEmpty(reGitlabProjectMembers)) {
+            reGitlabProjectMembers.forEach(gitlabMember -> {
+                if (!(gitlabMemberMap.get(gitlabMember.getUserId()) != null
+                        && gitlabMemberMap.get(gitlabMember.getUserId()).getAccessLevel().value >= gitlabMember.getAccessLevel().value)) {
+                    userIds.add(gitlabMember.getUserId());
+                }
+            });
+        }
+        reGitlabProjectMembers = reGitlabProjectMembers.stream().filter(gitlabMember -> !userIds.contains(gitlabMember.getUserId())).collect(Collectors.toList());
+        dbMembers = dbMembers.stream().filter(rdmMember -> !userIds.contains(rdmMember.getUserId())).collect(Collectors.toList());
     }
 
     private List<RdmMember> getRdmMembers(Integer glProjectId) {

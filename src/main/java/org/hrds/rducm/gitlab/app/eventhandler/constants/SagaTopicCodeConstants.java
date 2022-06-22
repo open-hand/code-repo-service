@@ -71,6 +71,9 @@ public class SagaTopicCodeConstants {
     //创建项目
     public static final String PROJECT_CREATE = "iam-create-project";
 
+    //跟新项目
+    public static final String IAM_UPDATE_PROJECT = "iam-update-project";
+
 
     private SagaTopicCodeConstants() {
     }
