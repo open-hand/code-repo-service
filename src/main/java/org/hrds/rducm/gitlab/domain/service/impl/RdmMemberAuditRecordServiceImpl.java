@@ -432,7 +432,7 @@ public class RdmMemberAuditRecordServiceImpl implements IRdmMemberAuditRecordSer
         if (!CollectionUtils.isEmpty(reGitlabProjectMembers)) {
             reGitlabProjectMembers.forEach(gitlabMember -> {
                 if (!(gitlabMemberMap.get(gitlabMember.getUserId()) != null
-                        && gitlabMemberMap.get(gitlabMember.getUserId()).getAccessLevel().value >= gitlabMember.getAccessLevel().value)) {
+                        && gitlabMemberMap.get(gitlabMember.getUserId()).getAccessLevel().value > gitlabMember.getAccessLevel().value)) {
                     userIds.add(gitlabMember.getUserId());
                 }
             });
