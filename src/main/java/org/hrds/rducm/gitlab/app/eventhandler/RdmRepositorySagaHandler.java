@@ -264,7 +264,6 @@ public class RdmRepositorySagaHandler {
     }
 
 
-
     /**
      * 创建应用服务有3个来源, 都需要初始化代码库权限
      *
@@ -291,7 +290,7 @@ public class RdmRepositorySagaHandler {
             orgAdminsMap = orgAdmins.stream().collect(Collectors.toMap(C7nUserVO::getId, v -> v));
         }
         if (!CollectionUtils.isEmpty(gitlabOwners)) {
-            gitlabOwnersMap = gitlabOwners.stream().collect(Collectors.toMap(C7nUserVO::getId, Function.identity()));
+            gitlabOwnersMap = gitlabOwners.stream().filter(c7nUserVO -> c7nUserVO.getId() != null).collect(Collectors.toMap(C7nUserVO::getId, Function.identity()));
         }
         // 获取需初始化的用户
         Map<Long, C7nUserVO> finalOrgAdminsMap = orgAdminsMap;
