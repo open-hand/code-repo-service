@@ -290,7 +290,7 @@ public class RdmRepositorySagaHandler {
             orgAdminsMap = orgAdmins.stream().collect(Collectors.toMap(C7nUserVO::getId, v -> v));
         }
         if (!CollectionUtils.isEmpty(gitlabOwners)) {
-            gitlabOwnersMap = gitlabOwners.stream().filter(c7nUserVO -> c7nUserVO.getId() != null).collect(Collectors.toMap(C7nUserVO::getId, Function.identity()));
+            gitlabOwnersMap = gitlabOwners.stream().filter(c7nUserVO -> c7nUserVO != null && c7nUserVO.getId() != null).collect(Collectors.toMap(C7nUserVO::getId, Function.identity()));
         }
         // 获取需初始化的用户
         Map<Long, C7nUserVO> finalOrgAdminsMap = orgAdminsMap;
