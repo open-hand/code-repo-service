@@ -25,6 +25,7 @@ import org.hrds.rducm.gitlab.infra.enums.IamRoleCodeEnum;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nAppServiceVO;
 import org.hrds.rducm.gitlab.infra.feign.vo.C7nUserVO;
 import org.hrds.rducm.gitlab.infra.mapper.RdmMemberMapper;
+import org.hrds.rducm.gitlab.infra.util.JsonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -290,7 +291,10 @@ public class RdmRepositorySagaHandler {
             orgAdminsMap = orgAdmins.stream().collect(Collectors.toMap(C7nUserVO::getId, v -> v));
         }
         if (!CollectionUtils.isEmpty(gitlabOwners)) {
-            gitlabOwnersMap = gitlabOwners.stream().filter(c7nUserVO -> c7nUserVO != null && c7nUserVO.getId() != null).collect(Collectors.toMap(C7nUserVO::getId, Function.identity()));
+            logger.debug(">>>>>>>>>>>>>>>>>>{}", JsonHelper.marshalByJackson(gitlabOwners));
+            List<C7nUserVO> collect = gitlabOwners.stream().filter(c7nUserVO -> c7nUserVO != null && c7nUserVO.getId() != null).collect(Collectors.toList());
+            List<C7nUserVO> nUserVOS = removeDuplicate(collect);
+            gitlabOwnersMap = nUserVOS.stream().collect(Collectors.toMap(C7nUserVO::getId, Function.identity()));
         }
         // 获取需初始化的用户
         Map<Long, C7nUserVO> finalOrgAdminsMap = orgAdminsMap;
@@ -315,5 +319,16 @@ public class RdmRepositorySagaHandler {
                 rdmMemberRepository.insertWithOwner(organizationId, projectId, repositoryId, r.getId(), glProjectId, glUserId);
             }
         });
+    }
+
+    public static List<C7nUserVO> removeDuplicate(List<C7nUserVO> list) {
+        for (int i = 0; i < list.size() - 1; i++) {
+            for (int j = list.size() - 1; j > i; j--) {
+                if (list.get(j).getId().equals(list.get(i).getId())) {
+                    list.remove(j);
+                }
+            }
+        }
+        return list;
     }
 }
