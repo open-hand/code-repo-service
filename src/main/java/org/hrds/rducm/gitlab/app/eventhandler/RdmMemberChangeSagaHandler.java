@@ -335,23 +335,11 @@ public class RdmMemberChangeSagaHandler {
                         // 无项目角色, 删除权限
                         handleRemoveMemberOnProjectLevel(organizationId, projectId, userId);
                     } else {
-                        //删除的角色里面是否包含gitlab Owner的标签
-                        boolean containsGitlabOwner = Boolean.FALSE;
-                        if (!CollectionUtils.isEmpty(gitlabGroupMemberVO.getDeleteRoleLabels())) {
-                            containsGitlabOwner = gitlabGroupMemberVO.getDeleteRoleLabels().contains(RoleLabelEnum.GITLAB_OWNER.value());
-                        }
-                        //新增的角色
-                        String roleType = fetchProjectRoleLabel(userMemberRoleList, containsGitlabOwner);
-                        //如果用户新增的角色是项目成员，但是还包含其他owner的权限则roleType为default(这里主要考虑带owner标签的自定义角色)
-                        if (!CollectionUtils.isEmpty(gitlabGroupMemberVO.getRoleLabels())) {
-                            if (gitlabGroupMemberVO.getRoleLabels().contains(RoleLabelEnum.GITLAB_OWNER.value())) {
-                                roleType = RoleLabelEnum.DEFAULT.value();
-                            }
-                        }
+                        String roleType = getRoleType(gitlabGroupMemberVO, projectId);
                         RoleLabelEnum roleLabelEnum = Optional.ofNullable(EnumUtils.getEnum(RoleLabelEnum.class, roleType)).orElseThrow(IllegalArgumentException::new);
                         switch (roleLabelEnum) {
                             case PROJECT_MEMBER:
-                                // 设置角色为项目成员, 删除权限
+                                // 设置角色为项目成员, 删除权限  项目成员只删除Owner
                                 handleProjectMemberOnProjectLevel(organizationId, projectId, userId);
                                 break;
                             case PROJECT_ADMIN:
@@ -363,6 +351,22 @@ public class RdmMemberChangeSagaHandler {
                         }
                     }
                 });
+    }
+
+    private String getRoleType(GitlabGroupMemberVO gitlabGroupMemberVO, Long projectId) {
+        String roleType = RoleLabelEnum.DEFAULT.value();
+        //看用户剩余的项目层角色里面是否有Owner标签
+        List<C7nUserVO> gitlabOwners = c7nBaseServiceFacade.listCustomGitlabOwnerLableUser(projectId, RoleLabelEnum.GITLAB_OWNER.value());
+        if (CollectionUtils.isEmpty(gitlabOwners)) {
+            return RoleLabelEnum.PROJECT_MEMBER.value();
+        }
+        List<Long> gitlabOwnerUserIds = gitlabOwners.stream().map(C7nUserVO::getId).collect(Collectors.toList());
+        if (gitlabOwnerUserIds.contains(gitlabGroupMemberVO.getUserId())) {
+            roleType = RoleLabelEnum.PROJECT_ADMIN.value();
+        } else {
+            roleType = RoleLabelEnum.PROJECT_MEMBER.value();
+        }
+        return roleType;
     }
 
     /**
