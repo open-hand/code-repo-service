@@ -12,7 +12,7 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member_audit_record.g
             createSequence(sequenceName: 'rducm_gitlab_member_audit_record_s', startValue: "1")
         }
         createTable(tableName: "rducm_gitlab_member_audit_record", remarks: "成员权限审计记录表") {
-            column(name: "id", type: "bigint(20)", autoIncrement: true, remarks: "") { constraints(primaryKey: true) }
+            column(name: "id", type: "bigint(20)", autoIncrement: true, remarks: "主键ID") { constraints(primaryKey: true) }
             column(name: "organization_id", type: "bigint(20)", remarks: "组织id") { constraints(nullable: "false") }
             column(name: "project_id", type: "bigint(20)", remarks: "项目层，项目id") { constraints(nullable: "false") }
             column(name: "repository_id", type: "bigint(20)", remarks: "代码仓库id") { constraints(nullable: "false") }
@@ -25,10 +25,10 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_member_audit_record.g
             column(name: "gl_expires_at", type: "datetime", remarks: "gitlab成员过期时间(Gitlab)")
             column(name: "sync_flag", type: "tinyint(1)", defaultValue: "0", remarks: "同步标识") { constraints(nullable: "false") }
             column(name: "object_version_number", type: "bigint(20)", defaultValue: "1", remarks: "行版本号，用来处理锁") { constraints(nullable: "false") }
-            column(name: "created_by", type: "bigint(20)", defaultValue: "-1", remarks: "") { constraints(nullable: "false") }
-            column(name: "creation_date", type: "datetime", defaultValueComputed: "CURRENT_TIMESTAMP", remarks: "") { constraints(nullable: "false") }
-            column(name: "last_updated_by", type: "bigint(20)", defaultValue: "-1", remarks: "") { constraints(nullable: "false") }
-            column(name: "last_update_date", type: "datetime", defaultValueComputed: "CURRENT_TIMESTAMP", remarks: "") { constraints(nullable: "false") }
+            column(name: "created_by", type: "bigint(20)", defaultValue: "-1", remarks: "创建者") { constraints(nullable: "false") }
+            column(name: "creation_date", type: "datetime", defaultValueComputed: "CURRENT_TIMESTAMP", remarks: "创建时间") { constraints(nullable: "false") }
+            column(name: "last_updated_by", type: "bigint(20)", defaultValue: "-1", remarks: "更新者") { constraints(nullable: "false") }
+            column(name: "last_update_date", type: "datetime", defaultValueComputed: "CURRENT_TIMESTAMP", remarks: "更新时间") { constraints(nullable: "false") }
 
         }
 

@@ -12,7 +12,7 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_operation_log.groovy'
             createSequence(sequenceName: 'rducm_gitlab_operation_log_s', startValue: "1")
         }
         createTable(tableName: "rducm_gitlab_operation_log", remarks: "操作日志表") {
-            column(name: "id", type: "bigint(20)", autoIncrement: true, remarks: "") { constraints(primaryKey: true) }
+            column(name: "id", type: "bigint(20)", autoIncrement: true, remarks: "主键Id") { constraints(primaryKey: true) }
             column(name: "organization_id", type: "bigint(20)", remarks: "组织id") { constraints(nullable: "false") }
             column(name: "project_id", type: "bigint(20)", remarks: "项目层，项目id") { constraints(nullable: "false") }
             column(name: "repository_id", type: "bigint(20)", remarks: "代码仓库id") { constraints(nullable: "false") }
@@ -24,10 +24,10 @@ databaseChangeLog(logicalFilePath: 'script/db/rducm_gitlab_operation_log.groovy'
             column(name: "op_date", type: "datetime", defaultValueComputed: "CURRENT_TIMESTAMP", remarks: "操作日期") { constraints(nullable: "false") }
             column(name: "extra_param", type: "text", remarks: "额外参数")
             column(name: "object_version_number", type: "bigint(20)", defaultValue: "1", remarks: "行版本号，用来处理锁") { constraints(nullable: "false") }
-            column(name: "created_by", type: "bigint(20)", defaultValue: "-1", remarks: "") { constraints(nullable: "false") }
-            column(name: "creation_date", type: "datetime", defaultValueComputed: "CURRENT_TIMESTAMP", remarks: "") { constraints(nullable: "false") }
-            column(name: "last_updated_by", type: "bigint(20)", defaultValue: "-1", remarks: "") { constraints(nullable: "false") }
-            column(name: "last_update_date", type: "datetime", defaultValueComputed: "CURRENT_TIMESTAMP", remarks: "") { constraints(nullable: "false") }
+            column(name: "created_by", type: "bigint(20)", defaultValue: "-1", remarks: "创建者") { constraints(nullable: "false") }
+            column(name: "creation_date", type: "datetime", defaultValueComputed: "CURRENT_TIMESTAMP", remarks: "创建时间") { constraints(nullable: "false") }
+            column(name: "last_updated_by", type: "bigint(20)", defaultValue: "-1", remarks: "跟新者") { constraints(nullable: "false") }
+            column(name: "last_update_date", type: "datetime", defaultValueComputed: "CURRENT_TIMESTAMP", remarks: "更新时间") { constraints(nullable: "false") }
 
         }
         createIndex(tableName: "rducm_gitlab_operation_log", indexName: "idx_op_date") {
