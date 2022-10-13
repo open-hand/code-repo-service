@@ -291,7 +291,6 @@ public class RdmRepositorySagaHandler {
             orgAdminsMap = orgAdmins.stream().collect(Collectors.toMap(C7nUserVO::getId, v -> v));
         }
         if (!CollectionUtils.isEmpty(gitlabOwners)) {
-            logger.debug(">>>>>>>>>>>>>>>>>>{}", JsonHelper.marshalByJackson(gitlabOwners));
             List<C7nUserVO> collect = gitlabOwners.stream().filter(c7nUserVO -> c7nUserVO != null && c7nUserVO.getId() != null).collect(Collectors.toList());
             List<C7nUserVO> nUserVOS = removeDuplicate(collect);
             gitlabOwnersMap = nUserVOS.stream().collect(Collectors.toMap(C7nUserVO::getId, Function.identity()));
